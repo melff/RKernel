@@ -28,7 +28,6 @@ Evaluator <- R6Class("Evaluator",
                 eval_result <- eval_with_vis$value
                 result <- list(status = "ok")
                 if(length(eval_result)){
-                    if(inherits(eval_result,"condition")) str(eval_result)
                     if(inherits(eval_result,"error")){
                         stop_on_error <- getOption("rkernel_stop_on_error",FALSE)
                         result$status <- "error"
