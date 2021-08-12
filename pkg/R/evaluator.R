@@ -1,11 +1,13 @@
 #' @export
 Evaluator <- R6Class("Evaluator",
     public = list(
+
         startup = function(...) {
             env <- new.env()
             attach(env,name="pseudo-package:RKernel")
             assign("q",q_evaluator,pos=2L)
         },
+
         eval = function(code,...){
             expr <- try(parse(text=code),silent=TRUE)
             if(inherits(expr,"try-error")){
@@ -16,26 +18,35 @@ Evaluator <- R6Class("Evaluator",
                     status = "error")
             }
             else {
-                eval_with_vis <- withVisible(try(eval(expr,.GlobalEnv)))
+                eval_output <- capture.output(eval_with_vis <- withVisible(try(eval(expr,.GlobalEnv),silent=TRUE)))
                 eval_result <- eval_with_vis$value
-                if(inherits(eval_result,"try-error")){
-                    condition <- attr(eval_result,"condition")
-                    result <- list(
-                        text = condition$message,
-                        stream = "stderr",
-                        status = "error")
-                }
-                else{
-                    if(eval_with_vis$visible){
-                        eval_output <- capture.output(print(eval_result))
-                        result <- list(
-                            text = paste(eval_output,collapse="\n"),
-                            stream = "stdout",
-                            status = "ok")
+                result <- list(status = "ok")
+                if(length(eval_result)){
+                    if(inherits(eval_result,"try-error")){
+                        condition <- attr(eval_result,"condition")
+                        error.critical <- getOption("rkernel.error.critical",FALSE)
+                        result$status <- "error"
+                        result$stream <- "stderr"
+                        if(isTRUE(error.critical)){
+                            result <- c(result,list(
+                                ename = class(condition)[1],
+                                evalue = condition$message,
+                                traceback = list(),
+                                abort = TRUE))
+                        }
+                        else {
+                            result$text <- condition$message
+                        }    
                     }
-                    else result <- list(status = "ok")
+                    else if(eval_with_vis$visible){
+                            eval_output <- c(eval_output,capture.output(print(eval_result)))
+                    }
                     payload <- attr(eval_result,"payload")
                     result$payload <- prep_payload(payload)
+                } 
+                if(length(eval_output)){
+                    result$text <- paste(eval_output,collapse="\n")
+                    result$stream = "stdout"
                 }
             }
             return(result)
