@@ -56,37 +56,39 @@ Kernel <- R6Class("Kernel",
                            socket_name="iopub",
                            code=msg$content$code,
                            execution_count=self$execution_count)
-      result <- private$evaluator$eval(msg$content$code)
-      if("stream" %in% names(result)){
-        private$send_message(type="stream",
+      results <- private$evaluator$eval(msg$content$code)
+      for(result in results){
+        if("stream" %in% names(result)){
+          private$send_message(type="stream",
+                               parent=msg,
+                               socket_name="iopub",
+                               name=result$stream,
+                               text=result$text)
+        }
+        if(isTRUE(result$abort)){
+          private$send_message(type="error",
+                               parent=msg,
+                               socket="iopub",
+                               ename = result$ename,
+                               evalue = result$evalue,
+                               traceback = result$traceback
+                               )
+          private$clear_shell_queue()
+        }
+        private$send_message(type="execute_reply",
                              parent=msg,
-                             socket_name="iopub",
-                             name=result$stream,
-                             text=result$text)
+                             socket="shell",
+                             status=result$status,
+                             payload=result$payload,
+                             execution_count=self$execution_count)
       }
-      if(isTRUE(result$abort)){
-        private$send_message(type="error",
-                             parent=msg,
-                             socket="iopub",
-                             ename = result$ename,
-                             evalue = result$evalue,
-                             traceback = result$traceback
-                             )
-        private$clear_shell_queue()
-      }
-      private$send_message(type="execute_reply",
-                           parent=msg,
-                           socket="shell",
-                           status=result$status,
-                           payload=result$payload,
-                           execution_count=self$execution_count)
       self$execution_count <- self$execution_count + 1
     },
 
     kernel_info_reply = function(msg) {
       rversion <- paste0(version$major,".",version$minor)
       response <- list(protocol_version= PROTOCOL_VERSION,
-                       implementation="basicRKernel",
+                       implementation="RKernel",
                        implementation_version = "0.1",
                        language_info = list(
                          name = "R",
@@ -103,7 +105,6 @@ Kernel <- R6Class("Kernel",
     },
 
     is_complete_reply = function(msg) {
-      code <- msg$code
       private$send_message(type="is_complete_reply",
                            parent=msg,
                            socket_name="shell",

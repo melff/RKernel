@@ -1,14 +1,41 @@
+#' @importFrom evaluate evaluate new_output_handler
+#' @importFrom utils capture.output
 #' @export
 Evaluator <- R6Class("Evaluator",
     public = list(
+        results = list(),
+        
+        output_handlers = list(),
 
         startup = function(...) {
             env <- new.env()
-            attach(env,name="pseudo-package:RKernel")
+            attach(env,name="RKernel")
             assign("q",q_evaluator,pos=2L)
+
+            options(device=svg)
+
+            self$output_handlers$default <- new_output_handler(
+                text     = self$handle_text,
+                graphics = self$handle_graphics,
+                message  = self$handle_message,
+                warning  = self$handle_warning,
+                error    = self$handle_error,
+                value    = self$handle_value)
+
+            self$output_handlers$silent <- new_output_handler(
+                text     = identity,
+                graphics = identity,
+                message  = identity,
+                warning  = identity,
+                error    = identity,
+                value    = identity)
+
         },
 
         eval = function(code,...){
+
+            self$results <- list()
+
             expr <- try(parse(text=code),silent=TRUE)
             if(inherits(expr,"try-error")){
                 condition <- attr(expr,"condition")
@@ -16,58 +43,101 @@ Evaluator <- R6Class("Evaluator",
                     text = condition$message,
                     stream = "stderr",
                     status = "error")
+                self$results <- append(self$results,result)
             }
             else {
-                
-                # eval_output <- capture.output(eval_with_vis <- withVisible(
-                #                                   tryCatch(eval(expr,.GlobalEnv),
-                #                                            error = identity,
-                #                                            warning = identity,
-                #                                            message = identity,
-                #                                            interrupt = identity)
-                #                               ))
-                # eval_result <- eval_with_vis$value
-                # result <- list(status = "ok")
-                # if(length(eval_result)){
-                #     if(inherits(eval_result,"condition")) str(eval_result)
-                #     if(inherits(eval_result,"error")){
-                #         stop_on_error <- getOption("rkernel_stop_on_error",FALSE)
-                #         result$status <- "error"
-                #         result$stream <- "stderr"
-                #         result$text <- paste("ERROR:",eval_result$message)
-                #         if(isTRUE(stop_on_error)){
-                #             result <- c(result,list(
-                #                 ename = "ERROR",
-                #                 evalue = eval_result$message,
-                #                 traceback = list("<execution suspended>"),
-                #                 abort = TRUE))
-                #         }
-                #     }
-                #     else if(inherits(eval_result,"warning")){
-                #         result$stream <- "stderr"
-                #         result$text <- paste("Warning:",eval_result$message)
-                #     }
-                #     else if(inherits(eval_result,"message")){
-                #         result$stream <- "stdout"
-                #         result$text <- eval_result$message
-                #     }
-                #     else if(inherits(eval_result,"interrupt")){
-                #         result$stream <- "stderr"
-                #         result$text <- "<interrupted>"
-                #     }
-                #     else if(eval_with_vis$visible){
-                #             eval_output <- c(eval_output,
-                #                              capture.output(print(eval_result)))
-                #     }
-                #     payload <- attr(eval_result,"payload")
-                #     result$payload <- prep_payload(payload)
-                # } 
-                # if(length(eval_output)){
-                #     result$text <- paste(eval_output,collapse="\n")
-                #     result$stream = "stdout"
-                # }
+                eval_results <- tryCatch(
+                    evaluate(code,
+                             envir=.GlobalEnv,
+                             stop_on_error=1L,
+                             output_handler=self$output_handlers$default,
+                             new_device=FALSE),
+                    interrupt = self$handle_interrupt)
             }
-            return(result)
+            return(self$results)
+        },
+
+        handle_text = function(text) {
+            result <- list(
+                stream = "stdout",
+                text   = text,
+                status = "ok"
+            )
+            self$results <- c(self$results,list(result))
+        },
+        handle_graphics = function(pltObj) {},
+        handle_message = function(m) {
+            text <- conditionMessage(m)
+            result <- list(
+                stream = "stdout",
+                text   = text,
+                status = "ok"
+            )
+            self$results <- c(self$results,list(result))
+        },
+        handle_warning = function(w) {
+            text <- conditionMessage(w)
+            call <- conditionCall(w)
+            if(is.null(call)) {
+                text <- paste0("Warning: ",text)
+            } else {
+                call <- deparse(call)[[1]]
+                text <- paste0("Warning in ",call,": ",text)
+            }
+            result <- list(
+                stream = "stderr",
+                text   = text,
+                status = "ok"
+            )
+            self$results <- c(self$results,list(result))
+        },
+        handle_error = function(e) {
+            text <- conditionMessage(e)
+            call <- conditionCall(e)
+            if(is.null(call)) {
+                text <- paste0("Error: ",text)
+            } else {
+                call <- deparse(call)[[1]]
+                text <- paste0("Error in ",call,": ",text)
+            }
+            result <- list(
+                stream = "stderr",
+                text   = text,
+                status = "error"
+            )
+            stop_on_error <- getOption("rkernel_stop_on_error",FALSE)
+            if(isTRUE(stop_on_error)){
+                result <- c(result,
+                            list(
+                                ename = "ERROR",
+                                evalue = eval_result$message,
+                                traceback = list("<execution suspended>"),
+                                abort = TRUE))
+            }
+            self$results <- c(self$results,list(result))
+        },
+        handle_value = function(x,visible) {
+            result <- list(status = "ok")
+            if(visible){
+                text <- capture.output(print(x))
+                text <- paste(text,collapse="\n")
+                result <- c(result,
+                            list(
+                                stream = "stdout",
+                                text   = text))
+            }
+            result$payload <- attr(x,"payload")
+            if(inherits(x,"display_data"))
+                result$display_data <- x
+            self$results <- c(self$results,list(result))
+        },
+        handle_interrupt = function(i){
+            result <- list(
+                stream = "stderr",
+                text   = "<interrupted>",
+                status = "aborted"
+            )
+            self$results <- c(self$results,list(result))
         }
 ))
 
