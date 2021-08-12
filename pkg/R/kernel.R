@@ -12,6 +12,7 @@ WIRE_DELIM <- charToRaw("<IDS|MSG>")
 Kernel <- R6Class("Kernel",
 
   public = list(
+
     initialize = function(conn_info,evaluator=NULL){
       .zmqopt_init(envir = private)
       private$zmqctx <- zmq.ctx.new()
@@ -32,6 +33,7 @@ Kernel <- R6Class("Kernel",
       private$conn_info <- conn_info
       private$evaluator <- evaluator
     },
+
     run = function(){
       private$evaluator$startup()
       continue <- TRUE
@@ -45,7 +47,9 @@ Kernel <- R6Class("Kernel",
                shell=private$respond_shell(req))
       }
     },
+
     execution_count = 1,
+
     execute_reply = function(msg){
       private$send_message(type="execute_input",
                            parent=msg,
@@ -60,15 +64,23 @@ Kernel <- R6Class("Kernel",
                              name=result$stream,
                              text=result$text)
       }
+      if(isTRUE(result$abort)){
+        private$send_message(type="error",
+                             parent=msg,
+                             socket="iopub",
+                             ename = result$ename,
+                             evalue = result$evalue,
+                             traceback = result$traceback)
+      }
       private$send_message(type="execute_reply",
                            parent=msg,
                            socket="shell",
                            status=result$status,
-                           #if(result$status == "ok")
                            payload=result$payload,
                            execution_count=self$execution_count)
       self$execution_count <- self$execution_count + 1
     },
+
     kernel_info_reply = function(msg) {
       rversion <- paste0(version$major,".",version$minor)
       response <- list(protocol_version= PROTOCOL_VERSION,
@@ -87,6 +99,7 @@ Kernel <- R6Class("Kernel",
                            socket_name="shell",
                            content=response)
     },
+
     is_complete_reply = function(msg) {
       code <- msg$code
       private$send_message(type="is_complete_reply",
@@ -98,11 +111,13 @@ Kernel <- R6Class("Kernel",
   ),
 
   private = list(
+
     .pbd_env = new.env(),
     sockets = list(),
     zmqctx = list(),
     conn_info = list(),
     evaluator = list(),
+
     poll_request = function(sock_names) {
       POLLIN <- private$.pbd_env$ZMQ.PO$POLLIN
       req <- list()
@@ -121,6 +136,7 @@ Kernel <- R6Class("Kernel",
       }
       return(req)
     },
+
     respond_hb = function(req){
       data <- zmq.msg.recv(private$sockets$hb,
                            flags=private$.pbd_env$ZMQ.SR$BLOCK,
@@ -130,6 +146,7 @@ Kernel <- R6Class("Kernel",
                    serialize=FALSE)
       return(TRUE)
     },
+
     respond_control = function(req){
       msg <- private$get_message("control")
       if(!length(msg)) return(TRUE)
@@ -137,6 +154,7 @@ Kernel <- R6Class("Kernel",
         return(FALSE)
       else return(TRUE)
     },
+
     respond_shell = function(req){
       msg <- private$get_message("shell")
       if(!length(msg)) return(TRUE)
@@ -151,6 +169,7 @@ Kernel <- R6Class("Kernel",
                            socket_name="iopub",execution_state="idle")
       return(TRUE)
     },
+
     get_message = function(socket_name){
       socket <- private$sockets[[socket_name]]
       #wire_in <- zmq.recv.multipart(socket,
@@ -168,6 +187,7 @@ Kernel <- R6Class("Kernel",
       msg <- private$wire_unpack(wire_in)
       return(msg)
     },
+
     send_message = function(type, parent, socket_name, content=list(...), ...){
       msg <- private$msg_new(type,parent,content)
       socket <- private$sockets[[socket_name]]
@@ -180,6 +200,7 @@ Kernel <- R6Class("Kernel",
         zmq.msg.send(wire_out[[i]],socket,flag=flag,serialize=FALSE)
       }
     },
+
     wire_unpack = function(wire_in){
       l <- length(wire_in)
       found <- FALSE
@@ -201,6 +222,7 @@ Kernel <- R6Class("Kernel",
         msg$extra <- wire_in[(i+5):l]
       return(msg)
     },
+
     wire_pack = function(msg){
       msg_body <- lapply(msg[c("header","parent_header","metadata","content")],
                          toRawJSON,auto_unbox=TRUE)
@@ -210,10 +232,12 @@ Kernel <- R6Class("Kernel",
         list(charToRaw(signature)),
         msg_body)
     },
+
     get_signature = function(msg){
       msg <- unlist(msg)
       hmac(private$conn_info$key,msg,"sha256")
     },
+
     msg_new = function(type,parent,content){
       parent_header <- parent$header
       header <- list(
