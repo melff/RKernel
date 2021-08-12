@@ -70,7 +70,8 @@ Kernel <- R6Class("Kernel",
                              socket="iopub",
                              ename = result$ename,
                              evalue = result$evalue,
-                             traceback = result$traceback)
+                             traceback = result$traceback
+                             )
         private$clear_shell_queue()
       }
       private$send_message(type="execute_reply",
