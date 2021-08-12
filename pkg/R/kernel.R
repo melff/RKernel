@@ -71,6 +71,7 @@ Kernel <- R6Class("Kernel",
                              ename = result$ename,
                              evalue = result$evalue,
                              traceback = result$traceback)
+        private$clear_shell_queue()
       }
       private$send_message(type="execute_reply",
                            parent=msg,
@@ -253,6 +254,24 @@ Kernel <- R6Class("Kernel",
            content = content,
            identities = parent$identities,
            metadata = namedList())
+    },
+
+    clear_shell_queue = function(...){
+      # Empty message queue from shell
+      POLLIN <- private$.pbd_env$ZMQ.PO$POLLIN
+      repeat {
+        r <- zmq.poll(c(private$sockets$shell),POLLIN,0L)
+        if(bitwAnd(zmq.poll.get.revents(1),POLLIN)){
+          request <- private$get_message("shell")
+          request_type <- request$header$msg_type
+          reply_type <- sub("_request","_reply",request_type,fixed=TRUE)
+          private$send_message(type=reply_type,
+                           parent=request,
+                           socket_name="shell",
+                           status="aborted")
+        }
+        else break
+      }
     }
   )
 )
