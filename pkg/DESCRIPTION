@@ -1,0 +1,24 @@
+Package: RKernel
+Title: A basic R kernel for Jupyter
+Version: 0.1
+Authors@R: c(
+    person('Martin', 'Elff', 
+           email = 'martin@elff.eu',
+           role = c('aut', 'cre'), comment = c(ORCID = "0000-0001-9032-9739")))
+Maintainer: Martin Elff <martin@elff.eu>
+Description: Provides a simple kernel for Jupyter.
+Encoding: UTF-8
+License: GPL-2
+Imports:
+    pbdZMQ (>= 0.2-1),
+    jsonlite (>= 0.9.6),
+    uuid,
+    digest,
+    R6
+Depends:
+    R (>= 3.0.1)
+Suggests:
+    roxygen2
+SystemRequirements:
+    jupyter
+RoxygenNote: 7.1.1
