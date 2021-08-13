@@ -43,7 +43,7 @@ Evaluator <- R6Class("Evaluator",
                     text = condition$message,
                     stream = "stderr",
                     status = "error")
-                self$results <- append(self$results,result)
+                self$results <- append(self$results,list(result))
             }
             else {
                 eval_results <- tryCatch(
@@ -58,6 +58,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_text = function(text) {
+            # cat("handle_text")
             result <- list(
                 stream = "stdout",
                 text   = text,
@@ -117,8 +118,10 @@ Evaluator <- R6Class("Evaluator",
             self$results <- c(self$results,list(result))
         },
         handle_value = function(x,visible) {
+            # cat("handle_value")
             result <- list(status = "ok")
             if(visible){
+                #cat("handle_visible_value")
                 text <- capture.output(print(x))
                 text <- paste(text,collapse="\n")
                 result <- c(result,
@@ -141,7 +144,7 @@ Evaluator <- R6Class("Evaluator",
         }
 ))
 
-identity <- function(x) x
+# identity <- function(x) x
 
 
 prep_payload <- function(payload){

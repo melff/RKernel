@@ -57,6 +57,7 @@ Kernel <- R6Class("Kernel",
                            code=msg$content$code,
                            execution_count=self$execution_count)
       results <- private$evaluator$eval(msg$content$code)
+      abort <- FALSE
       for(result in results){
         if("stream" %in% names(result)){
           private$send_message(type="stream",
@@ -73,7 +74,7 @@ Kernel <- R6Class("Kernel",
                                evalue = result$evalue,
                                traceback = result$traceback
                                )
-          private$clear_shell_queue()
+          abort <- TRUE
         }
         private$send_message(type="execute_reply",
                              parent=msg,
@@ -82,7 +83,8 @@ Kernel <- R6Class("Kernel",
                              payload=result$payload,
                              execution_count=self$execution_count)
       }
-      self$execution_count <- self$execution_count + 1
+      if(abort) private$clear_shell_queue()
+      else self$execution_count <- self$execution_count + 1
     },
 
     kernel_info_reply = function(msg) {
@@ -105,6 +107,8 @@ Kernel <- R6Class("Kernel",
     },
 
     is_complete_reply = function(msg) {
+      #cat("is_complete_reply\n")
+      #str(msg)
       private$send_message(type="is_complete_reply",
                            parent=msg,
                            socket_name="shell",
@@ -163,11 +167,13 @@ Kernel <- R6Class("Kernel",
       if(!length(msg)) return(TRUE)
       private$send_message(type="status",parent=msg,
                            socket_name="iopub",execution_state="busy")
+
       # do_stuff ...
       switch(msg$header$msg_type,
-             is_complete_request = self$is_complete_reply(msg),
              execute_request = self$execute_reply(msg),
+             is_complete_request = self$is_complete_reply(msg),
              kernel_info_request = self$kernel_info_reply(msg))
+
       private$send_message(type="status",parent=msg,
                            socket_name="iopub",execution_state="idle")
       return(TRUE)
@@ -191,8 +197,9 @@ Kernel <- R6Class("Kernel",
       return(msg)
     },
 
-    send_message = function(type, parent, socket_name, content=list(...), ...){
+    send_message = function(type, parent, socket_name, debug=FALSE, content=list(...), ...){
       msg <- private$msg_new(type,parent,content)
+      if(debug) str(msg)
       socket <- private$sockets[[socket_name]]
       wire_out <- private$wire_pack(msg)
       #zmq.send.multipart(socket,wire_out,serialize=FALSE)
