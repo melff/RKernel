@@ -4,6 +4,8 @@
 Evaluator <- R6Class("Evaluator",
     public = list(
         results = list(),
+
+        nframes = -1,
         
         output_handlers = list(),
 
@@ -33,6 +35,14 @@ Evaluator <- R6Class("Evaluator",
         },
 
         eval = function(code,...){
+
+            if(self$nframes < 0){
+                getnframes <- function(e) self$nframes <- sys.nframe()
+                tryCatch(evaluate(
+                    'stop()',
+                    stop_on_error = 1L,
+                    output_handler = new_output_handler(error = getnframes)))
+            }
 
             self$results <- list()
 
@@ -108,11 +118,22 @@ Evaluator <- R6Class("Evaluator",
             )
             stop_on_error <- getOption("rkernel_stop_on_error",FALSE)
             if(isTRUE(stop_on_error)){
+                calls <- sys.calls()
+                calls <- head(calls,-3)
+                drop_prev <- self$nframes - 2
+                calls <- tail(calls,-drop_prev)
+                calls <- limitedLabels(calls)
+                if(length(calls))
+                    calls <- paste0(format(seq_along(calls),justify="right"),
+                                    ". ",
+                                    calls)
+                traceback <- c("\nTraceback:",calls)
+                traceback <- paste(traceback,collapse="\n")
                 result <- c(result,
                             list(
                                 ename = "ERROR",
                                 evalue = text,
-                                traceback = list("<execution suspended>"),
+                                traceback = list(traceback),
                                 abort = TRUE))
             }
             self$results <- c(self$results,list(result))
