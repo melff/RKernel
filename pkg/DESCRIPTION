@@ -10,6 +10,8 @@ Description: Provides a simple kernel for Jupyter.
 Encoding: UTF-8
 License: GPL-2
 Imports:
+    evaluate,
+    utils,
     pbdZMQ (>= 0.2-1),
     jsonlite (>= 0.9.6),
     uuid,
