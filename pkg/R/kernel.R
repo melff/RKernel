@@ -59,8 +59,16 @@ Kernel <- R6Class("Kernel",
       results <- private$evaluator$eval(msg$content$code)
       abort <- FALSE
       status <- "ok"
+      payload <- list()
       if(length(results)){
         for(result in results){
+          if("clear_output" %in% names(result)){
+            private$send_message(type="clear_output",
+                                 parent=msg,
+                                 socket_name="iopub",
+                                 wait=results$clear_output
+                                 )
+          }
           if("stream" %in% names(result)){
             if(nzchar(result$text)){
               private$send_message(type="stream",
@@ -69,6 +77,37 @@ Kernel <- R6Class("Kernel",
                                    name=result$stream,
                                    text=result$text)
             }
+          }
+          if("execute_result" %in% names(result)){
+            private$send_message(type="execute_result",
+                                 parent=msg,
+                                 socket_name="iopub",
+                                 data=result$execute_result$data,
+                                 metadata=result$execute_result$metadata,
+                                 transient=result$execute_result$transient,
+                                 execution_count=self$execution_count
+                                 )
+          }
+          if("display_data" %in% names(result)){
+            private$send_message(type="display_data",
+                                 parent=msg,
+                                 socket_name="iopub",
+                                 data=result$display_data$data,
+                                 metadata=result$display_data$metadata,
+                                 transient=result$display_data$transient
+                                 )
+          }
+          if("update_display_data" %in% names(result)){
+            private$send_message(type="update_display_data",
+                                 parent=msg,
+                                 socket_name="iopub",
+                                 data=result$update_display_data$data,
+                                 metadata=result$update_display_data$metadata,
+                                 transient=result$update_display_data$transient
+                                 )
+          }
+          if("payload" %in% names(result)){
+            payload <- c(playload,list(result$payload))
           }
           if(isTRUE(result$abort)){
             private$send_message(type="error",
@@ -87,6 +126,7 @@ Kernel <- R6Class("Kernel",
       private$send_message(type="execute_reply",
                            parent=msg,
                            socket="shell",
+                           payload=payload,
                            status=status,
                            execution_count=self$execution_count)
       self$execution_count <- self$execution_count + 1

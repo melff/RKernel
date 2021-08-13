@@ -139,19 +139,33 @@ Evaluator <- R6Class("Evaluator",
             self$results <- c(self$results,list(result))
         },
         handle_value = function(x,visible) {
+            result <- NULL
             if(visible){
-                text <- capture.output(print(x))
-                text <- paste(text,collapse="\n")
+                if(inherits(x,"clear_output")){
+                    result <- list(clear_output=unclass(x))
+                }
+                else if(inherits(x,"execute_result")){
+                    result <- list(display_data=unclass(x))
+                }
+                else if(inherits(x,"display_data")){
+                    result <- list(display_data=unclass(x))
+                }
+                else if(inherits(x,"update_display_data")){
+                    result <- list(update_display_data=unclass(x))
+                }
+                else if(inherits(x,"payload")){
+                    result <- list(payload=unclass(x))
+                }
+                else {
+                    text <- capture.output(print(x))
+                    text <- paste(text,collapse="\n")
+                    result <- list(stream = "stdout",
+                                   text   = text,
+                                   status = "ok")
+                }
             }
-            else 
-                text <- ""
-            result <- list(stream = "stdout",
-                           text   = text,
-                           status = "ok")
-            result$payload <- attr(x,"payload")
-            if(inherits(x,"display_data"))
-                result$display_data <- x
-            self$results <- c(self$results,list(result))
+            if(length(result))
+                self$results <- c(self$results,list(result))
         },
         handle_interrupt = function(i){
             result <- list(
@@ -163,17 +177,29 @@ Evaluator <- R6Class("Evaluator",
         }
 ))
 
-
-prep_payload <- function(payload){
-    names(payload) <- NULL
-    payload[sapply(payload,has_source)]
+result_class <- function(x,cl){
+    if(!is.list(x) || !inherits(x,cl)) return(FALSE)
+    if(cl %in% c("execute_result","display_data","update_display_data"))
+        return(check_names(x,
+                           mandatory=c("data","metadata"),
+                           optional="transient"))
+    else if(cl == "clear_output")
+        return(check_names(x,mandatory="wait"))
+    else if(cl == "payload")
+        return(check_names(x,
+                           mandatory="source",
+                           any_other=TRUE))
+    else FALSE
 }
 
-has_source <- function(x) "source" %in% names(x)
+check_names <- function(x,mandatory,optional=NULL,any_other=FALSE){
+    if(!all(mandatory%in%names(x))) return(FALSE)
+    else if(!any_other && !all(names(x)%in%c(mandatory,optional))) return(FALSE)
+    else return(TRUE)
+}
 
-ask_exit_obj <- structure(TRUE,
-                          payload=list(
-                              list(source="ask_exit",
-                                   keepkernel=FALSE)))
+ask_exit_obj <- structure(list(source="ask_exit",
+                               keepkernel=FALSE),
+                          class="payload")
 
 q_evaluator <- function(...) invisible(ask_exit_obj)
