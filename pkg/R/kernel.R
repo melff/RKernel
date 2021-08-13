@@ -58,33 +58,39 @@ Kernel <- R6Class("Kernel",
                            execution_count=self$execution_count)
       results <- private$evaluator$eval(msg$content$code)
       abort <- FALSE
-      for(result in results){
-        if("stream" %in% names(result)){
-          private$send_message(type="stream",
-                               parent=msg,
-                               socket_name="iopub",
-                               name=result$stream,
-                               text=result$text)
+      status <- "ok"
+      if(length(results)){
+        for(result in results){
+          if("stream" %in% names(result)){
+            if(nzchar(result$text)){
+              private$send_message(type="stream",
+                                   parent=msg,
+                                   socket_name="iopub",
+                                   name=result$stream,
+                                   text=result$text)
+            }
+          }
+          if(isTRUE(result$abort)){
+            private$send_message(type="error",
+                                 parent=msg,
+                                 socket="iopub",
+                                 ename = result$ename,
+                                 evalue = result$evalue,
+                                 traceback = result$traceback
+                                 )
+            abort <- TRUE
+          }
+          if("status" %in% names(result))
+            status <- result$status
         }
-        if(isTRUE(result$abort)){
-          private$send_message(type="error",
-                               parent=msg,
-                               socket="iopub",
-                               ename = result$ename,
-                               evalue = result$evalue,
-                               traceback = result$traceback
-                               )
-          abort <- TRUE
-        }
-        private$send_message(type="execute_reply",
-                             parent=msg,
-                             socket="shell",
-                             status=result$status,
-                             payload=result$payload,
-                             execution_count=self$execution_count)
       }
-      if(abort) private$clear_shell_queue()
-      else self$execution_count <- self$execution_count + 1
+      private$send_message(type="execute_reply",
+                           parent=msg,
+                           socket="shell",
+                           status=status,
+                           execution_count=self$execution_count)
+      self$execution_count <- self$execution_count + 1
+      #cat("Sent a execute_reply ...\n")
     },
 
     kernel_info_reply = function(msg) {
@@ -104,6 +110,7 @@ Kernel <- R6Class("Kernel",
                            parent=msg,
                            socket_name="shell",
                            content=response)
+      #cat("Sent a kernel_info_reply ...\n")
     },
 
     is_complete_reply = function(msg) {
@@ -113,7 +120,9 @@ Kernel <- R6Class("Kernel",
                            parent=msg,
                            socket_name="shell",
                            status="complete",
+                           #debug=TRUE,
                            indent="")
+      #cat("Sent an is_complete_reply ...\n")
     }
   ),
 
@@ -167,7 +176,7 @@ Kernel <- R6Class("Kernel",
       if(!length(msg)) return(TRUE)
       private$send_message(type="status",parent=msg,
                            socket_name="iopub",execution_state="busy")
-
+      #cat("Got a", msg$header$msg_type, "request ...\n")
       # do_stuff ...
       switch(msg$header$msg_type,
              execute_request = self$execute_reply(msg),
@@ -194,6 +203,7 @@ Kernel <- R6Class("Kernel",
         i <- i + 1
       }
       msg <- private$wire_unpack(wire_in)
+      #cat("Got message from socket", socket_name)
       return(msg)
     },
 
@@ -209,6 +219,7 @@ Kernel <- R6Class("Kernel",
                 else private$.pbd_env$ZMQ.SR$BLOCK
         zmq.msg.send(wire_out[[i]],socket,flag=flag,serialize=FALSE)
       }
+      #cat("Sent message to socket", socket_name)
     },
 
     wire_unpack = function(wire_in){

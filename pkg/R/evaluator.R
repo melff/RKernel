@@ -111,24 +111,22 @@ Evaluator <- R6Class("Evaluator",
                 result <- c(result,
                             list(
                                 ename = "ERROR",
-                                evalue = eval_result$message,
+                                evalue = text,
                                 traceback = list("<execution suspended>"),
                                 abort = TRUE))
             }
             self$results <- c(self$results,list(result))
         },
         handle_value = function(x,visible) {
-            # cat("handle_value")
-            result <- list(status = "ok")
             if(visible){
-                #cat("handle_visible_value")
                 text <- capture.output(print(x))
                 text <- paste(text,collapse="\n")
-                result <- c(result,
-                            list(
-                                stream = "stdout",
-                                text   = text))
             }
+            else 
+                text <- ""
+            result <- list(stream = "stdout",
+                           text   = text,
+                           status = "ok")
             result$payload <- attr(x,"payload")
             if(inherits(x,"display_data"))
                 result$display_data <- x
@@ -143,8 +141,6 @@ Evaluator <- R6Class("Evaluator",
             self$results <- c(self$results,list(result))
         }
 ))
-
-# identity <- function(x) x
 
 
 prep_payload <- function(payload){
