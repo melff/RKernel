@@ -1,5 +1,6 @@
 #' @importFrom evaluate evaluate new_output_handler
 #' @importFrom utils capture.output
+#' @importFrom svglite svgstring
 #' @export
 Evaluator <- R6Class("Evaluator",
     public = list(
@@ -61,7 +62,7 @@ Evaluator <- R6Class("Evaluator",
                              envir=.GlobalEnv,
                              stop_on_error=1L,
                              output_handler=self$output_handlers$default,
-                             new_device=FALSE),
+                             new_device=TRUE),
                     interrupt = self$handle_interrupt)
             }
             return(self$results)
@@ -76,7 +77,31 @@ Evaluator <- R6Class("Evaluator",
             )
             self$results <- c(self$results,list(result))
         },
-        handle_graphics = function(pltObj) {},
+
+        handle_graphics = function(plt) {
+            # cat("handle_graphics")
+            width <- getOption("jupyter.plot.width",6)
+            height <- getOption("jupyter.plot.height",6)
+            s <- svgstring(width=width,height=height,standalone=FALSE)
+            replayPlot(plt)
+            dev.off()
+            svgstr <- s()
+            result <- list(
+                display_data = list(
+                    data = list(
+                        "image/svg+xml"=unclass(svgstr)
+                    ),
+                    metadata = list(
+                        "image/svg+xml"=list(
+                            width=width,
+                            height=height
+                        )
+                    )
+                )
+            )
+            self$results <- c(self$results,list(result))
+        },
+
         handle_message = function(m) {
             text <- conditionMessage(m)
             result <- list(
@@ -145,7 +170,7 @@ Evaluator <- R6Class("Evaluator",
                     result <- list(clear_output=unclass(x))
                 }
                 else if(inherits(x,"execute_result")){
-                    result <- list(display_data=unclass(x))
+                    result <- list(execute_result=unclass(x))
                 }
                 else if(inherits(x,"display_data")){
                     result <- list(display_data=unclass(x))
