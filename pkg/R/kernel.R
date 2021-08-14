@@ -107,7 +107,7 @@ Kernel <- R6Class("Kernel",
                                  )
           }
           if("payload" %in% names(result)){
-            payload <- c(playload,list(result$payload))
+            payload <- c(payload,list(result$payload))
           }
           if("status" %in% names(result))
             status <- result$status
