@@ -109,6 +109,8 @@ Kernel <- R6Class("Kernel",
           if("payload" %in% names(result)){
             payload <- c(playload,list(result$payload))
           }
+          if("status" %in% names(result))
+            status <- result$status
           if(isTRUE(result$abort)){
             private$send_message(type="error",
                                  parent=msg,
@@ -119,8 +121,6 @@ Kernel <- R6Class("Kernel",
                                  )
             abort <- TRUE
           }
-          if("status" %in% names(result))
-            status <- result$status
         }
       }
       private$send_message(type="execute_reply",
@@ -131,6 +131,7 @@ Kernel <- R6Class("Kernel",
                            execution_count=self$execution_count)
       self$execution_count <- self$execution_count + 1
       #cat("Sent a execute_reply ...\n")
+      if(abort) private$clear_shell_queue()
     },
 
     kernel_info_reply = function(msg) {
