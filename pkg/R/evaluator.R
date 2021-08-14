@@ -82,23 +82,36 @@ Evaluator <- R6Class("Evaluator",
             # cat("handle_graphics")
             width <- getOption("jupyter.plot.width",6)
             height <- getOption("jupyter.plot.height",6)
+            embedded <- getOption("jupyter.embed.graphics",TRUE)
             s <- svgstring(width=width,height=height,standalone=FALSE)
             replayPlot(plt)
             dev.off()
             svgstr <- s()
-            result <- list(
-                display_data = list(
-                    data = list(
-                        "image/svg+xml"=unclass(svgstr)
-                    ),
-                    metadata = list(
-                        "image/svg+xml"=list(
-                            width=width,
-                            height=height
+            if(embedded){
+                result <- list(
+                    display_data = list(
+                        data = list(
+                            "image/svg+xml"=unclass(svgstr)
+                        ),
+                        metadata = list(
+                            "image/svg+xml"=list(
+                                width=width,
+                                height=height
+                            )
                         )
                     )
                 )
-            )
+            } else {
+                result <- list(
+                    payload = list(
+                        source="page",
+                        data=list(
+                            "text/html"=unclass(svgstr)
+                        ),
+                        start=1
+                    )
+                )
+            }
             self$results <- c(self$results,list(result))
         },
 
