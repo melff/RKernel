@@ -22,3 +22,12 @@ update.display_data <- function(object,...){
     id <- display_id(object)
     display(...,id=id,update=TRUE)
 }
+
+
+#' @export
+jkpage <- function(x,...) UseMethod("jkpage")
+#' @export
+jkpage.default <- function(x,start=1,...){
+   p <- list(source="page",data=list(...),start=start)
+   structure(p,class="payload")
+}
