@@ -271,6 +271,7 @@ Evaluator <- R6Class("Evaluator",
                     result <- list(stream = "stdout",
                                    text   = text)
                 }
+                self$set_last_value(x)
             }
             if(length(result))
                 self$add_result(result)
@@ -284,6 +285,11 @@ Evaluator <- R6Class("Evaluator",
             self$add_result(result)
             seff$status <- "aborted"
             self$aborted <- TRUE
+        },
+
+        set_last_value = function(x){
+            pos <- match("RKernel",search())
+            assign(".Last.value",x,pos=pos)
         }
 ))
 
@@ -307,3 +313,4 @@ check_names <- function(x,mandatory,optional=NULL,any_other=FALSE){
     else if(!any_other && !all(names(x)%in%c(mandatory,optional))) return(FALSE)
     else return(TRUE)
 }
+
