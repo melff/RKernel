@@ -1,4 +1,4 @@
 {"argv": ["R", "--slave", "-e", "RKernel::main()", "--args", "{connection_file}"],
- "display_name":"R (Rkernel)",
+ "display_name":"R (RKernel)",
  "language":"R"
 }
