@@ -57,9 +57,6 @@ Kernel <- R6Class("Kernel",
                            code=msg$content$code,
                            execution_count=self$execution_count)
       results <- private$evaluator$eval(msg$content$code)
-      abort <- FALSE
-      status <- "ok"
-      payload <- list()
       if(length(results)){
         for(result in results){
           if("clear_output" %in% names(result)){
@@ -106,23 +103,20 @@ Kernel <- R6Class("Kernel",
                                  transient=result$update_display_data$transient
                                  )
           }
-          if("payload" %in% names(result)){
-            payload <- c(payload,list(result$payload))
-          }
-          if("status" %in% names(result))
-            status <- result$status
-          if(isTRUE(result$abort)){
+          if("error" %in% names(result)){
             private$send_message(type="error",
                                  parent=msg,
                                  socket="iopub",
-                                 ename = result$ename,
-                                 evalue = result$evalue,
-                                 traceback = result$traceback
+                                 ename = result$error$name,
+                                 evalue = result$error$value,
+                                 traceback = result$error$traceback
                                  )
-            abort <- TRUE
           }
         }
       }
+      payload <- private$evaluator$get_payload(clear=TRUE)
+      status <- private$evaluator$get_status(reset=TRUE)
+      aborted <- private$evaluator$is_aborted(reset=TRUE)
       private$send_message(type="execute_reply",
                            parent=msg,
                            socket="shell",
@@ -131,7 +125,7 @@ Kernel <- R6Class("Kernel",
                            execution_count=self$execution_count)
       self$execution_count <- self$execution_count + 1
       #cat("Sent a execute_reply ...\n")
-      if(abort) private$clear_shell_queue()
+      if(aborted) private$clear_shell_queue()
     },
 
     kernel_info_reply = function(msg) {

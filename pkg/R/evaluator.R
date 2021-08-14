@@ -4,18 +4,26 @@
 #' @export
 Evaluator <- R6Class("Evaluator",
     public = list(
-        results = list(),
-
+ 
         nframes = -1,
-        
         output_handlers = list(),
+        aborted = FALSE,
+        status = "ok",
+        payload = list(),
+        results = list(),
+        env = list(),
 
         startup = function(...) {
-            env <- new.env()
-            attach(env,name="RKernel")
-            assign("q",q_evaluator,pos=2L)
+
+            self$env <- new.env()
+            attach(self$env,name="RKernel")
+            pos <- match("RKernel",search())
+            assign("q",self$quit,pos=pos)
+            assign("jpage",self$page,pos=pos)
+            assign("jpager",self$pager,pos=pos)
 
             options(device=svg)
+            options(pager=self$pager)
 
             self$output_handlers$default <- new_output_handler(
                 text     = self$handle_text,
@@ -35,7 +43,10 @@ Evaluator <- R6Class("Evaluator",
 
         },
 
-        eval = function(code,...){
+        eval = function(code,...,silent=FALSE){
+
+            options(device=svg)
+            options(pager=self$pager)
 
             if(self$nframes < 0){
                 getnframes <- function(e) self$nframes <- sys.nframe()
@@ -46,18 +57,23 @@ Evaluator <- R6Class("Evaluator",
             }
 
             self$results <- list()
+            if(self$aborted) return(self$results)
+            if(silent)
+                output_handler <- self$output_handler$silent
+            else
+                output_handler <- self$output_handler$default
 
             expr <- try(parse(text=code),silent=TRUE)
             if(inherits(expr,"try-error")){
                 condition <- attr(expr,"condition")
                 result <- list(
                     text = condition$message,
-                    stream = "stderr",
-                    status = "error")
-                self$results <- append(self$results,list(result))
+                    stream = "stderr")
+                self$add_result(result)
+                self$status <- "error"
             }
             else {
-                eval_results <- tryCatch(
+                tryCatch(
                     evaluate(code,
                              envir=.GlobalEnv,
                              stop_on_error=1L,
@@ -68,6 +84,62 @@ Evaluator <- R6Class("Evaluator",
             return(self$results)
         },
 
+        add_result = function(result){
+            self$results <- append(self$results,list(result))
+        },
+
+        add_payload = function(payload){
+            self$payload <- append(self$payload,list(payload))
+        },
+
+        get_payload = function(clear=FALSE){
+            payload <- self$payload
+            if(clear)
+                self$payload <- list()
+            return(payload)
+        },
+
+        get_status = function(reset=FALSE){
+            status <- self$status
+            if(reset)
+                self$status <- "ok"
+            return(status)
+        },
+
+        is_aborted = function(reset=FALSE){
+            aborted <- self$aborted
+            if(reset)
+                self$aborted <- FALSE
+            return(aborted)
+        },
+
+        quit = function(...){
+            payload <- list(source="ask_exit",
+                            keepkernel=FALSE)
+            self$add_payload(payload)
+        },
+
+        page = function(...,start=1){
+            payload <- list(
+                source="page",
+                data=list(...),
+                start=start
+                )
+            self$add_payload(payload)
+        },
+
+        pager = function(files,header,title,delete.file){
+            text <- c(header,"",title,"")
+            for(file in files){
+                text <- c(text,readLines(file))
+            }
+            if(delete.file){
+                file.remove(files)
+            }
+            text <- paste(text,collapse="\n")
+            self$page("text/plain"=text)
+        },
+
         handle_text = function(text) {
             # cat("handle_text")
             result <- list(
@@ -75,7 +147,7 @@ Evaluator <- R6Class("Evaluator",
                 text   = text,
                 status = "ok"
             )
-            self$results <- c(self$results,list(result))
+            self$add_result(result)
         },
 
         handle_graphics = function(plt) {
@@ -101,29 +173,28 @@ Evaluator <- R6Class("Evaluator",
                         )
                     )
                 )
+                self$add_result(result)
             } else {
-                result <- list(
-                    payload = list(
-                        source="page",
-                        data=list(
-                            "text/html"=unclass(svgstr)
-                        ),
-                        start=1
-                    )
+                payload <- list(
+                    source="page",
+                    data=list(
+                        "text/html"=unclass(svgstr)
+                    ),
+                    start=1
                 )
+                self$add_payload(payload)
             }
-            self$results <- c(self$results,list(result))
         },
 
         handle_message = function(m) {
             text <- conditionMessage(m)
             result <- list(
                 stream = "stdout",
-                text   = text,
-                status = "ok"
+                text   = text
             )
-            self$results <- c(self$results,list(result))
+            self$add_result(result)
         },
+
         handle_warning = function(w) {
             text <- conditionMessage(w)
             call <- conditionCall(w)
@@ -135,11 +206,11 @@ Evaluator <- R6Class("Evaluator",
             }
             result <- list(
                 stream = "stderr",
-                text   = text,
-                status = "ok"
+                text   = text
             )
-            self$results <- c(self$results,list(result))
+            self$add_result(result)
         },
+
         handle_error = function(e) {
             text <- conditionMessage(e)
             call <- conditionCall(e)
@@ -151,9 +222,9 @@ Evaluator <- R6Class("Evaluator",
             }
             result <- list(
                 stream = "stderr",
-                text   = text,
-                status = "error"
+                text   = text
             )
+            self$status <- "error"
             stop_on_error <- getOption("rkernel_stop_on_error",FALSE)
             if(isTRUE(stop_on_error)){
                 calls <- sys.calls()
@@ -167,15 +238,15 @@ Evaluator <- R6Class("Evaluator",
                                     calls)
                 traceback <- c("\nTraceback:",calls)
                 traceback <- paste(traceback,collapse="\n")
-                result <- c(result,
-                            list(
-                                ename = "ERROR",
-                                evalue = text,
-                                traceback = list(traceback),
-                                abort = TRUE))
+                result$error <- list(
+                                name = "ERROR",
+                                value = text,
+                                traceback = list(traceback))
+                self$aborted <- TRUE
             }
-            self$results <- c(self$results,list(result))
+            self$add_result(result)
         },
+
         handle_value = function(x,visible) {
             result <- NULL
             if(visible){
@@ -192,26 +263,27 @@ Evaluator <- R6Class("Evaluator",
                     result <- list(update_display_data=unclass(x))
                 }
                 else if(inherits(x,"payload")){
-                    result <- list(payload=unclass(x))
+                    self$add_payload(unclass(x))
                 }
                 else {
                     text <- capture.output(print(x))
                     text <- paste(text,collapse="\n")
                     result <- list(stream = "stdout",
-                                   text   = text,
-                                   status = "ok")
+                                   text   = text)
                 }
             }
             if(length(result))
-                self$results <- c(self$results,list(result))
+                self$add_result(result)
         },
+
         handle_interrupt = function(i){
             result <- list(
                 stream = "stderr",
-                text   = "<interrupted>",
-                status = "aborted"
+                text   = "<interrupted>"
             )
-            self$results <- c(self$results,list(result))
+            self$add_result(result)
+            seff$status <- "aborted"
+            self$aborted <- TRUE
         }
 ))
 
@@ -235,9 +307,3 @@ check_names <- function(x,mandatory,optional=NULL,any_other=FALSE){
     else if(!any_other && !all(names(x)%in%c(mandatory,optional))) return(FALSE)
     else return(TRUE)
 }
-
-ask_exit_obj <- structure(list(source="ask_exit",
-                               keepkernel=FALSE),
-                          class="payload")
-
-q_evaluator <- function(...) invisible(ask_exit_obj)
