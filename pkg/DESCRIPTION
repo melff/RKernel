@@ -1,6 +1,7 @@
 Package: RKernel
 Title: A basic R kernel for Jupyter
 Version: 0.1
+Date: 2021-08-14
 Authors@R: c(
     person('Martin', 'Elff', 
            email = 'martin@elff.eu',
@@ -16,7 +17,8 @@ Imports:
     jsonlite (>= 0.9.6),
     uuid,
     digest,
-    R6
+    R6,
+    svglite
 Depends:
     R (>= 3.0.1)
 Suggests:
