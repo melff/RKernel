@@ -13,7 +13,7 @@ Kernel <- R6Class("Kernel",
 
   public = list(
 
-    initialize = function(conn_info,evaluator=NULL){
+    initialize = function(conn_info,evaluator){
       .zmqopt_init(envir = private)
       private$zmqctx <- zmq.ctx.new()
       private$sockets$hb      <-  zmq.socket(private$zmqctx, private$.pbd_env$ZMQ.ST$REP)
@@ -153,7 +153,7 @@ Kernel <- R6Class("Kernel",
       #cat("is_complete_reply\n")
       #str(msg)
       code <- msg$content$code
-      status <- code_is_complete(code)
+      status <- private$evaluator$code_is_complete(code)
       private$send_message(type="is_complete_reply",
                            parent=msg,
                            socket_name="shell",
@@ -166,13 +166,14 @@ Kernel <- R6Class("Kernel",
     complete_reply = function(msg){
       code <- msg$content$code
       cursor_pos <- msg$content$cursor_pos
+      result <- private$evaluator$get_completions(code,cursor_pos)
       private$send_message(type="complete_reply",
                            parent=msg,
                            socket_name="shell",
                            status="ok",
-                           matches=list(),
-                           cursor_start=cursor_pos,
-                           cursor_end=cursor_pos,
+                           matches=result$matches,
+                           cursor_start=result$start,
+                           cursor_end=result$end,
                            metadata=namedList())
     }
   ),

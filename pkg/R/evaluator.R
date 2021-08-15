@@ -1,6 +1,7 @@
 #' @importFrom evaluate evaluate new_output_handler
 #' @importFrom utils capture.output
 #' @importFrom svglite svgstring
+#' @importFrom evaluate parse_all
 #' @export
 Evaluator <- R6Class("Evaluator",
     public = list(
@@ -348,7 +349,29 @@ Evaluator <- R6Class("Evaluator",
         set_last_value = function(x){
             pos <- match("RKernel",search())
             assign(".Last.value",x,pos=pos)
+        },
+
+        code_is_complete = function(code){
+            status <- tryCatch({
+                parse_all(code)
+                "complete"
+            },
+            error = conditionMessage)
+            if(is_unexpected_end(status) || is_unexpected_string(status))
+                return("incomplete")
+            else if(status!="complete")
+                return("invalid")
+            else return("complete")
+        },
+
+        get_completions = function(code,cursor_pos){
+            return(list(
+                matches = list(),
+                start = cursor_pos,
+                end = cursor_pos
+            ))
         }
+
 ))
 
 result_class <- function(x,cl){
@@ -370,21 +393,6 @@ check_names <- function(x,mandatory,optional=NULL,any_other=FALSE){
     if(!all(mandatory%in%names(x))) return(FALSE)
     else if(!any_other && !all(names(x)%in%c(mandatory,optional))) return(FALSE)
     else return(TRUE)
-}
-
-
-#' @importFrom evaluate parse_all
-code_is_complete <- function(code){
-    status <- tryCatch({
-        parse_all(code)
-        "complete"
-    },
-    error = conditionMessage)
-    if(is_unexpected_end(status) || is_unexpected_string(status))
-        return("incomplete")
-    else if(status!="complete")
-         return("invalid")
-    else return("complete")
 }
 
 is_unexpected_end <- function(code) 
