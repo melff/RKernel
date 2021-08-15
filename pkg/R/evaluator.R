@@ -24,7 +24,6 @@ Evaluator <- R6Class("Evaluator",
             assign("display",display,pos=pos)
             assign("Page",Page,pos=pos)
 
-            options(device=svg)
             options(pager=self$pager)
             options(crayon.enabled=TRUE,crayon.colors=256L)
             options(rkernel_graphics_types=c("image/svg+xml","image/png","application/pdf"))
@@ -45,6 +44,48 @@ Evaluator <- R6Class("Evaluator",
                 error    = identity,
                 value    = identity)
 
+            setHook('plot.new',self$plot_new_hook)
+            setHook('grid.newpage',self$plot_new_hook)
+            setHook('before.plot.new',self$before_plot_new_hook)
+            setHook('before.grid.newpage',self$before_plot_new_hook)
+            
+            trace(plot.xy,self$plot_xy_hook,print=FALSE)
+            trace(curve,quote(curve_hook(add)),print=FALSE)
+
+            assign("curve_hook",self$curve_hook,pos=pos)
+
+        },
+
+        plot_new_called = FALSE,
+
+        current_plot = list(),
+
+        current_plot_display_id = "",
+
+        before_plot_new_hook = function(...){
+        },
+
+        plot_new_hook = function(...){
+            self$plot_new_called <- TRUE
+        },
+
+        graphics_par_usr = numeric(0),
+
+        curve_hook = function(add){
+            if(isTRUE(add) && !self$plot_new_called){
+                replayPlot(self$current_plot)
+                par(usr = self$graphics_par_usr)
+                self$plot_new_called <- TRUE
+            }
+        },
+
+        plot_xy_hook = function(...){
+            if(!self$plot_new_called){
+                # plot.new()
+                replayPlot(self$current_plot)
+                par(usr = self$graphics_par_usr)
+                self$plot_new_called <- TRUE
+            }
         },
 
         eval = function(code,...,silent=FALSE){
@@ -79,6 +120,7 @@ Evaluator <- R6Class("Evaluator",
                 self$status <- "error"
             }
             else {
+                self$plot_new_called <- FALSE
                 tryCatch(
                     evaluate(code,
                              envir=.GlobalEnv,
@@ -149,6 +191,9 @@ Evaluator <- R6Class("Evaluator",
 
         handle_graphics = function(plt) {
             # cat("handle_graphics")
+            self$current_plot <- plt
+            self$graphics_par_usr <- par("usr")
+
             width <- getOption("rkernel_plot_width",6)
             height <- getOption("rkernel_plot_height",6)
             pointsize <- getOption("rkernel_plot_pointsize",12)
