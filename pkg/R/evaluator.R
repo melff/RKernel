@@ -407,5 +407,6 @@ is_unexpected_string <- function(code)
 
 dummy_dev_filename <- function(...) file.path(tempdir(),"dummy-device.png")
 
+#' @importFrom grDevices png
 dummy_device <- function(filename = dummy_dev_filename(),
                          ...) png(filename,...)
