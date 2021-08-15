@@ -27,6 +27,7 @@ Evaluator <- R6Class("Evaluator",
             options(device=svg)
             options(pager=self$pager)
             options(crayon.enabled=TRUE,crayon.colors=256L)
+            options(rkernel_graphics_types=c("image/svg+xml","image/png","application/pdf"))
 
             self$output_handlers$default <- new_output_handler(
                 text     = self$handle_text,
@@ -148,33 +149,44 @@ Evaluator <- R6Class("Evaluator",
 
         handle_graphics = function(plt) {
             # cat("handle_graphics")
-            width <- getOption("jupyter.plot.width",6)
-            height <- getOption("jupyter.plot.height",6)
-            embedded <- getOption("jupyter.embed.graphics",TRUE)
-            s <- svgstring(width=width,height=height,standalone=FALSE)
-            replayPlot(plt)
-            dev.off()
-            svgstr <- s()
+            width <- getOption("rkernel_plot_width",6)
+            height <- getOption("rkernel_plot_height",6)
+            pointsize <- getOption("rkernel_plot_pointsize",12)
+            resolution <- getOption("rkernel_plot_resolution",600)
+            embedded <- getOption("rkernel_plot_graphics",TRUE)
+
+            rkernel_graphics_types <- getOption("rkernel_graphics_types")
+
+            mime_data <- list()
+            mime_metadata <- list()
+
+            for(mime in rkernel_graphics_types){
+                repr_func <- mime2repr[[mime]]
+                mime_data[[mime]] <- repr_func(plt,
+                                          width=width,
+                                          height=height,
+                                          pointsize=pointsize,
+                                          res=resolution)
+                mime_metadata[[mime]] <- list(
+                    width=width*resolution,
+                    height=height*resolution)
+                if(mime=="image/svg+xml")
+                    mime_metadata[[mime]]$isolated <-TRUE
+            }
+
             if(embedded){
                 result <- list(
                     display_data = list(
-                        data = list(
-                            "image/svg+xml"=unclass(svgstr)
-                        ),
-                        metadata = list(
-                            "image/svg+xml"=list(
-                                width=width,
-                                height=height
-                            )
-                        )
+                        data = mime_data,
+                        metadata = mime_metadata
                     )
                 )
                 self$add_result(result)
-            } else {
+            } else if("image/svg+xml" %in% rkernel_graphics_types){
                 payload <- list(
                     source="page",
                     data=list(
-                        "text/html"=unclass(svgstr)
+                        "text/html"=mime_data[["image/svg+xml"]]
                     ),
                     start=1
                 )
