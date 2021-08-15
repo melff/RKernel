@@ -26,6 +26,7 @@ Evaluator <- R6Class("Evaluator",
 
             options(device=svg)
             options(pager=self$pager)
+            options(crayon.enabled=TRUE,crayon.colors=256L)
 
             self$output_handlers$default <- new_output_handler(
                 text     = self$handle_text,
