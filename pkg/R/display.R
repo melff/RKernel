@@ -1,15 +1,35 @@
+#' @importFrom repr mime2repr
+
 #' @export
 display <- function(x,...) UseMethod("display")
 #' @export
 display.default <- function(x,...,metadata=NULL,id=uuid::UUIDgenerate(),update=FALSE){
-   if(!length(metadata)) metadata <- namedList()
-   d <- list(data=list(...))
-   d$metadata <- metadata
-   d$transient <- list(display_id=id)
-   if(update) cl <- "update_display_data"
-   else cl <- "display_data"
-   structure(d,class=cl)
+
+    if(missing(x)){
+        if(!length(metadata)) metadata <- namedList()
+        d <- list(data=list(...))
+    } 
+    else {
+        rkernel_mime_types <- getOption("rkernel_mime_types",
+                                        c("text/plain",
+                                          "text/html",
+                                          "text/latex",
+                                          "text/markdown"))
+        mime_data <- list()
+        for(mime_type in rkernel_mime_types){
+            repr_func <- mime2repr[[mime_type]]
+            repr_result <- repr_func(x,...)
+            mime_data[[mime_type]] <- repr_result
+            d <- list(data=mime_data)
+        }
+    }
+    d$metadata <- metadata
+    d$transient <- list(display_id=id)
+    if(update) cl <- "update_display_data"
+    else cl <- "display_data"
+    structure(d,class=cl)
 }
+
 #' @export
 display_id <- function(x) UseMethod("display_id")
 #' @export
@@ -25,9 +45,56 @@ update.display_data <- function(object,...){
 
 
 #' @export
-jkpage <- function(x,...) UseMethod("jkpage")
+Page <- function(x,...) UseMethod("Page")
 #' @export
-jkpage.default <- function(x,start=1,...){
-   p <- list(source="page",data=list(...),start=start)
-   structure(p,class="payload")
+Page.default <- function(x,start=1,...){
+    if(missing(x)){
+        data <- list(...)
+    } 
+    else {
+        displayed <- display(x=x,...)
+        data <- displayed$data
+    }
+    p <- list(source="page",
+              data=data,
+              start=start)
+    structure(p,class="payload")
+}
+
+#' @export
+add_displayed_classes <- function(x){
+    if(is.character(x)) classes <- x
+    else classes <- class(x)
+    if(length(classes)){
+        displayed_classes <- getOption("rkernel_displayed_classes")
+        options(rkernel_displayed_classes=union(displayed_classes,classes))
+    }
+}
+#' @export
+remove_displayed_classes <- function(x){
+    if(is.character(x)) classes <- x
+    else classes <- class(x)
+    if(length(classes)){
+        displayed_classes <- getOption("rkernel_displayed_classes")
+        options(rkernel_displayed_classes=setdiff(displayed_classes,classes))
+    }
+}
+
+#' @export
+add_paged_classes <- function(x){
+    if(is.character(x)) classes <- x
+    else classes <- class(x)
+    if(length(classes)){
+        paged_classes <- getOption("rkernel_paged_classes")
+        options(rkernel_paged_classes=union(paged_classes,classes))
+    }
+}
+#' @export
+remove_paged_classes <- function(x){
+    if(is.character(x)) classes <- x
+    else classes <- class(x)
+    if(length(classes)){
+        paged_classes <- getOption("rkernel_paged_classes")
+        options(rkernel_paged_classes=setdiff(paged_classes,classes))
+    }
 }

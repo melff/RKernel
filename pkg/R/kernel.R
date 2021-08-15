@@ -115,6 +115,7 @@ Kernel <- R6Class("Kernel",
         }
       }
       payload <- private$evaluator$get_payload(clear=TRUE)
+      payload <- check_page_payload(payload)
       status <- private$evaluator$get_status(reset=TRUE)
       aborted <- private$evaluator$is_aborted(reset=TRUE)
       private$send_message(type="execute_reply",
@@ -343,6 +344,22 @@ toRawJSON <- function(x,...){
 }
 
 namedList <- function() structure(list(),names=character(0))
+
+check_page_payload <- function(payload){
+  for(i in seq_along(payload)){
+    payload_item <- payload[[i]]
+    if(payload_item$source=="page"){
+      data <- payload_item$data
+      if(!("text/plain" %in% names(data))){
+        payload_item$data[["text/plain"]] <- "[No plain text data for paging]"
+        payload[[i]] <- payload_item
+      }
+    }      
+  }
+  payload
+}
+
+
 
 # Local Variables:
 # ess-indent-offset: 2

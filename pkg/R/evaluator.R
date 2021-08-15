@@ -19,8 +19,10 @@ Evaluator <- R6Class("Evaluator",
             attach(self$env,name="RKernel")
             pos <- match("RKernel",search())
             assign("q",self$quit,pos=pos)
-            assign("jpage",self$page,pos=pos)
-            assign("jpager",self$pager,pos=pos)
+            assign("quit",self$quit,pos=pos)
+
+            assign("display",display,pos=pos)
+            assign("Page",Page,pos=pos)
 
             options(device=svg)
             options(pager=self$pager)
@@ -47,6 +49,8 @@ Evaluator <- R6Class("Evaluator",
 
             options(device=svg)
             options(pager=self$pager)
+
+            add_paged_classes(c("help_files_with_topic","packageIQR"))
 
             if(self$nframes < 0){
                 getnframes <- function(e) self$nframes <- sys.nframe()
@@ -116,15 +120,6 @@ Evaluator <- R6Class("Evaluator",
         quit = function(...){
             payload <- list(source="ask_exit",
                             keepkernel=FALSE)
-            self$add_payload(payload)
-        },
-
-        page = function(...,start=1){
-            payload <- list(
-                source="page",
-                data=list(...),
-                start=start
-                )
             self$add_payload(payload)
         },
 
@@ -250,7 +245,18 @@ Evaluator <- R6Class("Evaluator",
         handle_value = function(x,visible) {
             result <- NULL
             if(visible){
-                if(inherits(x,"clear_output")){
+                if(any(class(x) %in% getOption("rkernel_paged_classes"))){
+                    displayed <- display(x)
+                    payload <- list(source="page",
+                                    data=displayed$data,
+                                    start=1)
+                    self$add_payload(payload)
+                }
+                else if(any(class(x) %in% getOption("rkernel_displayed_classes"))){
+                    displayed <- display(x)
+                    result <- list(display_data=unclass(displayed))
+                }
+                else if(inherits(x,"clear_output")){
                     result <- list(clear_output=unclass(x))
                 }
                 else if(inherits(x,"execute_result")){

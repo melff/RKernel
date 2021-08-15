@@ -18,7 +18,8 @@ Imports:
     uuid,
     digest,
     R6,
-    svglite
+    svglite,
+    repr
 Depends:
     R (>= 3.0.1)
 Suggests:
