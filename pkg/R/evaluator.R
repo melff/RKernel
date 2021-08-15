@@ -24,6 +24,7 @@ Evaluator <- R6Class("Evaluator",
             assign("display",display,pos=pos)
             assign("Page",Page,pos=pos)
 
+            options(device=dummy_device)
             options(pager=self$pager)
             options(crayon.enabled=TRUE,crayon.colors=256L)
             options(rkernel_graphics_types=c("image/svg+xml","image/png","application/pdf"))
@@ -85,9 +86,6 @@ Evaluator <- R6Class("Evaluator",
         },
 
         eval = function(code,...,silent=FALSE){
-
-            options(device=svg)
-            options(pager=self$pager)
 
             add_paged_classes(c("help_files_with_topic","packageIQR"))
 
@@ -398,3 +396,8 @@ is_unexpected_string <- function(code)
     grepl(gettextf("unexpected %s","INCOMPLETE_STRING",
                   domain = "R"),
           code,fixed = TRUE)
+
+dummy_dev_filename <- function(...) file.path(tempdir(),"dummy-device.png")
+
+dummy_device <- function(filename = dummy_dev_filename(),
+                         ...) png(filename,...)
