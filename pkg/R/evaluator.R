@@ -49,8 +49,8 @@ Evaluator <- R6Class("Evaluator",
             setHook('before.plot.new',self$before_plot_new_hook)
             setHook('before.grid.newpage',self$before_plot_new_hook)
             
-            trace(plot.xy,self$plot_xy_hook,print=FALSE)
-            trace(curve,quote(curve_hook(add)),print=FALSE)
+            suppressMessages(trace(plot.xy,self$plot_xy_hook,print=FALSE))
+            suppressMessages(trace(curve,quote(curve_hook(add)),print=FALSE))
 
             assign("curve_hook",self$curve_hook,pos=pos)
 
@@ -378,3 +378,27 @@ check_names <- function(x,mandatory,optional=NULL,any_other=FALSE){
     else return(TRUE)
 }
 
+
+#' @importFrom evaluate parse_all
+code_is_complete <- function(code){
+    status <- tryCatch({
+        parse_all(code)
+        "complete"
+    },
+    error = conditionMessage)
+    if(is_unexpected_end(status) || is_unexpected_string(status))
+        return("incomplete")
+    else if(status!="complete")
+         return("invalid")
+    else return("complete")
+}
+
+is_unexpected_end <- function(code) 
+    grepl(gettext("unexpected end of input",
+                  domain = "R"),
+          code,fixed = TRUE)
+
+is_unexpected_string <- function(code) 
+    grepl(gettextf("unexpected %s","INCOMPLETE_STRING",
+                  domain = "R"),
+          code,fixed = TRUE)

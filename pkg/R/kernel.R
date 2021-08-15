@@ -152,10 +152,12 @@ Kernel <- R6Class("Kernel",
     is_complete_reply = function(msg) {
       #cat("is_complete_reply\n")
       #str(msg)
+      code <- msg$content$code
+      status <- code_is_complete(code)
       private$send_message(type="is_complete_reply",
                            parent=msg,
                            socket_name="shell",
-                           status="complete",
+                           status=status,
                            #debug=TRUE,
                            indent="")
       #cat("Sent an is_complete_reply ...\n")
