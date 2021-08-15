@@ -364,11 +364,43 @@ Evaluator <- R6Class("Evaluator",
             else return("complete")
         },
 
+        completions_inited = FALSE,
+        cf = list(),
+
+        init_completions = function(){
+            utils_ns <- asNamespace('utils')
+            self$cf$assignLinebuffer <- get(".assignLinebuffer",utils_ns)
+            self$cf$assignEnd <- get(".assignEnd",utils_ns)
+            self$cf$guessTokenFromLine <- get(".guessTokenFromLine",utils_ns)
+            self$cf$completeToken <- get(".completeToken",utils_ns)
+            self$cf$retrieveCompletions <- get(".retrieveCompletions",utils_ns)
+            self$completions_inited <- TRUE
+        },
+        
         get_completions = function(code,cursor_pos){
+            if(!self$completions_inited) self$init_completions()
+
+            lines <- splitLines(code)
+            llines <- nchar(lines)
+            line_end <- cumsum(llines)
+            line_start <- head(c(0,line_end),-1)
+            i <- max(which(cursor_pos <= line_end))
+            pos <- cursor_pos - line_start[i] + 1
+            line <- lines[i]
+            self$cf$assignLinebuffer(line)
+            self$cf$assignEnd(pos)
+            match_info <- self$cf$guessTokenFromLine(update=FALSE)
+            self$cf$guessTokenFromLine()
+            self$cf$completeToken()
+
+            matches <- self$cf$retrieveCompletions()
+            start <- line_start[i] + match_info$start
+            end <- start + nchar(match_info$token)
+
             return(list(
-                matches = list(),
-                start = cursor_pos,
-                end = cursor_pos
+                matches = matches,
+                start = start,
+                end = end
             ))
         }
 
@@ -410,3 +442,5 @@ dummy_dev_filename <- function(...) file.path(tempdir(),"dummy-device.png")
 #' @importFrom grDevices png
 dummy_device <- function(filename = dummy_dev_filename(),
                          ...) png(filename,...)
+
+splitLines <- function(text) strsplit(text,"\n",fixed=TRUE)[[1]]
