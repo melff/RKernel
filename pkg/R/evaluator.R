@@ -190,10 +190,10 @@ Evaluator <- R6Class("Evaluator",
             self$current_plot <- plt
             self$graphics_par_usr <- par("usr")
 
-            width <- getOption("rkernel_plot_width",6)
-            height <- getOption("rkernel_plot_height",6)
+            width <- getOption("rkernel_plot_width",7)
+            height <- getOption("rkernel_plot_height",7)
             pointsize <- getOption("rkernel_plot_pointsize",12)
-            resolution <- getOption("rkernel_plot_resolution",600)
+            resolution <- getOption("rkernel_plot_resolution",120)
             embedded <- getOption("rkernel_plot_graphics",TRUE)
 
             rkernel_graphics_types <- getOption("rkernel_graphics_types")
