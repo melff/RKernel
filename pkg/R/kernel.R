@@ -129,7 +129,7 @@ Kernel <- R6Class("Kernel",
       if(aborted) private$clear_shell_queue()
     },
 
-    kernel_info_reply = function(msg) {
+    kernel_info_reply = function(msg){
       rversion <- paste0(version$major,".",version$minor)
       response <- list(protocol_version= PROTOCOL_VERSION,
                        implementation="RKernel",
@@ -149,7 +149,7 @@ Kernel <- R6Class("Kernel",
       #cat("Sent a kernel_info_reply ...\n")
     },
 
-    is_complete_reply = function(msg) {
+    is_complete_reply = function(msg){
       #cat("is_complete_reply\n")
       #str(msg)
       code <- msg$content$code
@@ -161,6 +161,19 @@ Kernel <- R6Class("Kernel",
                            #debug=TRUE,
                            indent="")
       #cat("Sent an is_complete_reply ...\n")
+    },
+
+    complete_reply = function(msg){
+      code <- msg$content$code
+      cursor_pos <- msg$content$cursor_pos
+      private$send_message(type="complete_reply",
+                           parent=msg,
+                           socket_name="shell",
+                           status="ok",
+                           matches=list(),
+                           cursor_start=cursor_pos,
+                           cursor_end=cursor_pos,
+                           metadata=namedList())
     }
   ),
 
@@ -219,7 +232,8 @@ Kernel <- R6Class("Kernel",
       switch(msg$header$msg_type,
              execute_request = self$execute_reply(msg),
              is_complete_request = self$is_complete_reply(msg),
-             kernel_info_request = self$kernel_info_reply(msg))
+             kernel_info_request = self$kernel_info_reply(msg),
+             complete_request = self$complete_reply(msg))
 
       private$send_message(type="status",parent=msg,
                            socket_name="iopub",execution_state="idle")
