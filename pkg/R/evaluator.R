@@ -60,11 +60,6 @@ Evaluator <- R6Class("Evaluator",
 
         current_plot = list(),
 
-        current_plot_display_id = "",
-
-        before_plot_new_hook = function(...){
-        },
-
         plot_new_hook = function(...){
             self$plot_new_called <- TRUE
         },
@@ -72,7 +67,8 @@ Evaluator <- R6Class("Evaluator",
         graphics_par_usr = numeric(0),
 
         curve_hook = function(add){
-            if(isTRUE(add) && !self$plot_new_called){
+            if(isTRUE(add) && !self$plot_new_called && 
+               length(self$current_plot) > 0){
                 replayPlot(self$current_plot)
                 par(usr = self$graphics_par_usr)
                 self$plot_new_called <- TRUE
@@ -80,8 +76,8 @@ Evaluator <- R6Class("Evaluator",
         },
 
         plot_xy_hook = function(...){
-            if(!self$plot_new_called){
-                # plot.new()
+            if(!self$plot_new_called && 
+               length(self$current_plot) > 0){
                 replayPlot(self$current_plot)
                 par(usr = self$graphics_par_usr)
                 self$plot_new_called <- TRUE
