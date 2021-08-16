@@ -125,8 +125,12 @@ Kernel <- R6Class("Kernel",
                            payload=payload,
                            status=status,
                            execution_count=self$execution_count)
-      self$execution_count <- self$execution_count + 1
       #cat("Sent a execute_reply ...\n")
+      message("Code:", msg$content$code)
+      #message("Store history:", msg$content$store_history)
+      #message("Execution count:", self$execution_count)
+      if(msg$content$store_history)
+        self$execution_count <- self$execution_count + 1
       if(aborted) private$clear_shell_queue()
     },
 
