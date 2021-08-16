@@ -24,6 +24,8 @@ Evaluator <- R6Class("Evaluator",
 
             assign("display",display,pos=pos)
             assign("Page",Page,pos=pos)
+            if("var_dic_list" %in% objects()) rm("var_dic_list",pos=1)
+            assign("var_dic_list",self$var_dic_list,pos=pos)
 
             options(device=dummy_device)
             options(pager=self$pager)
@@ -93,6 +95,9 @@ Evaluator <- R6Class("Evaluator",
         eval = function(code,...,silent=FALSE){
 
             add_paged_classes(c("help_files_with_topic","packageIQR"))
+            #if("var_dic_list" %in% objects()) rm(var_dic_list,pos=1)
+            #pos <- match("RKernel",search())
+            #assign("var_dic_list",self$var_dic_list,pos=pos)
 
             if(self$nframes < 0){
                 getnframes <- function(e) self$nframes <- sys.nframe()
@@ -406,6 +411,27 @@ Evaluator <- R6Class("Evaluator",
                 start = start,
                 end = end
             ))
+        },
+
+        var_dic_list = function(){ 
+            ll <- ls(.GlobalEnv, all.names = FALSE)
+            varList <- list()
+            n <- 1
+            for (k in ll){
+                class <- class(get(k)) 
+                rk <- paste(capture.output(str(get(k))),collapse="\n")
+                size <-  object.size(get(k))
+                sk <- substr(rk,0, 200); 
+                l <- list(varName = k, 
+                          varType = class, 
+                          varSize = size, 
+                          varContent = sk)
+                varList[[n]] <- l
+                n = n + 1
+                }
+            return(toJSON(varList, 
+                          simplifyVector=FALSE, 
+                          force=TRUE))
         }
 
 ))
