@@ -277,7 +277,7 @@ Evaluator <- R6Class("Evaluator",
                 text   = text
             )
             self$status <- "error"
-            stop_on_error <- getOption("rkernel_stop_on_error",FALSE)
+            stop_on_error <- getOption("rkernel_stop_on_error",TRUE)
             if(isTRUE(stop_on_error)){
                 calls <- sys.calls()
                 calls <- head(calls,-3)
