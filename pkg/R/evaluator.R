@@ -346,7 +346,7 @@ Evaluator <- R6Class("Evaluator",
                 text   = "<interrupted>"
             )
             self$add_result(result)
-            seff$status <- "aborted"
+            self$status <- "aborted"
             self$aborted <- TRUE
         },
 
