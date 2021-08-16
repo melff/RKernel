@@ -46,6 +46,7 @@ Kernel <- R6Class("Kernel",
                control=private$respond_control(req),
                shell=private$respond_shell(req))
       }
+      private$evaluator$shutdown()
     },
 
     execution_count = 1,
@@ -218,8 +219,10 @@ Kernel <- R6Class("Kernel",
     respond_control = function(req){
       msg <- private$get_message("control")
       if(!length(msg)) return(TRUE)
-      if(msg$header$msg_type=="shutdown_request")
+      if(msg$header$msg_type=="shutdown_request"){
+        # cat("shutdown_request received")
         return(FALSE)
+      }
       else return(TRUE)
     },
 

@@ -58,6 +58,10 @@ Evaluator <- R6Class("Evaluator",
 
         },
 
+        shutdown = function(){
+            base::q()
+        },
+
         plot_new_called = FALSE,
 
         current_plot = list(),
