@@ -57,6 +57,7 @@ Evaluator <- R6Class("Evaluator",
             suppressMessages(trace(curve,quote(curve_hook(add)),print=FALSE))
 
             assign("curve_hook",self$curve_hook,pos=pos)
+            add_paged_classes(c("help_files_with_topic","packageIQR"))
 
         },
 
@@ -94,7 +95,6 @@ Evaluator <- R6Class("Evaluator",
 
         eval = function(code,...,silent=FALSE){
 
-            add_paged_classes(c("help_files_with_topic","packageIQR"))
             #if("var_dic_list" %in% objects()) rm(var_dic_list,pos=1)
             #pos <- match("RKernel",search())
             #assign("var_dic_list",self$var_dic_list,pos=pos)
