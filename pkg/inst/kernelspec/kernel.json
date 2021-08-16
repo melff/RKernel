@@ -1,4 +1,11 @@
-{"argv": ["R", "--slave", "-e", "RKernel::main()", "--args", "{connection_file}"],
+{"argv": ["R",
+          "--no-restore-data",  
+          "--no-save", 
+          "--slave", 
+          "-e", 
+          "RKernel::main()", 
+          "--args", 
+          "{connection_file}"],
  "display_name":"R (RKernel)",
  "language":"R"
 }
