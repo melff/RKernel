@@ -24,7 +24,8 @@ Evaluator <- R6Class("Evaluator",
 
             assign("display",display,pos=pos)
             assign("Page",Page,pos=pos)
-            if("var_dic_list" %in% objects()) rm("var_dic_list",pos=1)
+            if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
+                rm(var_dic_list,envir=.GlobalEnv)
             assign("var_dic_list",self$var_dic_list,pos=pos)
 
             options(device=dummy_device)
@@ -95,7 +96,8 @@ Evaluator <- R6Class("Evaluator",
 
         eval = function(code,...,silent=FALSE){
 
-            #if("var_dic_list" %in% objects()) rm(var_dic_list,pos=1)
+            if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
+                rm(var_dic_list,envir=.GlobalEnv)
             #pos <- match("RKernel",search())
             #assign("var_dic_list",self$var_dic_list,pos=pos)
 
