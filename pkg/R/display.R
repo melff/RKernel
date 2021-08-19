@@ -3,7 +3,10 @@
 #' @export
 display <- function(x,...) UseMethod("display")
 #' @export
-display.default <- function(x,...,metadata=NULL,id=uuid::UUIDgenerate(),update=FALSE){
+display.default <- function(x,...,
+                            metadata=NULL,
+                            id=uuid::UUIDgenerate(),
+                            update=FALSE){
 
     if(missing(x)){
         if(!length(metadata)) metadata <- namedList()
@@ -20,8 +23,8 @@ display.default <- function(x,...,metadata=NULL,id=uuid::UUIDgenerate(),update=F
             repr_func <- mime2repr[[mime_type]]
             repr_result <- repr_func(x,...)
             mime_data[[mime_type]] <- repr_result
-            d <- list(data=mime_data)
         }
+        d <- list(data=mime_data)
     }
     d$metadata <- metadata
     d$transient <- list(display_id=id)
@@ -29,6 +32,46 @@ display.default <- function(x,...,metadata=NULL,id=uuid::UUIDgenerate(),update=F
     else cl <- "display_data"
     structure(d,class=cl)
 }
+
+#' @importFrom htmltools htmlEscape
+#' @export
+display.htmlwidget <- function(x,...,
+                            metadata=NULL,
+                            id=uuid::UUIDgenerate(),
+                            update=FALSE){
+    rkernel_mime_types <- getOption("rkernel_mime_types",
+                                    c("text/plain",
+                                      "text/html"))
+    rkernel_mime_types <- intersect(rkernel_mime_types,
+                                   c("text/plain",
+                                     "text/html"))
+    mime_data <- list()
+    for(mime_type in rkernel_mime_types){
+        repr_func <- mime2repr[[mime_type]]
+        repr_result <- repr_func(x,...)
+        mime_data[[mime_type]] <- repr_result
+    }
+    # This is needed to make htmlwidgets appear in Firefox
+    if("text/html" %in% names(mime_data)){
+        r_html <- mime_data["text/html"]
+        r_html <- gsub("\n","",r_html,fixed=TRUE)
+        r_html <- gsub("\t","",r_html,fixed=TRUE)
+        r_html <- htmlEscape(r_html)
+        r_html <- paste0("<div>\n<iframe srcdoc='",
+                         r_html,
+                         "' width='100%' height='500' frameborder='0'>\n</iframe>\n</div>\n")
+        # TODO obtain height from the widget object itself
+        mime_data["text/html"] <- r_html
+    }
+    d <- list(data=mime_data)
+    d$metadata <- metadata
+    d$transient <- list(display_id=id)
+    if(update) cl <- "update_display_data"
+    else cl <- "display_data"
+    structure(d,class=cl)
+}
+
+
 
 #' @export
 display_id <- function(x) UseMethod("display_id")

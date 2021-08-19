@@ -24,6 +24,10 @@ Evaluator <- R6Class("Evaluator",
 
             assign("display",display,pos=pos)
             assign("Page",Page,pos=pos)
+
+            assign("add_paged_classes",add_paged_classes,pos=pos)
+            assign("add_displayed_classes",add_displayed_classes,pos=pos)
+
             if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
                 rm(var_dic_list,envir=.GlobalEnv)
             assign("var_dic_list",self$var_dic_list,pos=pos)
@@ -31,7 +35,8 @@ Evaluator <- R6Class("Evaluator",
             options(device=dummy_device)
             options(pager=self$pager)
             options(crayon.enabled=TRUE,crayon.colors=256L)
-            options(rkernel_graphics_types=c("image/svg+xml","image/png","application/pdf"))
+            options(jupyter.graphics.types=c("image/svg+xml","image/png","application/pdf"))
+            #options(jupyter.graphics.types=c("image/png","application/pdf"))
 
             self$output_handlers$default <- new_output_handler(
                 text     = self$handle_text,
@@ -59,6 +64,7 @@ Evaluator <- R6Class("Evaluator",
 
             assign("curve_hook",self$curve_hook,pos=pos)
             add_paged_classes(c("help_files_with_topic","packageIQR"))
+            add_displayed_classes(c("htmlwidget"))
 
         },
 
@@ -196,17 +202,16 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_graphics = function(plt) {
-            # cat("handle_graphics")
             self$current_plot <- plt
             self$graphics_par_usr <- par("usr")
 
-            width <- getOption("rkernel_plot_width",7)
-            height <- getOption("rkernel_plot_height",7)
-            pointsize <- getOption("rkernel_plot_pointsize",12)
-            resolution <- getOption("rkernel_plot_resolution",120)
-            embedded <- getOption("rkernel_plot_graphics",TRUE)
+            width <- getOption("jupyter.plot.width",7)
+            height <- getOption("jupyter.plot.height",7)
+            pointsize <- getOption("jupyter.plot.pointsize",12)
+            resolution <- getOption("jupyter.plot.resolution",120)
+            embedded <- getOption("jupyter.embed.graphics",TRUE)
 
-            rkernel_graphics_types <- getOption("rkernel_graphics_types")
+            rkernel_graphics_types <- getOption("jupyter.graphics.types")
 
             mime_data <- list()
             mime_metadata <- list()
@@ -258,10 +263,10 @@ Evaluator <- R6Class("Evaluator",
             text <- conditionMessage(w)
             call <- conditionCall(w)
             if(is.null(call)) {
-                text <- paste0("Warning: ",text)
+                text <- paste0("\nWarning:\n\t",paste(text,collapse="\n"))
             } else {
                 call <- deparse(call)[[1]]
-                text <- paste0("Warning in ",call,": ",text)
+                text <- paste0("\nWarning in ",call,":\n\t",paste(text,collapse="\n"))
             }
             result <- list(
                 stream = "stderr",
