@@ -126,7 +126,7 @@ Kernel <- R6Class("Kernel",
                            status=status,
                            execution_count=self$execution_count)
       #cat("Sent a execute_reply ...\n")
-      message("Code:", msg$content$code)
+      # message("Code:", msg$content$code)
       #message("Store history:", msg$content$store_history)
       #message("Execution count:", self$execution_count)
       if(msg$content$store_history)
