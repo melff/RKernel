@@ -21,6 +21,8 @@ Evaluator <- R6Class("Evaluator",
             pos <- match("RKernel",search())
             assign("q",self$quit,pos=pos)
             assign("quit",self$quit,pos=pos)
+            assign("cell.options",self$cell.options,pos=pos)
+            assign("cell.par",self$cell.par,pos=pos)
 
             assign("display",display,pos=pos)
             assign("Page",Page,pos=pos)
@@ -140,6 +142,16 @@ Evaluator <- R6Class("Evaluator",
                              output_handler=self$output_handlers$default,
                              new_device=TRUE),
                     interrupt = self$handle_interrupt)
+                if(length(self$saved.options)){
+                    op <- self$saved.options
+                    self$saved.options <- list()
+                    do.call("options",op)
+                }
+                if(length(self$saved.parms)){
+                    op <- self$saved.parms
+                    self$saved.parms <- list()
+                    do.call("par",op)
+                }
             }
             return(self$results)
         },
@@ -439,6 +451,26 @@ Evaluator <- R6Class("Evaluator",
             return(toJSON(varList, 
                           simplifyVector=FALSE, 
                           force=TRUE))
+        },
+
+        saved.options = list(),
+        cell.options = function(...){
+            op <- options()
+            self$saved.options <- op
+            args <- list(...)
+            nms <- names(args)
+            op[nms] <- args
+            do.call("options",op)
+        },
+
+        saved.parms = list(),
+        cell.par = function(...){
+            op <- par(no.readonly=TRUE)
+            self$saved.parms <- op
+            args <- list(...)
+            nms <- names(args)
+            op[nms] <- args
+            do.call("par",op)
         }
 
 ))
