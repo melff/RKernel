@@ -34,10 +34,17 @@ Evaluator <- R6Class("Evaluator",
                 rm(var_dic_list,envir=.GlobalEnv)
             assign("var_dic_list",self$var_dic_list,pos=pos)
 
-            options(device=dummy_device)
-            options(pager=self$pager)
-            options(crayon.enabled=TRUE,crayon.colors=256L)
-            options(jupyter.graphics.types=c("image/svg+xml","image/png","application/pdf"))
+            options(device=dummy_device,
+                    pager=self$pager,
+                    crayon.enabled=TRUE,crayon.colors=256L,
+                    jupyter.graphics.types=c("image/svg+xml","image/png","application/pdf"),
+                    jupyter.plot.width=6,
+                    jupyter.plot.height=6,
+                    jupyter.plot.pointsize=12,
+                    jupyter.plot.res=96,
+                    jupyter.plot.units="in",
+                    jupyter.embed.graphics=TRUE)
+
             #options(jupyter.graphics.types=c("image/png","application/pdf"))
 
             self$output_handlers$default <- new_output_handler(
@@ -217,10 +224,10 @@ Evaluator <- R6Class("Evaluator",
             self$current_plot <- plt
             self$graphics_par_usr <- par("usr")
 
-            width <- getOption("jupyter.plot.width",7)
-            height <- getOption("jupyter.plot.height",7)
+            width <- getOption("jupyter.plot.width",6)
+            height <- getOption("jupyter.plot.height",6)
             pointsize <- getOption("jupyter.plot.pointsize",12)
-            resolution <- getOption("jupyter.plot.resolution",120)
+            resolution <- getOption("jupyter.plot.res",96)
             embedded <- getOption("jupyter.embed.graphics",TRUE)
 
             rkernel_graphics_types <- getOption("jupyter.graphics.types")
@@ -510,6 +517,15 @@ dummy_dev_filename <- function(...) file.path(tempdir(),"dummy-device.png")
 
 #' @importFrom grDevices png
 dummy_device <- function(filename = dummy_dev_filename(),
-                         ...) png(filename,...)
+                         width = getOption("jupyter.plot.width",7),
+                         height = getOption("jupyter.plot.height",7),
+                         res = getOption("jupyter.plot.res",96),
+                         pointsize = getOption("jupyter.plot.pointsize",12),
+                         units = getOption("jupyter.plot.units","in"),
+                         ...) png(filename,
+                                  width=width,
+                                  height=height,
+                                  res=res,
+                                  units=units,...)
 
 splitLines <- function(text) strsplit(text,"\n",fixed=TRUE)[[1]]
