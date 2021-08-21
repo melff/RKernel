@@ -13,7 +13,7 @@ Kernel <- R6Class("Kernel",
 
   public = list(
 
-    initialize = function(conn_info,evaluator){
+    initialize = function(conn_info,evaluator,comm_dispatcher){
       .zmqopt_init(envir = private)
       private$zmqctx <- zmq.ctx.new()
       private$sockets$hb      <-  zmq.socket(private$zmqctx, private$.pbd_env$ZMQ.ST$REP)
@@ -45,6 +45,7 @@ Kernel <- R6Class("Kernel",
                hb=private$respond_hb(req),
                control=private$respond_control(req),
                shell=private$respond_shell(req))
+        private$comm_dispatch()
       }
       private$evaluator$shutdown()
     },
@@ -180,6 +181,52 @@ Kernel <- R6Class("Kernel",
                            cursor_start=result$start,
                            cursor_end=result$end,
                            metadata=namedList())
+    },
+
+    comm_info_reply = function(msg){
+      target_name <- NULL
+      if("target_name" %in% names(msg$content))
+        target_name <- msg$content$target_name
+      comms <- private$comm_dispatcher$get_comms(target_name)
+      private$send_message("comm_info_reply",
+                           parent=msg,
+                           socket_name="shell",
+                           status="ok",
+                           comms=comms)
+    },
+
+    comm_open = function(msg){
+      target_name <- msg$content$target_name
+      id <- msg$content$comm_id
+      data <- msg$content$data
+      private$comm_dispatcher$open(target_name,id,data)
+      private$comm_parent <- msg
+    },
+
+    comm_receive = function(msg){
+      id <- msg$content$comm_id
+      data <- msg$content$data
+      private$comm_dispatcher$receive(id,data)
+      private$comm_parent <- msg
+    },
+
+    comm_close = function(msg){
+      id <- msg$content$comm_id
+      data <- msg$content$data
+      private$comm_dispatcher$close(id,data)
+      private$comm_parent <- msg
+    },
+
+    comm_dispatch = function(){
+      comm_messages <- private$comm_dispatcher$get_queue()
+      for(comm_msg in comm_messages){
+        private$send_message(type="comm_msg",
+                             parent=private$comm_parent,
+                             socket_name="iopub",
+                             comm_id=comm_msg$id,
+                             data=comm_msg$data
+                             )
+      }
     }
   ),
 
@@ -241,7 +288,12 @@ Kernel <- R6Class("Kernel",
              execute_request = self$execute_reply(msg),
              is_complete_request = self$is_complete_reply(msg),
              kernel_info_request = self$kernel_info_reply(msg),
-             complete_request = self$complete_reply(msg))
+             complete_request = self$complete_reply(msg),
+             comm_info_request = self$comm_info_reply(msg),
+             comm_open = self$comm_open(msg),
+             comm_msg = self$comm_receive(msg),
+             comm_close = self$comm_close(msg)
+             )
 
       private$send_message(type="status",parent=msg,
                            socket_name="iopub",execution_state="idle")
@@ -352,7 +404,9 @@ Kernel <- R6Class("Kernel",
         }
         else break
       }
-    }
+    },
+
+    comm_parent = list()
   )
 )
 

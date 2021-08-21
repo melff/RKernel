@@ -529,3 +529,13 @@ dummy_device <- function(filename = dummy_dev_filename(),
                                   units=units,...)
 
 splitLines <- function(text) strsplit(text,"\n",fixed=TRUE)[[1]]
+
+
+CommDispatcher <- R6Class("CommDispatcher",
+    public=list(
+        get_comms = function(target_name) NULL,
+        open = function(target_name,id,data) NULL,
+        receive = function(id,data) NULL,
+        close = function(id,data) NULL,
+        get_queue = function() NULL
+))
