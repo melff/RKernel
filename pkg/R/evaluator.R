@@ -48,7 +48,8 @@ Evaluator <- R6Class("Evaluator",
                     jupyter.plot.pointsize=12,
                     jupyter.plot.res=96,
                     jupyter.plot.units="in",
-                    jupyter.embed.graphics=TRUE)
+                    jupyter.embed.graphics=TRUE,
+                    jupyter.update.graphics=TRUE)
 
             #options(jupyter.graphics.types=c("image/png","application/pdf"))
 
@@ -93,6 +94,7 @@ Evaluator <- R6Class("Evaluator",
 
         plot_new_hook = function(...){
             self$plot_new_called <- TRUE
+            message("plot_new called")
         },
 
         graphics_par_usr = numeric(0),
@@ -222,6 +224,8 @@ Evaluator <- R6Class("Evaluator",
             private$kernel$stream(text=text,stream="stdout")
         },
 
+        last_plot_id = character(),
+
         handle_graphics = function(plt) {
             self$current_plot <- plt
             self$graphics_par_usr <- par("usr")
@@ -231,6 +235,7 @@ Evaluator <- R6Class("Evaluator",
             pointsize <- getOption("jupyter.plot.pointsize",12)
             resolution <- getOption("jupyter.plot.res",96)
             embedded <- getOption("jupyter.embed.graphics",TRUE)
+            update_graphics <- getOption("jupyter.update.graphics",TRUE)
 
             rkernel_graphics_types <- getOption("jupyter.graphics.types")
 
@@ -253,6 +258,24 @@ Evaluator <- R6Class("Evaluator",
 
             if(embedded){
                 if(update_graphics){
+                    # message("update_graphics")
+                    if(self$plot_new_called){
+                        id <- UUIDgenerate()
+                        private$kernel$display_data(data = mime_data,
+                                                    metadata = mime_metadata,
+                                                    transient = list(display_id=id))
+                        self$last_plot_id <- id
+                        # message(sprintf("Creating new display %s",id))
+                    } 
+                    else {
+                        id <- self$last_plot_id
+                        private$kernel$update_display_data(data = mime_data,
+                                                           metadata = mime_metadata,
+                                                           transient = list(display_id=id))
+                        # message(sprintf("Updating display %s",id))
+                    }
+                }
+                else{
                     # message("NOT update_graphics")
                     private$kernel$display_data(data = mime_data,
                                                 metadata = mime_metadata)
@@ -322,7 +345,6 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_value = function(x,visible) {
-            result <- NULL
             if(visible){
                 if(any(class(x) %in% getOption("rkernel_paged_classes"))){
                     displayed <- display(x)
