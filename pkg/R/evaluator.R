@@ -28,7 +28,7 @@ Evaluator <- R6Class("Evaluator",
             assign("cell.options",self$cell.options,pos=pos)
             assign("cell.par",self$cell.par,pos=pos)
 
-            assign("display",display,pos=pos)
+            assign("display",self$display,pos=pos)
             assign("javascript",javascript,pos=pos)
             assign("Page",Page,pos=pos)
 
@@ -140,11 +140,9 @@ Evaluator <- R6Class("Evaluator",
             expr <- try(parse(text=code),silent=TRUE)
             if(inherits(expr,"try-error")){
                 condition <- attr(expr,"condition")
-                result <- list(
-                    text = condition$message,
-                    stream = "stderr")
-                self$add_result(result)
                 self$status <- "error"
+                private$kernel$stream(text=condition$message,
+                                      stream="stdout")
             }
             else {
                 self$plot_new_called <- FALSE
@@ -166,7 +164,6 @@ Evaluator <- R6Class("Evaluator",
                     do.call("par",op)
                 }
             }
-            return(self$results)
         },
 
         add_result = function(result){
@@ -189,6 +186,10 @@ Evaluator <- R6Class("Evaluator",
             if(reset)
                 self$status <- "ok"
             return(status)
+        },
+
+        set_status = function(status){
+            self$status <- status
         },
 
         is_aborted = function(reset=FALSE){
@@ -218,12 +219,7 @@ Evaluator <- R6Class("Evaluator",
 
         handle_text = function(text) {
             # cat("handle_text")
-            result <- list(
-                stream = "stdout",
-                text   = text,
-                status = "ok"
-            )
-            self$add_result(result)
+            private$kernel$stream(text=text,stream="stdout")
         },
 
         handle_graphics = function(plt) {
@@ -256,13 +252,11 @@ Evaluator <- R6Class("Evaluator",
             }
 
             if(embedded){
-                result <- list(
-                    display_data = list(
-                        data = mime_data,
-                        metadata = mime_metadata
-                    )
-                )
-                self$add_result(result)
+                if(update_graphics){
+                    # message("NOT update_graphics")
+                    private$kernel$display_data(data = mime_data,
+                                                metadata = mime_metadata)
+                }
             } else if("image/svg+xml" %in% rkernel_graphics_types){
                 payload <- list(
                     source="page",
@@ -277,11 +271,8 @@ Evaluator <- R6Class("Evaluator",
 
         handle_message = function(m) {
             text <- conditionMessage(m)
-            result <- list(
-                stream = "stdout",
-                text   = text
-            )
-            self$add_result(result)
+            private$kernel$stream(text = text,
+                                  stream = "stdout")
         },
 
         handle_warning = function(w) {
@@ -293,11 +284,8 @@ Evaluator <- R6Class("Evaluator",
                 call <- deparse(call)[[1]]
                 text <- paste0("\nWarning in ",call,":\n\t",paste(text,collapse="\n"))
             }
-            result <- list(
-                stream = "stderr",
-                text   = text
-            )
-            self$add_result(result)
+            private$kernel$stream(text = text,
+                                  stream = "stderr")
         },
 
         handle_error = function(e) {
@@ -309,12 +297,10 @@ Evaluator <- R6Class("Evaluator",
                 call <- deparse(call)[[1]]
                 text <- paste0("Error in ",call,": ",text)
             }
-            result <- list(
-                stream = "stderr",
-                text   = text
-            )
             self$status <- "error"
             stop_on_error <- getOption("rkernel_stop_on_error",TRUE)
+            private$kernel$stream(text = text,
+                                  stream = "stderr")
             if(isTRUE(stop_on_error)){
                 calls <- sys.calls()
                 calls <- head(calls,-3)
@@ -327,13 +313,12 @@ Evaluator <- R6Class("Evaluator",
                                     calls)
                 traceback <- c("\nTraceback:",calls)
                 traceback <- paste(traceback,collapse="\n")
-                result$error <- list(
-                                name = "ERROR",
-                                value = text,
-                                traceback = list(traceback))
                 self$aborted <- TRUE
+                private$kernel$send_error(name = "ERROR",
+                                          value = value,
+                                          traceback = list(traceback)
+                                          )
             }
-            self$add_result(result)
         },
 
         handle_value = function(x,visible) {
@@ -347,20 +332,28 @@ Evaluator <- R6Class("Evaluator",
                     self$add_payload(payload)
                 }
                 else if(any(class(x) %in% getOption("rkernel_displayed_classes"))){
-                    displayed <- display(x)
-                    result <- list(display_data=unclass(displayed))
+                    d <- display(x)
+                    private$kernel$display_data(data=d$data,
+                                                metadata=d$metadata,
+                                                transient=d$transient)
                 }
                 else if(inherits(x,"clear_output")){
-                    result <- list(clear_output=unclass(x))
+                    private$kernel$clear_output(x)
                 }
                 else if(inherits(x,"execute_result")){
-                    result <- list(execute_result=unclass(x))
+                    private$kernel$execute_result(data=x$data,
+                                                  metadata=x$metadata,
+                                                  transient=x$transient)
                 }
                 else if(inherits(x,"display_data")){
-                    result <- list(display_data=unclass(x))
+                    private$kernel$display_data(data=x$data,
+                                                metadata=x$metadata,
+                                                transient=x$transient)
                 }
                 else if(inherits(x,"update_display_data")){
-                    result <- list(update_display_data=unclass(x))
+                    private$kernel$update_display_data(data=x$data,
+                                                       metadata=x$metadata,
+                                                       transient=x$transient)
                 }
                 else if(inherits(x,"payload")){
                     self$add_payload(unclass(x))
@@ -368,23 +361,25 @@ Evaluator <- R6Class("Evaluator",
                 else {
                     text <- capture.output(print(x))
                     text <- paste(text,collapse="\n")
-                    result <- list(stream = "stdout",
-                                   text   = text)
+                    private$kernel$stream(text = text,
+                                   stream = "stdout")
+
                 }
-                self$set_last_value(x)
             }
-            if(length(result))
-                self$add_result(result)
         },
 
         handle_interrupt = function(i){
-            result <- list(
-                stream = "stderr",
-                text   = "<interrupted>"
-            )
-            self$add_result(result)
+            private$kernel$stream(text = "<interrupted>",
+                                  stream = "stderr")
             self$status <- "aborted"
             self$aborted <- TRUE
+        },
+
+        display = function(x,...){
+            d <- display(x,...)
+            private$kernel$display_data(data=d$data,
+                                        metadata=d$metadata,
+                                        transient=d$transient)
         },
 
         set_last_value = function(x){

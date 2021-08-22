@@ -58,69 +58,71 @@ Kernel <- R6Class("Kernel",
     execution_count = 1,
 
     execute_reply = function(msg){
+      self$execute_request <- msg
       private$send_message(type="execute_input",
                            parent=msg,
                            socket_name="iopub",
                            code=msg$content$code,
                            execution_count=self$execution_count)
-      results <- self$evaluator$eval(msg$content$code)
-      if(length(results)){
-        for(result in results){
-          if("clear_output" %in% names(result)){
-            private$send_message(type="clear_output",
-                                 parent=msg,
-                                 socket_name="iopub",
-                                 wait=results$clear_output
-                                 )
-          }
-          if("stream" %in% names(result)){
-            if(nzchar(result$text)){
-              private$send_message(type="stream",
-                                   parent=msg,
-                                   socket_name="iopub",
-                                   name=result$stream,
-                                   text=result$text)
-            }
-          }
-          if("execute_result" %in% names(result)){
-            private$send_message(type="execute_result",
-                                 parent=msg,
-                                 socket_name="iopub",
-                                 data=result$execute_result$data,
-                                 metadata=result$execute_result$metadata,
-                                 transient=result$execute_result$transient,
-                                 execution_count=self$execution_count
-                                 )
-          }
-          if("display_data" %in% names(result)){
-            private$send_message(type="display_data",
-                                 parent=msg,
-                                 socket_name="iopub",
-                                 data=result$display_data$data,
-                                 metadata=result$display_data$metadata,
-                                 transient=result$display_data$transient
-                                 )
-          }
-          if("update_display_data" %in% names(result)){
-            private$send_message(type="update_display_data",
-                                 parent=msg,
-                                 socket_name="iopub",
-                                 data=result$update_display_data$data,
-                                 metadata=result$update_display_data$metadata,
-                                 transient=result$update_display_data$transient
-                                 )
-          }
-          if("error" %in% names(result)){
-            private$send_message(type="error",
-                                 parent=msg,
-                                 socket="iopub",
-                                 ename = result$error$name,
-                                 evalue = result$error$value,
-                                 traceback = result$error$traceback
-                                 )
-          }
-        }
-      }
+      self$evaluator$eval(msg$content$code)
+      #results <- self$evaluator$eval(msg$content$code)
+      # if(length(results)){
+      #   for(result in results){
+      #     if("clear_output" %in% names(result)){
+      #       private$send_message(type="clear_output",
+      #                            parent=msg,
+      #                            socket_name="iopub",
+      #                            wait=results$clear_output
+      #                            )
+      #     }
+      #     if("stream" %in% names(result)){
+      #       if(nzchar(result$text)){
+      #         private$send_message(type="stream",
+      #                              parent=msg,
+      #                              socket_name="iopub",
+      #                              name=result$stream,
+      #                              text=result$text)
+      #       }
+      #     }
+      #     if("execute_result" %in% names(result)){
+      #       private$send_message(type="execute_result",
+      #                            parent=msg,
+      #                            socket_name="iopub",
+      #                            data=result$execute_result$data,
+      #                            metadata=result$execute_result$metadata,
+      #                            transient=result$execute_result$transient,
+      #                            execution_count=self$execution_count
+      #                            )
+      #     }
+      #     if("display_data" %in% names(result)){
+      #       private$send_message(type="display_data",
+      #                            parent=msg,
+      #                            socket_name="iopub",
+      #                            data=result$display_data$data,
+      #                            metadata=result$display_data$metadata,
+      #                            transient=result$display_data$transient
+      #                            )
+      #     }
+      #     if("update_display_data" %in% names(result)){
+      #       private$send_message(type="update_display_data",
+      #                            parent=msg,
+      #                            socket_name="iopub",
+      #                            data=result$update_display_data$data,
+      #                            metadata=result$update_display_data$metadata,
+      #                            transient=result$update_display_data$transient
+      #                            )
+      #     }
+      #     if("error" %in% names(result)){
+      #       private$send_message(type="error",
+      #                            parent=msg,
+      #                            socket="iopub",
+      #                            ename = result$error$name,
+      #                            evalue = result$error$value,
+      #                            traceback = result$error$traceback
+      #                            )
+      #     }
+      #   }
+      # }
       payload <- self$evaluator$get_payload(clear=TRUE)
       payload <- check_page_payload(payload)
       status <- self$evaluator$get_status(reset=TRUE)
@@ -138,6 +140,64 @@ Kernel <- R6Class("Kernel",
       if(msg$content$store_history)
         self$execution_count <- self$execution_count + 1
       if(aborted) private$clear_shell_queue()
+    },
+
+    execute_request = character(0),
+
+    clear_output = function(wait){
+      private$send_message(type="clear_output",
+                                 parent=msg,
+                                 socket_name="iopub",
+                                 wait=wait)
+    },
+
+    stream = function(text,stream){
+      private$send_message(type="stream",
+                           parent=self$execute_request,
+                           socket_name="iopub",
+                           name=stream,
+                           text=text)
+    },
+
+    execute_result = function(data,metadata=NULL,transient=NULL){
+      private$send_message(type="execute_result",
+                           parent=self$execute_request,
+                           socket_name="iopub",
+                           data=data,
+                           metadata=metadata,
+                           transient=transient,
+                           execution_count=self$execution_count
+                           )
+    },
+
+    display_data = function(data,metadata=NULL,transient=NULL){
+      private$send_message(type="display_data",
+                           parent=self$execute_request,
+                           socket_name="iopub",
+                           data=data,
+                           metadata=metadata,
+                           transient=transient
+                           )
+    },
+
+    update_display_data = function(data,metadata=NULL,transient){
+      private$send_message(type="update_display_data",
+                           parent=self$execute_request,
+                           socket_name="iopub",
+                           data=data,
+                           metadata=metadata,
+                           transient=transient
+                           )
+    },
+
+    send_error = function(name,value,traceback){
+            private$send_message(type="error",
+                           parent=self$execute_request,
+                                 socket="iopub",
+                                 ename = name,
+                                 evalue = value,
+                                 traceback = traceback
+                                 )
     },
 
     kernel_info_reply = function(msg){
