@@ -13,7 +13,7 @@ Kernel <- R6Class("Kernel",
 
   public = list(
 
-    initialize = function(conn_info,evaluator,comm_dispatcher){
+    initialize = function(conn_info){
       .zmqopt_init(envir = private)
       private$zmqctx <- zmq.ctx.new()
       private$sockets$hb      <-  zmq.socket(private$zmqctx, private$.pbd_env$ZMQ.ST$REP)
@@ -31,23 +31,28 @@ Kernel <- R6Class("Kernel",
         zmq.bind(private$sockets[[s]],url_with_port)
       }
       private$conn_info <- conn_info
-      private$evaluator <- evaluator
+      self$evaluator <- Evaluator$new(self)
+      self$comm_dispatcher <- CommDispatcher$new(self)
     },
 
+    evaluator = list(),
+    comm_dispatcher = list(),
+
     run = function(){
-      private$evaluator$startup()
+      self$evaluator$startup()
+      self$comm_dispatcher$startup()
       continue <- TRUE
       while(continue) {
         req <- private$poll_request(c("hb","control","shell"))
         #Sys.sleep(1)
         if(req$abort) break
+        # print(req$socket_name)
         continue <- switch(req$socket_name,
                hb=private$respond_hb(req),
                control=private$respond_control(req),
                shell=private$respond_shell(req))
-        private$comm_dispatch()
       }
-      private$evaluator$shutdown()
+      self$evaluator$shutdown()
     },
 
     execution_count = 1,
@@ -58,7 +63,7 @@ Kernel <- R6Class("Kernel",
                            socket_name="iopub",
                            code=msg$content$code,
                            execution_count=self$execution_count)
-      results <- private$evaluator$eval(msg$content$code)
+      results <- self$evaluator$eval(msg$content$code)
       if(length(results)){
         for(result in results){
           if("clear_output" %in% names(result)){
@@ -116,10 +121,10 @@ Kernel <- R6Class("Kernel",
           }
         }
       }
-      payload <- private$evaluator$get_payload(clear=TRUE)
+      payload <- self$evaluator$get_payload(clear=TRUE)
       payload <- check_page_payload(payload)
-      status <- private$evaluator$get_status(reset=TRUE)
-      aborted <- private$evaluator$is_aborted(reset=TRUE)
+      status <- self$evaluator$get_status(reset=TRUE)
+      aborted <- self$evaluator$is_aborted(reset=TRUE)
       private$send_message(type="execute_reply",
                            parent=msg,
                            socket="shell",
@@ -159,7 +164,7 @@ Kernel <- R6Class("Kernel",
       #cat("is_complete_reply\n")
       #str(msg)
       code <- msg$content$code
-      status <- private$evaluator$code_is_complete(code)
+      status <- self$evaluator$code_is_complete(code)
       private$send_message(type="is_complete_reply",
                            parent=msg,
                            socket_name="shell",
@@ -172,7 +177,7 @@ Kernel <- R6Class("Kernel",
     complete_reply = function(msg){
       code <- msg$content$code
       cursor_pos <- msg$content$cursor_pos
-      result <- private$evaluator$get_completions(code,cursor_pos)
+      result <- self$evaluator$get_completions(code,cursor_pos)
       private$send_message(type="complete_reply",
                            parent=msg,
                            socket_name="shell",
@@ -187,7 +192,7 @@ Kernel <- R6Class("Kernel",
       target_name <- NULL
       if("target_name" %in% names(msg$content))
         target_name <- msg$content$target_name
-      comms <- private$comm_dispatcher$get_comms(target_name)
+      comms <- self$comm_dispatcher$get_comms(target_name)
       private$send_message("comm_info_reply",
                            parent=msg,
                            socket_name="shell",
@@ -195,39 +200,52 @@ Kernel <- R6Class("Kernel",
                            comms=comms)
     },
 
-    comm_open = function(msg){
+    comm_handle_open = function(msg){
       target_name <- msg$content$target_name
       id <- msg$content$comm_id
       data <- msg$content$data
-      private$comm_dispatcher$open(target_name,id,data)
+      self$comm_dispatcher$handle_open(target_name,id,data)
       private$comm_parent <- msg
     },
 
     comm_receive = function(msg){
       id <- msg$content$comm_id
       data <- msg$content$data
-      private$comm_dispatcher$receive(id,data)
+      self$comm_dispatcher$handle_msg(id,data)
       private$comm_parent <- msg
     },
 
-    comm_close = function(msg){
+    comm_handle_close = function(msg){
       id <- msg$content$comm_id
       data <- msg$content$data
-      private$comm_dispatcher$close(id,data)
+      self$comm_dispatcher$handle_close(id,data)
       private$comm_parent <- msg
     },
 
-    comm_dispatch = function(){
-      comm_messages <- private$comm_dispatcher$get_queue()
-      for(comm_msg in comm_messages){
-        private$send_message(type="comm_msg",
-                             parent=private$comm_parent,
-                             socket_name="iopub",
-                             comm_id=comm_msg$id,
-                             data=comm_msg$data
-                             )
-      }
+    comm_send = function(id,data){
+      send_message("comm_msg",
+                   parent=private$comm_parent,
+                   socket_name="iopub",
+                   comm_id=id,
+                   data=data)
+    },
+    
+    comm_send_open = function(id,data){
+      send_message("comm_open",
+                   parent=private$comm_parent,
+                   socket_name="iopub",
+                   comm_id=id,
+                   data=data)
+    },
+    
+    comm_send_close = function(id,data){
+      send_message("comm_close",
+                   parent=private$comm_parent,
+                   socket_name="iopub",
+                   comm_id=id,
+                   data=data)
     }
+
   ),
 
   private = list(
@@ -236,7 +254,6 @@ Kernel <- R6Class("Kernel",
     sockets = list(),
     zmqctx = list(),
     conn_info = list(),
-    evaluator = list(),
 
     poll_request = function(sock_names) {
       POLLIN <- private$.pbd_env$ZMQ.PO$POLLIN

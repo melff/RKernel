@@ -14,6 +14,10 @@ Evaluator <- R6Class("Evaluator",
         results = list(),
         env = list(),
 
+        initialize = function(kernel){
+            private$kernel <- kernel
+        },
+
         startup = function(...) {
 
             self$env <- new.env()
@@ -75,6 +79,7 @@ Evaluator <- R6Class("Evaluator",
             add_paged_classes(c("help_files_with_topic","packageIQR"))
             add_displayed_classes(c("htmlwidget"))
 
+            private$comm_dispatcher <- private$kernel$comm_dispatcher
         },
 
         shutdown = function(){
@@ -480,7 +485,14 @@ Evaluator <- R6Class("Evaluator",
             do.call("par",op)
         }
 
-))
+    ),
+    
+    private = list(
+        kernel=list(),
+        comm_dispatcher=list()
+    )
+
+)
 
 result_class <- function(x,cl){
     if(!is.list(x) || !inherits(x,cl)) return(FALSE)
@@ -531,11 +543,3 @@ dummy_device <- function(filename = dummy_dev_filename(),
 splitLines <- function(text) strsplit(text,"\n",fixed=TRUE)[[1]]
 
 
-CommDispatcher <- R6Class("CommDispatcher",
-    public=list(
-        get_comms = function(target_name) NULL,
-        open = function(target_name,id,data) NULL,
-        receive = function(id,data) NULL,
-        close = function(id,data) NULL,
-        get_queue = function() NULL
-))
