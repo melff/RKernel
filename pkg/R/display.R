@@ -211,3 +211,48 @@ remove_paged_classes <- function(x){
         options(rkernel_paged_classes=setdiff(paged_classes,classes))
     }
 }
+
+#' @importFrom tools Rd2HTML Rd2txt Rd2latex
+display.help_files_with_topic <- function(x,...,
+                                          id=uuid::UUIDgenerate(),
+                                          update=FALSE){
+
+    paths <- as.character(x)
+    topic <- attr(x,"topic")
+
+    if (length(paths) == 0) {
+        return(paste(gettextf('No documentation for %s in specified packages and libraries:', sQuote(topic)),
+                     gettextf('you could try %s', sQuote(paste0('??', topic))), sep = '\n'))
+    } else if(length(paths) > 1) {
+        message(sprintf("More than one help page on topic %s, using the first",sQuote(topic)))
+    }
+
+    file <- paths[[1]]
+    pkgname <- basename(dirname(dirname(file)))
+
+    utils_ns <- asNamespace("utils")
+    getHelpFile <- get(".getHelpFile",utils_ns)
+    Rd <- getHelpFile(file)
+
+    text_plain <- capture.output(Rd2txt(Rd, package = pkgname, outputEncoding = 'UTF-8'))
+    text_html <- capture.output(Rd2HTML(Rd, package = pkgname, outputEncoding = 'UTF-8'))
+    text_latex <- capture.output(Rd2latex(Rd, package = pkgname, outputEncoding = 'UTF-8'))
+
+    head_end_idx <- grep("</head><body>",text_html)
+    body_end_idx <- grep("</body></html>",text_html)
+    lines_to_remove <- c(seq_len(head_end_idx),body_end_idx)
+    text_html <- text_html[-lines_to_remove]
+
+    mime_data <- list(
+        "text/plain"=paste(text_plain,collapse="\n"),
+        "text/html"=paste(text_html,collapse="\n"),
+        "text/latex"=paste(text_latex,collapse="\n")
+    )
+
+    d <- list(data=mime_data)
+    d$metadata <- namedList()
+    d$transient <- list(display_id=id)
+    if(update) cl <- "update_display_data"
+    else cl <- "display_data"
+    structure(d,class=cl)
+}

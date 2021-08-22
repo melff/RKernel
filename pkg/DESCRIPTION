@@ -19,7 +19,8 @@ Imports:
     digest,
     R6,
     svglite,
-    repr
+    repr,
+    htmltools
 Depends:
     R (>= 3.0.1)
 Suggests:
