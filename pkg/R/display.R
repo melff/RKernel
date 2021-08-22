@@ -256,3 +256,12 @@ display.help_files_with_topic <- function(x,...,
     else cl <- "display_data"
     structure(d,class=cl)
 }
+
+javascript <- function(text,file){
+    if(missing(text)){
+        text <- readLines(file)
+        text <- paste(text,collapse="\n")
+    }
+    text_html <- paste("<script>",text,"</script>",sep="\n")
+    display("text/html"=text_html)
+}
