@@ -42,15 +42,13 @@ Evaluator <- R6Class("Evaluator",
             options(device=dummy_device,
                     pager=self$pager,
                     crayon.enabled=TRUE,crayon.colors=256L,
-                    jupyter.graphics.types=c("image/svg+xml","image/png","application/pdf"),
+                    jupyter.graphics.types=c("image/png","application/pdf"),
                     jupyter.plot.width=6,
                     jupyter.plot.height=6,
                     jupyter.plot.pointsize=12,
                     jupyter.plot.res=96,
                     jupyter.plot.units="in",
                     jupyter.update.graphics=TRUE)
-
-            #options(jupyter.graphics.types=c("image/png","application/pdf"))
 
             self$output_handlers$default <- new_output_handler(
                 text     = self$handle_text,
