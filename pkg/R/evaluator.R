@@ -46,8 +46,9 @@ Evaluator <- R6Class("Evaluator",
                     jupyter.plot.width=6,
                     jupyter.plot.height=6,
                     jupyter.plot.pointsize=12,
-                    jupyter.plot.res=96,
+                    jupyter.plot.res=150,
                     jupyter.plot.units="in",
+                    jupyter.plot.scale=0.5,
                     jupyter.update.graphics=TRUE)
 
             self$output_handlers$default <- new_output_handler(
@@ -238,10 +239,11 @@ Evaluator <- R6Class("Evaluator",
             self$current_plot <- plt
             self$graphics_par_usr <- par("usr")
 
-            width <- getOption("jupyter.plot.width",6)
-            height <- getOption("jupyter.plot.height",6)
-            pointsize <- getOption("jupyter.plot.pointsize",12)
-            resolution <- getOption("jupyter.plot.res",96)
+            width <- getOption("jupyter.plot.width")
+            height <- getOption("jupyter.plot.height")
+            pointsize <- getOption("jupyter.plot.pointsize")
+            resolution <- getOption("jupyter.plot.res")
+            scale <- getOption("jupyter.plot.scale")
 
             rkernel_graphics_types <- getOption("jupyter.graphics.types")
 
@@ -256,8 +258,8 @@ Evaluator <- R6Class("Evaluator",
                                           pointsize=pointsize,
                                           res=resolution)
                 mime_metadata[[mime]] <- list(
-                    width=width*resolution,
-                    height=height*resolution)
+                    width=width*resolution*scale,
+                    height=height*resolution*scale)
                 if(mime=="image/svg+xml")
                     mime_metadata[[mime]]$isolated <-TRUE
             }
