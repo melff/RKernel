@@ -49,7 +49,8 @@ Evaluator <- R6Class("Evaluator",
                     jupyter.plot.res=150,
                     jupyter.plot.units="in",
                     jupyter.plot.scale=0.5,
-                    jupyter.update.graphics=TRUE)
+                    jupyter.update.graphics=TRUE,
+                    rkernel_stop_on_error=TRUE)
 
             self$output_handlers$default <- new_output_handler(
                 text     = self$handle_text,
@@ -294,18 +295,20 @@ Evaluator <- R6Class("Evaluator",
 
         handle_message = function(m) {
             text <- conditionMessage(m)
+            text <- paste(text,collapse="\n")
             private$kernel$stream(text = text,
                                   stream = "stdout")
         },
 
         handle_warning = function(w) {
             text <- conditionMessage(w)
+            text <- paste(text,collapse="\n")
             call <- conditionCall(w)
             if(is.null(call)) {
-                text <- paste0("\nWarning:\n\t",paste(text,collapse="\n"))
+                text <- paste0("Warning:\n",text)
             } else {
                 call <- deparse(call)[[1]]
-                text <- paste0("\nWarning in ",call,":\n\t",paste(text,collapse="\n"))
+                text <- paste0("Warning in ",call,":\n",text)
             }
             private$kernel$stream(text = text,
                                   stream = "stderr")
@@ -313,12 +316,13 @@ Evaluator <- R6Class("Evaluator",
 
         handle_error = function(e) {
             text <- conditionMessage(e)
+            text <- paste(text,collapse="\n")
             call <- conditionCall(e)
             if(is.null(call)) {
-                text <- paste0("Error: ",text)
+                text <- paste0("Error:\n",text)
             } else {
                 call <- deparse(call)[[1]]
-                text <- paste0("Error in ",call,": ",text)
+                text <- paste0("Error in ",call,":\n",text)
             }
             self$status <- "error"
             stop_on_error <- getOption("rkernel_stop_on_error",TRUE)
