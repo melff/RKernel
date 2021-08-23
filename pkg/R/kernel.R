@@ -65,64 +65,6 @@ Kernel <- R6Class("Kernel",
                            code=msg$content$code,
                            execution_count=self$execution_count)
       self$evaluator$eval(msg$content$code)
-      #results <- self$evaluator$eval(msg$content$code)
-      # if(length(results)){
-      #   for(result in results){
-      #     if("clear_output" %in% names(result)){
-      #       private$send_message(type="clear_output",
-      #                            parent=msg,
-      #                            socket_name="iopub",
-      #                            wait=results$clear_output
-      #                            )
-      #     }
-      #     if("stream" %in% names(result)){
-      #       if(nzchar(result$text)){
-      #         private$send_message(type="stream",
-      #                              parent=msg,
-      #                              socket_name="iopub",
-      #                              name=result$stream,
-      #                              text=result$text)
-      #       }
-      #     }
-      #     if("execute_result" %in% names(result)){
-      #       private$send_message(type="execute_result",
-      #                            parent=msg,
-      #                            socket_name="iopub",
-      #                            data=result$execute_result$data,
-      #                            metadata=result$execute_result$metadata,
-      #                            transient=result$execute_result$transient,
-      #                            execution_count=self$execution_count
-      #                            )
-      #     }
-      #     if("display_data" %in% names(result)){
-      #       private$send_message(type="display_data",
-      #                            parent=msg,
-      #                            socket_name="iopub",
-      #                            data=result$display_data$data,
-      #                            metadata=result$display_data$metadata,
-      #                            transient=result$display_data$transient
-      #                            )
-      #     }
-      #     if("update_display_data" %in% names(result)){
-      #       private$send_message(type="update_display_data",
-      #                            parent=msg,
-      #                            socket_name="iopub",
-      #                            data=result$update_display_data$data,
-      #                            metadata=result$update_display_data$metadata,
-      #                            transient=result$update_display_data$transient
-      #                            )
-      #     }
-      #     if("error" %in% names(result)){
-      #       private$send_message(type="error",
-      #                            parent=msg,
-      #                            socket="iopub",
-      #                            ename = result$error$name,
-      #                            evalue = result$error$value,
-      #                            traceback = result$error$traceback
-      #                            )
-      #     }
-      #   }
-      # }
       payload <- self$evaluator$get_payload(clear=TRUE)
       payload <- check_page_payload(payload)
       status <- self$evaluator$get_status(reset=TRUE)
