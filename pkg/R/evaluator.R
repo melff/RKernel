@@ -48,7 +48,6 @@ Evaluator <- R6Class("Evaluator",
                     jupyter.plot.pointsize=12,
                     jupyter.plot.res=96,
                     jupyter.plot.units="in",
-                    jupyter.embed.graphics=TRUE,
                     jupyter.update.graphics=TRUE)
 
             #options(jupyter.graphics.types=c("image/png","application/pdf"))
@@ -90,11 +89,19 @@ Evaluator <- R6Class("Evaluator",
 
         plot_new_called = FALSE,
 
+        plot_new_display = TRUE,
+
+        plot_new_cell = TRUE,
+
         current_plot = list(),
+
+        before_plot_new_hook = function(...){
+            current_plot = list()
+        },
 
         plot_new_hook = function(...){
             self$plot_new_called <- TRUE
-            message("plot_new called")
+            self$plot_new_display <- TRUE
         },
 
         graphics_par_usr = numeric(0),
@@ -105,7 +112,8 @@ Evaluator <- R6Class("Evaluator",
                 replayPlot(self$current_plot)
                 par(usr = self$graphics_par_usr)
                 self$plot_new_called <- TRUE
-            }
+            } 
+            #self$plot_new_display <- !isTRUE(add)
         },
 
         plot_xy_hook = function(...){
@@ -148,6 +156,7 @@ Evaluator <- R6Class("Evaluator",
             }
             else {
                 self$plot_new_called <- FALSE
+                self$plot_new_cell <- TRUE
                 tryCatch(
                     evaluate(code,
                              envir=.GlobalEnv,
@@ -227,6 +236,7 @@ Evaluator <- R6Class("Evaluator",
         last_plot_id = character(),
 
         handle_graphics = function(plt) {
+
             self$current_plot <- plt
             self$graphics_par_usr <- par("usr")
 
@@ -234,8 +244,6 @@ Evaluator <- R6Class("Evaluator",
             height <- getOption("jupyter.plot.height",6)
             pointsize <- getOption("jupyter.plot.pointsize",12)
             resolution <- getOption("jupyter.plot.res",96)
-            embedded <- getOption("jupyter.embed.graphics",TRUE)
-            update_graphics <- getOption("jupyter.update.graphics",TRUE)
 
             rkernel_graphics_types <- getOption("jupyter.graphics.types")
 
@@ -256,40 +264,32 @@ Evaluator <- R6Class("Evaluator",
                     mime_metadata[[mime]]$isolated <-TRUE
             }
 
-            if(embedded){
-                if(update_graphics){
-                    # message("update_graphics")
-                    if(self$plot_new_called){
-                        id <- UUIDgenerate()
-                        private$kernel$display_data(data = mime_data,
-                                                    metadata = mime_metadata,
-                                                    transient = list(display_id=id))
-                        self$last_plot_id <- id
-                        # message(sprintf("Creating new display %s",id))
-                    } 
-                    else {
-                        id <- self$last_plot_id
-                        private$kernel$update_display_data(data = mime_data,
-                                                           metadata = mime_metadata,
-                                                           transient = list(display_id=id))
-                        # message(sprintf("Updating display %s",id))
-                    }
-                }
-                else{
-                    # message("NOT update_graphics")
-                    private$kernel$display_data(data = mime_data,
-                                                metadata = mime_metadata)
-                }
-            } else if("image/svg+xml" %in% rkernel_graphics_types){
-                payload <- list(
-                    source="page",
-                    data=list(
-                        "text/html"=mime_data[["image/svg+xml"]]
-                    ),
-                    start=1
-                )
-                self$add_payload(payload)
+            jupyter_update_graphics <- getOption("jupyter.update.graphics",TRUE)
+
+            if(self$plot_new_cell && !jupyter_update_graphics){
+                plot_new_display <- TRUE
             }
+            else{
+                 plot_new_display <- self$plot_new_display
+            }
+
+            if(plot_new_display){
+                id <- UUIDgenerate()
+                private$kernel$display_data(data = mime_data,
+                                            metadata = mime_metadata,
+                                            transient = list(display_id=id))
+                self$last_plot_id <- id
+            } 
+            else {
+                id <- self$last_plot_id
+                private$kernel$update_display_data(data = mime_data,
+                                                   metadata = mime_metadata,
+                                                   transient = list(display_id=id))
+            }
+
+            self$plot_new_cell <- FALSE
+            self$plot_new_display <- FALSE
+
         },
 
         handle_message = function(m) {
@@ -547,8 +547,8 @@ dummy_dev_filename <- function(...) file.path(tempdir(),"dummy-device.png")
 
 #' @importFrom grDevices png
 dummy_device <- function(filename = dummy_dev_filename(),
-                         width = getOption("jupyter.plot.width",7),
-                         height = getOption("jupyter.plot.height",7),
+                         width = getOption("jupyter.plot.width",6),
+                         height = getOption("jupyter.plot.height",6),
                          res = getOption("jupyter.plot.res",96),
                          pointsize = getOption("jupyter.plot.pointsize",12),
                          units = getOption("jupyter.plot.units","in"),
