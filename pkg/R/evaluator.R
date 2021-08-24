@@ -30,7 +30,8 @@ Evaluator <- R6Class("Evaluator",
             assign("cell.par",self$cell.par,pos=pos)
 
             assign("display",self$display,pos=pos)
-            assign("javascript",javascript,pos=pos)
+            assign("Javascript",javascript,pos=pos)
+            assign("Math",LaTeXMath,pos=pos)
             assign("Page",Page,pos=pos)
 
             assign("add_paged_classes",add_paged_classes,pos=pos)

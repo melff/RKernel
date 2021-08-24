@@ -260,8 +260,18 @@ display.help_files_with_topic <- function(x,...,
 javascript <- function(text,file){
     if(missing(text)){
         text <- readLines(file)
-        text <- paste(text,collapse="\n")
     }
+    text <- paste(text,collapse="\n")
+    text_plain <- paste("Javascript: ",text,sep="\n")
     text_html <- paste("<script>",text,"</script>",sep="\n")
-    display("text/html"=text_html)
+    display("text/plain"=text_plain,
+            "text/html"=text_html)
+}
+
+LaTeXMath <- function(text){
+    text <- paste(text,collapse="\n")
+    text_plain <- paste("Math:",text,sep="\n")
+    text_latex <- paste0("$$",text,"$$")
+    display("text/plain"=text_plain,
+            "text/latex"=text_latex)
 }
