@@ -32,15 +32,16 @@ Kernel <- R6Class("Kernel",
       }
       private$conn_info <- conn_info
       self$evaluator <- Evaluator$new(self)
-      self$comm_dispatcher <- CommDispatcher$new(self)
+      comm_manager <- CommManager$new(self)
+      self$comm_manager <- comm_manager
+      self$evaluator$comm_manager <- comm_manager
     },
 
     evaluator = list(),
-    comm_dispatcher = list(),
+    comm_manager = list(),
 
     run = function(){
       self$evaluator$startup()
-      self$comm_dispatcher$startup()
       continue <- TRUE
       while(continue) {
         req <- private$poll_request(c("hb","control","shell"))
@@ -194,7 +195,7 @@ Kernel <- R6Class("Kernel",
       target_name <- NULL
       if("target_name" %in% names(msg$content))
         target_name <- msg$content$target_name
-      comms <- self$comm_dispatcher$get_comms(target_name)
+      comms <- self$comm_manager$get_comms(target_name)
       private$send_message("comm_info_reply",
                            parent=msg,
                            socket_name="shell",
@@ -206,26 +207,32 @@ Kernel <- R6Class("Kernel",
       target_name <- msg$content$target_name
       id <- msg$content$comm_id
       data <- msg$content$data
-      self$comm_dispatcher$handle_open(target_name,id,data)
+      self$comm_manager$handle_open(target_name,id,data)
       private$comm_parent <- msg
+      message("Kernel: comm_handle_open")
+      print(msg)
     },
 
     comm_receive = function(msg){
       id <- msg$content$comm_id
       data <- msg$content$data
-      self$comm_dispatcher$handle_msg(id,data)
+      self$comm_manager$handle_msg(id,data)
       private$comm_parent <- msg
+      message("Kernel: comm_receive")
+      print(msg)
     },
 
     comm_handle_close = function(msg){
       id <- msg$content$comm_id
       data <- msg$content$data
-      self$comm_dispatcher$handle_close(id,data)
+      self$comm_manager$handle_close(id,data)
       private$comm_parent <- msg
+      message("Kernel: comm_handle_close")
+      print(msg)
     },
 
     comm_send = function(id,data){
-      send_message("comm_msg",
+      private$send_message("comm_msg",
                    parent=private$comm_parent,
                    socket_name="iopub",
                    comm_id=id,
@@ -233,7 +240,7 @@ Kernel <- R6Class("Kernel",
     },
     
     comm_send_open = function(id,data){
-      send_message("comm_open",
+      private$send_message("comm_open",
                    parent=private$comm_parent,
                    socket_name="iopub",
                    comm_id=id,
@@ -241,7 +248,7 @@ Kernel <- R6Class("Kernel",
     },
     
     comm_send_close = function(id,data){
-      send_message("comm_close",
+      private$send_message("comm_close",
                    parent=private$comm_parent,
                    socket_name="iopub",
                    comm_id=id,
@@ -301,7 +308,7 @@ Kernel <- R6Class("Kernel",
       if(!length(msg)) return(TRUE)
       private$send_message(type="status",parent=msg,
                            socket_name="iopub",execution_state="busy")
-      #cat("Got a", msg$header$msg_type, "request ...\n")
+      cat("Got a", msg$header$msg_type, "request ...\n")
       # do_stuff ...
       switch(msg$header$msg_type,
              execute_request = self$execute_reply(msg),
@@ -309,9 +316,9 @@ Kernel <- R6Class("Kernel",
              kernel_info_request = self$kernel_info_reply(msg),
              complete_request = self$complete_reply(msg),
              comm_info_request = self$comm_info_reply(msg),
-             comm_open = self$comm_open(msg),
+             comm_open = self$comm_handle_open(msg),
              comm_msg = self$comm_receive(msg),
-             comm_close = self$comm_close(msg)
+             comm_close = self$comm_handle_close(msg)
              )
 
       private$send_message(type="status",parent=msg,

@@ -13,6 +13,7 @@ Evaluator <- R6Class("Evaluator",
         payload = list(),
         results = list(),
         env = list(),
+        comm_manager = list(),
 
         initialize = function(kernel){
             private$kernel <- kernel
@@ -34,6 +35,8 @@ Evaluator <- R6Class("Evaluator",
 
             assign("add_paged_classes",add_paged_classes,pos=pos)
             assign("add_displayed_classes",add_displayed_classes,pos=pos)
+
+            assign("comm_manager",self$comm_manager,pos=pos)
 
             if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
                 rm(var_dic_list,envir=.GlobalEnv)
@@ -325,11 +328,12 @@ Evaluator <- R6Class("Evaluator",
                 text <- paste0("Error in ",call,":\n",text)
             }
             self$status <- "error"
-            stop_on_error <- getOption("rkernel_stop_on_error",TRUE)
             private$kernel$stream(text = text,
                                   stream = "stderr")
-            if(isTRUE(stop_on_error)){
+            stop_on_error <- getOption("rkernel_stop_on_error")
+            if(stop_on_error){
                 calls <- sys.calls()
+                self$aborted <- TRUE
                 calls <- head(calls,-3)
                 drop_prev <- self$nframes - 2
                 calls <- tail(calls,-drop_prev)
@@ -340,7 +344,8 @@ Evaluator <- R6Class("Evaluator",
                                     calls)
                 traceback <- c("\nTraceback:",calls)
                 traceback <- paste(traceback,collapse="\n")
-                self$aborted <- TRUE
+                private$kernel$stream(text = traceback,
+                                      stream = "stderr")
                 private$kernel$send_error(name = "ERROR",
                                           value = value,
                                           traceback = list(traceback)

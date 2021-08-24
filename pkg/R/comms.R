@@ -1,17 +1,9 @@
-CommDispatcher <- R6Class("CommDispatcher",
+CommManager <- R6Class("CommManager",
     
     public=list(
 
         initialize = function(kernel){
             private$kernel <- kernel
-        },
-
-        startup = function(...){
-            pos <- match("RKernel",search())
-            assign("comm.add_handlers",self$add_handlers,pos=pos)
-            assign("comm.remove_handlers",self$remove_handlers,pos=pos)
-            assign("comm.new",self$new_comm,pos=pos)
-            assign("comm.getall",self$get_comms,pos=pos)
         },
 
         add_handlers = function(target_name,handlers){
@@ -23,17 +15,17 @@ CommDispatcher <- R6Class("CommDispatcher",
         get_comms = function(target_name=NULL){
             comms <- list()
             for(c in private$comms){
-                if(!length(target_name || target_name %in% names(private$targets)))
+                if(!length(target_name) || target_name %in% names(private$targets))
                     comms[c$id] <- list(target_name=c$target_name)
             }
             return(comms)
         },
-        new_comm = function(target_name,data){
+        new_comm = function(target_name){
             if(target_name %in% names(private$targets)){
                 id <- UUIDgenerate()
                 handlers <- private$targets[[target_name]]
                 comm <- Comm$new(target_name,id,self,handlers)
-                comm$handle_open(data)
+                private$comms[[id]] <- comm
                 return(comm)
             }
             else return(NULL)
@@ -78,25 +70,28 @@ CommDispatcher <- R6Class("CommDispatcher",
 Comm <- R6Class("Comm",
 
     public = list(
+
+        id = character(0),
+        target_name = character(0),
         
-        initialize = function(target_name,id,dispatcher,handlers){
-            private$target_name <- target_name
-            private$id <- id
-            private$dispatcher <- dispatcher
-            self$set_handler(handlers)
+        initialize = function(target_name,id,manager,handlers){
+            self$target_name <- target_name
+            self$id <- id
+            private$manager <- manager
+            self$set_handlers(handlers)
         },
 
         open = function(data){
             id <- private$id
-            private$dispatcher$send_open(id,data)
+            private$manager$send_open(id,data)
         },
         send = function(data){
             id <- private$id
-            private$dispatcher$send(id,data)
+            private$manager$send(id,data)
         },
         close = function(data){
             id <- private$id
-            private$dispatcher$send_close(id,data)
+            private$manager$send_close(id,data)
         },
         handle_open = list(),
         handle_msg = list(),
@@ -118,8 +113,6 @@ Comm <- R6Class("Comm",
     ),
     
     private = list(
-        id = character(0),
-        target_name = character(0),
-        dispatcher = list()
+        manager = list()
     )
 )
