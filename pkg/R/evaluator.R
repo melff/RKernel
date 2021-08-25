@@ -30,8 +30,9 @@ Evaluator <- R6Class("Evaluator",
             assign("cell.par",self$cell.par,pos=pos)
 
             assign("display",self$display,pos=pos)
-            assign("Javascript",javascript,pos=pos)
+            assign("Javascript",Javascript,pos=pos)
             assign("Math",LaTeXMath,pos=pos)
+            assign("raw_html",raw_html,pos=pos)
             assign("Page",Page,pos=pos)
 
             assign("add_paged_classes",add_paged_classes,pos=pos)
@@ -130,6 +131,15 @@ Evaluator <- R6Class("Evaluator",
         },
 
         eval = function(code,...,silent=FALSE){
+
+            perc_match <- getMatch(code,regexec("^%(.+?)\n\n",code))
+            if(length(perc_match) > 1){
+                magic <- perc_match[2]
+                message(sprintf("Found magic '%s'",magic))
+                code <- gsub("^%.+?\n\n","",code)
+                self$handle_magic(magic,code)
+                return()
+            }
 
             if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
                 rm(var_dic_list,envir=.GlobalEnv)
@@ -399,6 +409,28 @@ Evaluator <- R6Class("Evaluator",
                 }
             }
         },
+
+        handle_magic = function(magic,code){
+            if(magic == "Math"){
+                d <- LaTeXMath(code)
+                private$kernel$display_data(data=d$data,
+                                            metadata=d$metadata,
+                                            transient=d$transient)
+            } 
+            else if (magic == "Javascript"){
+                d <- Javascript(code)
+                private$kernel$display_data(data=d$data,
+                                            metadata=d$metadata,
+                                            transient=d$transient)
+            }
+            else if (magic == "html"){
+                d <- raw_html(code)
+                private$kernel$display_data(data=d$data,
+                                            metadata=d$metadata,
+                                            transient=d$transient)
+            }
+        },
+
 
         handle_interrupt = function(i){
             private$kernel$stream(text = "<interrupted>",

@@ -257,7 +257,7 @@ display.help_files_with_topic <- function(x,...,
     structure(d,class=cl)
 }
 
-javascript <- function(text,file){
+Javascript <- function(text,file){
     if(missing(text)){
         text <- readLines(file)
     }
@@ -274,4 +274,10 @@ LaTeXMath <- function(text){
     text_latex <- paste0("$$",text,"$$")
     display("text/plain"=text_plain,
             "text/latex"=text_latex)
+}
+
+raw_html <- function(text){
+    text <- paste(text,collapse="\n")
+    display("text/plain"=text,
+            "text/html"=text)
 }
