@@ -30,6 +30,10 @@ Evaluator <- R6Class("Evaluator",
             assign("cell.par",self$cell.par,pos=pos)
 
             assign("display",self$display,pos=pos)
+            assign("stream",self$stream,pos=pos)
+            assign("cat",self$cat,pos=pos)
+            assign("print",self$print,pos=pos)
+
             assign("Javascript",Javascript,pos=pos)
             assign("Math",LaTeXMath,pos=pos)
             assign("raw_html",raw_html,pos=pos)
@@ -446,6 +450,12 @@ Evaluator <- R6Class("Evaluator",
                                         transient=d$transient)
         },
 
+        stream = function(text, stream=c("stdio","stderr")){
+            stream <- match.arg(stream)
+            private$kernel$stream(text=text,
+                                  stream=stream)
+        },
+
         set_last_value = function(x){
             pos <- match("RKernel",search())
             assign(".Last.value",x,pos=pos)
@@ -543,6 +553,29 @@ Evaluator <- R6Class("Evaluator",
             nms <- names(args)
             op[nms] <- args
             do.call("par",op)
+        },
+
+        cat = function (..., file = "", sep = " ", fill = FALSE, labels = NULL, 
+                        append = FALSE){
+            if(!missing(file))
+                base::cat(...,file,sep,fill,labels,append)
+            else {
+                text <- paste(...,sep=sep)
+                if(fill){
+                    width <- if(is.numeric(fill)) fill else getOption("width")
+                    text <- strwrap(text,width=width)
+                    text <- paste(text,collapse="\n")
+                }
+                private$kernel$stream(text=text,
+                                      stream="stdio")
+            }
+        },
+
+        print = function(x,...){
+            text <- capture.output(base::print(x,...))
+            text <- paste0(text,"\n")
+            private$kernel$stream(text=text,
+                                  stream="stdio")       
         }
 
     ),
