@@ -243,7 +243,8 @@ Evaluator <- R6Class("Evaluator",
                 file.remove(files)
             }
             text <- paste(text,collapse="\n")
-            self$page("text/plain"=text)
+            p <- Page("text/plain"=text)
+            self$add_payload(unclass(p))
         },
 
         handle_text = function(text) {
