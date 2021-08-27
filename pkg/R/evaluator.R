@@ -139,7 +139,7 @@ Evaluator <- R6Class("Evaluator",
             perc_match <- getMatch(code,regexec("^%(.+?)\n\n",code))
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
-                message(sprintf("Found magic '%s'",magic))
+                # message(sprintf("Found magic '%s'",magic))
                 code <- gsub("^%.+?\n\n","",code)
                 self$handle_magic(magic,code)
                 return()
@@ -450,7 +450,7 @@ Evaluator <- R6Class("Evaluator",
                                         transient=d$transient)
         },
 
-        stream = function(text, stream=c("stdio","stderr")){
+        stream = function(text, stream=c("stdout","stderr")){
             stream <- match.arg(stream)
             private$kernel$stream(text=text,
                                   stream=stream)
@@ -567,15 +567,15 @@ Evaluator <- R6Class("Evaluator",
                     text <- paste(text,collapse="\n")
                 }
                 private$kernel$stream(text=text,
-                                      stream="stdio")
+                                      stream="stdout")
             }
         },
 
         print = function(x,...){
             text <- capture.output(base::print(x,...))
             text <- paste0(text,"\n")
-            private$kernel$stream(text=text,
-                                  stream="stdio")       
+            stream(text=text,
+                   stream="stdout")       
         }
 
     ),
