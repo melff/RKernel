@@ -2,6 +2,7 @@
 
 S3method(Page,default)
 S3method(display,default)
+S3method(display,hsearch)
 S3method(display,htmlwidget)
 S3method(display_id,display_data)
 S3method(display_id,update_display_data)

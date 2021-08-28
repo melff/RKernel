@@ -235,13 +235,21 @@ display.help_files_with_topic <- function(x,...,
     Rd <- getHelpFile(file)
 
     text_plain <- capture.output(Rd2txt(Rd, package = pkgname, outputEncoding = 'UTF-8'))
-    text_html <- capture.output(Rd2HTML(Rd, package = pkgname, outputEncoding = 'UTF-8'))
+    #text_html <- capture.output(Rd2HTML(Rd, package = pkgname, outputEncoding = 'UTF-8'))
     text_latex <- capture.output(Rd2latex(Rd, package = pkgname, outputEncoding = 'UTF-8'))
 
-    head_end_idx <- grep("</head><body>",text_html)
-    body_end_idx <- grep("</body></html>",text_html)
-    lines_to_remove <- c(seq_len(head_end_idx),body_end_idx)
-    text_html <- text_html[-lines_to_remove]
+    #head_end_idx <- grep("</head><body>",text_html)
+    #body_end_idx <- grep("</body></html>",text_html)
+    #lines_to_remove <- c(seq_len(head_end_idx),body_end_idx)
+    #text_html <- text_html[-lines_to_remove]
+
+    help_url <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(file),".html")
+    text_html <- paste(paste0("<iframe src='",help_url,"'"),
+                        "style='width: 100%; height: 5000em;'",
+                        "id='manpage'",
+                        "frameborder='0' seamless>",
+                        "</iframe>",
+                        sep="\n")
 
     mime_data <- list(
         "text/plain"=paste(text_plain,collapse="\n"),
@@ -256,6 +264,81 @@ display.help_files_with_topic <- function(x,...,
     else cl <- "display_data"
     structure(d,class=cl)
 }
+
+#' @export
+display.hsearch <- function(x,..., 
+    id=uuid::UUIDgenerate(), 
+    update=FALSE){
+    
+    matches <- x$matches
+    matches <- unique(matches[c("Topic","Title","Package","Type")])
+    matches <- within(matches,
+                      Name <- paste0(Package,"::",Topic))
+    
+    matches <- split(matches,matches$Type)
+    text_out_grp <- lapply(matches,tformat_mgroup)
+    text_plain <- character(0)
+    if("help" %in% names(text_out_grp)){
+        text_plain <- c(text_plain,"Help pages:","",text_out_grp$help,"")
+    }
+    if("vignette" %in% names(text_out_grp)){
+        text_plain <- c(text_plain,"Vignettes:","",text_out_grp$vignette,"")
+    }
+    if("demo" %in% names(text_out_grp)){
+        text_plain <- c(text_plain,"Demos:","",text_out_grp$demo,"")
+    }
+
+# http://127.0.0.1:10006/doc/html/Search?pattern=regression&
+#fields.alias=1&fields.title=1&fields.concept=1&ignore.case=1&types.help=1&types.vignette=1&types.demo=1
+
+    help_search_url <- paste0(get_help_url(),
+                  "/doc/html/Search?pattern=",
+                  gsub(" ","+",x$pattern,fixed=TRUE))
+    for(field in x$fields){
+        help_search_url <- paste0(help_search_url,paste0("&fields.",field,"=1"))
+    }
+    if(x$ignore.case)
+        help_search_url <- paste0(help_search_url,"&ignore.cases=1")
+    if(x$type=="fuzzy")
+        help_search_url <- paste0(help_search_url,"&agrep=1")
+    else if(is.numeric(x$agrep))
+        help_search_url <- paste0(help_search_url,"&agrep=",x$agrep)
+    for(type in c("help","vignette","demo")){
+        if(type %in% x$types)
+            help_search_url <- paste0(help_search_url,paste0("&types.",type,"=1"))
+    }
+    if(length(x$package)){
+        help_search_url <- paste0(help_search_url,paste0("&package",type,"=",x$package))
+    }
+    text_html <- paste(paste0("<iframe src='",help_search_url,"'"),
+                        "style='width: 100%; height: 5000em;'",
+                        "id='manpage'",
+                        "frameborder='0' seamless onload=window.parent.scrollTo(0,0)>",
+                        "</iframe>",
+                        sep="\n")
+
+    mime_data <- list("text/plain"=paste(text_plain,collapse="\n"),
+                      "text/html"=paste(text_html,collapse="\n"))
+    d <- list(data=mime_data)
+    #d$metadata <- namedList()
+    d$transient <- list(display_id=id)
+    if(update) cl <- "update_display_data"
+    else cl <- "display_data"
+    structure(d,class=cl)
+}
+
+tformat_mgroup <- function(matches){
+    text_out <- matches[c("Topic","Title")]
+    apply(text_out,1,format_item)
+}
+
+format_item <- function(x){
+    x2 <- x[2]
+    x2 <- strwrap(x2,120-7)
+    x2 <- paste0("      ",x2)
+    paste0(c(x[1],x2,""),collapse="\n")
+}
+
 
 Javascript <- function(text,file){
     if(missing(text)){
@@ -281,3 +364,5 @@ raw_html <- function(text){
     display("text/plain"=text,
             "text/html"=text)
 }
+
+

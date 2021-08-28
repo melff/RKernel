@@ -87,7 +87,7 @@ Evaluator <- R6Class("Evaluator",
             suppressMessages(trace(curve,quote(curve_hook(add)),print=FALSE))
 
             assign("curve_hook",self$curve_hook,pos=pos)
-            add_paged_classes(c("help_files_with_topic","packageIQR"))
+            add_paged_classes(c("help_files_with_topic","packageIQR","hsearch"))
             add_displayed_classes(c("htmlwidget"))
 
             private$comm_dispatcher <- private$kernel$comm_dispatcher
@@ -97,6 +97,7 @@ Evaluator <- R6Class("Evaluator",
             assign("help_port",self$help_port,pos=pos)
             assign("help.start",self$help_start,pos=pos)
 
+            assign("get_help_url",function()self$help_url,pos=pos)
         },
 
         help_port = integer(),
