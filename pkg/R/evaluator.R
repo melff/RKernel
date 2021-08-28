@@ -43,6 +43,7 @@ Evaluator <- R6Class("Evaluator",
             assign("add_displayed_classes",add_displayed_classes,pos=pos)
 
             assign("comm_manager",self$comm_manager,pos=pos)
+            assign("help_port",self$help_port,pos=pos)
 
             if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
                 rm(var_dic_list,envir=.GlobalEnv)
@@ -90,6 +91,44 @@ Evaluator <- R6Class("Evaluator",
             add_displayed_classes(c("htmlwidget"))
 
             private$comm_dispatcher <- private$kernel$comm_dispatcher
+
+            self$start_help_system()
+            assign("help_proc",self$help_proc,pos=pos)
+            assign("help_port",self$help_port,pos=pos)
+            assign("help.start",self$help_start,pos=pos)
+
+        },
+
+        help_port = integer(),
+        help_proc = integer(),
+        help_url = character(),
+
+        start_help_system = function(help_port=NULL){
+            if(is.null(help_port)){
+                help_port <- tools::startDynamicHelp(TRUE)
+                port0 <- tools::startDynamicHelp(FALSE)
+                stopifnot(port0 == 0)
+            }
+            help_port <- as.integer(help_port)
+            self$help_proc  <- callr::r_bg(function(port){
+                options(help.ports=port)
+                tools::startDynamicHelp(TRUE)
+                repeat Sys.sleep(60)
+            },args=list(port=help_port))
+            self$help_port <- help_port
+            self$help_url <- paste0("http://127.0.0.1:",help_port)
+        },
+
+        help_start = function(update = FALSE, 
+                              gui = "irrelevant", 
+                              browser = getOption("browser"), 
+                              remote = NULL){
+            if(is.null(remote))
+                remote <- self$help_url
+            utils::help.start(update=update,
+                              gui=gui,
+                              browser=browser,
+                              remote=remote)
         },
 
         shutdown = function(){
