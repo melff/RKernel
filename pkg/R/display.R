@@ -220,36 +220,53 @@ display.help_files_with_topic <- function(x,...,
     paths <- as.character(x)
     topic <- attr(x,"topic")
 
-    if (length(paths) == 0) {
-        return(paste(gettextf('No documentation for %s in specified packages and libraries:', sQuote(topic)),
-                     gettextf('you could try %s', sQuote(paste0('??', topic))), sep = '\n'))
-    } else if(length(paths) > 1) {
-        message(sprintf("More than one help page on topic %s, using the first",sQuote(topic)))
-    }
-
-    file <- paths[[1]]
-    pkgname <- basename(dirname(dirname(file)))
-
     utils_ns <- asNamespace("utils")
     getHelpFile <- get(".getHelpFile",utils_ns)
-    Rd <- getHelpFile(file)
 
-    text_plain <- capture.output(Rd2txt(Rd, package = pkgname, outputEncoding = 'UTF-8'))
-    #text_html <- capture.output(Rd2HTML(Rd, package = pkgname, outputEncoding = 'UTF-8'))
-    text_latex <- capture.output(Rd2latex(Rd, package = pkgname, outputEncoding = 'UTF-8'))
+    if(length(paths)>=1){
+        text_plain <- character(0)
+        text_latex <- character(0)
+        help_urls <- character(0)
+        help_labels <- character(0)
 
-    #head_end_idx <- grep("</head><body>",text_html)
-    #body_end_idx <- grep("</body></html>",text_html)
-    #lines_to_remove <- c(seq_len(head_end_idx),body_end_idx)
-    #text_html <- text_html[-lines_to_remove]
+        for(file in paths){
+            pkgname <- basename(dirname(dirname(file)))
+            Rd <- getHelpFile(file)
+            text_plain1 <- capture.output(Rd2txt(Rd, package = pkgname, outputEncoding = 'UTF-8'))
+            text_latex1 <- capture.output(Rd2latex(Rd, package = pkgname, outputEncoding = 'UTF-8'))
+            text_plain <- c(text_plain,text_plain1)
+            text_latex <- c(text_latex,text_latex1)
+            help_label1 <- paste0(pkgname,"::",topic)
+            help_labels <- c(help_labels,help_label1)
+            help_url1 <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(file),".html")
+            help_urls <- c(help_urls,help_url1)
+        }
+    } 
+    else {
+        text_plain <- paste(gettextf('No documentation for %s in specified packages and libraries:', sQuote(topic)),
+                      gettextf('you could try %s', sQuote(paste0('??', topic))), sep = '\n')
+        text_latex <- text_plain
+    }
 
-    help_url <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(file),".html")
-    text_html <- paste(paste0("<iframe src='",help_url,"'"),
-                        "style='width: 100%; height: 5000em;'",
-                        "id='manpage'",
-                        "frameborder='0' seamless>",
-                        "</iframe>",
-                        sep="\n")
+    if(length(paths) == 1){
+        help_url <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(paths),".html")
+        text_html <- paste(paste0("<iframe src='",help_url,"'"),
+                           "style='width: 100%; height: 5000em;'",
+                           "id='manpage'",
+                           "frameborder='0' seamless>",
+                           "</iframe>",
+                           sep="\n")
+    } 
+    else {
+        help_url <- paste0(get_help_url(),"/library/NULL/help/",URLencode(topic,reserved=TRUE))
+        text_html <- paste(paste0("<iframe src='",help_url,"'"),
+                           "style='width: 100%; height: 5000em;'",
+                           "id='manpage'",
+                           "frameborder='0' seamless>",
+                           "</iframe>",
+                           sep="\n")
+    }
+
 
     mime_data <- list(
         "text/plain"=paste(text_plain,collapse="\n"),
