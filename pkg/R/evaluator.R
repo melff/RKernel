@@ -38,6 +38,8 @@ Evaluator <- R6Class("Evaluator",
             assign("Math",LaTeXMath,pos=pos)
             assign("raw_html",raw_html,pos=pos)
             assign("Page",Page,pos=pos)
+            assign("View",View,pos=pos)
+            assign("ls_str",ls_str,pos=pos)
 
             assign("add_paged_classes",add_paged_classes,pos=pos)
             assign("add_displayed_classes",add_displayed_classes,pos=pos)
