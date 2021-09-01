@@ -210,7 +210,7 @@ Evaluator <- R6Class("Evaluator",
                 condition <- attr(expr,"condition")
                 self$status <- "error"
                 private$kernel$stream(text=condition$message,
-                                      stream="stdout")
+                                      stream="stderr")
             }
             else {
                 self$plot_new_called <- FALSE
