@@ -362,10 +362,10 @@ Javascript <- function(text,file){
         text <- readLines(file)
     }
     text <- paste(text,collapse="\n")
-    text_plain <- paste("Javascript: ",text,sep="\n")
-    text_html <- paste("<script>",text,"</script>",sep="\n")
-    display("text/plain"=text_plain,
-            "text/html"=text_html)
+    # text_plain <- paste("Javascript: ",text,sep="\n")
+    #text_html <- paste("<script>",text,"</script>",sep="\n")
+    display(#"text/plain"="",
+            "application/javascript"=text)
 }
 
 LaTeXMath <- function(text){
@@ -376,10 +376,11 @@ LaTeXMath <- function(text){
             "text/latex"=text_latex)
 }
 
-raw_html <- function(text){
+raw_html <- function(text,id=uuid::UUIDgenerate()){
     text <- paste(text,collapse="\n")
-    display("text/plain"=text,
-            "text/html"=text)
+    display("text/plain"="",
+            "text/html"=text,
+            id=id)
 }
 
 
