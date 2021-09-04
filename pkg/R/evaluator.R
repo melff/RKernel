@@ -108,7 +108,10 @@ Evaluator <- R6Class("Evaluator",
 
         start_help_system = function(help_port=NULL){
             if(is.null(help_port)){
-                help_port <- tools::startDynamicHelp(TRUE)
+                repeat{
+                    help_port <- tools::startDynamicHelp(TRUE)
+                    if(help_port > 0) break
+                }
                 port0 <- tools::startDynamicHelp(FALSE)
                 stopifnot(port0 == 0)
             }
