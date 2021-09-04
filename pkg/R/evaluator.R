@@ -489,8 +489,8 @@ Evaluator <- R6Class("Evaluator",
             self$aborted <- TRUE
         },
 
-        display = function(x,...){
-            d <- display(x,...)
+        display = function(...){
+            d <- display(...)
             private$kernel$display_data(data=d$data,
                                         metadata=d$metadata,
                                         transient=d$transient)
