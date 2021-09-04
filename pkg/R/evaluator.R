@@ -369,10 +369,10 @@ Evaluator <- R6Class("Evaluator",
             text <- paste(text,collapse="\n")
             call <- conditionCall(w)
             if(is.null(call)) {
-                text <- paste0("Warning:\n",text)
+                text <- paste0("Warning:\n",text,"\n")
             } else {
                 call <- deparse(call)[[1]]
-                text <- paste0("Warning in ",call,":\n",text)
+                text <- paste0("Warning in ",call,":\n",text,"\n")
             }
             private$kernel$stream(text = text,
                                   stream = "stderr")
