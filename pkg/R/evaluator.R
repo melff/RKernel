@@ -100,6 +100,8 @@ Evaluator <- R6Class("Evaluator",
             assign("help.start",self$help_start,pos=pos)
 
             assign("get_help_url",function()self$help_url,pos=pos)
+
+
         },
 
         help_port = integer(),
@@ -180,6 +182,8 @@ Evaluator <- R6Class("Evaluator",
         },
 
         eval = function(code,...,silent=FALSE){
+
+            if(!self$datatable_inited) self$init_datatable()
 
             perc_match <- getMatch(code,regexec("^%(.+?)\n\n",code))
             if(length(perc_match) > 1){
@@ -622,6 +626,16 @@ Evaluator <- R6Class("Evaluator",
             text <- paste0(text,"\n")
             stream(text=text,
                    stream="stdout")       
+        },
+
+        datatable_inited = FALSE,
+
+        init_datatable = function()
+        if(!self$datatable_inited){
+            js <- readLines(system.file("datatables/load_datatables_connected.js",package="RKernel"))
+            js <- Javascript(js)
+            private$kernel$display_data(data=js$data)
+            self$datatable_inited <- TRUE
         }
 
     ),
