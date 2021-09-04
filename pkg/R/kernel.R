@@ -338,6 +338,13 @@ Kernel <- R6Class("Kernel",
       }
       msg <- private$wire_unpack(wire_in)
       #cat("Got message from socket", socket_name)
+      if(!length(private$session)){
+        header <- msg$header
+        private$session <- header$session
+        private$username <- header$username
+        # cat("Session:",private$session,"\n")
+        # cat("User:",private$username,"\n")
+      }
       return(msg)
     },
 
@@ -393,12 +400,24 @@ Kernel <- R6Class("Kernel",
       hmac(private$conn_info$key,msg,"sha256")
     },
 
+    session = character(0),
+    username = character(0),
+
     msg_new = function(type,parent,content){
-      parent_header <- parent$header
+      if(length(parent) && "header" %in% names(parent)){
+        parent_header <- parent$header
+        session <- parent_header$session
+        username <- parent_header$username
+      }
+      else {
+        parent_header <- namedList()
+        session <- private$session
+        username <- private$username
+      }
       header <- list(
         msg_id = UUIDgenerate(),
-        session = parent_header$session,
-        username = parent_header$username,
+        session = session,
+        username = username,
         date = strftime(as.POSIXlt(Sys.time(),"UTC"),"%Y-%m-%dT%H:%M:%OS6Z"),
         msg_type = type,
         version = PROTOCOL_VERSION
