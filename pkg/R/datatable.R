@@ -29,7 +29,7 @@ data_table <- function(x,id=UUIDgenerate()){
     )
     dt_args <- toJSON(dt_args,auto_unbox=TRUE)
     js <- sprintf(c(
-"require([\"datatables\"], function (datatables) {
+"require([\"jquery\",\"datatables\"], function (jquery,datatables) {
     $(document).ready(function () {
         dt_args = %s;
         table = $('#%s').DataTable(dt_args);

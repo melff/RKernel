@@ -1,6 +1,7 @@
 require.config({
     paths: {
-        datatables: 'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min',
+        jquery: 'https://code.jquery.com/jquery-3.5.1',
+        datatables: 'https://cdn.datatables.net/1.11.1/js/jquery.dataTables.min',
     }
 });
 
