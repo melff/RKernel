@@ -20,16 +20,21 @@ html_table <- function(x,id=UUIDgenerate()){
 
 data_table <- function(x,id=UUIDgenerate()){
     table <- html_table(x,id)
+    dt_args <- list(
+        searching = FALSE,
+        scrollY = 250,
+        paging = TRUE,
+        scrollX = TRUE,
+        scrollCollapse = TRUE
+    )
+    dt_args <- toJSON(dt_args,auto_unbox=TRUE)
     js <- sprintf(c(
 "require([\"datatables\"], function (datatables) {
     $(document).ready(function () {
-        table = $('#%s').DataTable({
-                \"searching\":   false,
-                \"scrollY\": 250,
-                \"scrollCollapse\": true,
-                });
+        dt_args = %s;
+        table = $('#%s').DataTable(dt_args);
     });
-});"),id)
+});"),dt_args,id)
     html <- c(
         "<div>",
         table,
