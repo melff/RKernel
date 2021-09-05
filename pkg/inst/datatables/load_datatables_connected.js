@@ -10,4 +10,12 @@ $('head').append('<link rel="stylesheet" type="text/css" \
 
 $('head').append('<style> table td { text-overflow: ellipsis; overflow: hidden; } </style>');
 
+$('head').append('<style> \
+                 .rendered_html .tab-left-aligned tr, \
+                 .rendered_html .tab-left-aligned th, \
+                 .rendered_html .tab-left-aligned td \
+                 { text-align: left; } \
+                 </style>');
+
+
 // alert('datatables_connected ...');
