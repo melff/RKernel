@@ -2,8 +2,11 @@
 View <- function(x,title) UseMethod("View")
 
 
-str_ <- function(nm,envir) chartr(r"(\)",r"(\\)",
-          trimws(capture.output(str(get(nm,envir)))))
+# str_ <- function(nm,envir) chartr(r"(\)",r"(\\)",
+#           trimws(capture.output(str(get(nm,envir)))))
+
+
+str_ <- function(nm,envir) htmlEscape(trimws(capture.output(str(get(nm,envir)))))
 
 #' @export
 ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
