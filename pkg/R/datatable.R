@@ -28,6 +28,7 @@ html_table <- function(x,id=UUIDgenerate(),
 
 data_table <- function(x,id=UUIDgenerate(),
                        html_class="display",
+                       wrap_cells=NULL,
                        expand=FALSE,
                        use.rownames = TRUE,
                        searching = FALSE,
@@ -52,10 +53,13 @@ data_table <- function(x,id=UUIDgenerate(),
         x <- cbind(rn,x)
         nms <- c("",nms)
     }
+    w <- apply(x,2,function(x)max(nchar(x)))
+    if(length(wrap_cells))
+        x[] <- paste0(wrap_cells[1],x[],wrap_cells[2])
 
     if(length(colnames(x))) nms <- colnames(x)
     else nms <- 1:ncol(x)
-    columns <- lapply(nms,function(nm)list(title=nm))
+    columns <- lapply(nms,function(nm)list(title=nm,width=paste0(w[[nm]],"ex")))
     dt_args <- list(
         data=x,
         columns=columns,

@@ -21,10 +21,11 @@ ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern,
     res[,1] <- nms
     str_nms <- sapply(nms,str_,envir=envir)
     res[,2] <- sapply(str_nms,"[",1)
-    res[] <- paste0("<code>",res,"</code>")
     colnames(res) <- c("Object","Structure")
     data_table(res,use.rownames=FALSE,paging=FALSE,expand=TRUE,ordering=nrow(res) > 1,
-               html_class="cell-border tab-left-aligned")
+               info=FALSE,
+               html_class="cell-border tab-left-aligned",
+               wrap_cells=c("<code>","</code>"))
 }
 
 #' @export
