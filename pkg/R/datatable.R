@@ -23,8 +23,7 @@ html_table <- function(x,id=UUIDgenerate(),
                       ">"),
                thead,tbody,"</table>")
     table <- paste0(table,collapse="\n")
-    #raw_html(table,id=id)   
-    table
+    raw_html(table,id=id)   
 }
 
 data_table <- function(x,id=UUIDgenerate(),
@@ -39,8 +38,16 @@ data_table <- function(x,id=UUIDgenerate(),
                        # fixedColumns = 1,
                        ...
                        ){
-    table <- html_table(x,id,use.rownames,html_class,expand)
+    table <- paste0("<table id='",id,
+                     "' class='",html_class,"'",
+                     if(expand) " width='100%'" else "",
+                     "></table>")
+    if(length(colnames(x))) nms <- colnames(x)
+    else nms <- 1:ncol(x)
+    columns <- lapply(nms,function(nm)list(title=nm))
     dt_args <- list(
+        data=x,
+        columns=columns,
         searching=searching,
         scrollY=scrollY,
         paging=paging,
