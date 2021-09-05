@@ -185,11 +185,11 @@ Evaluator <- R6Class("Evaluator",
 
             if(!self$datatable_inited) self$init_datatable()
 
-            perc_match <- getMatch(code,regexec("^%(.+?)\n\n",code))
+            perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
                 # message(sprintf("Found magic '%s'",magic))
-                code <- gsub("^%.+?\n\n","",code)
+                code <- gsub("^%%.+?\n\n","",code)
                 self$handle_magic(magic,code)
                 return()
             }
