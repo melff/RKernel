@@ -27,5 +27,5 @@ ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern,
 #' @export
 View.default <- function(x,title){
     data_table(x,paging=FALSE,
-               html_class="display cell-border tab-left-aligned")
+               html_class="display cell-border")
 }
