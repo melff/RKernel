@@ -42,6 +42,17 @@ data_table <- function(x,id=UUIDgenerate(),
                      "' class='",html_class,"'",
                      if(expand) " width='100%'" else "",
                      "></table>")
+
+    x <- as.data.frame(x)
+    rn <- row.names(x)
+    nms <- names(x)
+    x <- format(x)
+    x <- as.matrix(x)
+    if(use.rownames){
+        x <- cbind(rn,x)
+        nms <- c("",nms)
+    }
+
     if(length(colnames(x))) nms <- colnames(x)
     else nms <- 1:ncol(x)
     columns <- lapply(nms,function(nm)list(title=nm))
