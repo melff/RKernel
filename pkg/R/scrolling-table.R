@@ -52,7 +52,7 @@ scrolling_table <- function(x,id=uuid::UUIDgenerate(),
 
     tbody <- array("",dim=dim(x))
     # tbody[,1] <- paste0("<td class='firstCol'>",x[,1],"</td>")
-    tbody[,1] <- paste0("<th>",x[,1],"</td>")
+    tbody[,1] <- paste0("<th>",x[,1],"</th>")
     if(missing(wrap_cells)){
         tbody[,-1] <- paste0("<td>",x[,-1],"</td>")
     }
