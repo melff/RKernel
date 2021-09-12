@@ -181,8 +181,14 @@ Evaluator <- R6Class("Evaluator",
             }
         },
 
+        scrolling_table_inited = FALSE,
         eval = function(code,...,silent=FALSE){
 
+            if(!self$scrolling_table_inited){
+                self$init_scrolling_table()
+                self$scrolling_table_inited <- TRUE
+            }
+            
             perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
@@ -619,6 +625,9 @@ Evaluator <- R6Class("Evaluator",
             }
         },
 
+        init_scrolling_table = function(){
+            d <- init_scrolling_table()
+            private$kernel$display_data(d$data)
         },
 
         }
