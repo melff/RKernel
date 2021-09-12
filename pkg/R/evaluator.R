@@ -619,11 +619,6 @@ Evaluator <- R6Class("Evaluator",
             }
         },
 
-        print = function(x,...){
-            text <- capture.output(base::print(x,...))
-            text <- paste0(text,"\n")
-            stream(text=text,
-                   stream="stdout")       
         },
 
         }
