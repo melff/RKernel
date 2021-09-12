@@ -42,7 +42,7 @@
 }
 
 .tableFixHead th:after,
-th:before {
+.tableFixHead th:before {
     content: '';
     position: absolute;
     background: #cfcfcf;
