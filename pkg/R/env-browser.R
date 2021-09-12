@@ -71,17 +71,24 @@ ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern,
     tbody <- unlist(tbody)
     tbody <- tbody[nzchar(tbody)]
     thead <- c("Name","Value")
-    thead <- c(paste0("<th class='border-left'>",thead[1],"</th>"),
-                "<th></th>",
+    thead <- c(paste0("<th class='border-left' colspan='2'>",thead[1],"</th>"),
                paste0("<th class='border-left border-right'>",thead[2],"</th>"))
     thead <- paste0(thead,collapse="")
     thead <- paste0("<tr>",thead,"</tr>")
-    table <- c("<table class='env-browser'>",
+    colgroup <- c("<col class='object-name-col'>",
+                  "<col class='toggle-col'>",
+                  "<col class='object-value-col'>")
+    table <- c("<div class='env-browser-wrapper'>",
+               "<table class='env-browser'>",
+               "<colgroup>",
+               colgroup,
+               "</colgroup>",
                "<thead>",
                thead,
                "</thead>",
                tbody,
-               "</table>"
+               "</table>",
+               "</div>"
               )
     table <- paste0(table,collapse="\n")
     raw_html(table)

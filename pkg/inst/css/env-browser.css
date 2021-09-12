@@ -1,13 +1,36 @@
-.env-browser table {
-    width: unset;
-    border-collapse: collapse;
+.env-browser-wrapper {
     overflow: auto;
     max-height: 300px
 }
 
+
+.env-browser thead {
+    position: sticky;
+    top: 0;
+}
+
+table.env-browser {
+    width: 100%;
+    border-collapse: separate !important;
+    border-spacing: 0;
+}
+
+.env-browser .object-name-col {
+    width: 15%;
+}
+
+.env-browser .toggle-col {
+    width: 2%;
+}
+
+.env-browser .object-value-col {
+    width: 83%;
+}
+
+
 .env-browser th {
     text-align: left;
-    background-color: white;
+    background-color:  #f7f7f7;
     border-top: 1px solid #cfcfcf; 
     border-bottom: 1px solid #cfcfcf; 
     padding: 0.5ex 0.5ex;
@@ -15,7 +38,6 @@
 .env-browser td {
     text-align: left;
     background-color: white;
-    border-top: 1px solid #cfcfcf;    
     border-bottom: 1px solid #cfcfcf; 
     padding: 0.5ex 0.5ex;
 }
