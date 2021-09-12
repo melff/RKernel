@@ -101,7 +101,6 @@ Evaluator <- R6Class("Evaluator",
 
             assign("get_help_url",function()self$help_url,pos=pos)
 
-
         },
 
         help_port = integer(),
@@ -182,11 +181,18 @@ Evaluator <- R6Class("Evaluator",
         },
 
         scrolling_table_inited = FALSE,
+        env_browser_inited = FALSE,
+        
         eval = function(code,...,silent=FALSE){
 
             if(!self$scrolling_table_inited){
                 self$init_scrolling_table()
                 self$scrolling_table_inited <- TRUE
+            }
+            
+            if(!self$env_browser_inited){
+                self$init_env_browser()
+                self$env_browser_inited <- TRUE
             }
             
             perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
@@ -630,6 +636,9 @@ Evaluator <- R6Class("Evaluator",
             private$kernel$display_data(d$data)
         },
 
+        init_env_browser = function(){
+            d <- init_env_browser()
+            private$kernel$display_data(d$data)
         }
 
     ),

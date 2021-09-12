@@ -1,0 +1,54 @@
+.env-browser table {
+    width: unset;
+    border-collapse: collapse;
+    overflow: auto;
+    max-height: 300px
+}
+
+.env-browser th {
+    text-align: left;
+    background-color: white;
+    border-top: 1px solid #cfcfcf; 
+    border-bottom: 1px solid #cfcfcf; 
+    padding: 0.5ex 0.5ex;
+}
+.env-browser td {
+    text-align: left;
+    background-color: white;
+    border-top: 1px solid #cfcfcf;    
+    border-bottom: 1px solid #cfcfcf; 
+    padding: 0.5ex 0.5ex;
+}
+
+.env-browser th.border-left,
+.env-browser td.border-left {
+    border-left: 1px solid #cfcfcf;    
+}
+
+.env-browser th.border-right,
+.env-browser td.border-right {
+    border-right: 1px solid #cfcfcf;    
+}
+
+.env-browser td code {
+    background: unset;
+}
+
+td.toggle-container {
+    padding: 0;
+    text-align: right;
+}
+
+td.toggle-container button {
+    border: none;
+    background: white;
+}
+
+tbody.subtable {
+    max-height: 10ex;
+    overflow-y: auto;
+}
+
+.subtable td {
+    padding-left: 2em;
+}
