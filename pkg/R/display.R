@@ -384,3 +384,36 @@ raw_html <- function(text,id=uuid::UUIDgenerate()){
 }
 
 
+#' @export
+display.data.frame <- function(x,...,
+                            metadata=NULL,
+                            id=uuid::UUIDgenerate(),
+                            update=FALSE){
+
+    rkernel_mime_types <- getOption("rkernel_mime_types",
+                                    c("text/plain",
+                                      "text/html",
+                                      "text/latex",
+                                      "text/markdown"))
+    mime_data <- list()
+    for(mime_type in rkernel_mime_types){
+        if(mime_type=="text/html"){
+            r_html <- scrolling_table(x)$data[["text/html"]]
+            mime_data[[mime_type]] <- r_html
+        }
+        else{
+            repr_func <- mime2repr[[mime_type]]
+            repr_result <- repr_func(x,...)
+            mime_data[[mime_type]] <- repr_result
+        }
+    }
+    d <- list(data=mime_data)
+    d$metadata <- metadata
+    d$transient <- list(display_id=id)
+    if(update) cl <- "update_display_data"
+    else cl <- "display_data"
+    structure(d,class=cl)
+}
+
+#' @export
+display.matrix <- display.data.frame
