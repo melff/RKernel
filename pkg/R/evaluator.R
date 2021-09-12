@@ -183,8 +183,6 @@ Evaluator <- R6Class("Evaluator",
 
         eval = function(code,...,silent=FALSE){
 
-            if(!self$datatable_inited) self$init_datatable()
-
             perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
@@ -628,14 +626,6 @@ Evaluator <- R6Class("Evaluator",
                    stream="stdout")       
         },
 
-        datatable_inited = FALSE,
-
-        init_datatable = function()
-        if(!self$datatable_inited){
-            js <- readLines(system.file("datatables/load_datatables_connected.js",package="RKernel"))
-            js <- Javascript(js)
-            private$kernel$display_data(data=js$data)
-            self$datatable_inited <- TRUE
         }
 
     ),
