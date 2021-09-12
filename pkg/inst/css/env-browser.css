@@ -29,14 +29,14 @@ table.env-browser {
 
 
 .env-browser th {
-    text-align: left;
+    text-align: left !important;
     background-color:  #f7f7f7;
     border-top: 1px solid #cfcfcf; 
     border-bottom: 1px solid #cfcfcf; 
     padding: 0.5ex 0.5ex;
 }
 .env-browser td {
-    text-align: left;
+    text-align: left !important;
     background-color: white;
     border-bottom: 1px solid #cfcfcf; 
     padding: 0.5ex 0.5ex;
