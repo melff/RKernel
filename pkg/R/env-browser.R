@@ -11,6 +11,62 @@ ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern,
     mode = "any"){
     if (missing(envir)) 
         envir <- as.environment(pos)
+    table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
+                         pattern=pattern,mode=mode)
+    raw_html(table)
+}
+
+
+#' @export
+browse_env_fixed <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
+    mode = "any", id=uuid::UUIDgenerate()){
+    if (missing(envir)) 
+        envir <- as.environment(pos)
+    table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
+                               pattern=pattern,mode=mode)
+    tgl_id <- id
+    toggle <- paste0(paste0("<button data-toggle=\"collapse\" ",
+                             "type=\"button\"",
+                             "data-target=\"#",tgl_id,"\">"),
+                      "&plus;",
+                      "</button>")
+    div <- c("<div class='browse_env'>",
+             toggle,
+             paste0("<div class='collapse' id='",tgl_id,"'>"),
+             table,
+             "</div>",
+             "</div>")
+    div <- paste(div,collapse="\n")
+    raw_html(div,id=id)
+}
+
+browse_env <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
+    mode = "any", id=uuid::UUIDgenerate()){
+    if (missing(envir)) 
+        envir <- as.environment(pos)
+    table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
+                               pattern=pattern,mode=mode)
+    d <- raw_html(table)
+    payload <- list(source="page",
+                    data=d$data,
+                    start=1)
+    structure(payload,class="payload")
+}
+
+
+init_env_browser <- function(){
+
+    env_browser_css <- readLines(system.file("css/env-browser.css",
+                                                 package="RKernel"))
+    env_browser_css <- paste0(env_browser_css,collapse="\n")
+    env_browser_css <- paste("<style>",env_browser_css,"</style>",sep="\n")
+    raw_html(env_browser_css)
+}
+
+env_browser_table <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
+    mode = "any"){
+    if (missing(envir)) 
+        envir <- as.environment(pos)
     nms <- ls(name, envir = envir, all.names = all.names, pattern = pattern)
     r <- vapply(nms, exists, NA, envir = envir, mode = mode, 
         inherits = FALSE)
@@ -30,7 +86,7 @@ ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern,
         if(nzchar(row[3])){  
             tgl_id <- uuid::UUIDgenerate()
             toggler <- paste0(paste0("<button data-toggle=\"collapse\" ",
-                                     "type=\"button\"",
+                                     "type=\"button\" ",
                                      "data-target=\"#",tgl_id,"\">"),
                         "&plus;",
                         #"<i class=\"fa fa-angle-double-right\"></i>",
@@ -90,16 +146,6 @@ ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern,
                "</table>",
                "</div>"
               )
-    table <- paste0(table,collapse="\n")
-    raw_html(table)
+    paste0(table,collapse="\n")
 }
 
-
-init_env_browser <- function(){
-
-    env_browser_css <- readLines(system.file("css/env-browser.css",
-                                                 package="RKernel"))
-    env_browser_css <- paste0(env_browser_css,collapse="\n")
-    env_browser_css <- paste("<style>",env_browser_css,"</style>",sep="\n")
-    raw_html(env_browser_css)
-}

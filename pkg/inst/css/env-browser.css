@@ -74,3 +74,18 @@ tbody.subtable {
 .subtable td {
     padding-left: 2em;
 }
+
+.browse_env {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 200;
+    background-color: white;
+    max-width: 50%;
+    box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2);
+}
+
+.browse_env .env-browser-wrapper {
+    background-color: white;
+    width: 100%;
+}
