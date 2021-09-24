@@ -4,29 +4,46 @@
 }
 
 
-.env-browser thead {
-    position: sticky;
-    top: 0;
-}
+/* .env-browser thead {
+ *     position: sticky;
+ *     top: 0;
+ * } */
 
 table.env-browser {
-    width: 100%;
+    width: 160ex;
     border-collapse: separate !important;
     border-spacing: 0;
 }
 
-.env-browser .object-name-col {
+table.env-browser-head {
+    position: sticky;
+    top: 0;
+}
+
+/* .env-browser .object-name-col {
+ *     width: 15%;
+ * }
+ * 
+ * .env-browser .toggle-col {
+ *     width: 2%;
+ * }
+ * 
+ * .env-browser .object-value-col {
+ *     width: 83%;
+ * } */
+
+.env-browser .object-name {
     width: 15%;
 }
 
-.env-browser .toggle-col {
-    width: 2%;
+
+.env-browser .object-summary {
+    width: 85%;
 }
 
-.env-browser .object-value-col {
-    width: 83%;
+table.env-browser {
+    margin: 0 !important;
 }
-
 
 .env-browser th {
     text-align: left !important;
@@ -40,6 +57,11 @@ table.env-browser {
     background-color: white;
     border-bottom: 1px solid #cfcfcf; 
     padding: 0.5ex 0.5ex;
+}
+
+.env-browser th.border-top,
+.env-browser td.border-top {
+    border-top: 1px solid #cfcfcf;    
 }
 
 .env-browser th.border-left,
@@ -79,13 +101,46 @@ tbody.subtable {
     position: fixed;
     bottom: 0;
     left: 0;
-    z-index: 200;
-    background-color: white;
-    max-width: 50%;
-    box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2);
+    /* z-index: 200;
+     * background-color: white;
+     * max-width: 50%;
+     * box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2); */
 }
 
 .browse_env .env-browser-wrapper {
     background-color: white;
     width: 100%;
+    border: 1px solid #cfcfcf; 
+    box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2); 
+}
+
+.env-browser-wrapper summary::marker {
+    content:''; 
+}
+details summary::-webkit-details-marker { display: none; }
+
+.env-browser-wrapper details .object-summary::before {
+    content: "\2BC8";
+    padding-left: 4px;
+}
+
+.env-browser-wrapper details[open] .object-summary::before {
+    content: "\2BC6";
+}
+
+.ui-dialog.env-browser-dialog {
+    font-size: 11px;
+}
+
+.env-browser-dialog .ui-dialog-titlebar,
+.env-browser-dialog .ui-dialog-content {
+    padding: 0;
+}
+
+.env-browser-dialog .ui-dialog-titlebar {
+    border-radius: 1px;
+}
+
+.env-browser-dialog .ui-dialog-title {
+    padding: 0.5ex;
 }
