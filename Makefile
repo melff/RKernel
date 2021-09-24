@@ -8,7 +8,7 @@ ARCHIVE := $(PACKAGE)_$(VERSION).tar.gz
 RCHKIMG := kalibera-rchk-master-def.simg
 
 .PHONY: all
-all: roxygenize build install
+all: roxygenize build install installspec
 
 .PHONY: describe
 describe:
@@ -57,6 +57,10 @@ install-dir-clean:
 .PHONY: install
 install:
 	R CMD INSTALL $(ARCHIVE)
+
+.PHONY: installspec
+installspec:
+	Rscript --vanilla -e 'RKernel::installspec()'
 
 .PHONY: build-and-install
 build-and-install: build install
