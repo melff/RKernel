@@ -190,10 +190,10 @@ Evaluator <- R6Class("Evaluator",
                 self$scrolling_table_inited <- TRUE
             }
             
-            if(!self$env_browser_inited){
-                self$init_env_browser()
-                self$env_browser_inited <- TRUE
-            }
+            # if(!self$env_browser_inited){
+            #     self$init_env_browser()
+            #     self$env_browser_inited <- TRUE
+            # }
             
             perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
             if(length(perc_match) > 1){

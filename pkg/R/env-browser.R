@@ -13,49 +13,75 @@ ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern,
         envir <- as.environment(pos)
     table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
                          pattern=pattern,mode=mode)
-    raw_html(table)
+    css <- env_browser_css(scoped=TRUE)
+    html <- paste(
+        "<div class='ls_str'>",
+        css,
+        table,
+        "</div>",
+        sep="\n")
+    raw_html(html)
 }
 
 
 #' @export
 browse_env_fixed <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
-    mode = "any", id=uuid::UUIDgenerate(), tgl_id=uuid::UUIDgenerate()){
+    mode = "any", id="browse_env", tgl_id=uuid::UUIDgenerate(),update=FALSE){
     if (missing(envir)) 
         envir <- as.environment(pos)
     table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
-                               pattern=pattern,mode=mode)
-    toggle <- paste0(paste0("<button data-toggle=\"collapse\" ",
-                             "type=\"button\"",
-                             "data-target=\"#",tgl_id,"\">"),
-                      "&plus;",
-                      "</button>")
-    div <- c(paste0("<div class='browse_env' id='",id,"'>"),
-             toggle,
-             paste0("<div class='collapse in' id='",tgl_id,"'>"),
-             table,
-             "</div>",
-             "</div>")
-    div <- paste(div,collapse="\n")
+                               pattern=pattern,mode=mode,id=id)
+    # div <- c(paste0("<div class='browse_env' id='",id,"'>"),
+    #          table,
+    #          "</div>")
+    div <- paste(table,collapse="\n")
     script_tmpl <- "
 <script>
 $( function() {
     $('#%s').detach()
          .appendTo('body')
          .css('position','fixed')
-         /*.css('left','0')
-         .css('bottom','0')*/
-         .draggable()
-         /*.resizable()*/
+         .css('left','calc(100perc - 100px)')
+         .css('top','130px')
+         .css('max-height','unset')
+         .resizable({
+             handles: 'e, s, w'
+             })
+         .draggable({
+             handle: 'thead'
+         })
          .css('display','block')
-         /*.css('background-color','#fff')*/
-         .css('z-index','100')
+         .css('background-color','#fff')
+         .css('z-index','50')
          .css('opacity','1');
   });
 </script>
 "
+    rm_script_tmpl <- "
+<script>
+$( function() {
+    $('#%s').remove()
+  });
+</script>
+"
+
     script <- sprintf(script_tmpl,id)
-    res <- paste(div,script,sep="\n")
-    raw_html(res,id=id)
+    script <- sub("perc","%",script)
+    if(update){
+        rm_script <- sprintf(rm_script_tmpl,id)
+        res <- paste(rm_script,div,script,sep="\n")
+    }
+    else 
+        res <- paste(div,script,sep="\n")
+    raw_html(res,id=id,update=update)
+}
+
+remove_env_browser <- function(id="browse_env"){
+script_tmpl <- "$( function(){
+    $('#%s').remove()
+})"
+script <- sprintf(script_tmpl,id)
+Javascript(script)
 }
 
 browse_env <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
@@ -72,17 +98,22 @@ browse_env <- function(pos = -1, name, envir, all.names = FALSE, pattern,
 }
 
 
-init_env_browser <- function(){
-
+env_browser_css <- function(scoped=FALSE){
     env_browser_css <- readLines(system.file("css/env-browser.css",
                                                  package="RKernel"))
     env_browser_css <- paste0(env_browser_css,collapse="\n")
-    env_browser_css <- paste("<style>",env_browser_css,"</style>",sep="\n")
-    raw_html(env_browser_css)
+    if(scoped)
+        paste("<style scoped=''>",env_browser_css,"</style>",sep="\n")
+    else
+        paste("<style>",env_browser_css,"</style>",sep="\n")
+}
+
+init_env_browser <- function(){
+    raw_html(env_browser_css())
 }
 
 env_browser_table <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
-    mode = "any"){
+    mode = "any", id=NULL){
     if (missing(envir)) 
         envir <- as.environment(pos)
     nms <- ls(name, envir = envir, all.names = all.names, pattern = pattern)
@@ -108,42 +139,76 @@ env_browser_table <- function(pos = -1, name, envir, all.names = FALSE, pattern,
     thead <- c("<table class='env-browser env-browser-head'>",thead,"</table>")
     thead <- paste(thead,collapse="\n") 
     result <- append(result,thead)
-    for(i in 1:nrow(m)){
-        row <- m[i,]
-        summary <- c(
+    if(n > 0){
+        for(i in 1:n){
+            row <- m[i,]
+            summary <- c(
                 paste0("<td class='object-name border-left'><code>",row[1],"</code></td>"),
                 # if(nzchar(row[3])) paste0("<td class='toggle-container'>","&plus;","</td>"),
                 paste0("<td class='object-summary border-left border-right'><code>",row[2],"</code></td>")
             )
-        summary <- paste(summary,collapse="")
-        summary <- paste0("<tr>",summary,"</tr>")
-        summary <- c("<table class='env-browser'>",summary,"</table>")
-        summary <- paste(summary,collapse="\n")    
-        if(nzchar(row[3])){  
-            details <- unlist(strsplit(row[3],"\n"))
-            details <- paste0("<td class='object-details border-left border-right'><code>",
-                               details,
-                               "</code></td>")
-            details <- sapply(details,paste0,collapse="")
-            details <- paste0("<tr>",details,"</tr>")
-            details <- paste(details,collapse="\n")
-            details <- c("<table class='env-browser'>",details,"</table>")
-            details <- paste(details,collapse="\n")
-            result_i <- c(
-                            "<details>",
-                            "<summary>",
-                            summary,
-                            "</summary>",
-                            details,
-                            "</details>"
-                        )
-            result_i <- paste(result_i,collapse="\n")
-            result <- append(result,result_i)
-        } else {
-            result <- append(result,summary)
+            summary <- paste(summary,collapse="")
+            summary <- paste0("<tr>",summary,"</tr>")
+            summary <- c("<table class='env-browser'>",summary,"</table>")
+            summary <- paste(summary,collapse="\n")    
+            if(nzchar(row[3])){  
+                details <- unlist(strsplit(row[3],"\n"))
+                details <- paste0("<td class='object-details border-left border-right'><code>",
+                                  details,
+                                  "</code></td>")
+                details <- sapply(details,paste0,collapse="")
+                details <- paste0("<tr>",details,"</tr>")
+                details <- paste(details,collapse="\n")
+                details <- c("<table class='env-browser'>",details,"</table>")
+                details <- paste(details,collapse="\n")
+                result_i <- c(
+                    "<details>",
+                    "<summary>",
+                    summary,
+                    "</summary>",
+                    details,
+                    "</details>"
+                )
+                result_i <- paste(result_i,collapse="\n")
+                result <- append(result,result_i)
+            } else {
+                result <- append(result,summary)
+            }
         }
     }
-    result <- c("<div class='env-browser-wrapper'>",result,"</div>")
+    if(missing(id))
+        result <- c("<div class='env-browser-wrapper'>",
+                    result,
+                    "</div>")
+    else
+        result <- c(paste0("<div class='env-browser-wrapper' id='",id,"'>"),
+                    result,
+                    "</div>")
     paste(result,collapse="\n")
 }
 
+output_wrapper <- function(on=TRUE){
+    if(on){
+        js <- system.file("js/output-wrapper.js",
+                                         package="RKernel")
+    }
+    else {
+        js <- system.file("js/output-wrapper-off.js",
+                                         package="RKernel")
+    } 
+    Javascript(file=js)
+}
+
+
+
+ls_str_refresh <- function(on=TRUE){
+    if(on){
+        ls_str_refresh.js <- system.file("js/ls-str-refresh.js",
+                                         package="RKernel")
+    }
+    else {
+        ls_str_refresh.js <- system.file("js/ls-str-refresh-off.js",
+                                         package="RKernel")
+    }
+    Javascript(file=ls_str_refresh.js)
+}
