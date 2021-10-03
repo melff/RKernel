@@ -418,3 +418,11 @@ display.data.frame <- function(x,...,
 
 #' @export
 display.matrix <- display.data.frame
+
+add_to_head <- function(code){
+    script_tmpl <- "$('%s').appendTo(\"head\");"
+    code <- gsub("\n","\\ \n",code,fixed=TRUE)
+    script <- sprintf(script_tmpl,code)
+    print(script)
+    Javascript(script)
+}
