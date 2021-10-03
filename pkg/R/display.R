@@ -376,11 +376,12 @@ LaTeXMath <- function(text){
             "text/latex"=text_latex)
 }
 
-raw_html <- function(text,id=uuid::UUIDgenerate()){
+raw_html <- function(text,id=uuid::UUIDgenerate(),update=FALSE){
     text <- paste(text,collapse="\n")
     display("text/plain"="",
             "text/html"=text,
-            id=id)
+            id=id,
+            update=update)
 }
 
 
