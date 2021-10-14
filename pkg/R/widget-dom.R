@@ -1,11 +1,11 @@
 #' @export
-DOMWidgetClass <- R6Class("DOMWidget",
+DOMWidgetClass <- R6Class_("DOMWidget",
   inherit = CoreWidgetClass,
   public = list(
-    `_dom_classes` = trait(character(0),sync=TRUE),
-    tabbable = trait(FALSE,optional=TRUE,sync=TRUE),
-    tooltip = trait(character(0),optional=TRUE,sync=TRUE),
-    layout = trait(quote(Layout()),sync=TRUE),
+    `_dom_classes` = Unicode(character(0),sync=TRUE),
+    tabbable = Boolean(logical(0),sync=TRUE),
+    tooltip = Unicode(character(0),sync=TRUE),
+    layout = Instance(LayoutClass,sync=TRUE),
     add_class = function(className){
       self$state$`_dom_classes` <- union(self$state$`_dom_classes`,className)
     },

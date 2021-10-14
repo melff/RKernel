@@ -1,23 +1,23 @@
 #' @export
-DescriptionStyleClass <- R6Class("DescriptionStyle",
+DescriptionStyleClass <- R6Class_("DescriptionStyle",
   inherit = CoreWidgetClass,
   public = list(
-    `_model_name` = trait("DescriptionStyleModel",sync=TRUE),
-    `_view_name` = trait("StyleView",sync=TRUE),
-    description_width = trait(character(0),sync=TRUE)
+    `_model_name` = Unicode("DescriptionStyleModel",sync=TRUE),
+    `_view_name` = Unicode("StyleView",sync=TRUE),
+    description_width = Unicode(character(0),sync=TRUE)
   )
 )
 #' @export
 DescriptionStyle <- function(...) DescriptionStyleClass$new(...)
 
 #' @export
-DescriptionWidgetClass <- R6Class("DescriptionWidget",
+DescriptionWidgetClass <- R6Class_("DescriptionWidget",
   inherit = DOMWidgetClass,
   public = list(
-    `_model_name` = trait("DescriptionModel",sync=TRUE),
-    description = trait("",sync=TRUE),
-    description_allow_html = trait(FALSE,sync=TRUE),
-    style = trait(quote(DescriptionStyle()),sync=TRUE)
+    `_model_name` = Unicode("DescriptionModel",sync=TRUE),
+    description = Unicode("",sync=TRUE),
+    description_allow_html = Boolean(FALSE,sync=TRUE),
+    style = Instance(DescriptionStyleClass,sync=TRUE)
   )
 )
 #' @export

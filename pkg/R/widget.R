@@ -1,20 +1,17 @@
 
-WidgetClass <- R6Class("Widget",
+WidgetClass <- R6Class_("Widget",
+  inherit = HasTraits,
   public = list(
-    `_model_name` = trait("WidgetModel",sync=TRUE),
-    `_model_module` = trait("@jupyter-widgets/base",sync=TRUE),
-    `_model_module_version` = trait(jupyter_widgets_base_version,sync=TRUE),
-    `_view_name` = trait(character(0),sync=TRUE),
-    `_view_module` = trait(character(0),sync=TRUE),
-    `_view_module_version` = trait(character(0),sync=TRUE),
-    `_view_count` = trait(integer(0),sync=TRUE),
-    state = list(),
+    `_model_id` = Unicode(character(0),sync=TRUE),
+    `_model_name` = Unicode("WidgetModel",sync=TRUE),
+    `_model_module` = Unicode("@jupyter-widgets/base",sync=TRUE),
+    `_model_module_version` = Unicode(jupyter_widgets_base_version,sync=TRUE),
+    `_view_name` = Unicode(character(0),sync=TRUE),
+    `_view_module` = Unicode(character(0),sync=TRUE),
+    `_view_module_version` = Unicode(character(0),sync=TRUE),
+    `_view_count` = Unicode(integer(0),sync=TRUE),
     initialize = function(...){
-      members <- ls(self)
-      for(k in members){
-        if(is.trait(self[[k]]) && attr(self[[k]],"sync"))
-          self$state[[k]] <- eval(self[[k]])
-      }
+      super$initialize()
       add_displayed_classes(class(self)[1])
       self$open()
     },
@@ -27,7 +24,7 @@ WidgetClass <- R6Class("Widget",
         state <- self$get_state()
         data <- list(state=state)
         self$comm$open(data=data)
-        state["_model_id"] <- self$comm$id
+        state$state[["_model_id"]] <- self$comm$id
       }
     },
     finalize = function(){
@@ -38,11 +35,11 @@ WidgetClass <- R6Class("Widget",
         self$comm$close()
     },
     get_state = function(keys=NULL){
+      state <- super$get_state()
       if(is.null(keys))
-        keys <- names(self$state)
-      state <- list("_model_id"=self$model_id)
+        keys <- names(state)
       for(k in keys){
-        state[[k]] <- to_json(self$state[[k]])
+        state[[k]] <- to_json(state[[k]])
       }
       return(state)
     },
@@ -52,8 +49,8 @@ WidgetClass <- R6Class("Widget",
                   state=state)
       self$`_send`(msg)
     },
-    notify_change = function(change_names){
-      self$send_state(change_names)
+    notify = function(change_name){
+      self$send_state(change_name)
     },
     send = function(content){
       msg <- list(method="custom","content"=content)
@@ -61,7 +58,7 @@ WidgetClass <- R6Class("Widget",
     },
     display_data = function(){
       data <- list("text/plain" = class(self)[1])
-      if("_view_name" %in% self$state_keys)
+      if(length(self[["_view_name"]]))
         data[["application/vnd.jupyter.widget-view+json"]] <- list(
           version_major = 2,
           version_minor = 0,
