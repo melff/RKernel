@@ -1,4 +1,5 @@
-CommManager <- R6Class("CommManager",
+#' @export
+CommManagerClass <- R6Class("CommManager",
     
     public=list(
 
@@ -20,6 +21,8 @@ CommManager <- R6Class("CommManager",
         remove_handlers = function(target_name) {
             private$handlers[[target_name]] <- NULL
         },
+        has_handlers = function(target_name) target_name %in% names(private$handlers),
+        get_handlers = function(target_name) private$handlers[[target_name]],
         get_comms = function(target_name=NULL){
             comms <- list()
             for(c in self$comms){
@@ -30,9 +33,12 @@ CommManager <- R6Class("CommManager",
         },
         new_comm = function(target_name){
             if(target_name %in% names(private$handlers)){
-                id <- UUIDgenerate()
+                id <- uuid()
                 handlers <- private$handlers[[target_name]]
-                comm <- Comm$new(target_name,id,self,handlers)
+                comm <- Comm(target_name,
+                             id,
+                             self,
+                             handlers)
                 self$comms[[id]] <- comm
                 return(comm)
             }
@@ -41,7 +47,7 @@ CommManager <- R6Class("CommManager",
         handle_open = function(target_name,id,data){
             if(target_name %in% names(private$handlers)){
                 handlers <- private$handlers[[target_name]]
-                comm <- Comm$new(target_name,id,self,handlers)
+                comm <- Comm(target_name,id,self,handlers)
                 comm$data <- data
                 if("open" %in% names(handlers)){
                     text <- tryCatch(capture.output(handlers$open(comm,data)),
@@ -116,8 +122,11 @@ CommManager <- R6Class("CommManager",
         handlers = list()
     )
 )
+#' @export
+CommManager <- function(...) CommManagerClass$new(...)
 
-Comm <- R6Class("Comm",
+#' @export
+CommClass <- R6Class("Comm",
 
     public = list(
 
@@ -126,7 +135,10 @@ Comm <- R6Class("Comm",
         handlers = list(),
         data = list(),
         
-        initialize = function(target_name,id,manager,handlers){
+        initialize = function(target_name,
+                              id = uuid(),
+                              manager = get_comm_manager(),
+                              handlers = manager$get_handlers(target_name)){
             self$target_name <- target_name
             self$id <- id
             private$manager <- manager
@@ -152,3 +164,10 @@ Comm <- R6Class("Comm",
         manager = list()
     )
 )
+#' @export
+Comm <- function(...) CommClass$new(...)
+
+get_comm_manager <- function() {
+    kernel <- get_current_kernel()
+    kernel$comm_manager
+}

@@ -8,6 +8,8 @@
 PROTOCOL_VERSION <- '5.3'
 WIRE_DELIM <- charToRaw("<IDS|MSG>")
 
+kernel <- new.env()
+
 #' @export
 Kernel <- R6Class("Kernel",
 
@@ -32,10 +34,11 @@ Kernel <- R6Class("Kernel",
       }
       private$conn_info <- conn_info
       evaluator <- Evaluator$new(self)
-      comm_manager <- CommManager$new(self,evaluator)
+      comm_manager <- CommManager(self,evaluator)
       self$comm_manager <- comm_manager
       self$evaluator <- evaluator
       self$evaluator$comm_manager <- comm_manager
+      kernel$current <- self
     },
 
     evaluator = list(),
@@ -451,6 +454,8 @@ Kernel <- R6Class("Kernel",
   )
 )
 
+#' @importFrom jsonlite fromJSON toJSON
+
 fromRawJSON <- function(raw_json) {
     json <- rawToChar(raw_json)
     Encoding(json) <- "UTF-8"
@@ -478,7 +483,7 @@ check_page_payload <- function(payload){
   payload
 }
 
-
+get_current_kernel <- function() kernel$current
 
 # Local Variables:
 # ess-indent-offset: 2
