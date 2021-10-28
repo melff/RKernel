@@ -67,8 +67,9 @@ Kernel <- R6Class("Kernel",
       private$send_message(type="execute_input",
                            parent=msg,
                            socket_name="iopub",
-                           code=msg$content$code,
-                           execution_count=self$execution_count)
+                           content=list(
+                             code=msg$content$code,
+                             execution_count=self$execution_count))
       self$evaluator$eval(msg$content$code)
       payload <- self$evaluator$get_payload(clear=TRUE)
       payload <- check_page_payload(payload)
@@ -77,9 +78,10 @@ Kernel <- R6Class("Kernel",
       private$send_message(type="execute_reply",
                            parent=msg,
                            socket="shell",
-                           payload=payload,
-                           status=status,
-                           execution_count=self$execution_count)
+                           content=list(
+                             status=status,
+                             payload=payload,
+                             execution_count=self$execution_count))
       #cat("Sent a execute_reply ...\n")
       # message("Code:", msg$content$code)
       #message("Store history:", msg$content$store_history)
@@ -95,56 +97,60 @@ Kernel <- R6Class("Kernel",
       private$send_message(type="clear_output",
                                  parent=msg,
                                  socket_name="iopub",
-                                 wait=wait)
+                                 content=list(wait=wait))
     },
 
     stream = function(text,stream){
       private$send_message(type="stream",
                            parent=self$execute_request,
                            socket_name="iopub",
-                           name=stream,
-                           text=text)
+                           content=list(
+                             name=stream,
+                             text=text))
     },
 
     execute_result = function(data,metadata=NULL,transient=NULL){
       private$send_message(type="execute_result",
                            parent=self$execute_request,
                            socket_name="iopub",
-                           data=data,
-                           metadata=metadata,
-                           transient=transient,
-                           execution_count=self$execution_count
-                           )
+                           content=list(
+                             data=data,
+                             metadata=metadata,
+                             execution_count=self$execution_count
+                           ))
     },
 
     display_data = function(data,metadata=NULL,transient=NULL){
       private$send_message(type="display_data",
                            parent=self$execute_request,
                            socket_name="iopub",
-                           data=data,
-                           metadata=metadata,
-                           transient=transient
-                           )
+                           content=list(
+                             data=data,
+                             metadata=metadata,
+                             transient=transient
+                           ))
     },
 
     update_display_data = function(data,metadata=NULL,transient){
       private$send_message(type="update_display_data",
                            parent=self$execute_request,
                            socket_name="iopub",
-                           data=data,
-                           metadata=metadata,
-                           transient=transient
-                           )
+                           content=list(
+                             data=data,
+                             metadata=metadata,
+                             transient=transient
+                           ))
     },
 
     send_error = function(name,value,traceback){
             private$send_message(type="error",
                            parent=self$execute_request,
-                                 socket="iopub",
-                                 ename = name,
-                                 evalue = value,
-                                 traceback = traceback
-                                 )
+                           socket="iopub",
+                           content=list(
+                             ename = name,
+                             evalue = value,
+                             traceback = traceback
+                           ))
     },
 
     kernel_info_reply = function(msg){
@@ -175,9 +181,9 @@ Kernel <- R6Class("Kernel",
       private$send_message(type="is_complete_reply",
                            parent=msg,
                            socket_name="shell",
-                           status=status,
-                           #debug=TRUE,
-                           indent="")
+                           content=list(
+                             status=status,
+                             indent=""))
       #cat("Sent an is_complete_reply ...\n")
     },
 
@@ -188,11 +194,12 @@ Kernel <- R6Class("Kernel",
       private$send_message(type="complete_reply",
                            parent=msg,
                            socket_name="shell",
-                           status="ok",
-                           matches=result$matches,
-                           cursor_start=result$start,
-                           cursor_end=result$end,
-                           metadata=namedList())
+                           content=list(
+                             status="ok",
+                             matches=result$matches,
+                             cursor_start=result$start,
+                             cursor_end=result$end,
+                             metadata=namedList()))
     },
 
     comm_info_reply = function(msg){
@@ -200,11 +207,12 @@ Kernel <- R6Class("Kernel",
       if("target_name" %in% names(msg$content))
         target_name <- msg$content$target_name
       comms <- self$comm_manager$get_comms(target_name)
-      private$send_message("comm_info_reply",
+      private$send_message(type="comm_info_reply",
                            parent=msg,
                            socket_name="shell",
-                           status="ok",
-                           comms=comms)
+                           content=list(
+                             status="ok",
+                             comms=comms))
     },
 
     handle_comm_open = function(msg){
@@ -229,29 +237,35 @@ Kernel <- R6Class("Kernel",
       private$comm_parent <- msg
     },
 
-    send_comm_msg = function(id,data){
-      private$send_message("comm_msg",
+    send_comm_msg = function(id,data,metadata=NULL){
+      private$send_message(type="comm_msg",debug=TRUE,
                    parent=private$comm_parent,
                    socket_name="iopub",
-                   comm_id=id,
-                   data=data)
+                   content=list(
+                     comm_id=id,
+                     data=data),
+                   metadata=metadata)
     },
     
-    send_comm_open = function(id,target_name,data){
-      private$send_message("comm_open",
+    send_comm_open = function(id,target_name,data,metadata=NULL){
+      private$send_message(type="comm_open",debug=TRUE,
                    parent=private$comm_parent,
                    socket_name="iopub",
-                   comm_id=id,
-                   target_name=target_name,
-                   data=data)
+                   content=list(
+                     comm_id=id,
+                     target_name=target_name,
+                     data=data),
+                   metadata=metadata)
     },
     
-    send_comm_close = function(id,data){
-      private$send_message("comm_close",
+    send_comm_close = function(id,data,metadata=NULL){
+      private$send_message(type="comm_close",debug=TRUE,
                    parent=private$comm_parent,
                    socket_name="iopub",
-                   comm_id=id,
-                   data=data)
+                   content=list(
+                     comm_id=id,
+                     data=data),
+                   metadata=metadata)
     }
 
   ),
@@ -305,8 +319,11 @@ Kernel <- R6Class("Kernel",
     respond_shell = function(req){
       msg <- private$get_message("shell")
       if(!length(msg)) return(TRUE)
-      private$send_message(type="status",parent=msg,
-                           socket_name="iopub",execution_state="busy")
+      private$send_message(type="status",
+                           parent=msg,
+                           socket_name="iopub",
+                           content=list(
+                             execution_state="busy"))
       # cat("Got a", msg$header$msg_type, "request ...\n")
       # do_stuff ...
       switch(msg$header$msg_type,
@@ -320,8 +337,11 @@ Kernel <- R6Class("Kernel",
              comm_info_request = self$comm_info_reply(msg)
              )
 
-      private$send_message(type="status",parent=msg,
-                           socket_name="iopub",execution_state="idle")
+      private$send_message(type="status",
+                           parent=msg,
+                           socket_name="iopub",
+                           content=list(
+                             execution_state="idle"))
       return(TRUE)
     },
 
@@ -351,9 +371,13 @@ Kernel <- R6Class("Kernel",
       return(msg)
     },
 
-    send_message = function(type, parent, socket_name, debug=FALSE, content=list(...), ...){
-      msg <- private$msg_new(type,parent,content)
-      if(debug) str(msg)
+    send_message = function(type, parent, socket_name, debug=FALSE, content, metadata=NULL){
+      msg <- private$msg_new(type,parent,content,metadata)
+      if(debug) {
+        msg_body <- lapply(msg[c("header","parent_header","metadata","content")],
+                         toJSON,auto_unbox=TRUE)
+        print(msg_body)
+      }
       socket <- private$sockets[[socket_name]]
       wire_out <- private$wire_pack(msg)
       #zmq.send.multipart(socket,wire_out,serialize=FALSE)
@@ -406,7 +430,9 @@ Kernel <- R6Class("Kernel",
     session = character(0),
     username = character(0),
 
-    msg_new = function(type,parent,content){
+    msg_new = function(type,parent,content,metadata=NULL){
+      if(is.null(metadata))
+        metadata = namedList()
       if(length(parent) && "header" %in% names(parent)){
         parent_header <- parent$header
         session <- parent_header$session
@@ -429,7 +455,7 @@ Kernel <- R6Class("Kernel",
            parent_header = parent_header,
            content = content,
            identities = parent$identities,
-           metadata = namedList())
+           metadata = metadata)
     },
 
     clear_shell_queue = function(...){
@@ -444,7 +470,8 @@ Kernel <- R6Class("Kernel",
           private$send_message(type=reply_type,
                            parent=request,
                            socket_name="shell",
-                           status="aborted")
+                           content=list(
+                             status="aborted"))
         }
         else break
       }

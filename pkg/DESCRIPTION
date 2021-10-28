@@ -30,3 +30,27 @@ Suggests:
 SystemRequirements:
     jupyter
 RoxygenNote: 7.1.1
+Collate: 
+    'View.R'
+    'aa-versions.R'
+    'comms.R'
+    'display.R'
+    'env-browser.R'
+    'evaluator.R'
+    'installspec.R'
+    'kernel.R'
+    'main.R'
+    'scrolling-table.R'
+    'traitlets.R'
+    'traitlets-boolean.R'
+    'traitlets-instance.R'
+    'traitlets-int.R'
+    'traitlets-unicode.R'
+    'traitlets-str_enum.R'
+    'utils.R'
+    'widget.R'
+    'widget-core.R'
+    'widget-description.R'
+    'widget-layout.R'
+    'widget-dom.R'
+    'widget-slider.R'

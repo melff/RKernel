@@ -1,18 +1,28 @@
+#' @include traitlets.R
+
 #' @export
-Instance <- function(klass,
-                   observe=FALSE,
-                   sync=TRUE,
-                   ...
-                   )
-    structure(
-        list(
-        initial=klass$new(...),    
+R6TraitClass <- R6Class_("R6Trait",
+    inherit=TraitClass,
+    public=list(
+        initial=NULL,
+        value=NULL,
+        class=NULL,
+        init_args=NULL,
         validator=function(value){
-            if(length(initial$validator))
-                value <- initial$validator(value)
-            value
+            if(!isa(value,self$class)) stop("wrong class")
         },
-        observe=observe,
-        notifier=notifier,
-        sync=sync
-    ),class=c("Unicode","Trait"))
+        initialize=function(klass,...){
+            self$class <- klass
+            self$init_args <- list(...)
+        },
+        setup = function(){
+            str(self$class)
+            initial <- do.call(self$class$new,self$init_args)
+            self$initial <- initial
+            self$value <- initial
+            self$class <- class(initial)
+        }
+    )
+)
+#' @export
+R6Instance <- function(...)R6TraitClass$new(...)

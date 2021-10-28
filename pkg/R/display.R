@@ -419,10 +419,39 @@ display.data.frame <- function(x,...,
 #' @export
 display.matrix <- display.data.frame
 
+#' @export
 add_to_head <- function(code){
     script_tmpl <- "$('%s').appendTo(\"head\");"
     code <- gsub("\n","\\ \n",code,fixed=TRUE)
     script <- sprintf(script_tmpl,code)
     print(script)
     Javascript(script)
+}
+
+#' @export
+display.html_elem <- function(x,...,
+                              metadata=NULL,
+                              id=uuid::UUIDgenerate(),
+                              update=FALSE){
+    text <- as.character(x)
+    text <- paste(text,collapse="\n")
+    display("text/plain"="",
+            "text/html"=text,
+            metadata=metadata,
+            id=id,
+            update=update)
+}
+
+#' @export
+display.shiny.tag <- function(x,...,
+                              metadata=NULL,
+                              id=uuid::UUIDgenerate(),
+                              update=FALSE){
+    text <- as.character(x)
+    text <- paste(text,collapse="\n")
+    display("text/plain"="",
+            "text/html"=text,
+            metadata=metadata,
+            id=id,
+            update=update)
 }

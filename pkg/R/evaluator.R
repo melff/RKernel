@@ -90,7 +90,7 @@ Evaluator <- R6Class("Evaluator",
 
             assign("curve_hook",self$curve_hook,pos=pos)
             add_paged_classes(c("help_files_with_topic","packageIQR","hsearch"))
-            add_displayed_classes(c("htmlwidget"))
+            add_displayed_classes(c("htmlwidget","html_elem","shiny.tag"))
 
             private$comm_dispatcher <- private$kernel$comm_dispatcher
 

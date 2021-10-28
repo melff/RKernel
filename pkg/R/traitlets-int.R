@@ -1,28 +1,52 @@
+#' @include traitlets.R
+#'
 #' @export
-BoundedInteger <- function(initial=0L,
-                           range,
-                           observe=FALSE,
-                           sync=TRUE,
-                           notifier=function(n,v) print(sprintf("Trait '%s' changed to value %d",n,v)))
-    structure(
-        list(
-        initial=as.integer(initial),    
+IntegerClass <- R6Class_("Integer",
+   inherit=TraitClass,
+   public=list(
+        initial=integer(0),
+        value = integer(0),
         validator=function(value){
-                min <- as.integer(range[1])
-                max <- as.integer(range[2])
                 if(!is.integer(value)) stop("wrong type")
-                if(value > max || value < min)
+                value
+        },
+        initialize = function(initial=0L){
+            initial <- as.integer(initial)
+            initial <- self$validator(initial)
+            self$initial <- initial
+            self$value <- initial
+        }
+   )
+)
+#' @export
+Integer <- function(...)IntegerClass$new(...)
+
+as.integer.Integer <- function(x,...) x$value
+
+#' @export
+BoundedIntClass <- R6Class_("BoundedInteger",
+   inherit=TraitClass,
+   public=list(
+        initial=integer(0),
+        value = integer(0),
+        min = integer(0),
+        max = integer(0),
+        validator=function(value){
+                if(!is.integer(value)) stop("wrong type")
+                if(value > self$max || value < self$min)
                     stop("value out of range")
                 value
         },
-        observe=observe,
-        notifier=notifier,
-        sync=sync
-    ),class=c("BoundedInt","Trait"))
-
-# HasBoundedInt <- R6Class_("HasBoundedInt",
-#   inherit=HasTraits,
-#   public=list(
-#       value=BoundedInt(0L,c(0L,100L),TRUE)
-#   )
-# )
+        initialize = function(initial=0L,
+                              range){
+            self$min <- range[1]
+            self$max <- range[2]
+            initial <- as.integer(initial)
+            initial <- self$validator(initial)
+            self$initial <- initial
+            self$value <- initial
+        }
+   )
+)
+#' @export
+BoundedInteger <- function(...)BoundedIntClass$new(...)
