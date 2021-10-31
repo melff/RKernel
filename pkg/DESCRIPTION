@@ -53,4 +53,5 @@ Collate:
     'widget-description.R'
     'widget-layout.R'
     'widget-dom.R'
+    'widget-label.R'
     'widget-slider.R'

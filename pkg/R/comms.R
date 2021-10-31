@@ -91,6 +91,7 @@ CommManagerClass <- R6Class("CommManager",
             handlers <- comm$handlers
             comm$data <- data
             if("msg" %in% names(handlers)){
+                # handlers$msg(comm,data)
                 text <- tryCatch(capture.output(handlers$msg(comm,data)),
                                  error=function(e) {
                                      emsg <- conditionMessage(e)

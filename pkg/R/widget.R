@@ -18,11 +18,12 @@ WidgetClass <- R6Class_("Widget",
         str(self)
         return(NULL)
       }
-      super$initialize()
+      super$initialize(...)
       for(tn in names(self$traits)){
         if(isTRUE(attr(self$traits[[tn]],"sync"))){
           self$traits_to_sync <- append(self$traits_to_sync,tn)
           handler <- function(tn,trait,value){
+            # print(str(list(tn=tn,trait=trait,value=value)))
             self$send_state(tn)
           }
           self$observe(tn,handler)
@@ -37,11 +38,13 @@ WidgetClass <- R6Class_("Widget",
         if(!manager$has_handlers("jupyter.widget"))
           manager$add_handlers("jupyter.widget",list(self$handle_comm_opened))
         self$comm <- manager$new_comm("jupyter.widget")
+        self[["_model_id"]] <- self$comm$id
         state <- self$get_state()
         data <- list(state=state)
-        metadata <- list(version="2.0.0")
+        metadata <- list(version=jupyter_widgets_protocol_version)
         self$comm$open(data=data,metadata=metadata)
-        self[["_model_id"]] <- self$comm$id
+        self$comm$handlers$open <- self$handle_comm_opened
+        self$comm$handlers$msg <- self$handle_comm_msg
       } else print(self[["_model_id"]])
     },
     finalize = function(){
@@ -63,6 +66,13 @@ WidgetClass <- R6Class_("Widget",
       }
       return(state)
     },
+    set_state = function(state){
+      keys <- names(state)
+      for(k in keys){
+        if(k %in% self$traits_to_sync)
+          self[[k]] <- state[[k]]
+      }
+    },
     send_state = function(keys=NULL,drop_defaults=FALSE){
       state <- self$get_state(keys)
       if(length(state)){
@@ -81,7 +91,7 @@ WidgetClass <- R6Class_("Widget",
         data[["application/vnd.jupyter.widget-view+json"]] <- list(
           version_major = 2,
           version_minor = 0,
-          model_id = self$model_id
+          model_id = self[["_model_id"]]
         )
       return(data)
     },
@@ -89,6 +99,16 @@ WidgetClass <- R6Class_("Widget",
       data <- msg$content$data
       state <- data$state
       print(msg)
+    },
+    handle_comm_msg = function(comm,msg){
+      # cat("=====================\n")
+      # print(msg)
+      if(msg$method=="update"){
+        # cat("------------------\n")
+        state <- msg$state
+        # print(state)
+        self$set_state(state)
+      }
     },
     `_comm` = NULL,
     `_send` = function(msg){
@@ -110,7 +130,7 @@ Widget <- function(...) WidgetClass$new(...)
 #' @export
 display.Widget <- function(x,...,
                            metadata=NULL,
-                           id=d$model_id,
+                           id=uuid::UUIDgenerate(),
                            update=FALSE){
   d <- list(data=x$display_data())
   d$metadata <- metadata

@@ -5,9 +5,9 @@ DOMWidgetClass <- R6Class_("DOMWidget",
   inherit = CoreWidgetClass,
   public = list(
     `_dom_classes` = structure(Unicode(character(0)),sync=TRUE),
-    tabbable = structure(Boolean(logical(0)),sync=TRUE),
-    tooltip = structure(Unicode(character(0)),sync=TRUE),
-    #layout = structure(R6Instance(LayoutClass),sync=TRUE),
+    #tabbable = structure(Boolean(logical(0)),sync=TRUE),
+    #tooltip = structure(Unicode(character(0)),sync=TRUE),
+    layout = structure(R6Instance(LayoutClass),sync=TRUE),
     add_class = function(className){
       self$`_dom_classes` <- union(self$`_dom_classes`,className)
     },

@@ -18,9 +18,10 @@ DescriptionWidgetClass <- R6Class_("DescriptionWidget",
   public = list(
     `_model_name` = structure(Unicode("DescriptionModel"),sync=TRUE),
     description = structure(Unicode(""),sync=TRUE),
-    description_allow_html = structure(Boolean(FALSE),sync=TRUE)#,
-    #style = structure(R6Instance(DescriptionStyleClass),sync=TRUE)
+    description_allow_html = structure(Boolean(FALSE),sync=TRUE),
+    style = structure(R6Instance(DescriptionStyleClass),sync=TRUE)
   )
 )
+
 #' @export
 DescriptionWidget <- function(...) DescriptionWidgetClass$new(...)

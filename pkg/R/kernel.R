@@ -238,7 +238,7 @@ Kernel <- R6Class("Kernel",
     },
 
     send_comm_msg = function(id,data,metadata=NULL){
-      private$send_message(type="comm_msg",debug=TRUE,
+      private$send_message(type="comm_msg",debug=FALSE,
                    parent=private$comm_parent,
                    socket_name="iopub",
                    content=list(
@@ -248,7 +248,7 @@ Kernel <- R6Class("Kernel",
     },
     
     send_comm_open = function(id,target_name,data,metadata=NULL){
-      private$send_message(type="comm_open",debug=TRUE,
+      private$send_message(type="comm_open",debug=FALSE,
                    parent=private$comm_parent,
                    socket_name="iopub",
                    content=list(
@@ -259,7 +259,7 @@ Kernel <- R6Class("Kernel",
     },
     
     send_comm_close = function(id,data,metadata=NULL){
-      private$send_message(type="comm_close",debug=TRUE,
+      private$send_message(type="comm_close",debug=FALSE,
                    parent=private$comm_parent,
                    socket_name="iopub",
                    content=list(
@@ -373,11 +373,11 @@ Kernel <- R6Class("Kernel",
 
     send_message = function(type, parent, socket_name, debug=FALSE, content, metadata=NULL){
       msg <- private$msg_new(type,parent,content,metadata)
-      if(debug) {
-        msg_body <- lapply(msg[c("header","parent_header","metadata","content")],
-                         toJSON,auto_unbox=TRUE)
-        print(msg_body)
-      }
+       if(debug) {
+         msg_body <- msg[c("header","parent_header","metadata","content")]
+         msg_body <- to_JSON(msg_body,pretty=TRUE,auto_unbox=TRUE)
+         print(msg_body)
+       }
       socket <- private$sockets[[socket_name]]
       wire_out <- private$wire_pack(msg)
       #zmq.send.multipart(socket,wire_out,serialize=FALSE)
@@ -385,6 +385,7 @@ Kernel <- R6Class("Kernel",
       for(i in 1:l){
         flag <- if(i < l) private$.pbd_env$ZMQ.SR$SNDMORE 
                 else private$.pbd_env$ZMQ.SR$BLOCK
+        #if(debug) print(wire_out[[i]])
         zmq.msg.send(wire_out[[i]],socket,flag=flag,serialize=FALSE)
       }
       #cat("Sent message to socket", socket_name)
@@ -483,6 +484,11 @@ Kernel <- R6Class("Kernel",
 
 #' @importFrom jsonlite fromJSON toJSON
 
+to_JSON <- function(x,...){
+  x <- toJSON(x,...)
+  gsub("[]","null",x,fixed=TRUE)
+}
+
 fromRawJSON <- function(raw_json) {
     json <- rawToChar(raw_json)
     Encoding(json) <- "UTF-8"
@@ -490,7 +496,7 @@ fromRawJSON <- function(raw_json) {
 }
 
 toRawJSON <- function(x,...){
-  json <- toJSON(x,...)
+  json <- to_JSON(x,...)
   charToRaw(json)
 }
 
