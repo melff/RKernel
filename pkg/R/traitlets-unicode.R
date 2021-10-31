@@ -24,7 +24,6 @@ UnicodeClass <- R6Class_("Unicode",
    )
 )
 #' @export
-Unicode <- function(...)UnicodeClass$new(...)
-
+Unicode <- function(...)TraitInstance(Class=UnicodeClass,...)
 #' @export
 as.character.Unicode <- function(x,...) x$value

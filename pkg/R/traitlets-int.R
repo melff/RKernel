@@ -7,8 +7,8 @@ IntegerClass <- R6Class_("Integer",
         initial=integer(0),
         value = integer(0),
         validator=function(value){
-                if(!is.integer(value)) stop("wrong type")
-                value
+                if(!is.numeric(value)) stop("wrong type")
+                as.integer(value)
         },
         initialize = function(initial=0L){
             initial <- as.integer(initial)
@@ -19,20 +19,18 @@ IntegerClass <- R6Class_("Integer",
    )
 )
 #' @export
-Integer <- function(...)IntegerClass$new(...)
+Integer <- function(...)TraitInstance(...,Class=IntegerClass)
 
 as.integer.Integer <- function(x,...) x$value
 
 #' @export
 BoundedIntClass <- R6Class_("BoundedInteger",
-   inherit=TraitClass,
+   inherit=IntegerClass,
    public=list(
-        initial=integer(0),
-        value = integer(0),
         min = integer(0),
         max = integer(0),
         validator=function(value){
-                if(!is.integer(value)) stop("wrong type")
+                value <- super$validator(value)
                 if(value > self$max || value < self$min)
                     stop("value out of range")
                 value
@@ -49,4 +47,4 @@ BoundedIntClass <- R6Class_("BoundedInteger",
    )
 )
 #' @export
-BoundedInteger <- function(...)BoundedIntClass$new(...)
+BoundedInteger <- function(...)TraitInstance(Class=BoundedIntClass,...)

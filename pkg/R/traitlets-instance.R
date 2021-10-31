@@ -11,13 +11,8 @@ R6TraitClass <- R6Class_("R6Trait",
         validator=function(value){
             if(!isa(value,self$class)) stop("wrong class")
         },
-        initialize=function(klass,...){
-            self$class <- klass
-            self$init_args <- list(...)
-        },
-        setup = function(){
-            str(self$class)
-            initial <- do.call(self$class$new,self$init_args)
+        initialize=function(Class,...){
+            initial <- Class$new(...)
             self$initial <- initial
             self$value <- initial
             self$class <- class(initial)
@@ -25,4 +20,4 @@ R6TraitClass <- R6Class_("R6Trait",
     )
 )
 #' @export
-R6Instance <- function(...)R6TraitClass$new(...)
+R6Instance <- function(...)TraitInstance(Class=R6TraitClass,...)

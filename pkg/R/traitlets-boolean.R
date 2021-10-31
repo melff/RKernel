@@ -21,4 +21,4 @@ BooleanClass <- R6Class_("Boolean",
                        }
 ))
 #' @export
-Boolean <- function(...)BooleanClass$new(...)
+Boolean <- function(...)TraitInstance(Class=BooleanClass,...)

@@ -5,82 +5,94 @@ R6Class_ <- function(...,lock_objects=FALSE)
 
 #' @export
 TraitClass <- R6Class_("Trait",
-    public=list(
+   public=list(
+        name = character(0),
         set = function(value){
             if("validator" %in% ls(self))
-                value <- self$validator(value)
+                self$validator(value)
             self$value <- value
+            if(length(self$callbacks)){
+                for(cb in self$callbacks){
+                    if(is.function(cb))
+                        cb(self$name,self,value)
+                }
+            }
         },
         get = function() self$value,
-        is_default = function() !isFALSE(self$value != self$initial)
-    )                       
+        is_default = function() self$value == self$initial,
+        callbacks = list()
+   )
 )
 
+#' @export
+TraitInstance <- function(Class,...){
+    structure(
+        list(
+            args=list(...),
+            Class=Class),
+        class="TraitInstance")
+}
+
+
+as_property <- function(self) {
+    #self <- force(self)
+    e <- new.env()
+    res <- function(value){
+            if(missing(value)) return(self$get())
+            else return(self$set(value))
+            }
+    e$self <- self
+    environment(res) <- e
+    return(res)
+}
 
 #' @export
 HasTraits <- R6Class_("HasTraits",
-    public=list(
-        traits=list(),
-        callbacks=list(),
-        initialize=function(...){
-            members <- ls(self)
-        #print(members)
-            trait_names <- character()
-            for(member in members){
-                if(inherits(get(member,envir=self),"Trait"))
-                    trait_names <- union(trait_names,member)
-            }
-            print(ls.str(self))
-            print(self$traits)
-            for(tn in trait_names){
-                trait <- get(tn,self)
-                rm(list=tn,envir=self)
-                # cat("===================")
-                # cat(tn,"\n")
-                if(is.function(trait$setup)){
-                    # cat("-------------------")
-                    # str(trait)
-                    # cat("-------------------")
-                    trait$setup()
-                    # str(trait)
-                    # self$traits[[tn]] <- NULL
-                }
-                self$traits[[tn]] <- trait
-                trait_fun <- eval(substitute(function(value){
-                    trait <- self$traits[[tn]]
-                    if(missing(value)) return(trait$get())
-                    trait$set(value)
-                    if(!trait$is_default())
-                        self$notify(tn,value)
-                },list(tn=tn)))
-                makeActiveBinding(tn, trait_fun, self)
-            }
-        },
-        notify=function(tn,value){
-            if(tn %in% names(self$callbacks)){
-                trait <- self$traits[[tn]]
-                callbacks <- self$callbacks[[tn]]
-                for(cb in callbacks)
-                    cb(tn,self,value)
-            }
-        },
-        observe=function(tn,handler){
-            if(!(tn %in% names(self$callbacks))){
-                self$callbacks[[tn]] <- list()
-            }
-            self$callbacks[[tn]] <- append(self$callbacks[[tn]],handler)
-        },
-        unobserve=function(tn,handler){
-            if(tn %in% names(self$callbacks)){
-                callbacks_in <- self$callbacks[[tn]]
-                callbacks_out <- list()
-                for(h in callbacks){
-                    if(!identical(h,handler))
-                        callbacks_out <- append(callbacks_out,h)
-                }
-                self$callbacks[[tn]] <- callbacks_out
-            }
+  public=list(
+      traits=list(),
+      properties=list(),
+      envs = list(),
+      initialize=function(...){
+          initials <- list(...)
+          members <- ls(self)
+          trait_names <- character()
+          for(member in members){
+              if(inherits(get(member,envir=self),"TraitInstance"))
+                  trait_names <- union(trait_names,member)
+          }
+          for(tn in trait_names){
+              traitgen <- get(tn,self)
+              rm(list=tn,envir=self)
+              args <- traitgen$args
+              Class <- traitgen$Class
+              attribs <- attributes(traitgen)
+              attribs$class <- NULL
+              attribs$names <- NULL
+              trait <- do.call(Class$new,args)
+              attribs$class <- class(trait)
+              attributes(trait) <- attribs
+              trait$name <- tn
+              if(tn %in% names(initials))
+                  trait$set(initials[[tn]])
+              self$traits[[tn]] <- trait
+              property <- as_property(trait)
+              self$properties[[tn]] <- property
+              makeActiveBinding(tn, property, self)
+          }
+      },
+      observe=function(tn,handler){
+          trait <- self$traits[[tn]]
+          trait$callbacks <- append(trait$callbacks,handler)
+      },
+      unobserve=function(tn,handler){
+          trait <- self$traits[[tn]]
+          callbacks_in <- trait$callbacks
+          callbacks_out <- list()
+          for(h in callbacks_in){
+              if(!identical(h,handler))
+                  callbacks_out <- append(callbacks_out,h)
+          }
+          trait$callbacks <- callbacks_out
         }
-    )
+  )
 )
-

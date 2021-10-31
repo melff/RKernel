@@ -19,4 +19,4 @@ StrEnumClass <- R6Class_("StrEnum",
    )
 )
 #' @export
-StrEnum <- function(...)StrEnumClass$new(...)
+StrEnum <- function(...)TraitInstance(Class=StrEnumClass,...)
