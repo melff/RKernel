@@ -51,6 +51,7 @@ Collate:
     'widget.R'
     'widget-core.R'
     'widget-description.R'
+    'widget-checkbox.R'
     'widget-layout.R'
     'widget-dom.R'
     'widget-label.R'
