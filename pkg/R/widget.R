@@ -1,3 +1,33 @@
+#' @include json.R
+
+#' @export
+CallbackDispatcherClass <- R6Class("CallbackDispatcher",
+    public = list(
+      callbacks = list(),
+      register = function(handler,remove){
+        old <- self$callbacks
+        new <- list()
+        for(cb in old){
+          if(!identical(cb,handler))
+            new <- append(new,cb)
+        }
+        if(!remove){
+          new <- append(new,handler)
+        }
+        self$callbacks <- new
+      },
+      run = function(...){
+        for(cb in self$callbacks){
+            cb(...)
+        }
+      }
+    )
+)
+
+
+#' @export
+CallbackDispatcher <- function(...) CallbackDispatcherClass$new(...)
+
 #' @export
 WidgetClass <- R6Class_("Widget",
   inherit = HasTraits,
@@ -11,13 +41,8 @@ WidgetClass <- R6Class_("Widget",
     `_view_module_version` = structure(Unicode(character(0)),sync=TRUE),
     `_view_count` = structure(Unicode(integer(0)),sync=TRUE),
     traits_to_sync = character(0),
+    callbacks = list(),
     initialize = function(...,open=TRUE){
-      kernel <- get_current_kernel()
-      if(!length(kernel)){
-        warning("Attempting to create widget without running kernel")
-        str(self)
-        return(NULL)
-      }
       super$initialize(...)
       for(tn in names(self$traits)){
         if(isTRUE(attr(self$traits[[tn]],"sync"))){
@@ -29,8 +54,13 @@ WidgetClass <- R6Class_("Widget",
           self$observe(tn,handler)
         }
       }
-      add_displayed_classes(class(self)[1])
-      if(open) self$open()
+      self$callbacks <- CallbackDispatcher()
+      kernel <- get_current_kernel()
+      #browser()
+      if(length(kernel)){
+        add_displayed_classes(class(self)[1])
+        if(open) self$open()
+      }
     },
     open = function(){
       if(!length(self[["_model_id"]])){
@@ -61,19 +91,24 @@ WidgetClass <- R6Class_("Widget",
       if(is.null(keys))
         keys <- names(self$traits)
       for(k in keys){
-        if(!(drop_defaults && self$traits[[k]]$is_default()))
-          state[[k]] <- to_json(self[[k]])
+        if(k %in% self$traits_to_sync &&
+          !(drop_defaults && self$traits[[k]]$is_default())){
+          state[[k]] <- to_json(self$traits[[k]])
+          # state[[k]] <- to_json(self[[k]])
+        }
       }
       return(state)
     },
     set_state = function(state){
       keys <- names(state)
       for(k in keys){
+        # cat("Updating",k)
         if(k %in% self$traits_to_sync)
           self[[k]] <- state[[k]]
       }
     },
     send_state = function(keys=NULL,drop_defaults=FALSE){
+      # cat("send_state")
       state <- self$get_state(keys)
       if(length(state)){
         msg <- list(method="update",
@@ -95,20 +130,33 @@ WidgetClass <- R6Class_("Widget",
         )
       return(data)
     },
-    handle_comm_opened = function(comm,msg){
-      data <- msg$content$data
+    handle_comm_opened = function(comm,data){
       state <- data$state
-      print(msg)
     },
-    handle_comm_msg = function(comm,msg){
+    handle_comm_msg = function(comm,data){
+      # print(data)
       # cat("=====================\n")
-      # print(msg)
-      if(msg$method=="update"){
+      method <- data$method
+      if(method=="update"){
         # cat("------------------\n")
-        state <- msg$state
+        state <- data$state
         # print(state)
         self$set_state(state)
       }
+      else if(method=="request_state")
+        self$send_state()
+      else if(method=="custom"){
+        if("content" %in% names(data))
+          self$handle_custom_msg(data$content)
+      }
+    },
+    handle_custom_msg = function(content){
+      value <- self$callbacks$run(self,content)
+      if(length(value))
+        return(value)
+    },
+    on_msg = function(handler,remove=FALSE){
+      self$callbacks$register(handler,remove)
     },
     `_comm` = NULL,
     `_send` = function(msg){
@@ -140,18 +188,11 @@ display.Widget <- function(x,...,
   structure(d,class=cl)
 }
 
-#' @importFrom jsonlite fromJSON toJSON
-
-to_json <- function(x) UseMethod("to_json")
-to_json.default <- function(x) {
-  attributes(x) <- NULL
-  x
-}
-
 #' @export
 to_json.Widget <- function(x){
   paste0("IPY_MODEL_",x[["_model_id"]])
 }
+
 
 # Local Variables:
 # ess-indent-offset: 2

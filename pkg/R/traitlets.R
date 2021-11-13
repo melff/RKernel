@@ -1,3 +1,5 @@
+#' @include json.R
+
 #' @export
 R6Class_ <- function(...,lock_objects=FALSE)
              R6Class(...,
@@ -6,21 +8,34 @@ R6Class_ <- function(...,lock_objects=FALSE)
 #' @export
 TraitClass <- R6Class_("Trait",
    public=list(
-        name = character(0),
-        set = function(value){
-            if("validator" %in% ls(self))
-                self$validator(value)
-            self$value <- value
-            if(length(self$callbacks)){
-                for(cb in self$callbacks){
-                    if(is.function(cb))
-                        cb(self$name,self,value)
+       name = character(0),
+       value = NULL,
+       set = function(value,notify=FALSE){
+            if(length(self$validators)){
+                for(validator in self$validators){
+                    if(is.function(validator))
+                        value <- validator(value)
                 }
             }
-        },
-        get = function() self$value,
-        is_default = function() self$value == self$initial,
-        callbacks = list()
+            self$value <- value
+            if(length(self$observers) && notify){
+                for(observer in self$observers){
+                    if(is.function(observer))
+                        observer(self$name,self,value)
+                }
+            }
+       },
+       get = function() self$value,
+       is_default = function() self$value == self$initial,
+       observers = list(),
+       validators = list(),
+       initialize = function(initial,coerce=TRUE){
+            validator <- self$validator
+            if(is.function(validator) && !missing(initial)){
+                self$value <- validator(initial)
+                self$validators <- list(validator)
+            }
+       }
    )
 )
 
@@ -33,13 +48,16 @@ TraitInstance <- function(Class,...){
         class="TraitInstance")
 }
 
+#' @export
+Trait <- function(...)TraitInstance(...,Class=TraitClass)
+
 
 as_property <- function(self) {
     #self <- force(self)
     e <- new.env()
     res <- function(value){
             if(missing(value)) return(self$get())
-            else return(self$set(value))
+            else return(self$set(value,notify=TRUE))
             }
     e$self <- self
     environment(res) <- e
@@ -54,6 +72,8 @@ HasTraits <- R6Class_("HasTraits",
       envs = list(),
       initialize=function(...){
           initials <- list(...)
+          # print(class(self))
+          # print(initials)
           members <- ls(self)
           trait_names <- character()
           for(member in members){
@@ -61,6 +81,7 @@ HasTraits <- R6Class_("HasTraits",
                   trait_names <- union(trait_names,member)
           }
           for(tn in trait_names){
+              # print(tn)
               traitgen <- get(tn,self)
               rm(list=tn,envir=self)
               args <- traitgen$args
@@ -74,25 +95,59 @@ HasTraits <- R6Class_("HasTraits",
               trait$name <- tn
               if(tn %in% names(initials))
                   trait$set(initials[[tn]])
+              observer <- function(name,trait,value){
+                  self$notify(name,value)
+              }
+              trait$observers <- list(observer)
               self$traits[[tn]] <- trait
               property <- as_property(trait)
               self$properties[[tn]] <- property
               makeActiveBinding(tn, property, self)
           }
       },
-      observe=function(tn,handler){
-          trait <- self$traits[[tn]]
-          trait$callbacks <- append(trait$callbacks,handler)
+      notify = function(tn,value){
+          # cat("notify",tn,value)
+          if(length(self$observers) && tn %in% names(self$observers)){
+              observers <- self$observers[[tn]]
+              for(cb in observers){
+                  if(is.function(cb))
+                      cb(tn,self,value)
+              }
+          }
       },
-      unobserve=function(tn,handler){
-          trait <- self$traits[[tn]]
-          callbacks_in <- trait$callbacks
+      observers = list(),
+      observe=function(tn,handler,remove=FALSE){
+          callbacks_in <- self$observers[[tn]]
           callbacks_out <- list()
           for(h in callbacks_in){
               if(!identical(h,handler))
                   callbacks_out <- append(callbacks_out,h)
           }
-          trait$callbacks <- callbacks_out
-        }
+          if(!remove)
+              callbacks_out <- append(callbacks_out,handler)
+          self$observers[[tn]] <- callbacks_out
+      },
+      validate=function(tn,handler,remove=FALSE){
+          trait <- self$traits[[tn]]
+          callbacks_in <- trait$validators
+          callbacks_out <- list()
+          for(h in callbacks_in){
+              if(!identical(h,handler))
+                  callbacks_out <- append(callbacks_out,h)
+          }
+          if(!remove)
+              callbacks_out <- append(callbacks_out,handler)
+          trait$validators <- callbacks_out
+          self$traits[[tn]] <- trait
+      }
   )
 )
+
+
+#' @export
+to_json.Trait <- function(x){
+    value <- x$get()
+    if(!length(value))
+        character(0)
+    else to_json(value)
+}

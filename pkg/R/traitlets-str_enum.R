@@ -10,11 +10,10 @@ StrEnumClass <- R6Class_("StrEnum",
            if(length(value) > 0 && !(value %in% self$enum)) stop("incorrect value")
            value
        },
-       initialize = function(enum,
-                             initial=character(0),
-                             optional=length(initial)==0){
+       initialize = function(enum,default=character(0),optional=FALSE){
+           self$optional <- optional
            self$enum <- as.character(enum)
-           super$initialize(initial,optional)
+           super$initialize(default,optional=optional)
         }
    )
 )

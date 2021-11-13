@@ -455,3 +455,12 @@ display.shiny.tag <- function(x,...,
             id=id,
             update=update)
 }
+
+#' @export
+alert <- function(text){
+    alert.js <- sprintf("alert('%s')",text)
+    d <- Javascript(alert.js)
+    kernel <- get_current_kernel()
+    kernel$display_data(data=d$data,
+                        metadata=d$metadata)
+}
