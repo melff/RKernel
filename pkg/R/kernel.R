@@ -111,15 +111,15 @@ Kernel <- R6Class("Kernel",
                              text=text))
     },
 
-    execute_result = function(data,metadata=NULL,transient=NULL){
+    execute_result = function(data,metadata=NULL){
+      content <- list(data=data,
+                      execution_count=self$execution_count)
+      if(length(metadata))
+        content$metadata <- metadata
       private$send_message(type="execute_result",
                            parent=self$execute_request,
                            socket_name="iopub",
-                           content=list(
-                             data=data,
-                             metadata=metadata,
-                             execution_count=self$execution_count
-                           ))
+                           content=content)
     },
 
     display_data = function(data,metadata=NULL,transient=NULL){

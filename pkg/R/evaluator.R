@@ -446,11 +446,10 @@ Evaluator <- R6Class("Evaluator",
                 else if(inherits(x,"clear_output")){
                     private$kernel$clear_output(x)
                 }
-                else if(inherits(x,"execute_result")){
-                    private$kernel$execute_result(data=x$data,
-                                                  metadata=x$metadata,
-                                                  transient=x$transient)
-                }
+                # else if(inherits(x,"execute_result")){
+                #     private$kernel$execute_result(data=x$data,
+                #                                   metadata=x$metadata)
+                # }
                 else if(inherits(x,"display_data")){
                     private$kernel$display_data(data=x$data,
                                                 metadata=x$metadata,
@@ -467,9 +466,10 @@ Evaluator <- R6Class("Evaluator",
                 else {
                     text <- capture.output(print(x))
                     text <- paste(text,collapse="\n")
-                    private$kernel$stream(text = text,
-                                   stream = "stdout")
-
+                    #private$kernel$stream(text = text,
+                    #               stream = "stdout")
+                    data <- list("text/plain"=text)
+                    private$kernel$execute_result(data=data)
                 }
             }
         },
