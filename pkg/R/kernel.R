@@ -75,13 +75,15 @@ Kernel <- R6Class("Kernel",
       payload <- check_page_payload(payload)
       status <- self$evaluator$get_status(reset=TRUE)
       aborted <- self$evaluator$is_aborted(reset=TRUE)
+      content <- list(status = status,
+                      execution_count = self$execution_count)
+      if(length(payload))
+        content$payload <- payload
+
       private$send_message(type="execute_reply",
                            parent=msg,
                            socket="shell",
-                           content=list(
-                             status=status,
-                             payload=payload,
-                             execution_count=self$execution_count))
+                           content=content)
       #cat("Sent a execute_reply ...\n")
       # message("Code:", msg$content$code)
       #message("Store history:", msg$content$store_history)
