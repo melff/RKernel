@@ -116,6 +116,8 @@ Kernel <- R6Class("Kernel",
                       execution_count=self$execution_count)
       if(length(metadata))
         content$metadata <- metadata
+      else
+        content$metadata <- namedList()
       private$send_message(type="execute_result",
                            parent=self$execute_request,
                            socket_name="iopub",
@@ -123,6 +125,11 @@ Kernel <- R6Class("Kernel",
     },
 
     display_data = function(data,metadata=NULL,transient=NULL){
+      content <- list(data=data,transient=transient)
+      if(length(metadata))
+        content$metadata <- metadata
+      else
+        content$metadata <- namedList()
       private$send_message(type="display_data",
                            parent=self$execute_request,
                            socket_name="iopub",
