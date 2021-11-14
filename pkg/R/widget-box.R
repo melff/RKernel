@@ -29,10 +29,14 @@ ContainerClass_new <- function(Class,...){
     }
     else{
         named_args <- nzchar(argnames)
-        children <- args[!named_args]
-        other <- args[named_args]
-        call_args <- c(list(children=children),
-                       other)
+        if(!("children" %in% argnames)){
+            children <- args[!named_args]
+            other <- args[named_args]
+            call_args <- c(list(children=children),
+                           other)
+        }
+        else
+            call_args <- args
     }
     do.call(Class$new,call_args)
 }
