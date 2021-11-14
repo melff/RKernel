@@ -4,18 +4,14 @@
 DOMWidgetClass <- R6Class_("DOMWidget",
   inherit = CoreWidgetClass,
   public = list(
-    `_dom_classes` = structure(Unicode(character(0)),sync=TRUE),
-    #tabbable = structure(Boolean(logical(0)),sync=TRUE),
-    #tooltip = structure(Unicode(character(0)),sync=TRUE),
+    `_dom_classes` = structure(Vector(),sync=TRUE),
     layout = structure(R6Instance(LayoutClass),sync=TRUE),
     add_class = function(className){
-      self$`_dom_classes` <- union(self$`_dom_classes`,className)
+      self$`_dom_classes` <- as.list(unlist(union(self$`_dom_classes`),className))
     },
     remove_class = function(className){
-      self$`_dom_classes` <- setdiff(self$`_dom_classes`,className)
-    },
-    focus = function() self$send(list(do="focus")),
-    blur = function() self$send(list(do="blur"))
+      self$`_dom_classes` <- as.list(setdiff(unlist(self$`_dom_classes`),className))
+    }
   )
 )
 
