@@ -32,7 +32,8 @@ CallbackDispatcher <- function(...) CallbackDispatcherClass$new(...)
 WidgetClass <- R6Class_("Widget",
   inherit = HasTraits,
   public = list(
-    `_model_id` = structure(Unicode(character(0)),sync=TRUE),
+    #`_model_id` = structure(Unicode(character(0)),sync=TRUE),
+    `_model_id` = character(0),
     `_model_name` = structure(Unicode("WidgetModel"),sync=TRUE),
     `_model_module` = structure(Unicode("@jupyter-widgets/base"),sync=TRUE),
     `_model_module_version` = structure(Unicode(jupyter_widgets_base_version),sync=TRUE),
