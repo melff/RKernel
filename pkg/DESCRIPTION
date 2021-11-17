@@ -60,6 +60,7 @@ Collate:
     'widget-button.R'
     'widget-float.R'
     'widget-integer.R'
+    'widget-output.R'
     'widget-play.R'
     'widget-progress.R'
     'widget-selection.R'

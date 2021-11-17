@@ -9,3 +9,10 @@ to_json.default <- function(x) {
   x
 }
 
+#' @export
+to_json.list <- function(x) {
+  nms <- names(x)
+  attributes(x) <- NULL
+  names(x) <- nms
+  x
+}
