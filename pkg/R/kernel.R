@@ -97,7 +97,7 @@ Kernel <- R6Class("Kernel",
 
     clear_output = function(wait){
       private$send_message(type="clear_output",
-                                 parent=msg,
+                                 parent=self$execute_request,
                                  socket_name="iopub",
                                  content=list(wait=wait))
     },
@@ -385,7 +385,7 @@ Kernel <- R6Class("Kernel",
        if(debug) {
          msg_body <- msg[c("header","parent_header","metadata","content")]
          msg_body <- to_JSON(msg_body,pretty=TRUE,auto_unbox=TRUE)
-         print(msg_body)
+         base::cat(format(msg_body))
        }
       socket <- private$sockets[[socket_name]]
       wire_out <- private$wire_pack(msg)
