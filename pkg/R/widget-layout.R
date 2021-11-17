@@ -18,11 +18,12 @@ LayoutClass <- R6Class_("Layout",
     align_self = structure(StrEnum(c("auto","flex-start","flex-end","center","baseline","stretch"),
                                    optional=TRUE),
                            sync=TRUE),
-    border_top = structure(Unicode(character(0)),sync=TRUE),
-    border_right = structure(Unicode(character(0)),sync=TRUE),
-    border_bottom = structure(Unicode(character(0)),sync=TRUE),
-    border_left = structure(Unicode(character(0)),sync=TRUE),
+    # border_top = structure(Unicode(character(0)),sync=TRUE),
+    # border_right = structure(Unicode(character(0)),sync=TRUE),
+    # border_bottom = structure(Unicode(character(0)),sync=TRUE),
+    # border_left = structure(Unicode(character(0)),sync=TRUE),
     bottom = structure(Unicode(character(0)),sync=TRUE),
+    border = structure(Unicode(character(0)),sync=TRUE),
     display = structure(Unicode(character(0)),sync=TRUE),
     flex = structure(Unicode(character(0)),sync=TRUE),
     flex_flow = structure(Unicode(character(0)),sync=TRUE),
@@ -61,26 +62,25 @@ LayoutClass <- R6Class_("Layout",
     grid_row = structure(Unicode(character(0)),sync=TRUE),
     grid_column = structure(Unicode(character(0)),sync=TRUE),
     grid_area = structure(Unicode(character(0)),sync=TRUE)
-   )
-,
-   active=list(
-     border = function(value){
-       if(missing(value)){
-         found <- NULL
-         for(side in c("top","right","bottom","left")){
-           old <- found
-           border_side <- self[[paste0("border_",side)]]
-           found <- as.character(border_side)
-           if(!length(found)) return(NULL)
-           if(length(old) && found != old) return(NULL)
-         }
-         return(found)
-       }
-       for(side in c("top","right","bottom","left")){
-         self[[paste0("border_",side)]] <- value
-       }
-     }
-   )
+   )#, For later ipywidgets version
+   # active=list(
+   #   border = function(value){
+   #     if(missing(value)){
+   #       found <- NULL
+   #       for(side in c("top","right","bottom","left")){
+   #         old <- found
+   #         border_side <- self[[paste0("border_",side)]]
+   #         found <- as.character(border_side)
+   #         if(!length(found)) return(NULL)
+   #         if(length(old) && found != old) return(NULL)
+   #       }
+   #       return(found)
+   #     }
+   #     for(side in c("top","right","bottom","left")){
+   #       self[[paste0("border_",side)]] <- value
+   #     }
+   #   }
+   # )
 )
 
 #' @export
