@@ -30,7 +30,7 @@ to_json.Vector <- function(x){
 
 
 #' @export
-DictClass <- R6Class_("NamedVector",
+DictClass <- R6Class_("Dict",
     inherit=VectorClass,
     public=list(
         validator=function(value){
@@ -45,3 +45,25 @@ DictClass <- R6Class_("NamedVector",
 #' @export
 Dict <- function(...)TraitInstance(...,Class=DictClass)
 
+
+#' @export
+ListClass <- R6Class_("List",
+    inherit=TraitClass,
+    public=list(
+        value = list(),
+        validator=function(value){
+            if(!is.list(value)) stop("value must be a list")
+            value
+        }
+))
+
+#' @export
+List <- function(...)TraitInstance(...,Class=ListClass)
+
+#' @export
+to_json.List <- function(x){
+    value <- lapply(x$get(),to_json)
+    # if(length(value) == 1)
+    #     value <- list(value)
+    value
+}
