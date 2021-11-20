@@ -225,6 +225,7 @@ Kernel <- R6Class("Kernel",
     },
 
     handle_comm_open = function(msg){
+      self$log("handle_comm_open")
       target_name <- msg$content$target_name
       id <- msg$content$comm_id
       data <- msg$content$data
@@ -263,6 +264,7 @@ Kernel <- R6Class("Kernel",
                    content=list(
                      comm_id=id,
                      target_name=target_name,
+                     target_module=list(),
                      data=data),
                    metadata=metadata)
     },
@@ -275,6 +277,12 @@ Kernel <- R6Class("Kernel",
                      comm_id=id,
                      data=data),
                    metadata=metadata)
+    },
+    
+    log = function(message,use.print=FALSE){
+      if(use.print)
+        message <- capture.output(print(message))
+      cat(crayon::bgBlue(format(Sys.time()),message,"\n"),file=stderr())
     }
 
   ),
@@ -325,7 +333,7 @@ Kernel <- R6Class("Kernel",
       else return(TRUE)
     },
 
-    respond_shell = function(req){
+    respond_shell = function(req,debug=TRUE){
       msg <- private$get_message("shell")
       if(!length(msg)) return(TRUE)
       private$send_message(type="status",
@@ -333,6 +341,8 @@ Kernel <- R6Class("Kernel",
                            socket_name="iopub",
                            content=list(
                              execution_state="busy"))
+      if(debug)
+        self$log(paste("Got a", msg$header$msg_type, "request ..."))
       # cat("Got a", msg$header$msg_type, "request ...\n")
       # do_stuff ...
       switch(msg$header$msg_type,
@@ -385,7 +395,7 @@ Kernel <- R6Class("Kernel",
        if(debug) {
          msg_body <- msg[c("header","parent_header","metadata","content")]
          msg_body <- to_JSON(msg_body,pretty=TRUE,auto_unbox=TRUE)
-         base::cat(format(msg_body))
+         self$log(format(msg_body))
        }
       socket <- private$sockets[[socket_name]]
       wire_out <- private$wire_pack(msg)
@@ -495,8 +505,11 @@ Kernel <- R6Class("Kernel",
 
 to_JSON <- function(x,...){
   x <- toJSON(x,...)
-  gsub("[]","null",x,fixed=TRUE)
+  x <- gsub("[]","null",x,fixed=TRUE)
+  # x <- gsub("[{}]","[]",x,fixed=TRUE)
+  x
 }
+# to_JSON <- toJSON
 
 fromRawJSON <- function(raw_json) {
     json <- rawToChar(raw_json)
