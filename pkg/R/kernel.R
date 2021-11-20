@@ -225,7 +225,6 @@ Kernel <- R6Class("Kernel",
     },
 
     handle_comm_open = function(msg){
-      self$log("handle_comm_open")
       target_name <- msg$content$target_name
       id <- msg$content$comm_id
       data <- msg$content$data

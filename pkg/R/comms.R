@@ -26,7 +26,7 @@ CommManagerClass <- R6Class("CommManager",
         get_comms = function(target_name=NULL){
             comms <- list()
             for(c in self$comms){
-                if(!length(target_name) || target_name %in% names(private$targets))
+                if(!length(target_name) || target_name == c$target_name)
                     comms[[c$id]] <- list(target_name=c$target_name)
             }
             return(comms)
@@ -123,7 +123,6 @@ CommManagerClass <- R6Class("CommManager",
     private = list(
         kernel  = list(),
         evaluator = list(),
-        targets = list(),
         handlers = list()
     )
 )
