@@ -71,7 +71,7 @@ WidgetClass <- R6Class_("Widget",
         self$comm <- manager$new_comm("jupyter.widget")
         self[["_model_id"]] <- self$comm$id
         state <- self$get_state()
-        data <- list(state=state)
+        data <- list(state=state,'buffer_paths'=list())
         metadata <- list(version=jupyter_widgets_protocol_version)
         self$comm$open(data=data,metadata=metadata)
         self$comm$handlers$open <- self$handle_comm_opened
