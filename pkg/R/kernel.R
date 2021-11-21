@@ -124,6 +124,23 @@ Kernel <- R6Class("Kernel",
                            content=content)
     },
 
+    display_send = function(d){
+      if(class(d)%in%c("display_data","update_display_data"))
+        msg_type <- class(d)
+      else stop("'display_data' or 'update_display_data' object required")
+      
+      private$send_message(type=msg_type,
+                           parent=self$execute_request,
+                           socket_name="iopub",
+                           content=list(
+                             data=d$data,
+                             metadata=d$metadata,
+                             transient=d$transient))
+      self$display_id <- d$transient$display_id
+    },
+    display_id = character(0),
+    last_display = function() self$display_id,
+    
     display_data = function(data,metadata=NULL,transient=NULL){
       content <- list(data=data,transient=transient)
       if(length(metadata))
@@ -278,7 +295,7 @@ Kernel <- R6Class("Kernel",
                    metadata=metadata)
     },
     
-    log = function(message,use.print=FALSE){
+    log_out = function(message,use.print=FALSE){
       if(use.print)
         message <- capture.output(print(message))
       cat(crayon::bgBlue(format(Sys.time()),message,"\n"),file=stderr())
@@ -341,7 +358,7 @@ Kernel <- R6Class("Kernel",
                            content=list(
                              execution_state="busy"))
       if(debug)
-        self$log(paste("Got a", msg$header$msg_type, "request ..."))
+        self$log_out(paste("Got a", msg$header$msg_type, "request ..."))
       # cat("Got a", msg$header$msg_type, "request ...\n")
       # do_stuff ...
       switch(msg$header$msg_type,
@@ -497,6 +514,7 @@ Kernel <- R6Class("Kernel",
     },
 
     comm_parent = list()
+
   )
 )
 
@@ -538,6 +556,8 @@ check_page_payload <- function(payload){
 }
 
 get_current_kernel <- function() kernel$current
+
+log_out <- function(...) kernel$current$log_out(...)
 
 # Local Variables:
 # ess-indent-offset: 2

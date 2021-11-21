@@ -24,17 +24,19 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         display_index = integer(0),
         stdout = function(text) self$stream(text,stream_name="stdout"),
         stderr = function(text) self$stream(text,stream_name="stderr"),
-        display = function(x,
-                           ...,
-                           metadata=NULL,
-                           id=uuid::UUIDgenerate(),
-                           update=FALSE){
-            d <- display(x,...,metadata=metadata,id=id)
+        display_send = function(d){
+            if(!(class(d)%in%c("display_data","update_display_data")))
+                stop("'display_data' or 'update_display_data' object required")
             out_data <- list(output_type = "display_data",
                              data = d$data,
                              metadata = d$metadata)
+            id <- d$transient$display_id
+            update <- inherits(d,"update_display_data")
+            l <- length(self$display_index)
+            #log_out(id,use.print=TRUE)
+            log_out(self$display_index,use.print=TRUE)
             if(update){
-                if(id == "last" && (l <- length(self$display_index)) > 0){
+                if(id == "last" && l > 0){
                     i <- self$display_index[l]
                     self$outputs[[i]] <- out_data
                 }
@@ -43,9 +45,9 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                     self$outputs[[i]] <- out_data
                 }
             } else {
-                if(!(id %in% names(self$display_index))){
+                if(l < 1 || !(id %in% names(self$display_index))){
                     i <- length(self$outputs) + 1L
-                    ii <- length(self$display_index) + 1L
+                    ii <- l + 1L
                     self$display_index[ii] <- i
                     names(self$display_index)[ii] <- id
                     self$outputs[[i]] <- out_data
@@ -53,7 +55,8 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             }
         },
         last_display = function(){
-            if((l <- length(self$display_index)) > 0){
+            l <- length(self$display_index)
+            if(l > 0){
                 names(self$display_index[l])
             }
             else

@@ -26,30 +26,31 @@ Evaluator <- R6Class("Evaluator",
             pos <- match("RKernel",search())
             assign("q",self$quit,pos=pos)
             assign("quit",self$quit,pos=pos)
-            assign("cell.options",self$cell.options,pos=pos)
-            assign("cell.par",self$cell.par,pos=pos)
-
-            assign("display",self$display,pos=pos)
-            assign("stream",self$stream,pos=pos)
-            #assign("cat",self$cat,pos=pos)
-            #assign("print",self$print,pos=pos)
-
-            assign("Javascript",Javascript,pos=pos)
-            assign("Math",LaTeXMath,pos=pos)
-            assign("raw_html",raw_html,pos=pos)
-            assign("Page",Page,pos=pos)
-            assign("View",View,pos=pos)
-            assign("ls_str",ls_str,pos=pos)
-
-            assign("add_paged_classes",add_paged_classes,pos=pos)
-            assign("add_displayed_classes",add_displayed_classes,pos=pos)
-
-            assign("comm_manager",self$comm_manager,pos=pos)
-            assign("help_port",self$help_port,pos=pos)
-
-            if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
-                rm(var_dic_list,envir=.GlobalEnv)
-            assign("var_dic_list",self$var_dic_list,pos=pos)
+            # assign("cell.options",self$cell.options,pos=pos)
+            # assign("cell.par",self$cell.par,pos=pos)
+            # 
+            # # assign("display",self$display,pos=pos)
+            # assign("display",display,pos=pos)
+            # assign("stream",self$stream,pos=pos)
+            # #assign("cat",self$cat,pos=pos)
+            # #assign("print",self$print,pos=pos)
+            # 
+            # assign("Javascript",Javascript,pos=pos)
+            # assign("Math",LaTeXMath,pos=pos)
+            # assign("raw_html",raw_html,pos=pos)
+            # assign("Page",Page,pos=pos)
+            # assign("View",View,pos=pos)
+            # assign("ls_str",ls_str,pos=pos)
+            # 
+            # assign("add_paged_classes",add_paged_classes,pos=pos)
+            # assign("add_displayed_classes",add_displayed_classes,pos=pos)
+            # 
+            # assign("comm_manager",self$comm_manager,pos=pos)
+            # assign("help_port",self$help_port,pos=pos)
+            # 
+            # if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
+            #     rm(var_dic_list,envir=.GlobalEnv)
+            # assign("var_dic_list",self$var_dic_list,pos=pos)
 
             options(device=dummy_device,
                     pager=self$pager,
@@ -354,18 +355,21 @@ Evaluator <- R6Class("Evaluator",
 
             if(plot_new_display){
                 id <- UUIDgenerate()
-                private$kernel$display_data(data = mime_data,
-                                            metadata = mime_metadata,
-                                            transient = list(display_id=id))
                 self$last_plot_id <- id
+                cls <- "display_data"
             } 
             else {
                 id <- self$last_plot_id
-                private$kernel$update_display_data(data = mime_data,
-                                                   metadata = mime_metadata,
-                                                   transient = list(display_id=id))
+                cls <- "update_display_data"
             }
 
+            d <- list(data = mime_data,
+                      metadata = mime_metadata,
+                      transient = list(display_id=id))
+            class(d) <- cls
+
+            channel <- get_current_channel()
+            channel$display_send(d)
             self$plot_new_cell <- FALSE
             self$plot_new_display <- FALSE
 
@@ -431,14 +435,14 @@ Evaluator <- R6Class("Evaluator",
         handle_value = function(x,visible) {
             if(visible){
                 if(any(class(x) %in% getOption("rkernel_paged_classes"))){
-                    displayed <- display(x)
+                    displayed <- display_data(x)
                     payload <- list(source="page",
                                     data=displayed$data,
                                     start=1)
                     self$add_payload(payload)
                 }
                 else if(any(class(x) %in% getOption("rkernel_displayed_classes"))){
-                    d <- display(x)
+                    d <- display_data(x)
                     private$kernel$display_data(data=d$data,
                                                 metadata=d$metadata,
                                                 transient=d$transient)
@@ -503,12 +507,12 @@ Evaluator <- R6Class("Evaluator",
             self$aborted <- TRUE
         },
 
-        display = function(...){
-            d <- display(...)
-            private$kernel$display_data(data=d$data,
-                                        metadata=d$metadata,
-                                        transient=d$transient)
-        },
+        # display = function(...){
+        #     d <- display(...)
+        #     private$kernel$display_data(data=d$data,
+        #                                 metadata=d$metadata,
+        #                                 transient=d$transient)
+        # },
 
         stream = function(text, stream=c("stdout","stderr")){
             stream <- match.arg(stream)

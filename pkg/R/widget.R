@@ -177,7 +177,7 @@ WidgetClass <- R6Class_("Widget",
 Widget <- function(...) WidgetClass$new(...)
 
 #' @export
-display.Widget <- function(x,...,
+display_data.Widget <- function(x,...,
                            metadata=NULL,
                            id=uuid::UUIDgenerate(),
                            update=FALSE){

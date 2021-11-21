@@ -1,9 +1,46 @@
 #' @importFrom repr mime2repr
 
+output_channels <- new.env()
+
 #' @export
-display <- function(x,...) UseMethod("display")
+set_channel <- function(channel=NULL){
+    channels <- output_channels$stack
+    l <- length(channels)
+    if(length(channel)){
+        channels[[l+1]] <- channel
+    }
+    else if(l > 1)
+        channels <- channels[seq.int(l-1)]
+        
+    output_channels$stack <- channels
+}
+
 #' @export
-display.default <- function(x,...,
+get_current_channel <- function(){
+    channels <- output_channels$stack
+    l <- length(channels)
+    if(l > 0)
+        channels[[l]]
+    else {
+        kernel <- get_current_kernel()
+        channels <- list(kernel)
+        output_channels$stack <- channels
+        kernel
+    }
+}
+
+
+#' @export
+display <- function(...){
+    d <- display_data(...)
+    channel <- get_current_channel()
+    channel$display_send(d)
+}
+
+#' @export
+display_data <- function(x,...) UseMethod("display_data")
+#' @export
+display_data.default <- function(x,...,
                             metadata=NULL,
                             id=uuid::UUIDgenerate(),
                             update=FALSE){
@@ -35,7 +72,7 @@ display.default <- function(x,...,
 
 #' @importFrom htmltools htmlEscape
 #' @export
-display.htmlwidget <- function(x,...,
+display_data.htmlwidget <- function(x,...,
                             metadata=NULL,
                             id=uuid::UUIDgenerate(),
                             update=FALSE){
@@ -142,6 +179,11 @@ getMatch <- function(x,match){
     res
 }
 
+#' @export
+display_data.display_data <- function(x,...) x
+
+#' @export
+display_data.update_display_data <- function(x,...) x
 
 #' @export
 display_id <- function(x) UseMethod("display_id")
@@ -153,7 +195,7 @@ display_id.update_display_data <- function(x) x$transient$display_id
 #' @export
 update.display_data <- function(object,...){
     id <- display_id(object)
-    display(...,id=id,update=TRUE)
+    display_data(...,id=id,update=TRUE)
 }
 
 
@@ -165,7 +207,7 @@ Page.default <- function(x,start=1,...){
         data <- list(...)
     } 
     else {
-        displayed <- display(x=x,...)
+        displayed <- display_data(x=x,...)
         data <- displayed$data
     }
     p <- list(source="page",
@@ -213,7 +255,7 @@ remove_paged_classes <- function(x){
 }
 
 #' @importFrom tools Rd2HTML Rd2txt Rd2latex
-display.help_files_with_topic <- function(x,...,
+display_data.help_files_with_topic <- function(x,...,
                                           id=uuid::UUIDgenerate(),
                                           update=FALSE){
 
@@ -283,7 +325,7 @@ display.help_files_with_topic <- function(x,...,
 }
 
 #' @export
-display.hsearch <- function(x,..., 
+display_data.hsearch <- function(x,..., 
     id=uuid::UUIDgenerate(), 
     update=FALSE){
     
@@ -364,7 +406,7 @@ Javascript <- function(text,file){
     text <- paste(text,collapse="\n")
     # text_plain <- paste("Javascript: ",text,sep="\n")
     #text_html <- paste("<script>",text,"</script>",sep="\n")
-    display(#"text/plain"="",
+    display_data(#"text/plain"="",
             "application/javascript"=text)
 }
 
@@ -372,13 +414,13 @@ LaTeXMath <- function(text){
     text <- paste(text,collapse="\n")
     text_plain <- paste("Math:",text,sep="\n")
     text_latex <- paste0("$$",text,"$$")
-    display("text/plain"=text_plain,
+    display_data("text/plain"=text_plain,
             "text/latex"=text_latex)
 }
 
 raw_html <- function(text,id=uuid::UUIDgenerate(),update=FALSE){
     text <- paste(text,collapse="\n")
-    display("text/plain"="",
+    display_data("text/plain"="",
             "text/html"=text,
             id=id,
             update=update)
@@ -386,7 +428,7 @@ raw_html <- function(text,id=uuid::UUIDgenerate(),update=FALSE){
 
 
 #' @export
-display.data.frame <- function(x,...,
+display_data.data.frame <- function(x,...,
                             metadata=NULL,
                             id=uuid::UUIDgenerate(),
                             update=FALSE){
@@ -417,7 +459,7 @@ display.data.frame <- function(x,...,
 }
 
 #' @export
-display.matrix <- display.data.frame
+display_data.matrix <- display_data.data.frame
 
 #' @export
 add_to_head <- function(code){
@@ -429,13 +471,13 @@ add_to_head <- function(code){
 }
 
 #' @export
-display.html_elem <- function(x,...,
+display_data.html_elem <- function(x,...,
                               metadata=NULL,
                               id=uuid::UUIDgenerate(),
                               update=FALSE){
     text <- as.character(x)
     text <- paste(text,collapse="\n")
-    display("text/plain"="",
+    display_data("text/plain"="",
             "text/html"=text,
             metadata=metadata,
             id=id,
@@ -443,13 +485,13 @@ display.html_elem <- function(x,...,
 }
 
 #' @export
-display.shiny.tag <- function(x,...,
+display_data.shiny.tag <- function(x,...,
                               metadata=NULL,
                               id=uuid::UUIDgenerate(),
                               update=FALSE){
     text <- as.character(x)
     text <- paste(text,collapse="\n")
-    display("text/plain"="",
+    display_data("text/plain"="",
             "text/html"=text,
             metadata=metadata,
             id=id,
