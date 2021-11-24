@@ -156,6 +156,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         plot_new_hook = function(...){
+            log_out("plot_new_hook")
             self$plot_new_called <- TRUE
             self$plot_new_display <- TRUE
         },
@@ -163,6 +164,7 @@ Evaluator <- R6Class("Evaluator",
         graphics_par_usr = numeric(0),
 
         curve_hook = function(add){
+            log_out("curve_hook")
             if(isTRUE(add) && !self$plot_new_called && 
                length(self$current_plot) > 0){
                 replayPlot(self$current_plot)
@@ -173,6 +175,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         plot_xy_hook = function(...){
+            log_out("plot_xy_hook")
             if(!self$plot_new_called && 
                length(self$current_plot) > 0){
                 replayPlot(self$current_plot)
