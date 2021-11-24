@@ -24,6 +24,10 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         display_index = integer(0),
         stdout = function(text) self$stream(text,stream_name="stdout"),
         stderr = function(text) self$stream(text,stream_name="stderr"),
+        display = function(...){
+            d <- display_data(...)
+            self$display_send(d)
+        },
         display_send = function(d){
             if(!(class(d)%in%c("display_data","update_display_data")))
                 stop("'display_data' or 'update_display_data' object required")
