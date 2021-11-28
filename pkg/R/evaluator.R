@@ -1,19 +1,117 @@
-#' @importFrom evaluate evaluate new_output_handler
 #' @importFrom utils capture.output
 #' @importFrom svglite svgstring
-#' @importFrom evaluate parse_all
+
+OutputWatcher <- R6Class("OutputWatcher",
+  public = list(
+      connection = NULL,
+      last_plot = NULL,
+      text_callback = NULL,
+      graphics_callback = NULL,
+      initialize = function(text_callback=NULL,graphics_callback=NULL){
+          self$text_callback <- text_callback
+          self$graphics_callback <- graphics_callback
+          self$connection <- textConnection(NULL,"wr",local=TRUE)
+          sink(self$connection,split=FALSE)
+      },
+      open = function(){
+          self$connection <- textConnection(NULL,"wr",local=TRUE)
+          sink(self$connection,split=FALSE)
+      },
+      close = function(){
+          sink()
+          close(self$connection)
+      },
+      flush = function(){
+          sink()
+          close(self$connection)
+          self$connection <- textConnection(NULL,"wr",local=TRUE)
+          sink(self$connection,split=FALSE)
+      },
+      handle_output = function(){
+          log_out("OutputWatcher$handle_output()")
+          # log_out(self$connection,use.print=TRUE)
+          if(isIncomplete(self$connection))
+              cat("\n",file=self$connection)
+          text_output <- textConnectionValue(self$connection)
+          # log_out(text_output,use.print=TRUE)
+          if(is.function(self$text_callback))
+              self$text_callback(text_output)
+          if(length(self$graphics_callback)){
+              plt <- self$graphics_snapshot()
+              if(length(plt)){
+                  self$graphics_callback(plt)
+              }
+          }
+        },
+      graphics_snapshot = function(){
+          if(is.null(dev.list())) return(NULL)
+          current_plot <- recordPlot()
+          if(identical(self$last_plot,current_plot)) return(NULL)
+          self$last_plot <- current_plot
+          return(current_plot)
+      }
+  )                      
+)
+
+Eval <- function(expressions,
+                  error_handler,
+                  warning_handler,
+                  message_handler,
+                  text_callback,
+                  graphics_callback,
+                  value_handler){
+    n <- length(expressions)
+    if(n < 1) return(NULL)
+    w <- OutputWatcher$new(text_callback=text_callback,
+                        graphics_callback=graphics_callback)
+    on.exit(w$close())
+    mHandler <- function(m) {
+        message_handler(m)
+        # invokeRestart("muffleMessage")
+    }
+    wHandler <- function(w){
+        if (getOption("warn") >= 2) return()
+        warning_handler(w)
+        # invokeRestart("muffleWarning")
+    }
+    eHandler <- function(e) {
+        error_handler(e)
+        # invokeRestart("muffleError")
+    }
+     
+    # dev.new()
+    # dev.control(displaylist = "enable")
+    # if(length(dev.list())){
+    #     dev <- dev.cur()
+    #     on.exit(dev.off(dev))
+    # }
+   
+    for(i in 1:n){
+        expr <- expressions[[i]]
+        ev <- list(value = NULL, visible = FALSE)
+        tryCatch(ev <- withVisible(eval(expr,envir=.GlobalEnv)),
+                 error=eHandler,
+                 warning=wHandler,
+                 message=mHandler)
+        w$handle_output()
+        value_handler(ev$value,ev$visible)
+        w$flush()
+    }
+}
+
 #' @export
 Evaluator <- R6Class("Evaluator",
     public = list(
  
         nframes = -1,
-        output_handlers = list(),
         aborted = FALSE,
         status = "ok",
         payload = list(),
         results = list(),
         env = list(),
         comm_manager = list(),
+
+        output_watcher = character(),
 
         initialize = function(kernel){
             private$kernel <- kernel
@@ -65,22 +163,6 @@ Evaluator <- R6Class("Evaluator",
                     jupyter.update.graphics=TRUE,
                     rkernel_stop_on_error=TRUE)
 
-            self$output_handlers$default <- new_output_handler(
-                text     = self$handle_text,
-                graphics = self$handle_graphics,
-                message  = self$handle_message,
-                warning  = self$handle_warning,
-                error    = self$handle_error,
-                value    = self$handle_value)
-
-            self$output_handlers$silent <- new_output_handler(
-                text     = identity,
-                graphics = identity,
-                message  = identity,
-                warning  = identity,
-                error    = identity,
-                value    = identity)
-
             setHook('plot.new',self$plot_new_hook)
             setHook('grid.newpage',self$plot_new_hook)
             setHook('before.plot.new',self$before_plot_new_hook)
@@ -88,8 +170,9 @@ Evaluator <- R6Class("Evaluator",
             
             suppressMessages(trace(plot.xy,self$plot_xy_hook,print=FALSE))
             suppressMessages(trace(curve,quote(curve_hook(add)),print=FALSE))
-
+            
             assign("curve_hook",self$curve_hook,pos=pos)
+
             add_paged_classes(c("help_files_with_topic","packageIQR","hsearch"))
             add_displayed_classes(c("htmlwidget","html_elem","shiny.tag"))
 
@@ -184,21 +267,8 @@ Evaluator <- R6Class("Evaluator",
             }
         },
 
-        scrolling_table_inited = FALSE,
-        env_browser_inited = FALSE,
-        
         eval = function(code,...,silent=FALSE){
 
-            if(!self$scrolling_table_inited){
-                self$init_scrolling_table()
-                self$scrolling_table_inited <- TRUE
-            }
-            
-            # if(!self$env_browser_inited){
-            #     self$init_env_browser()
-            #     self$env_browser_inited <- TRUE
-            # }
-            
             perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
@@ -215,22 +285,16 @@ Evaluator <- R6Class("Evaluator",
 
             if(self$nframes < 0){
                 getnframes <- function(e) self$nframes <- sys.nframe()
-                tryCatch(evaluate(
-                    'stop()',
-                    stop_on_error = 1L,
-                    output_handler = new_output_handler(error = getnframes)))
+                tryCatch(evalq(stop()),
+                    error = getnframes)
             }
 
             self$results <- list()
             if(self$aborted) return(self$results)
-            if(silent)
-                output_handler <- self$output_handler$silent
-            else
-                output_handler <- self$output_handler$default
 
-            expr <- try(parse(text=code),silent=TRUE)
-            if(inherits(expr,"try-error")){
-                condition <- attr(expr,"condition")
+            expressions <- try(parse(text=code),silent=TRUE)
+            if(inherits(expressions,"try-error")){
+                condition <- attr(expressions,"condition")
                 self$status <- "error"
                 private$kernel$stream(text=condition$message,
                                       stream="stderr")
@@ -238,13 +302,16 @@ Evaluator <- R6Class("Evaluator",
             else {
                 self$plot_new_called <- FALSE
                 self$plot_new_cell <- TRUE
-                tryCatch(
-                    evaluate(code,
-                             envir=.GlobalEnv,
-                             stop_on_error=1L,
-                             output_handler=self$output_handlers$default,
-                             new_device=TRUE),
-                    interrupt = self$handle_interrupt)
+                
+                Eval(expressions,
+                     error_handler=self$handle_error,
+                     warning_handler=self$handle_warning,
+                     message_handler=self$handle_message,
+                     text_callback=self$handle_text,
+                     graphics_callback=self$handle_graphics,
+                     value_handler=self$handle_value
+                     )
+
                 if(length(self$saved.options)){
                     op <- self$saved.options
                     self$saved.options <- list()
@@ -311,7 +378,10 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_text = function(text) {
-            # cat("handle_text")
+            #log_out(sprintf("handle_text(%s)",text))
+            #log_out("handle_text")
+            #log_out(text,use.print=TRUE)
+            text <- paste(text,collapse="\n")
             private$kernel$stream(text=text,stream="stdout")
         },
 
@@ -416,9 +486,10 @@ Evaluator <- R6Class("Evaluator",
             if(stop_on_error){
                 calls <- sys.calls()
                 self$aborted <- TRUE
+                #drop_prev <- self$nframes - 2
+                #calls <- tail(calls,-drop_prev)
+                calls <- tail(calls,-15)
                 calls <- head(calls,-3)
-                drop_prev <- self$nframes - 2
-                calls <- tail(calls,-drop_prev)
                 calls <- limitedLabels(calls)
                 if(length(calls))
                     calls <- paste0(format(seq_along(calls),justify="right"),
@@ -426,10 +497,10 @@ Evaluator <- R6Class("Evaluator",
                                     calls)
                 traceback <- c("\nTraceback:",calls)
                 traceback <- paste(traceback,collapse="\n")
-                private$kernel$stream(text = traceback,
-                                      stream = "stderr")
+                # private$kernel$stream(text = traceback,
+                #                       stream = "stderr")
                 private$kernel$send_error(name = "ERROR",
-                                          value = value,
+                                          value = "",
                                           traceback = list(traceback)
                                           )
             }
@@ -530,7 +601,7 @@ Evaluator <- R6Class("Evaluator",
 
         code_is_complete = function(code){
             status <- tryCatch({
-                parse_all(code)
+                parse(text=code)
                 "complete"
             },
             error = conditionMessage)
@@ -688,20 +759,35 @@ is_unexpected_string <- function(code)
                   domain = "R"),
           code,fixed = TRUE)
 
-dummy_dev_filename <- function(...) file.path(tempdir(),"dummy-device.png")
-
 #' @importFrom grDevices png
-dummy_device <- function(filename = dummy_dev_filename(),
+dummy_device <- function(filename = NULL,
                          width = getOption("jupyter.plot.width",6),
                          height = getOption("jupyter.plot.height",6),
                          res = getOption("jupyter.plot.res",96),
                          pointsize = getOption("jupyter.plot.pointsize",12),
                          units = getOption("jupyter.plot.units","in"),
-                         ...) png(filename,
-                                  width=width,
-                                  height=height,
-                                  res=res,
-                                  units=units,...)
+                         ...){
+    os <- .Platform$OS.type
+    sysname <- Sys.info()[["sysname"]]
+    if(os == "unix" && sysname=="Darwin")
+        os <- "osx"
+    dev <- switch(os,
+                  windows=png,
+                  osx=pdf,
+                  unix=png)
+    if(is.null(filename))
+        filename <- switch(os,
+                           windows="NUL",
+                           osx=NULL,
+                           unix="/dev/null")
+    dev(filename=filename,
+        width=width,
+        height=height,
+        res=res,
+        units=units,
+        ...)
+    dev.control(displaylist="enable")
+}
 
 splitLines <- function(text) strsplit(text,"\n",fixed=TRUE)[[1]]
 
