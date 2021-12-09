@@ -106,7 +106,7 @@ rhub-fedora-clang-devel:
 	Rscript --vanilla -e 'rhub::check("${ARCHIVE}",platform="fedora-clang-devel",show_status = FALSE)'
 
 rhub-list-checks:
-	Rscript -e 'rhub::list_my_checks("memisc@elff.eu")'
+	Rscript -e 'rhub::list_my_checks("melff@elff.eu")'
 
 check-reverse:
 	rm -rfv depends/$(PACKAGE)_*
