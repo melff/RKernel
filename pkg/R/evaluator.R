@@ -34,9 +34,9 @@ OutputWatcher <- R6Class("OutputWatcher",
           self$handle_graphics()
         },
 
-      handle_text = function(){
+      handle_text = function(new_line=FALSE){
           # log_out("OutputWatcher$handle_text")
-          if(isIncomplete(self$connection))
+          if(isIncomplete(self$connection) || new_line)
               cat("\n",file=self$connection)
           self$prev_text_output <- self$text_output
           self$text_output <- textConnectionValue(self$connection)
@@ -332,27 +332,6 @@ Evaluator <- R6Class("Evaluator",
 
             assign("get_help_url",function()self$help_url,pos=pos)
 
-            # suppressMessages(trace(eval,
-            #                        self$eval_entry_hook,
-            #                        exit=self$eval_exit_hook,
-            #                        print=FALSE))
-            suppressMessages(trace(source,
-                                   self$source_entry_hook,
-                                   exit=self$source_exit_hook,
-                                   print=FALSE))
-
-        },
-
-        eval_depth = 0,
-        eval_entry_hook = function(){
-            #log_out("eval_entry_hook")
-            self$eval_depth <- self$eval_depth + 1
-            # log_out(paste(rep("#",self$eval_depth),collapse=""))
-        },
-
-        eval_exit_hook = function(){
-            self$eval_depth <- self$eval_depth - 1
-            # log_out("eval_exit_hook")
         },
 
         source_depth = 0,
@@ -367,6 +346,14 @@ Evaluator <- R6Class("Evaluator",
             self$source_depth <- self$source_depth - 1
             if(self$source_depth < 1)
                 suppressMessages(untrace(cat))
+        },
+        print_exit_hook = function(){
+            # log_out("print_exit_hook")
+            self$watcher$handle_text(new_line=TRUE)
+        },
+        cat_exit_hook = function(){
+            # log_out("cat_exit_hook")
+            self$watcher$handle_text()
         },
 
 
@@ -411,6 +398,22 @@ Evaluator <- R6Class("Evaluator",
 
         eval = function(code,...,silent=FALSE){
             # log_out("evaluator$eval")
+            suppressMessages(trace(source,
+                                   self$source_entry_hook,
+                                   exit=self$source_exit_hook,
+                                   print=FALSE))
+            suppressMessages(trace(print,
+                                   exit=self$print_exit_hook,
+                                   print=FALSE))
+            suppressMessages(trace(cat,
+                                   exit=self$cat_exit_hook,
+                                   print=FALSE))
+            on.exit({
+                suppressMessages(untrace(cat))
+                suppressMessages(untrace(print))
+                suppressMessages(untrace(source))
+            })
+            
             
             perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
             if(length(perc_match) > 1){
