@@ -223,12 +223,12 @@ Eval <- function(expressions,
     if(n < 1) return(NULL)
     mHandler <- function(m) {
         message_handler(m)
-        # invokeRestart("muffleMessage")
+        invokeRestart("muffleMessage")
     }
     wHandler <- function(w){
         if (getOption("warn") >= 2) return()
         warning_handler(w)
-        # invokeRestart("muffleWarning")
+        invokeRestart("muffleWarning")
     }
     eHandler <- function(e) {
         error_handler(e)
@@ -241,13 +241,19 @@ Eval <- function(expressions,
         expr <- expressions[[i]]
         ev <- list(value = NULL, visible = FALSE)
         # log_out("evaluating ...")
-        tryCatch(ev <- withVisible(eval(expr,envir=.GlobalEnv)),
-                 error=eHandler,
-                 warning=wHandler,
-                 message=mHandler)
+        ### See 'evaluate_call' in package "evaluate" (Yihui Xie et al.)
+        try(ev <- withCallingHandlers(
+                withVisible(eval(expr,envir=.GlobalEnv)),
+                error=eHandler,
+                warning=wHandler,
+                message=mHandler),silent=TRUE)
         # log_out("handling output ...")
         watcher$handle_output()
-        value_handler(ev$value,ev$visible)
+        try(ev <- withCallingHandlers(
+                value_handler(ev$value,ev$visible),
+                error=eHandler,
+                warning=wHandler,
+                message=mHandler),silent=TRUE)
         watcher$handle_output()
         reset <- FALSE
     }
