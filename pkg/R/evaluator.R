@@ -86,7 +86,7 @@ OutputWatcher <- R6Class("OutputWatcher",
       before_plot_new_hook = function(...){
           log_out("before_plot_new_hook")
           if(self$graphics_active()){
-              self$handle_output()
+              self$handle_text()
           }
       },
 
@@ -332,7 +332,43 @@ Evaluator <- R6Class("Evaluator",
 
             assign("get_help_url",function()self$help_url,pos=pos)
 
+            # suppressMessages(trace(eval,
+            #                        self$eval_entry_hook,
+            #                        exit=self$eval_exit_hook,
+            #                        print=FALSE))
+            suppressMessages(trace(source,
+                                   self$source_entry_hook,
+                                   exit=self$source_exit_hook,
+                                   print=FALSE))
+
         },
+
+        eval_depth = 0,
+        eval_entry_hook = function(){
+            #log_out("eval_entry_hook")
+            self$eval_depth <- self$eval_depth + 1
+            log_out(paste(rep("#",self$eval_depth),collapse=""))
+        },
+
+        eval_exit_hook = function(){
+            self$eval_depth <- self$eval_depth - 1
+            # log_out("eval_exit_hook")
+        },
+
+        source_depth = 0,
+        source_entry_hook = function(){
+            if(self$source_depth < 1)
+                suppressMessages(trace(cat,
+                                      self$watcher$handle_graphics,
+                                      print=FALSE))
+            self$source_depth <- self$source_depth + 1
+        },
+        source_exit_hook = function(){
+            self$source_depth <- self$source_depth - 1
+            if(self$source_depth < 1)
+                suppressMessages(untrace(cat))
+        },
+
 
         help_port = integer(),
         help_proc = integer(),
@@ -491,6 +527,8 @@ Evaluator <- R6Class("Evaluator",
         last_plot_id = character(),
 
         handle_graphics = function(plt,update=FALSE) {
+
+            update <- update && getOption("jupyter.update.graphics",TRUE)
             log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
 
             width <- getOption("jupyter.plot.width")
