@@ -27,7 +27,7 @@ OutputWatcher <- R6Class("OutputWatcher",
           close(self$connection)
       },
       handle_output = function(){
-          log_out("OutputWatcher$handle_output ")
+          # log_out("OutputWatcher$handle_output ")
           # log_out(self$connection,use.print=TRUE)
           # log_out(text_output,use.print=TRUE)
           self$handle_text()
@@ -35,7 +35,7 @@ OutputWatcher <- R6Class("OutputWatcher",
         },
 
       handle_text = function(){
-          log_out("OutputWatcher$handle_text")
+          # log_out("OutputWatcher$handle_text")
           if(isIncomplete(self$connection))
               cat("\n",file=self$connection)
           self$prev_text_output <- self$text_output
@@ -48,7 +48,7 @@ OutputWatcher <- R6Class("OutputWatcher",
                   current_text_output <- self$text_output
               if(length(current_text_output)){
                   current_text_output <- paste(current_text_output,collapse="\n")
-                  log_out(paste(current_text_output))
+                  # log_out(paste(current_text_output))
                   self$text_callback(current_text_output)
               }
           }
@@ -62,20 +62,20 @@ OutputWatcher <- R6Class("OutputWatcher",
       },
 
       handle_graphics = function(){
-          log_out("OutputWatcher$handle_graphics")
+          # log_out("OutputWatcher$handle_graphics")
           if(self$graphics_active()){
               self$last_plot <- self$current_plot
               plt <- recordPlot()
-              log_out("taking graphics snapshot")
-              log_out(sprintf("plot_new_called = %s",if(self$plot_new_called)"TRUE"else"FALSE"))
+              # log_out("taking graphics snapshot")
+              # log_out(sprintf("plot_new_called = %s",if(self$plot_new_called)"TRUE"else"FALSE"))
               do_send_plot <- !plot_is_empty(plt) && !identical(self$last_plot,plt) 
               if(do_send_plot) {
-                  log_out("graphics_callback")
+                  # log_out("graphics_callback")
                   update <- !self$plot_new_called
                   self$graphics_callback(plt,update=update)
                   self$current_plot <- plt
                   self$plot_new_called <- FALSE
-                  log_out("Setting plot_new_called <- FALSE")
+                  # log_out("Setting plot_new_called <- FALSE")
               }
           }
       },
@@ -84,29 +84,29 @@ OutputWatcher <- R6Class("OutputWatcher",
       graphics_par_usr = numeric(0),
 
       before_plot_new_hook = function(...){
-          log_out("before_plot_new_hook")
+          # log_out("before_plot_new_hook")
           if(self$graphics_active()){
               self$handle_text()
           }
       },
 
       plot_new_hook = function(...){
-          log_out("plot_new_hook")
+          # log_out("plot_new_hook")
           if(self$graphics_active()){
               self$plot_new_called <- TRUE
-              log_out("Setting plot_new_called <- TRUE")
+              # log_out("Setting plot_new_called <- TRUE")
               self$graphics_par_usr <- par("usr")
           }
       },
 
       plot_xy_hook = function(...){
-          log_out("plot_xy_hook")
+          # log_out("plot_xy_hook")
           if(self$graphics_active()){
               if(FALSE && !self$plot_new_called){
                   par(usr = self$graphics_par_usr)
                   replayPlot(self$current_plot)
                   self$plot_new_called <- TRUE
-                  log_out("Setting plot_new_called <- TRUE")
+                  # log_out("Setting plot_new_called <- TRUE")
               } 
           }
       },
@@ -189,12 +189,12 @@ empty_plot_calls <- c("palette",
 plot_is_empty <- function(plt) {
     if(!length(plt)) return(TRUE)
     pcalls <- plot_calls(plt)
-    log_out(pcalls,use.print=TRUE)
+    # log_out(pcalls,use.print=TRUE)
     # log_out(empty_plot_calls,use.print=TRUE)
     # log_out(pcalls%in%empty_plot_calls,use.print=TRUE)
     if(!length(pcalls)) return(TRUE)
     res <- all(pcalls %in% empty_plot_calls)
-    log_out(res)
+    # log_out(res)
     return(res)
 }
 
@@ -218,7 +218,7 @@ Eval <- function(expressions,
                   message_handler,
                   value_handler,
                   watcher){
-    log_out("Eval")
+    # log_out("Eval")
     n <- length(expressions)
     if(n < 1) return(NULL)
     mHandler <- function(m) {
@@ -237,15 +237,15 @@ Eval <- function(expressions,
      
     watcher$new_expression()
     for(i in 1:n){
-        log_out(sprintf("exressions[[%d]]",i))
+        # log_out(sprintf("exressions[[%d]]",i))
         expr <- expressions[[i]]
         ev <- list(value = NULL, visible = FALSE)
-        log_out("evaluating ...")
+        # log_out("evaluating ...")
         tryCatch(ev <- withVisible(eval(expr,envir=.GlobalEnv)),
                  error=eHandler,
                  warning=wHandler,
                  message=mHandler)
-        log_out("handling output ...")
+        # log_out("handling output ...")
         watcher$handle_output()
         value_handler(ev$value,ev$visible)
         watcher$handle_output()
@@ -347,7 +347,7 @@ Evaluator <- R6Class("Evaluator",
         eval_entry_hook = function(){
             #log_out("eval_entry_hook")
             self$eval_depth <- self$eval_depth + 1
-            log_out(paste(rep("#",self$eval_depth),collapse=""))
+            # log_out(paste(rep("#",self$eval_depth),collapse=""))
         },
 
         eval_exit_hook = function(){
@@ -410,7 +410,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         eval = function(code,...,silent=FALSE){
-            log_out("evaluator$eval")
+            # log_out("evaluator$eval")
             
             perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
             if(length(perc_match) > 1){
@@ -529,7 +529,7 @@ Evaluator <- R6Class("Evaluator",
         handle_graphics = function(plt,update=FALSE) {
 
             update <- update && getOption("jupyter.update.graphics",TRUE)
-            log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
+            # log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
 
             width <- getOption("jupyter.plot.width")
             height <- getOption("jupyter.plot.height")
@@ -571,7 +571,7 @@ Evaluator <- R6Class("Evaluator",
                       transient = list(display_id=id))
             class(d) <- cls
 
-            log_out(str(d),use.print=TRUE)
+            # log_out(str(d),use.print=TRUE)
 
             channel <- get_current_channel()
             channel$display_send(d)

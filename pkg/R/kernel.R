@@ -129,8 +129,8 @@ Kernel <- R6Class("Kernel",
         msg_type <- class(d)
       else stop("'display_data' or 'update_display_data' object required")
 
-      log_out("kernel$display_send")
-      log_out(sprintf("msg_type = %s",msg_type))
+      # log_out("kernel$display_send")
+      # log_out(sprintf("msg_type = %s",msg_type))
       
       private$send_message(type=msg_type,
                            parent=self$execute_request,
