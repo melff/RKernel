@@ -128,6 +128,9 @@ Kernel <- R6Class("Kernel",
       if(class(d)%in%c("display_data","update_display_data"))
         msg_type <- class(d)
       else stop("'display_data' or 'update_display_data' object required")
+
+      log_out("kernel$display_send")
+      log_out(sprintf("msg_type = %s",msg_type))
       
       private$send_message(type=msg_type,
                            parent=self$execute_request,
@@ -349,7 +352,7 @@ Kernel <- R6Class("Kernel",
       else return(TRUE)
     },
 
-    respond_shell = function(req,debug=TRUE){
+    respond_shell = function(req,debug=FALSE){
       msg <- private$get_message("shell")
       if(!length(msg)) return(TRUE)
       private$send_message(type="status",

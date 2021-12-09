@@ -1,17 +1,22 @@
 #' @importFrom utils capture.output
 #' @importFrom svglite svgstring
+#' @importFrom grDevices png
 
 OutputWatcher <- R6Class("OutputWatcher",
   public = list(
       connection = NULL,
       last_plot = NULL,
+      current_plot = NULL,
       text_callback = NULL,
       graphics_callback = NULL,
+      text_output = NULL,
+      prev_text_output = NULL,
       initialize = function(text_callback=NULL,graphics_callback=NULL){
           self$text_callback <- text_callback
           self$graphics_callback <- graphics_callback
           self$connection <- textConnection(NULL,"wr",local=TRUE)
           sink(self$connection,split=FALSE)
+          self$init_graphics()
       },
       open = function(){
           self$connection <- textConnection(NULL,"wr",local=TRUE)
@@ -21,50 +26,201 @@ OutputWatcher <- R6Class("OutputWatcher",
           sink()
           close(self$connection)
       },
-      flush = function(){
-          sink()
-          close(self$connection)
-          self$connection <- textConnection(NULL,"wr",local=TRUE)
-          sink(self$connection,split=FALSE)
-      },
       handle_output = function(){
-          log_out("OutputWatcher$handle_output()")
+          log_out("OutputWatcher$handle_output ")
           # log_out(self$connection,use.print=TRUE)
+          # log_out(text_output,use.print=TRUE)
+          self$handle_text()
+          self$handle_graphics()
+        },
+
+      handle_text = function(){
+          log_out("OutputWatcher$handle_text")
           if(isIncomplete(self$connection))
               cat("\n",file=self$connection)
-          text_output <- textConnectionValue(self$connection)
-          # log_out(text_output,use.print=TRUE)
-          if(is.function(self$text_callback))
-              self$text_callback(text_output)
-          if(length(self$graphics_callback)){
-              plt <- self$graphics_snapshot()
-              if(length(plt)){
-                  self$graphics_callback(plt)
+          self$prev_text_output <- self$text_output
+          self$text_output <- textConnectionValue(self$connection)
+          if(is.function(self$text_callback)){
+              nlines <- length(self$prev_text_output)
+              if(nlines > 0)
+                  current_text_output <- tail(self$text_output,-nlines)
+              else
+                  current_text_output <- self$text_output
+              if(length(current_text_output)){
+                  current_text_output <- paste(current_text_output,collapse="\n")
+                  log_out(paste(current_text_output))
+                  self$text_callback(current_text_output)
               }
           }
-        },
-      graphics_snapshot = function(){
-          if(is.null(dev.list())) return(NULL)
-          current_plot <- recordPlot()
-          if(identical(self$last_plot,current_plot)) return(NULL)
-          self$last_plot <- current_plot
-          return(current_plot)
+      },
+
+      graphics_active = function(){
+          res <- self$dev_num > 1 && self$dev_num == dev.cur()
+          # if(res) log_out("graphics is active")
+          # else log_out("graphics not active")
+          return(res)
+      },
+
+      handle_graphics = function(){
+          log_out("OutputWatcher$handle_graphics")
+          if(self$graphics_active()){
+              self$last_plot <- self$current_plot
+              plt <- recordPlot()
+              log_out("taking graphics snapshot")
+              log_out(sprintf("plot_new_called = %s",if(self$plot_new_called)"TRUE"else"FALSE"))
+              do_send_plot <- !plot_is_empty(plt) && !identical(self$last_plot,plt) 
+              if(do_send_plot) {
+                  log_out("graphics_callback")
+                  update <- !self$plot_new_called
+                  self$graphics_callback(plt,update=update)
+                  self$current_plot <- plt
+                  self$plot_new_called <- FALSE
+                  log_out("Setting plot_new_called <- FALSE")
+              }
+          }
+      },
+
+      plot_new_called = FALSE,
+      graphics_par_usr = numeric(0),
+
+      before_plot_new_hook = function(...){
+          log_out("before_plot_new_hook")
+          if(self$graphics_active()){
+              self$handle_output()
+          }
+      },
+
+      plot_new_hook = function(...){
+          log_out("plot_new_hook")
+          if(self$graphics_active()){
+              self$plot_new_called <- TRUE
+              log_out("Setting plot_new_called <- TRUE")
+              self$graphics_par_usr <- par("usr")
+          }
+      },
+
+      plot_xy_hook = function(...){
+          log_out("plot_xy_hook")
+          if(self$graphics_active()){
+              if(FALSE && !self$plot_new_called){
+                  par(usr = self$graphics_par_usr)
+                  replayPlot(self$current_plot)
+                  self$plot_new_called <- TRUE
+                  log_out("Setting plot_new_called <- TRUE")
+              } 
+          }
+      },
+
+      dev_filename = character(0),
+      dev_name = character(),
+      dev_num = 0,
+      device = list(),
+
+      init_graphics = function(){
+          os <- .Platform$OS.type
+          sysname <- Sys.info()[["sysname"]]
+          if(os == "unix" && sysname=="Darwin")
+              os <- "osx"
+          self$dev_filename <- switch(os,
+                                      windows="NUL",
+                                      osx=NULL,
+                                      unix="/dev/null")
+          self$dev_name <- switch(os,
+                                  windows="png",
+                                  osx="pdf",
+                                  unix="png")
+          self$device <- function(filename = NULL,
+                                 width = getOption("jupyter.plot.width",6),
+                                 height = getOption("jupyter.plot.height",6),
+                                 res = getOption("jupyter.plot.res",96),
+                                 pointsize = getOption("jupyter.plot.pointsize",12),
+                                 units = getOption("jupyter.plot.units","in"),
+                                 ...){
+              dev <- get(self$dev_name)
+              if(is.null(filename))
+                  dev(filename=self$dev_filename,
+                      width=width,
+                      height=height,
+                      res=res,
+                      units=units,
+                      ...)
+              self$dev_num <- dev.cur()
+              dev.control(displaylist="enable")
+          }
+          options(device=self$device)
+
+          setHook('plot.new',self$plot_new_hook)
+          setHook('grid.newpage',self$plot_new_hook)
+          setHook('before.plot.new',self$before_plot_new_hook)
+          setHook('before.grid.newpage',self$before_plot_new_hook)
+
+          suppressMessages(trace(plot.xy,self$plot_xy_hook,print=FALSE))
+          suppressMessages(trace(arrows,self$plot_xy_hook,print=FALSE))
+          suppressMessages(trace(segments,self$plot_xy_hook,print=FALSE))
+          suppressMessages(trace(abline,self$plot_xy_hook,print=FALSE))
+          suppressMessages(trace(box,self$plot_xy_hook,print=FALSE))
+          suppressMessages(trace(rect,self$plot_xy_hook,print=FALSE))
+          suppressMessages(trace(polygon,self$plot_xy_hook,print=FALSE))
+          suppressMessages(trace(dev.off,self$dev_off_hook,print=FALSE))
+
+      },
+      dev_off_hook = function(){
+          closed_dev <- get("which",envir=parent.frame())
+          if(closed_dev == self$dev_num)
+              self$dev_num <- NULL
+      },
+      new_expression = function() {
+          self$plot_new_called <- FALSE
       }
   )                      
 )
+
+# cf. 'graphics.r' in package "evaluate" (Yihui Xie et al.)
+empty_plot_calls <- c("palette",
+                      "palette2",
+                      paste0("C_",c("layout",
+                                  "par",
+                                  "clip",
+                                  "strWidth",
+                                  "strHeight",
+                                  "plot_new",
+                                  "plot_window")))
+
+plot_is_empty <- function(plt) {
+    if(!length(plt)) return(TRUE)
+    pcalls <- plot_calls(plt)
+    log_out(pcalls,use.print=TRUE)
+    # log_out(empty_plot_calls,use.print=TRUE)
+    # log_out(pcalls%in%empty_plot_calls,use.print=TRUE)
+    if(!length(pcalls)) return(TRUE)
+    res <- all(pcalls %in% empty_plot_calls)
+    log_out(res)
+    return(res)
+}
+
+plot_calls <- function(plt){
+    plt <- plt[[1]]
+    plt <- lapply(plt,"[[",2)
+    if(!length(plt)) return(NULL)
+    plt <- lapply(plt,"[[",1)
+    sapply(plt,get_name_el)
+}
+
+get_name_el <- function(x){
+    if(length(x$name)) x$name 
+    else deparse(x)
+}
+
 
 Eval <- function(expressions,
                   error_handler,
                   warning_handler,
                   message_handler,
-                  text_callback,
-                  graphics_callback,
-                  value_handler){
+                  value_handler,
+                  watcher){
+    log_out("Eval")
     n <- length(expressions)
     if(n < 1) return(NULL)
-    w <- OutputWatcher$new(text_callback=text_callback,
-                        graphics_callback=graphics_callback)
-    on.exit(w$close())
     mHandler <- function(m) {
         message_handler(m)
         # invokeRestart("muffleMessage")
@@ -79,23 +235,21 @@ Eval <- function(expressions,
         # invokeRestart("muffleError")
     }
      
-    # dev.new()
-    # dev.control(displaylist = "enable")
-    # if(length(dev.list())){
-    #     dev <- dev.cur()
-    #     on.exit(dev.off(dev))
-    # }
-   
+    watcher$new_expression()
     for(i in 1:n){
+        log_out(sprintf("exressions[[%d]]",i))
         expr <- expressions[[i]]
         ev <- list(value = NULL, visible = FALSE)
+        log_out("evaluating ...")
         tryCatch(ev <- withVisible(eval(expr,envir=.GlobalEnv)),
                  error=eHandler,
                  warning=wHandler,
                  message=mHandler)
-        w$handle_output()
+        log_out("handling output ...")
+        watcher$handle_output()
         value_handler(ev$value,ev$visible)
-        w$flush()
+        watcher$handle_output()
+        reset <- FALSE
     }
 }
 
@@ -111,7 +265,7 @@ Evaluator <- R6Class("Evaluator",
         env = list(),
         comm_manager = list(),
 
-        output_watcher = character(),
+        watcher = list(),
 
         initialize = function(kernel){
             private$kernel <- kernel
@@ -150,8 +304,7 @@ Evaluator <- R6Class("Evaluator",
             #     rm(var_dic_list,envir=.GlobalEnv)
             # assign("var_dic_list",self$var_dic_list,pos=pos)
 
-            options(device=dummy_device,
-                    pager=self$pager,
+            options(pager=self$pager,
                     crayon.enabled=TRUE,crayon.colors=256L,
                     jupyter.graphics.types=c("image/png","application/pdf"),
                     jupyter.plot.width=6,
@@ -163,21 +316,15 @@ Evaluator <- R6Class("Evaluator",
                     jupyter.update.graphics=TRUE,
                     rkernel_stop_on_error=TRUE)
 
-            setHook('plot.new',self$plot_new_hook)
-            setHook('grid.newpage',self$plot_new_hook)
-            setHook('before.plot.new',self$before_plot_new_hook)
-            setHook('before.grid.newpage',self$before_plot_new_hook)
-            
-            suppressMessages(trace(plot.xy,self$plot_xy_hook,print=FALSE))
-            suppressMessages(trace(curve,quote(curve_hook(add)),print=FALSE))
-            
-            assign("curve_hook",self$curve_hook,pos=pos)
 
             add_paged_classes(c("help_files_with_topic","packageIQR","hsearch"))
             add_displayed_classes(c("htmlwidget","html_elem","shiny.tag"))
 
             private$comm_dispatcher <- private$kernel$comm_dispatcher
 
+            self$watcher <- OutputWatcher$new(text_callback=self$handle_text,
+                                              graphics_callback=self$handle_graphics)
+            
             self$start_help_system()
             assign("help_proc",self$help_proc,pos=pos)
             assign("help_port",self$help_port,pos=pos)
@@ -226,49 +373,9 @@ Evaluator <- R6Class("Evaluator",
             base::q()
         },
 
-        plot_new_called = FALSE,
-
-        plot_new_display = TRUE,
-
-        plot_new_cell = TRUE,
-
-        current_plot = list(),
-
-        before_plot_new_hook = function(...){
-            current_plot = list()
-        },
-
-        plot_new_hook = function(...){
-            log_out("plot_new_hook")
-            self$plot_new_called <- TRUE
-            self$plot_new_display <- TRUE
-        },
-
-        graphics_par_usr = numeric(0),
-
-        curve_hook = function(add){
-            log_out("curve_hook")
-            if(isTRUE(add) && !self$plot_new_called && 
-               length(self$current_plot) > 0){
-                replayPlot(self$current_plot)
-                par(usr = self$graphics_par_usr)
-                self$plot_new_called <- TRUE
-            } 
-            #self$plot_new_display <- !isTRUE(add)
-        },
-
-        plot_xy_hook = function(...){
-            log_out("plot_xy_hook")
-            if(!self$plot_new_called && 
-               length(self$current_plot) > 0){
-                replayPlot(self$current_plot)
-                par(usr = self$graphics_par_usr)
-                self$plot_new_called <- TRUE
-            }
-        },
-
         eval = function(code,...,silent=FALSE){
-
+            log_out("evaluator$eval")
+            
             perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
@@ -300,16 +407,12 @@ Evaluator <- R6Class("Evaluator",
                                       stream="stderr")
             }
             else {
-                self$plot_new_called <- FALSE
-                self$plot_new_cell <- TRUE
-                
                 Eval(expressions,
                      error_handler=self$handle_error,
                      warning_handler=self$handle_warning,
                      message_handler=self$handle_message,
-                     text_callback=self$handle_text,
-                     graphics_callback=self$handle_graphics,
-                     value_handler=self$handle_value
+                     value_handler=self$handle_value,
+                     watcher=self$watcher
                      )
 
                 if(length(self$saved.options)){
@@ -378,7 +481,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_text = function(text) {
-            #log_out(sprintf("handle_text(%s)",text))
+            # log_out(sprintf("handle_text(%s)",text))
             #log_out("handle_text")
             #log_out(text,use.print=TRUE)
             text <- paste(text,collapse="\n")
@@ -387,10 +490,8 @@ Evaluator <- R6Class("Evaluator",
 
         last_plot_id = character(),
 
-        handle_graphics = function(plt) {
-
-            self$current_plot <- plt
-            self$graphics_par_usr <- par("usr")
+        handle_graphics = function(plt,update=FALSE) {
+            log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
 
             width <- getOption("jupyter.plot.width")
             height <- getOption("jupyter.plot.height")
@@ -417,34 +518,25 @@ Evaluator <- R6Class("Evaluator",
                     mime_metadata[[mime]]$isolated <-TRUE
             }
 
-            jupyter_update_graphics <- getOption("jupyter.update.graphics",TRUE)
-
-            if(self$plot_new_cell && !jupyter_update_graphics){
-                plot_new_display <- TRUE
-            }
-            else{
-                 plot_new_display <- self$plot_new_display
-            }
-
-            if(plot_new_display){
+            if(update){
+                id <- self$last_plot_id
+                cls <- "update_display_data"
+            } 
+            else {
                 id <- UUIDgenerate()
                 self$last_plot_id <- id
                 cls <- "display_data"
             } 
-            else {
-                id <- self$last_plot_id
-                cls <- "update_display_data"
-            }
 
             d <- list(data = mime_data,
                       metadata = mime_metadata,
                       transient = list(display_id=id))
             class(d) <- cls
 
+            log_out(str(d),use.print=TRUE)
+
             channel <- get_current_channel()
             channel$display_send(d)
-            self$plot_new_cell <- FALSE
-            self$plot_new_display <- FALSE
 
         },
 
@@ -759,36 +851,6 @@ is_unexpected_string <- function(code)
                   domain = "R"),
           code,fixed = TRUE)
 
-#' @importFrom grDevices png
-dummy_device <- function(filename = NULL,
-                         width = getOption("jupyter.plot.width",6),
-                         height = getOption("jupyter.plot.height",6),
-                         res = getOption("jupyter.plot.res",96),
-                         pointsize = getOption("jupyter.plot.pointsize",12),
-                         units = getOption("jupyter.plot.units","in"),
-                         ...){
-    os <- .Platform$OS.type
-    sysname <- Sys.info()[["sysname"]]
-    if(os == "unix" && sysname=="Darwin")
-        os <- "osx"
-    dev <- switch(os,
-                  windows=png,
-                  osx=pdf,
-                  unix=png)
-    if(is.null(filename))
-        filename <- switch(os,
-                           windows="NUL",
-                           osx=NULL,
-                           unix="/dev/null")
-    dev(filename=filename,
-        width=width,
-        height=height,
-        res=res,
-        units=units,
-        ...)
-    dev.control(displaylist="enable")
-}
 
 splitLines <- function(text) strsplit(text,"\n",fixed=TRUE)[[1]]
-
 
