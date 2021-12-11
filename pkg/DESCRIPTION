@@ -1,13 +1,13 @@
 Package: RKernel
 Title: A basic R kernel for Jupyter
-Version: 0.1
-Date: 2021-08-14
+Version: 0.2
+Date: 2021-12-11
 Authors@R: c(
     person('Martin', 'Elff', 
            email = 'martin@elff.eu',
            role = c('aut', 'cre'), comment = c(ORCID = "0000-0001-9032-9739")))
 Maintainer: Martin Elff <martin@elff.eu>
-Description: Provides a simple kernel for Jupyter.
+Description: Provides a kernel for Jupyter.
 Encoding: UTF-8
 License: GPL-2
 Imports:
@@ -40,8 +40,9 @@ Collate:
     'json.R'
     'kernel.R'
     'main.R'
-    'scrolling-table.R'
     'traitlets.R'
+    'output.R'
+    'scrolling-table.R'
     'traitlets-boolean.R'
     'traitlets-instance.R'
     'traitlets-numbers.R'

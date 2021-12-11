@@ -275,6 +275,8 @@ Evaluator <- R6Class("Evaluator",
 
         initialize = function(kernel){
             private$kernel <- kernel
+            private$output <- KernelOutputClass$new(kernel=kernel)
+            set_channel(private$output)
         },
 
         startup = function(...) {
@@ -527,10 +529,12 @@ Evaluator <- R6Class("Evaluator",
 
         handle_text = function(text) {
             # log_out(sprintf("handle_text(%s)",text))
-            #log_out("handle_text")
-            #log_out(text,use.print=TRUE)
+            # log_out("handle_text")
+            # log_out(text,use.print=TRUE)
             text <- paste(text,collapse="\n")
-            private$kernel$stream(text=text,stream="stdout")
+            channel <- get_current_channel()
+            channel$stream(text = text,
+                           stream = "stdout")
         },
 
         last_plot_id = character(),
@@ -540,58 +544,32 @@ Evaluator <- R6Class("Evaluator",
             update <- update && getOption("jupyter.update.graphics",TRUE)
             # log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
 
-            width <- getOption("jupyter.plot.width")
-            height <- getOption("jupyter.plot.height")
-            pointsize <- getOption("jupyter.plot.pointsize")
-            resolution <- getOption("jupyter.plot.res")
-            scale <- getOption("jupyter.plot.scale")
+            width      <- getOption("jupyter.plot.width",6)
+            height     <- getOption("jupyter.plot.height",6)
+            pointsize  <- getOption("jupyter.plot.pointsize",12)
+            resolution <- getOption("jupyter.plot.res",150)
+            scale      <- getOption("jupyter.plot.scale",0.5)
+            units      <- getOption("jupyter.plot.units","units")
 
-            rkernel_graphics_types <- getOption("jupyter.graphics.types")
-
-            mime_data <- list()
-            mime_metadata <- list()
-
-            for(mime in rkernel_graphics_types){
-                repr_func <- mime2repr[[mime]]
-                mime_data[[mime]] <- repr_func(plt,
-                                          width=width,
-                                          height=height,
-                                          pointsize=pointsize,
-                                          res=resolution)
-                mime_metadata[[mime]] <- list(
-                    width=width*resolution*scale,
-                    height=height*resolution*scale)
-                if(mime=="image/svg+xml")
-                    mime_metadata[[mime]]$isolated <-TRUE
-            }
-
-            if(update){
-                id <- self$last_plot_id
-                cls <- "update_display_data"
-            } 
-            else {
-                id <- UUIDgenerate()
-                self$last_plot_id <- id
-                cls <- "display_data"
-            } 
-
-            d <- list(data = mime_data,
-                      metadata = mime_metadata,
-                      transient = list(display_id=id))
-            class(d) <- cls
-
-            # log_out(str(d),use.print=TRUE)
 
             channel <- get_current_channel()
-            channel$display_send(d)
+            channel$graphics_send(plt,
+                                  width=width,
+                                  height=height,
+                                  pointsize=pointsize,
+                                  resolution=resolution,
+                                  scale=scale,
+                                  units=units,
+                                  update=update)
 
         },
 
         handle_message = function(m) {
             text <- conditionMessage(m)
             text <- paste(text,collapse="\n")
-            private$kernel$stream(text = text,
-                                  stream = "stdout")
+            channel <- get_current_channel()
+            channel$stream(text = text,
+                           stream = "stdout")
         },
 
         handle_warning = function(w) {
@@ -604,8 +582,9 @@ Evaluator <- R6Class("Evaluator",
                 call <- deparse(call)[[1]]
                 text <- paste0("Warning in ",call,":\n",text,"\n")
             }
-            private$kernel$stream(text = text,
-                                  stream = "stderr")
+            channel <- get_current_channel()
+            channel$stream(text = text,
+                           stream = "stderr")
         },
 
         handle_error = function(e) {
@@ -619,8 +598,9 @@ Evaluator <- R6Class("Evaluator",
                 text <- paste0("Error in ",call,":\n",text,"\n")
             }
             self$status <- "error"
-            private$kernel$stream(text = text,
-                                  stream = "stderr")
+            channel <- get_current_channel()
+            channel$stream(text = text,
+                           stream = "stderr")
             stop_on_error <- getOption("rkernel_stop_on_error")
             if(stop_on_error){
                 calls <- sys.calls()
@@ -862,7 +842,8 @@ Evaluator <- R6Class("Evaluator",
     
     private = list(
         kernel=list(),
-        comm_dispatcher=list()
+        comm_dispatcher=list(),
+        output=list()
     )
 
 )

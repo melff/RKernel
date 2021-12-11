@@ -1,37 +1,8 @@
 #' @importFrom repr mime2repr
 
-output_channels <- new.env()
-
-#' @export
-set_channel <- function(channel=NULL){
-    channels <- output_channels$stack
-    l <- length(channels)
-    if(length(channel)){
-        channels[[l+1]] <- channel
-    }
-    else if(l > 1)
-        channels <- channels[seq.int(l-1)]
-        
-    output_channels$stack <- channels
-}
-
-#' @export
-get_current_channel <- function(){
-    channels <- output_channels$stack
-    l <- length(channels)
-    if(l > 0)
-        channels[[l]]
-    else {
-        kernel <- get_current_kernel()
-        channels <- list(kernel)
-        output_channels$stack <- channels
-        kernel
-    }
-}
-
-
 #' @export
 display <- function(...){
+    # log_out("display")
     d <- display_data(...)
     channel <- get_current_channel()
     channel$display_send(d)
@@ -158,6 +129,45 @@ display_data.htmlwidget <- function(x,...,
     }
     d <- list(data=mime_data)
     d$metadata <- metadata
+    d$transient <- list(display_id=id)
+    if(update) cl <- "update_display_data"
+    else cl <- "display_data"
+    structure(d,class=cl)
+}
+
+display_data.recordedplot <- function(x,
+                                      width=getOption("jupyter.plot.wdith",6),
+                                      height=getOption("jupyter.plot.height",6),
+                                      pointsize=getOption("jupyter.plot.pointsize",12),
+                                      resolution=getOption("jupyter.plot.res",150),
+                                      scale=getOption("jupyter.plot.scale",.5),
+                                      units=getOption("jupyter.plot.units","in"),
+                                      metadata=NULL,
+                                      id=uuid::UUIDgenerate(),
+                                      update=FALSE){
+
+    rkernel_graphics_types <- getOption("jupyter.graphics.types",
+                                        c("image/png","application/pdf"))
+
+    mime_data <- list()
+    mime_metadata <- list()
+
+    for(mime in rkernel_graphics_types){
+        repr_func <- mime2repr[[mime]]
+        mime_data[[mime]] <- repr_func(x,
+                                       width=width,
+                                       height=height,
+                                       pointsize=pointsize,
+                                       res=resolution)
+        mime_metadata[[mime]] <- list(
+            width=width*resolution*scale,
+            height=height*resolution*scale)
+        if(mime=="image/svg+xml")
+            mime_metadata[[mime]]$isolated <-TRUE
+    }
+
+    d <- list(data=mime_data)
+    d$metadata <- mime_metadata
     d$transient <- list(display_id=id)
     if(update) cl <- "update_display_data"
     else cl <- "display_data"
