@@ -4,8 +4,9 @@
 display <- function(...){
     # log_out("display")
     d <- display_data(...)
-    channel <- get_current_channel()
-    channel$display_send(d)
+    kernel <- get_current_kernel()
+    kernel$display_data(data=d$data,
+                        metadata=d$metadata)
 }
 
 #' @export
@@ -409,6 +410,7 @@ format_item <- function(x){
 }
 
 
+#' @export
 Javascript <- function(text,file){
     if(missing(text)){
         text <- readLines(file)
@@ -420,6 +422,7 @@ Javascript <- function(text,file){
             "application/javascript"=text)
 }
 
+#' @export
 LaTeXMath <- function(text){
     text <- paste(text,collapse="\n")
     text_plain <- paste("Math:",text,sep="\n")
@@ -428,6 +431,7 @@ LaTeXMath <- function(text){
             "text/latex"=text_latex)
 }
 
+#' @export
 raw_html <- function(text,id=uuid::UUIDgenerate(),update=FALSE){
     text <- paste(text,collapse="\n")
     display_data("text/plain"="",

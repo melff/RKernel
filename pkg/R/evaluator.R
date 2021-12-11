@@ -2,262 +2,6 @@
 #' @importFrom svglite svgstring
 #' @importFrom grDevices png
 
-OutputWatcher <- R6Class("OutputWatcher",
-  public = list(
-      connection = NULL,
-      last_plot = NULL,
-      current_plot = NULL,
-      text_callback = NULL,
-      graphics_callback = NULL,
-      text_output = NULL,
-      prev_text_output = NULL,
-      initialize = function(text_callback=NULL,graphics_callback=NULL){
-          self$text_callback <- text_callback
-          self$graphics_callback <- graphics_callback
-          self$connection <- textConnection(NULL,"wr",local=TRUE)
-          sink(self$connection,split=FALSE)
-          self$init_graphics()
-      },
-      open = function(){
-          self$connection <- textConnection(NULL,"wr",local=TRUE)
-          sink(self$connection,split=FALSE)
-      },
-      close = function(){
-          sink()
-          close(self$connection)
-      },
-      handle_output = function(){
-          # log_out("OutputWatcher$handle_output ")
-          # log_out(self$connection,use.print=TRUE)
-          # log_out(text_output,use.print=TRUE)
-          self$handle_text()
-          self$handle_graphics()
-        },
-
-      handle_text = function(new_line=FALSE){
-          # log_out("OutputWatcher$handle_text")
-          if(isIncomplete(self$connection) || new_line)
-              cat("\n",file=self$connection)
-          self$prev_text_output <- self$text_output
-          self$text_output <- textConnectionValue(self$connection)
-          if(is.function(self$text_callback)){
-              nlines <- length(self$prev_text_output)
-              if(nlines > 0)
-                  current_text_output <- tail(self$text_output,-nlines)
-              else
-                  current_text_output <- self$text_output
-              if(length(current_text_output)){
-                  current_text_output <- paste(current_text_output,collapse="\n")
-                  # log_out(paste(current_text_output))
-                  self$text_callback(current_text_output)
-              }
-          }
-      },
-
-      graphics_active = function(){
-          res <- self$dev_num > 1 && self$dev_num == dev.cur()
-          # if(res) log_out("graphics is active")
-          # else log_out("graphics not active")
-          return(res)
-      },
-
-      handle_graphics = function(){
-          # log_out("OutputWatcher$handle_graphics")
-          if(self$graphics_active()){
-              self$last_plot <- self$current_plot
-              plt <- recordPlot()
-              # log_out("taking graphics snapshot")
-              # log_out(sprintf("plot_new_called = %s",if(self$plot_new_called)"TRUE"else"FALSE"))
-              do_send_plot <- !plot_is_empty(plt) && !identical(self$last_plot,plt) 
-              if(do_send_plot) {
-                  # log_out("graphics_callback")
-                  update <- !self$plot_new_called
-                  self$graphics_callback(plt,update=update)
-                  self$current_plot <- plt
-                  self$plot_new_called <- FALSE
-                  # log_out("Setting plot_new_called <- FALSE")
-              }
-          }
-      },
-
-      plot_new_called = FALSE,
-      graphics_par_usr = numeric(0),
-
-      before_plot_new_hook = function(...){
-          # log_out("before_plot_new_hook")
-          if(self$graphics_active()){
-              self$handle_text()
-          }
-      },
-
-      plot_new_hook = function(...){
-          # log_out("plot_new_hook")
-          if(self$graphics_active()){
-              self$plot_new_called <- TRUE
-              # log_out("Setting plot_new_called <- TRUE")
-              self$graphics_par_usr <- par("usr")
-          }
-      },
-
-      plot_xy_hook = function(...){
-          # log_out("plot_xy_hook")
-          if(self$graphics_active()){
-              if(FALSE && !self$plot_new_called){
-                  par(usr = self$graphics_par_usr)
-                  replayPlot(self$current_plot)
-                  self$plot_new_called <- TRUE
-                  # log_out("Setting plot_new_called <- TRUE")
-              } 
-          }
-      },
-
-      dev_filename = character(0),
-      dev_name = character(),
-      dev_num = 0,
-      device = list(),
-
-      init_graphics = function(){
-          os <- .Platform$OS.type
-          sysname <- Sys.info()[["sysname"]]
-          if(os == "unix" && sysname=="Darwin")
-              os <- "osx"
-          self$dev_filename <- switch(os,
-                                      windows="NUL",
-                                      osx=NULL,
-                                      unix="/dev/null")
-          self$dev_name <- switch(os,
-                                  windows="png",
-                                  osx="pdf",
-                                  unix="png")
-          self$device <- function(filename = NULL,
-                                 width = getOption("jupyter.plot.width",6),
-                                 height = getOption("jupyter.plot.height",6),
-                                 res = getOption("jupyter.plot.res",96),
-                                 pointsize = getOption("jupyter.plot.pointsize",12),
-                                 units = getOption("jupyter.plot.units","in"),
-                                 ...){
-              dev <- get(self$dev_name)
-              if(is.null(filename))
-                  dev(filename=self$dev_filename,
-                      width=width,
-                      height=height,
-                      res=res,
-                      units=units,
-                      ...)
-              self$dev_num <- dev.cur()
-              dev.control(displaylist="enable")
-          }
-          options(device=self$device)
-
-          setHook('plot.new',self$plot_new_hook)
-          setHook('grid.newpage',self$plot_new_hook)
-          setHook('before.plot.new',self$before_plot_new_hook)
-          setHook('before.grid.newpage',self$before_plot_new_hook)
-
-          suppressMessages(trace(plot.xy,self$plot_xy_hook,print=FALSE))
-          suppressMessages(trace(arrows,self$plot_xy_hook,print=FALSE))
-          suppressMessages(trace(segments,self$plot_xy_hook,print=FALSE))
-          suppressMessages(trace(abline,self$plot_xy_hook,print=FALSE))
-          suppressMessages(trace(box,self$plot_xy_hook,print=FALSE))
-          suppressMessages(trace(rect,self$plot_xy_hook,print=FALSE))
-          suppressMessages(trace(polygon,self$plot_xy_hook,print=FALSE))
-          suppressMessages(trace(dev.off,self$dev_off_hook,print=FALSE))
-
-      },
-      dev_off_hook = function(){
-          closed_dev <- get("which",envir=parent.frame())
-          if(closed_dev == self$dev_num)
-              self$dev_num <- NULL
-      },
-      new_expression = function() {
-          self$plot_new_called <- FALSE
-      }
-  )                      
-)
-
-# cf. 'graphics.r' in package "evaluate" (Yihui Xie et al.)
-empty_plot_calls <- c("palette",
-                      "palette2",
-                      paste0("C_",c("layout",
-                                  "par",
-                                  "clip",
-                                  "strWidth",
-                                  "strHeight",
-                                  "plot_new",
-                                  "plot_window")))
-
-plot_is_empty <- function(plt) {
-    if(!length(plt)) return(TRUE)
-    pcalls <- plot_calls(plt)
-    # log_out(pcalls,use.print=TRUE)
-    # log_out(empty_plot_calls,use.print=TRUE)
-    # log_out(pcalls%in%empty_plot_calls,use.print=TRUE)
-    if(!length(pcalls)) return(TRUE)
-    res <- all(pcalls %in% empty_plot_calls)
-    # log_out(res)
-    return(res)
-}
-
-plot_calls <- function(plt){
-    plt <- plt[[1]]
-    plt <- lapply(plt,"[[",2)
-    if(!length(plt)) return(NULL)
-    plt <- lapply(plt,"[[",1)
-    sapply(plt,get_name_el)
-}
-
-get_name_el <- function(x){
-    if(length(x$name)) x$name 
-    else deparse(x)
-}
-
-
-Eval <- function(expressions,
-                  error_handler,
-                  warning_handler,
-                  message_handler,
-                  value_handler,
-                  watcher){
-    # log_out("Eval")
-    n <- length(expressions)
-    if(n < 1) return(NULL)
-    mHandler <- function(m) {
-        message_handler(m)
-        invokeRestart("muffleMessage")
-    }
-    wHandler <- function(w){
-        if (getOption("warn") >= 2) return()
-        warning_handler(w)
-        invokeRestart("muffleWarning")
-    }
-    eHandler <- function(e) {
-        error_handler(e)
-        # invokeRestart("muffleError")
-    }
-     
-    watcher$new_expression()
-    for(i in 1:n){
-        # log_out(sprintf("exressions[[%d]]",i))
-        expr <- expressions[[i]]
-        ev <- list(value = NULL, visible = FALSE)
-        # log_out("evaluating ...")
-        ### See 'evaluate_call' in package "evaluate" (Yihui Xie et al.)
-        try(ev <- withCallingHandlers(
-                withVisible(eval(expr,envir=.GlobalEnv)),
-                error=eHandler,
-                warning=wHandler,
-                message=mHandler),silent=TRUE)
-        # log_out("handling output ...")
-        watcher$handle_output()
-        try(ev <- withCallingHandlers(
-                value_handler(ev$value,ev$visible),
-                error=eHandler,
-                warning=wHandler,
-                message=mHandler),silent=TRUE)
-        watcher$handle_output()
-        reset <- FALSE
-    }
-}
 
 #' @export
 Evaluator <- R6Class("Evaluator",
@@ -271,26 +15,24 @@ Evaluator <- R6Class("Evaluator",
         env = list(),
         comm_manager = list(),
 
-        watcher = list(),
+        context = list(),
 
         initialize = function(kernel){
             private$kernel <- kernel
-            private$output <- KernelOutputClass$new(kernel=kernel)
-            set_channel(private$output)
         },
 
         startup = function(...) {
 
             self$env <- new.env()
-            attach(self$env,name="RKernel")
-            pos <- match("RKernel",search())
-            assign("q",self$quit,pos=pos)
-            assign("quit",self$quit,pos=pos)
+            #attach(self$env,name="RKernel")
+            #pos <- match("RKernel",search())
+            assign("q",self$quit,envir=self$env)
+            assign("quit",self$quit,envir=self$env)
             # assign("cell.options",self$cell.options,pos=pos)
             # assign("cell.par",self$cell.par,pos=pos)
             # 
-            # # assign("display",self$display,pos=pos)
-            # assign("display",display,pos=pos)
+            assign("display",self$display,envir=self$env)
+            # assign("display",display,envir=self$env)
             # assign("stream",self$stream,pos=pos)
             # #assign("cat",self$cat,pos=pos)
             # #assign("print",self$print,pos=pos)
@@ -330,15 +72,21 @@ Evaluator <- R6Class("Evaluator",
 
             private$comm_dispatcher <- private$kernel$comm_dispatcher
 
-            self$watcher <- OutputWatcher$new(text_callback=self$handle_text,
-                                              graphics_callback=self$handle_graphics)
+            self$context <- Context$new(text_callback=self$handle_text,
+                                        message_callback=self$handle_message,
+                                        warning_callback=self$handle_warning,
+                                        error_callback=self$handle_error,
+                                        value_callback=self$handle_value,
+                                        graphics_callback=self$handle_graphics,
+                                        envir=.GlobalEnv,
+                                        enclos=self$env)
             
             self$start_help_system()
-            assign("help_proc",self$help_proc,pos=pos)
-            assign("help_port",self$help_port,pos=pos)
-            assign("help.start",self$help_start,pos=pos)
+            assign("help_proc",self$help_proc,envir=self$env)
+            assign("help_port",self$help_port,envir=self$env)
+            assign("help.start",self$help_start,envir=self$env)
 
-            assign("get_help_url",function()self$help_url,pos=pos)
+            assign("get_help_url",function()self$help_url,envir=self$env)
 
         },
 
@@ -405,23 +153,6 @@ Evaluator <- R6Class("Evaluator",
         },
 
         eval = function(code,...,silent=FALSE){
-            # log_out("evaluator$eval")
-            suppressMessages(trace(source,
-                                   self$source_entry_hook,
-                                   exit=self$source_exit_hook,
-                                   print=FALSE))
-            suppressMessages(trace(print,
-                                   exit=self$print_exit_hook,
-                                   print=FALSE))
-            suppressMessages(trace(cat,
-                                   exit=self$cat_exit_hook,
-                                   print=FALSE))
-            on.exit({
-                suppressMessages(untrace(cat))
-                suppressMessages(untrace(print))
-                suppressMessages(untrace(source))
-            })
-            
             
             perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
             if(length(perc_match) > 1){
@@ -454,13 +185,7 @@ Evaluator <- R6Class("Evaluator",
                                       stream="stderr")
             }
             else {
-                Eval(expressions,
-                     error_handler=self$handle_error,
-                     warning_handler=self$handle_warning,
-                     message_handler=self$handle_message,
-                     value_handler=self$handle_value,
-                     watcher=self$watcher
-                     )
+                self$context$eval(expressions)
 
                 if(length(self$saved.options)){
                     op <- self$saved.options
@@ -532,9 +257,8 @@ Evaluator <- R6Class("Evaluator",
             # log_out("handle_text")
             # log_out(text,use.print=TRUE)
             text <- paste(text,collapse="\n")
-            channel <- get_current_channel()
-            channel$stream(text = text,
-                           stream = "stdout")
+            private$kernel$stream(text = text,
+                                  stream = "stdout")
         },
 
         last_plot_id = character(),
@@ -552,23 +276,49 @@ Evaluator <- R6Class("Evaluator",
             units      <- getOption("jupyter.plot.units","units")
 
 
-            channel <- get_current_channel()
-            channel$graphics_send(plt,
-                                  width=width,
-                                  height=height,
-                                  pointsize=pointsize,
-                                  resolution=resolution,
-                                  scale=scale,
-                                  units=units,
-                                  update=update)
+            rkernel_graphics_types <- getOption("jupyter.graphics.types")
+
+            mime_data <- list()
+            mime_metadata <- list()
+
+            for(mime in rkernel_graphics_types){
+                repr_func <- mime2repr[[mime]]
+                mime_data[[mime]] <- repr_func(plt,
+                                          width=width,
+                                          height=height,
+                                          pointsize=pointsize,
+                                          res=resolution)
+                mime_metadata[[mime]] <- list(
+                    width=width*resolution*scale,
+                    height=height*resolution*scale)
+                if(mime=="image/svg+xml")
+                    mime_metadata[[mime]]$isolated <-TRUE
+            }
+
+            if(update){
+                id <- self$last_plot_id
+                cls <- "update_display_data"
+            } 
+            else {
+                id <- UUIDgenerate()
+                self$last_plot_id <- id
+                cls <- "display_data"
+            } 
+
+            d <- list(data = mime_data,
+                      metadata = mime_metadata,
+                      transient = list(display_id=id))
+            class(d) <- cls
+
+            # log_out(str(d),use.print=TRUE)
+            private$kernel$display_send(d)
 
         },
 
         handle_message = function(m) {
             text <- conditionMessage(m)
             text <- paste(text,collapse="\n")
-            channel <- get_current_channel()
-            channel$stream(text = text,
+            private$kernel$stream(text = text,
                            stream = "stdout")
         },
 
@@ -582,9 +332,8 @@ Evaluator <- R6Class("Evaluator",
                 call <- deparse(call)[[1]]
                 text <- paste0("Warning in ",call,":\n",text,"\n")
             }
-            channel <- get_current_channel()
-            channel$stream(text = text,
-                           stream = "stderr")
+            private$kernel$stream(text = text,
+                                  stream = "stderr")
         },
 
         handle_error = function(e) {
@@ -598,9 +347,8 @@ Evaluator <- R6Class("Evaluator",
                 text <- paste0("Error in ",call,":\n",text,"\n")
             }
             self$status <- "error"
-            channel <- get_current_channel()
-            channel$stream(text = text,
-                           stream = "stderr")
+            private$kernel$stream(text = text,
+                                  stream = "stderr")
             stop_on_error <- getOption("rkernel_stop_on_error")
             if(stop_on_error){
                 calls <- sys.calls()
@@ -700,12 +448,12 @@ Evaluator <- R6Class("Evaluator",
             self$aborted <- TRUE
         },
 
-        # display = function(...){
-        #     d <- display(...)
-        #     private$kernel$display_data(data=d$data,
-        #                                 metadata=d$metadata,
-        #                                 transient=d$transient)
-        # },
+        display = function(...){
+            d <- display(...)
+            private$kernel$display_data(data=d$data,
+                                        metadata=d$metadata,
+                                        transient=d$transient)
+        },
 
         stream = function(text, stream=c("stdout","stderr")){
             stream <- match.arg(stream)
