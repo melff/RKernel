@@ -298,9 +298,10 @@ Kernel <- R6Class("Kernel",
                    metadata=metadata)
     },
     
-    log_out = function(message,use.print=FALSE){
+    log_out = function(message,...,use.print=FALSE){
       if(use.print)
         message <- capture.output(print(message))
+      else message <- paste(message,...,collapse="")
       cat(crayon::bgBlue(format(Sys.time()),message,"\n"),file=stderr())
     }
 
