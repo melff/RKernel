@@ -139,7 +139,16 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                 }
             }
         },
-
+        cat = function(...,sep=" "){
+            text <- paste(...,sep=sep)
+            self$stream(text,"stdout")
+        },
+        print = function(x,...){
+            text <- capture.output(print(x,...))
+            self$stream(text,"stdout")
+        },
+        stdout = function(text) self$stream(text,"stdout"),
+        stderr = function(text) self$stream(text,"stderr"),
         stream = function(text,stream_name) {
             # log_out("OutputWidget$stream")
             self$outputs <- append(self$outputs,
