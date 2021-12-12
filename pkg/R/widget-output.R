@@ -13,15 +13,50 @@ OutputWidgetClass <- R6Class_("OutputWidget",
 
         msg_id = structure(Unicode(""),sync=TRUE),
         outputs = structure(List(),sync=TRUE),
+
+        context = NULL,
+        env = NULL,
+
+        initialize = function(...){
+            super$initialize(...)
+            self$env <- new.env()
+            self$context <- Context$new(text_callback=self$handle_text,
+                                        message_callback=self$handle_message,
+                                        warning_callback=self$handle_warning,
+                                        error_callback=self$handle_error,
+                                        value_callback=self$handle_value,
+                                        graphics_callback=self$handle_graphics,
+                                        envir=self$env,
+                                        enclos=list(
+                                            display=self$display
+                                        ))
+        },
+
+        do = function(...) self$context$do(...),
+        eval = function(expr) self$context$eval(expr),
+        evaluate = function(expressions) self$context$evaluate(expressions),
+
+        handle_text = function(text) {
+            text <- paste(text,collapse="\n")
+            self$stream(text = text,
+                        stream = "stdout")
+        },
+
         last_plot_id = character(0),
-        graphics_send = function(plt,
-                                 width=getOption("jupyter.plot.wdith",6),
-                                 height=getOption("jupyter.plot.height",6),
-                                 pointsize=getOption("jupyter.plot.pointsize",12),
-                                 resolution=getOption("jupyter.plot.res",150),
-                                 scale=getOption("jupyter.plot.scale",.5),
-                                 units=getOption("jupyter.plot.units","in"),
-                                 update=FALSE){
+        handle_graphics = function(plt,update=FALSE) {
+
+            update <- update && getOption("jupyter.update.graphics",TRUE)
+            # log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
+
+            width      <- getOption("jupyter.plot.width",6)
+            height     <- getOption("jupyter.plot.height",6)
+            pointsize  <- getOption("jupyter.plot.pointsize",12)
+            resolution <- getOption("jupyter.plot.res",150)
+            scale      <- getOption("jupyter.plot.scale",0.5)
+            units      <- getOption("jupyter.plot.units","units")
+
+            rkernel_graphics_types <- getOption("jupyter.graphics.types")
+
             # log_out("OutputWidget$graphics_send")
             # log_out("  -- update = ",if(update)"TRUE"else"FALSE")
             # log_out("  -- id = ",self$last_plot_id)
@@ -48,6 +83,63 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                               update=update)
             self$display_send(d)
         },
+
+        handle_message = function(m) {
+            text <- conditionMessage(m)
+            text <- paste(text,collapse="\n")
+            self$stream(text = text,
+                        stream = "stdout")
+        },
+
+        handle_warning = function(w) {
+            text <- conditionMessage(w)
+            text <- paste(text,collapse="\n")
+            call <- conditionCall(w)
+            if(is.null(call)) {
+                text <- paste0("Warning:\n",text,"\n")
+            } else {
+                call <- deparse(call)[[1]]
+                text <- paste0("Warning in ",call,":\n",text,"\n")
+            }
+            self$stream(text = text,
+                        stream = "stderr")
+        },
+
+        handle_error = function(e) {
+            text <- conditionMessage(e)
+            text <- paste(text,collapse="\n")
+            call <- conditionCall(e)
+            if(is.null(call)) {
+                text <- paste0("Error:\n",text,"\n")
+            } else {
+                call <- deparse(call)[[1]]
+                text <- paste0("Error in ",call,":\n",text,"\n")
+            }
+            self$stream(text = text,
+                        stream = "stderr")
+        },
+
+        handle_value = function(x,visible) {
+            if(visible){
+                if(any(class(x) %in% getOption("rkernel_displayed_classes"))){
+                    d <- display_data(x)
+                    self$display_send(d)
+                }
+                else if(inherits(x,"display_data")){
+                    self$display_send(x)
+                }
+                else if(inherits(x,"update_display_data")){
+                    self$display_send(x)
+                }
+                else {
+                    text <- capture.output(print(x))
+                    text <- paste(text,collapse="\n")
+                    self$stream(text = text,
+                                stream = "stdout")
+                }
+            }
+        },
+
         stream = function(text,stream_name) {
             # log_out("OutputWidget$stream")
             self$outputs <- append(self$outputs,
@@ -57,9 +149,11 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                                        text = text
                                    )))
         },
+        display = function(...){
+            d <- display_data(...)
+            self$display_send(d)
+        },
         display_index = integer(0),
-        stdout = function(text) self$stream(text,stream_name="stdout"),
-        stderr = function(text) self$stream(text,stream_name="stderr"),
         display_send = function(d){
             if(!(class(d)%in%c("display_data","update_display_data")))
                 stop("'display_data' or 'update_display_data' object required")
@@ -101,7 +195,11 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                 character(0)
         }
     )
-    )
+)
 
 #' @export
 OutputWidget <- function(...) OutputWidgetClass$new(...)
+
+
+#' @export
+with.OutputWidget <- function(data,expr,...) data$context$eval(substitute(expr))
