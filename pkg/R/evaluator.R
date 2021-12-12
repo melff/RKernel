@@ -185,7 +185,7 @@ Evaluator <- R6Class("Evaluator",
                                       stream="stderr")
             }
             else {
-                self$context$eval(expressions)
+                self$context$evaluate(expressions)
 
                 if(length(self$saved.options)){
                     op <- self$saved.options
@@ -449,7 +449,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         display = function(...){
-            d <- display(...)
+            d <- display_data(...)
             private$kernel$display_data(data=d$data,
                                         metadata=d$metadata,
                                         transient=d$transient)

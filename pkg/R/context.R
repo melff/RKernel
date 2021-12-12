@@ -1,3 +1,4 @@
+#' @export
 Context <- R6Class("Context",
    public = list(
        connection = NULL,
@@ -19,7 +20,7 @@ Context <- R6Class("Context",
                              error_callback=NULL,
                              value_callback=NULL,
                              graphics_callback=NULL,
-                             envir=.GlobalEnv,
+                             envir=new.env(),
                              enclos=NULL){
            self$text_callback <- text_callback
            self$message_callback <- message_callback
@@ -40,7 +41,17 @@ Context <- R6Class("Context",
            # log_out(ls(enclos),use.print=TRUE)
        },
 
-       eval = function(expressions){
+       do = function(...){
+           expr <- substitute(...)
+           if(class(expr)=="{"){
+               expressions <- as.list(expr[-1])
+               self$evaluate(expressions)
+           }
+           else
+               self$eval(expr)
+       },
+       eval = function(expr) self$evaluate(list(expr)),
+       evaluate = function(expressions){
            self$enter()
            n <- length(expressions)
            for(expr in expressions){
@@ -265,3 +276,6 @@ get_name_el <- function(x){
     if(length(x$name)) x$name 
     else deparse(x)
 }
+
+#' @export
+with.Context <- function(data,expr,...) data$eval(substitute(expr))
