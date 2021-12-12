@@ -90,29 +90,6 @@ Evaluator <- R6Class("Evaluator",
 
         },
 
-        source_depth = 0,
-        source_entry_hook = function(){
-            if(self$source_depth < 1)
-                suppressMessages(trace(cat,
-                                      self$watcher$handle_graphics,
-                                      print=FALSE))
-            self$source_depth <- self$source_depth + 1
-        },
-        source_exit_hook = function(){
-            self$source_depth <- self$source_depth - 1
-            if(self$source_depth < 1)
-                suppressMessages(untrace(cat))
-        },
-        print_exit_hook = function(){
-            # log_out("print_exit_hook")
-            self$watcher$handle_text(new_line=TRUE)
-        },
-        cat_exit_hook = function(){
-            # log_out("cat_exit_hook")
-            self$watcher$handle_text()
-        },
-
-
         help_port = integer(),
         help_proc = integer(),
         help_url = character(),

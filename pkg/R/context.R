@@ -187,18 +187,39 @@ Context <- R6Class("Context",
           }
       },
 
-      print_exit_hook = function(){
-          self$handle_text(new_line=TRUE)
+      cat_hook = function(){
+          # log_out("cat_hook")
+          self$handle_graphics()
       },
       cat_exit_hook = function(){
+          # log_out("cat_exit_hook")
           self$handle_text()
       },
 
       print_hook = function(){
           self$handle_graphics()
       },
-      cat_hook = function(){
-          self$handle_graphics()
+      print_exit_hook = function(){
+          self$handle_text(new_line=TRUE)
+      },
+
+      str_depth = 0,
+      str_hook = function(){
+          # log_out("str_hook")
+          self$str_depth <- self$str_depth + 1
+          if(self$str_depth == 1)
+              suppressMessages(untrace(cat))
+      },
+      str_exit_hook = function(){
+          # log_out("str_exit_hook")
+          if(self$str_depth == 1){
+              self$handle_text()
+              suppressMessages(trace(cat,
+                                     self$cat_hook,
+                                     exit=self$cat_exit_hook,
+                                     print=FALSE))
+          }
+          self$str_depth <- self$str_depth - 1
       },
 
       orig.device = NULL,
@@ -220,6 +241,11 @@ Context <- R6Class("Context",
                                  self$cat_hook,
                                  exit=self$cat_exit_hook,
                                  print=FALSE))
+          suppressMessages(trace(str,
+                                 self$str_hook,
+                                 exit=self$str_exit_hook,
+                                 print=FALSE))
+
           attach(self$enclos,name="RKernel::Context",
                  warn.conflicts=FALSE)
 
@@ -236,6 +262,7 @@ Context <- R6Class("Context",
           setHook('before.grid.newpage',NULL,"replace")
 
           suppressMessages(untrace(cat))
+          suppressMessages(untrace(str))
           suppressMessages(untrace(print))
       }
    )
