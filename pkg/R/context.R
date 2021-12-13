@@ -53,8 +53,10 @@ Context <- R6Class("Context",
        eval = function(expr) self$evaluate(list(expr)),
        evaluate = function(expressions){
            self$enter()
-           n <- length(expressions)
+           # n <- length(expressions)
+           # i <- 0
            for(expr in expressions){
+               # i <- i + 1
                # log_out(sprintf("exressions[[%d]]",i))
                # expr <- expressions[[i]]
                ev <- list(value = NULL, visible = FALSE)
@@ -116,19 +118,19 @@ Context <- R6Class("Context",
 
       handle_graphics = function(){
           if(!is.function(self$graphics_callback)) return()
+          # log_out("Context$handle_graphics()")
           if(self$graphics_active()){
-              # log_out("Context$handle_graphics()")
               self$last_plot <- self$current_plot
               plt <- recordPlot()
               do_send_plot <- !plot_is_empty(plt) && !identical(self$last_plot,plt) 
               if(do_send_plot) {
                   update <- !self$plot_new_called
-                  # log_out(format(update))
+                  # log_out("update =",format(update))
                   self$graphics_callback(plt,update=update)
                   self$current_plot <- plt
                   self$plot_new_called <- FALSE
               }
-          }
+          } #else log_out("graphics not active ...")
       },
 
       plot_new_called = FALSE,
@@ -141,10 +143,13 @@ Context <- R6Class("Context",
       },
 
       plot_new_hook = function(...){
+          # log_out("plot_new_hook")
+          # log_out("self$dev_num==",self$dev_num)
+          # log_out("dev.cur()==",dev.cur())
           if(self$graphics_active()){
               self$plot_new_called <- TRUE
               self$graphics_par_usr <- par("usr")
-          }
+          } #else log_out("graphics not active ...")
       },
 
       dev_filename = character(0),
@@ -184,6 +189,10 @@ Context <- R6Class("Context",
                       ...)
               self$dev_num <- dev.cur()
               dev.control(displaylist="enable")
+              
+              # log_out('self$device')
+              # log_out("self$dev_num==",self$dev_num)
+
           }
       },
 
@@ -223,10 +232,17 @@ Context <- R6Class("Context",
       },
 
       orig.device = NULL,
+      orig.dev_num = 1,
       enter = function(){
 
           sink(self$connection,split=FALSE)
           self$orig.device <- options(device=self$device)
+          if(self$dev_num == 0 || !(self$dev_num %in% dev.list()))
+              self$device()
+          if(self$dev_num > 1 && self$dev_num %in% dev.list() && dev.cur() != self$dev_num){
+              self$orig.dev_num <- dev.cur()
+              dev.set(self$dev_num)
+          }
 
           setHook('plot.new',self$plot_new_hook)
           setHook('grid.newpage',self$plot_new_hook)
@@ -255,6 +271,7 @@ Context <- R6Class("Context",
           detach("RKernel::Context")
           sink()
           options(device=self$orig.device)
+          if(self$orig.dev_num > 1 && self$orig.dev_num %in% dev.list()) dev.set(self$orig.dev_num)
 
           setHook('plot.new',NULL,"replace")
           setHook('grid.newpage',NULL,"replace")

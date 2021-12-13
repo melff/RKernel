@@ -129,6 +129,7 @@ Evaluator <- R6Class("Evaluator",
             base::q()
         },
 
+        new_cell = TRUE,
         eval = function(code,...,silent=FALSE){
             
             perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
@@ -162,6 +163,7 @@ Evaluator <- R6Class("Evaluator",
                                       stream="stderr")
             }
             else {
+                self$new_cell <- TRUE
                 self$context$evaluate(expressions)
 
                 if(length(self$saved.options)){
@@ -242,9 +244,9 @@ Evaluator <- R6Class("Evaluator",
 
         handle_graphics = function(plt,update=FALSE) {
 
-            update <- update && getOption("jupyter.update.graphics",TRUE)
             # log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
-
+            new_display <- !update || self$new_cell && !getOption("jupyter.update.graphics",TRUE)
+            
             width      <- getOption("jupyter.plot.width",6)
             height     <- getOption("jupyter.plot.height",6)
             pointsize  <- getOption("jupyter.plot.pointsize",12)
@@ -272,14 +274,14 @@ Evaluator <- R6Class("Evaluator",
                     mime_metadata[[mime]]$isolated <-TRUE
             }
 
-            if(update){
-                id <- self$last_plot_id
-                cls <- "update_display_data"
-            } 
-            else {
+            if(new_display) {
                 id <- UUIDgenerate()
                 self$last_plot_id <- id
                 cls <- "display_data"
+            }
+            else {
+                id <- self$last_plot_id
+                cls <- "update_display_data"
             } 
 
             d <- list(data = mime_data,
@@ -289,6 +291,8 @@ Evaluator <- R6Class("Evaluator",
 
             # log_out(str(d),use.print=TRUE)
             private$kernel$display_send(d)
+
+            self$new_cell <- FALSE
 
         },
 
