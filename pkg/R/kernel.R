@@ -299,10 +299,12 @@ Kernel <- R6Class("Kernel",
     },
     
     log_out = function(message,...,use.print=FALSE){
+      tstate <- tracingState(on=FALSE)
       if(use.print)
         message <- capture.output(print(message))
       else message <- paste(message,...,collapse="")
       cat(crayon::bgBlue(format(Sys.time()),message,"\n"),file=stderr())
+      tracingState(on=tstate)
     }
 
   ),
@@ -562,6 +564,7 @@ check_page_payload <- function(payload){
 get_current_kernel <- function() kernel$current
 
 log_out <- function(...) kernel$current$log_out(...)
+
 
 # Local Variables:
 # ess-indent-offset: 2
