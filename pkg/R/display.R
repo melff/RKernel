@@ -43,91 +43,54 @@ display_data.default <- function(x,...,
 }
 
 #' @importFrom htmltools htmlEscape
+#' @importFrom digest digest
 #' @export
 display_data.htmlwidget <- function(x,...,
                             metadata=NULL,
                             id=uuid::UUIDgenerate(),
                             update=FALSE){
-    rkernel_mime_types <- getOption("rkernel_mime_types",
-                                    c("text/plain",
-                                      "text/html"))
-    rkernel_mime_types <- intersect(rkernel_mime_types,
-                                   c("text/plain",
-                                     "text/html"))
-    forcedims <- getOption("jupyter.htmlwidget.force.dims",TRUE)
-    padding <- getOption("jupyter.htmlwidget.padding",20L)
-    mime_data <- list()
-    for(mime_type in rkernel_mime_types){
-        repr_func <- mime2repr[[mime_type]]
-        repr_result <- repr_func(x,...)
-        mime_data[[mime_type]] <- repr_result
+
+    hash <- digest::digest(as.character(x))
+    url <- paste0(hash,".html")
+
+    selfcontained <- getOption("htmlwidgets_complete",FALSE)
+    assets <- getOption("htmlwigets_assetsdir","assets")
+    path <- getOption("htmlwidget_path","htmlwidgets")
+    if(length(path)){
+        url <- paste(path,url,sep="/")
+        path <- file.path(getwd(),path)
+        if(!file_test("-d",path))
+            dir.create(path)
     }
-    # This is needed to make htmlwidgets appear in Firefox
-    if("text/html" %in% names(mime_data)){
-        r_html <- mime_data["text/html"]
-        height_match <- getMatch(r_html,regexec("height:([0-9]+)(.*?);",r_html))
-        width_match <- getMatch(r_html,regexec("width:([0-9]+)(.*?);",r_html))
-        if(length(height_match) > 1){
-            if(forcedims) {
-                height <- getOption("jupyter.plot.height",6)
-                height_units <- getOption("jupyter.plot.units","in")
-                height_res <- getOption("jupyter.plot.res",96)
-                if(height_units %in% c("in","cm","mm")){
-                    height <- height*height_res
-                    if(height_units == "cm")
-                        height <- round(height/2.54,0)
-                    else if(height_units == "mm")
-                        height <- round(height/25.4,0)
-                }
-                height_units <- "px"
-                style_height <- sprintf("height:%d%s;",height,height_units)
-                r_html <- sub("height:([0-9]+)(.*?);",style_height,r_html)
-            }
-            else {
-                height <- as.integer(height_match[2])
-                height_units <- height_match[3]
-            }
-            if(height_units == "%")
-                height <- paste0(height,height_units)
-            else
-                height <- height + padding
-        }
-        else
-            height <- 500
-        if(length(width_match) > 1){
-            if(forcedims){
-                width <- getOption("jupyter.plot.width",6)
-                width_units <- getOption("jupyter.plot.units","in")
-                width_res <- getOption("jupyter.plot.res",96)
-                if(width_units %in% c("in","cm","mm")){
-                    width <- width*width_res
-                    if(width_units == "cm")
-                        width <- round(width/2.54,0)
-                    else if(width_units == "mm")
-                        width <- round(width/25.4,0)
-                }
-                width_units <- "px"
-                style_width <- sprintf("width:%d%s;",width,width_units)
-                r_html <- sub("width:([0-9]+)(.*?);",style_width,r_html)
-            }
-            else {
-                width <- as.integer(width_match[2])
-                width_units <- width_match[3]
-            }
-            if(width_units == "%")
-                width <- paste0(width,width_units)
-            else
-                width <- width + padding
-        }
-        else
-            width <- 500
-        r_html <- gsub("\n","",r_html,fixed=TRUE)
-        r_html <- gsub("\t","",r_html,fixed=TRUE)
-        r_html <- htmlEscape(r_html)
-        r_html <- sprintf("<div>\n<iframe srcdoc='%s' width='%s' height='%s' frameborder='0'>\n</iframe>\n</div>\n",
-                         r_html,width,height)
-        mime_data["text/html"] <- r_html
-    }
+    else
+        path <- getwd()
+    htmlfile <- file.path(path,paste0(hash,".html"))
+    assets <- file.path(path,assets)
+
+    htmlwidgets::saveWidget(x,
+                            file=htmlfile,
+                            selfcontained=selfcontained,
+                            libdir=assets,
+                            )
+
+    res <- "<div>"
+    if_tmpl <- "
+            <iframe src=\"%s\" width=\"%s\" height=\"%i\" seamless  style=\"border-style:none\">
+            </iframe>
+            "
+    width <- getOption("embed_htmlwidget_width",960L)
+    height <- getOption("embed_htmlwidget_width",600L)
+    
+    # iframe <- sprintf(if_tmpl,url,as.integer(width),as.integer(height))
+    iframe <- sprintf(if_tmpl,url,"100%",as.integer(height))
+    res <- paste0(res,iframe)
+    res <- paste0(res,"</div>")
+    text <- paste(res,collapse="\n")
+    mime_data <- list(
+        "text/plain"="",
+        "text/html"=text
+    )
+
     d <- list(data=mime_data)
     d$metadata <- metadata
     d$transient <- list(display_id=id)

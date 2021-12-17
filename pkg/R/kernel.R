@@ -145,11 +145,16 @@ Kernel <- R6Class("Kernel",
     last_display = function() self$display_id,
     
     display_data = function(data,metadata=NULL,transient=NULL){
-      content <- list(data=data,transient=transient)
-      if(length(metadata))
-        content$metadata <- metadata
-      else
-        content$metadata <- namedList()
+      #content <- list(data=data,transient=transient)
+      #if(length(metadata))
+      #  content$metadata <- metadata
+      #else
+      #  content$metadata <- namedList()
+      # log_out("== display_data ===========")
+      # for(n in names(data)){
+      #   log_out("--",n,"--")
+      #   log_out(data[[n]])
+      # }
       private$send_message(type="display_data",
                            parent=self$execute_request,
                            socket_name="iopub",
