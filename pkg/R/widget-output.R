@@ -46,7 +46,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         handle_graphics = function(plt,update=FALSE) {
 
             update <- update && getOption("jupyter.update.graphics",TRUE)
-            # log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
+            # log_out(sprintf("OutputWidget$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
 
             width      <- getOption("jupyter.plot.width",6)
             height     <- getOption("jupyter.plot.height",6)
