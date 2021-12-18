@@ -44,6 +44,7 @@ display_data.default <- function(x,...,
 
 #' @importFrom htmltools htmlEscape
 #' @importFrom digest digest
+#' @importFrom base64enc dataURI
 #' @export
 display_data.htmlwidget <- function(x,...,
                             metadata=NULL,
@@ -53,7 +54,7 @@ display_data.htmlwidget <- function(x,...,
     hash <- digest::digest(as.character(x))
     url <- paste0(hash,".html")
 
-    selfcontained <- getOption("htmlwidgets_complete",FALSE)
+    embed <- getOption("htmlwidgets_embed",FALSE) 
     assets <- getOption("htmlwigets_assetsdir","assets")
     path <- getOption("htmlwidget_path","htmlwidgets")
     if(length(path)){
@@ -69,20 +70,21 @@ display_data.htmlwidget <- function(x,...,
 
     htmlwidgets::saveWidget(x,
                             file=htmlfile,
-                            selfcontained=selfcontained,
+                            selfcontained=embed,
                             libdir=assets,
                             )
 
     res <- "<div>"
     if_tmpl <- "
-            <iframe src=\"%s\" width=\"%s\" height=\"%i\" seamless  style=\"border-style:none\">
+            <iframe src=\"%s\" width=\"%s\" height=\"%s\" seamless  style=\"border-style:none\">
             </iframe>
             "
-    width <- getOption("embed_htmlwidget_width",960L)
-    height <- getOption("embed_htmlwidget_width",600L)
-    
-    # iframe <- sprintf(if_tmpl,url,as.integer(width),as.integer(height))
-    iframe <- sprintf(if_tmpl,url,"100%",as.integer(height))
+    width <- getOption("embed_htmlwidget_width","100%")
+    height <- getOption("embed_htmlwidget_height",600L)
+
+    if(embed)
+        url <- dataURI(mime="text/html",file=htmlfile)
+    iframe <- sprintf(if_tmpl,url,width,height)
     res <- paste0(res,iframe)
     res <- paste0(res,"</div>")
     text <- paste(res,collapse="\n")
