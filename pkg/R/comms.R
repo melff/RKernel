@@ -108,13 +108,13 @@ CommManagerClass <- R6Class("CommManager",
                 private$evaluator$stream(text,stream="stdout")
             }
         },
-        send = function(id,data,metadata=NULL){
+        send = function(id,data,metadata=emptyNamedList){
             private$kernel$send_comm_msg(id,data,metadata)  
         },
-        send_open = function(id,target_name,data,metadata=NULL){
+        send_open = function(id,target_name,data,metadata=emptyNamedList){
             private$kernel$send_comm_open(id,target_name,data,metadata)  
         },
-        send_close = function(id,target_name,data=NULL,metadata=NULL){
+        send_close = function(id,target_name,data=emptyNamedList,metadata=emptyNamedList){
             private$kernel$send_comm_close(id,data,metadata)  
         },
         list_targets = function() return(private$handlers)
@@ -149,16 +149,16 @@ CommClass <- R6Class("Comm",
             self$handlers <- handlers
         },
 
-        open = function(data,metadata=TRUE){
+        open = function(data,metadata=emptyNamedList){
             id <- self$id
             target_name <- self$target_name
             private$manager$send_open(id,target_name,data,metadata)
         },
-        send = function(data,metadata=TRUE){
+        send = function(data,metadata=emptyNamedList){
             id <- self$id
             private$manager$send(id,data,metadata)
         },
-        close = function(data,metadata=TRUE){
+        close = function(data,metadata=emptyNamedList){
             id <- self$id
             private$manager$send_close(id,data,metadata)
         }

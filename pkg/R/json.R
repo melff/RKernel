@@ -1,18 +1,21 @@
 #' @importFrom jsonlite fromJSON toJSON
 
 #' @export
-to_json <- function(x) UseMethod("to_json")
+to_json <- function(x,auto_unbox=TRUE,...) UseMethod("to_json")
 
 #' @export
-to_json.default <- function(x) {
-  attributes(x) <- NULL
-  x
+to_json.default <- function(x,auto_unbox=TRUE,...) {
+    if(is.null(x) || length(x) == 0) structure("null",class="json")
+    else toJSON(x,auto_unbox=auto_unbox,json_verbatim=TRUE,...)
 }
 
 #' @export
-to_json.list <- function(x) {
-  nms <- names(x)
-  attributes(x) <- NULL
-  names(x) <- nms
-  x
+to_json.list <- function(x,auto_unbox=TRUE,...) {
+    y <- lapply(x,to_json,auto_unbox=auto_unbox,...)
+    toJSON(y,...,json_verbatim=TRUE) 
 }
+
+#' @export
+to_json.json <- function(x,auto_unbox=TRUE,...) x
+
+as_json <- function(x) structure(as.character(x),class="json")

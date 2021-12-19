@@ -4,6 +4,8 @@
 #' @importFrom pbdZMQ zmq.recv.multipart zmq.send.multipart .zmqopt_init
 #' @importFrom digest hmac
 #' @importFrom uuid UUIDgenerate
+#' @importFrom jsonlite prettify
+
 
 PROTOCOL_VERSION <- '5.3'
 WIRE_DELIM <- charToRaw("<IDS|MSG>")
@@ -111,13 +113,10 @@ Kernel <- R6Class("Kernel",
                              text=text))
     },
 
-    execute_result = function(data,metadata=NULL){
+    execute_result = function(data,metadata=emptyNamedList){
       content <- list(data=data,
+                      metadata=metadata,
                       execution_count=self$execution_count)
-      if(length(metadata))
-        content$metadata <- metadata
-      else
-        content$metadata <- namedList()
       private$send_message(type="execute_result",
                            parent=self$execute_request,
                            socket_name="iopub",
@@ -144,12 +143,12 @@ Kernel <- R6Class("Kernel",
     display_id = character(0),
     last_display = function() self$display_id,
     
-    display_data = function(data,metadata=NULL,transient=NULL){
+    display_data = function(data,metadata=emtpyNamedList,transient=NULL){
       #content <- list(data=data,transient=transient)
       #if(length(metadata))
       #  content$metadata <- metadata
       #else
-      #  content$metadata <- namedList()
+      #  content$metadata <- emptyNamedList
       # log_out("== display_data ===========")
       # for(n in names(data)){
       #   log_out("--",n,"--")
@@ -165,7 +164,7 @@ Kernel <- R6Class("Kernel",
                            ))
     },
 
-    update_display_data = function(data,metadata=NULL,transient){
+    update_display_data = function(data,metadata=emptyNamedList,transient){
       private$send_message(type="update_display_data",
                            parent=self$execute_request,
                            socket_name="iopub",
@@ -233,7 +232,7 @@ Kernel <- R6Class("Kernel",
                              matches=result$matches,
                              cursor_start=result$start,
                              cursor_end=result$end,
-                             metadata=namedList()))
+                             metadata=emptyNamedList))
     },
 
     comm_info_reply = function(msg){
@@ -271,7 +270,7 @@ Kernel <- R6Class("Kernel",
       private$comm_parent <- msg
     },
 
-    send_comm_msg = function(id,data,metadata=NULL){
+    send_comm_msg = function(id,data,metadata=emptyNamedList){
       private$send_message(type="comm_msg",debug=FALSE,
                    parent=private$comm_parent,
                    socket_name="iopub",
@@ -281,19 +280,19 @@ Kernel <- R6Class("Kernel",
                    metadata=metadata)
     },
     
-    send_comm_open = function(id,target_name,data,metadata=NULL){
+    send_comm_open = function(id,target_name,data,metadata=emptyNamedList){
       private$send_message(type="comm_open",debug=FALSE,
                    parent=private$comm_parent,
                    socket_name="iopub",
                    content=list(
                      comm_id=id,
                      target_name=target_name,
-                     target_module=list(),
+                     target_module=NULL,
                      data=data),
                    metadata=metadata)
     },
     
-    send_comm_close = function(id,data,metadata=NULL){
+    send_comm_close = function(id,data,metadata=emptyNamedList){
       private$send_message(type="comm_close",debug=FALSE,
                    parent=private$comm_parent,
                    socket_name="iopub",
@@ -417,12 +416,12 @@ Kernel <- R6Class("Kernel",
       return(msg)
     },
 
-    send_message = function(type, parent, socket_name, debug=FALSE, content, metadata=NULL){
+    send_message = function(type, parent, socket_name, debug=FALSE, content, metadata=emptyNamedList){
       msg <- private$msg_new(type,parent,content,metadata)
        if(debug) {
          msg_body <- msg[c("header","parent_header","metadata","content")]
-         msg_body <- to_JSON(msg_body,pretty=TRUE,auto_unbox=TRUE)
-         self$log(format(msg_body))
+         msg_body <- to_json(msg_body,auto_unbox=TRUE)
+         self$log_out(prettify(msg_body))
        }
       socket <- private$sockets[[socket_name]]
       wire_out <- private$wire_pack(msg)
@@ -477,16 +476,16 @@ Kernel <- R6Class("Kernel",
     session = character(0),
     username = character(0),
 
-    msg_new = function(type,parent,content,metadata=NULL){
+    msg_new = function(type,parent,content,metadata=emptyNamedList){
       if(is.null(metadata))
-        metadata = namedList()
+        metadata = emptyNamedList
       if(length(parent) && "header" %in% names(parent)){
         parent_header <- parent$header
         session <- parent_header$session
         username <- parent_header$username
       }
       else {
-        parent_header <- namedList()
+        parent_header <- emptyNamedList
         session <- private$session
         username <- private$username
       }
@@ -529,15 +528,7 @@ Kernel <- R6Class("Kernel",
   )
 )
 
-#' @importFrom jsonlite fromJSON toJSON
-
-to_JSON <- function(x,...){
-  x <- toJSON(x,...)
-  x <- gsub("[]","null",x,fixed=TRUE)
-  # x <- gsub("[{}]","[]",x,fixed=TRUE)
-  x
-}
-# to_JSON <- toJSON
+#' @include json.R
 
 fromRawJSON <- function(raw_json) {
     json <- rawToChar(raw_json)
@@ -546,11 +537,12 @@ fromRawJSON <- function(raw_json) {
 }
 
 toRawJSON <- function(x,...){
-  json <- to_JSON(x,...)
+  json <- to_json(x,...)
   charToRaw(json)
 }
 
 namedList <- function() structure(list(),names=character(0))
+emptyNamedList <- structure(list(),names=character(0))
 
 check_page_payload <- function(payload){
   for(i in seq_along(payload)){

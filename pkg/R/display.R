@@ -13,12 +13,12 @@ display <- function(...){
 display_data <- function(x,...) UseMethod("display_data")
 #' @export
 display_data.default <- function(x,...,
-                            metadata=NULL,
+                            metadata=emptyNamedList,
                             id=uuid::UUIDgenerate(),
                             update=FALSE){
 
     if(missing(x)){
-        if(!length(metadata)) metadata <- namedList()
+        if(!length(metadata)) metadata <- emptyNamedList
         d <- list(data=list(...))
     } 
     else {
@@ -47,7 +47,7 @@ display_data.default <- function(x,...,
 #' @importFrom base64enc dataURI
 #' @export
 display_data.htmlwidget <- function(x,...,
-                            metadata=NULL,
+                            metadata=emptyNamedList,
                             id=uuid::UUIDgenerate(),
                             update=FALSE){
 
@@ -108,7 +108,7 @@ display_data.recordedplot <- function(x,
                                       resolution=getOption("jupyter.plot.res",150),
                                       scale=getOption("jupyter.plot.scale",.5),
                                       units=getOption("jupyter.plot.units","in"),
-                                      metadata=NULL,
+                                      metadata=emptyNamedList,
                                       id=uuid::UUIDgenerate(),
                                       update=FALSE){
 
@@ -293,7 +293,7 @@ display_data.help_files_with_topic <- function(x,...,
     )
 
     d <- list(data=mime_data)
-    d$metadata <- namedList()
+    d$metadata <- emptyNamedList
     d$transient <- list(display_id=id)
     if(update) cl <- "update_display_data"
     else cl <- "display_data"
@@ -355,7 +355,7 @@ display_data.hsearch <- function(x,...,
     mime_data <- list("text/plain"=paste(text_plain,collapse="\n"),
                       "text/html"=paste(text_html,collapse="\n"))
     d <- list(data=mime_data)
-    #d$metadata <- namedList()
+    #d$metadata <- emptyNamedList
     d$transient <- list(display_id=id)
     if(update) cl <- "update_display_data"
     else cl <- "display_data"
@@ -408,7 +408,7 @@ raw_html <- function(text,id=uuid::UUIDgenerate(),update=FALSE){
 
 #' @export
 display_data.data.frame <- function(x,...,
-                            metadata=NULL,
+                            metadata=emptyNamedList,
                             id=uuid::UUIDgenerate(),
                             update=FALSE){
 
@@ -451,7 +451,7 @@ add_to_head <- function(code){
 
 #' @export
 display_data.html_elem <- function(x,...,
-                              metadata=NULL,
+                              metadata=emptyNamedList,
                               id=uuid::UUIDgenerate(),
                               update=FALSE){
     text <- as.character(x)
@@ -465,7 +465,7 @@ display_data.html_elem <- function(x,...,
 
 #' @export
 display_data.shiny.tag <- function(x,...,
-                              metadata=NULL,
+                              metadata=emptyNamedList,
                               id=uuid::UUIDgenerate(),
                               update=FALSE){
     text <- as.character(x)
