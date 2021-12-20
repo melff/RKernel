@@ -50,10 +50,18 @@ Kernel <- R6Class("Kernel",
       self$evaluator$startup()
       continue <- TRUE
       while(continue) {
-        req <- private$poll_request(c("hb","control","shell"))
+        self$run_services()
+        rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
+        if(length(self$services) > 0) 
+          poll_timeout <- rkernel_poll_timeout 
+        else 
+          poll_timeout <- -1L
+        req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
+        if(!length(req)) next
         #Sys.sleep(1)
         if(req$abort) break
         # print(req$socket_name)
+        if(!length(req$socket_name)) next
         continue <- switch(req$socket_name,
                hb=private$respond_hb(req),
                control=private$respond_control(req),
@@ -312,8 +320,26 @@ Kernel <- R6Class("Kernel",
       else message <- paste(message,...,collapse="")
       cat(crayon::bgBlue(format(Sys.time()),"\n",message,"\n"),file=stderr())
       tracingState(on=tstate)
+    },
+    
+    services = list(),
+    add_service = function(run,init=NULL){
+      if(is.function(init)) init()
+      if(is.function(run))
+        self$services <- append(self$services,run)
+    },
+    run_services = function(){
+      for(service in self$services)
+        service()
+    },
+    remove_service = function(run){
+      services_to_keep <- list()
+      for(i in seq_along(self$services)){
+        if(!identical(run,self$services[[i]])) 
+          services_to_keep[[i]] <- self$services[[i]]
+      }
+      self$services <- services_to_keep
     }
-
   ),
 
   private = list(
@@ -323,12 +349,13 @@ Kernel <- R6Class("Kernel",
     zmqctx = list(),
     conn_info = list(),
 
-    poll_request = function(sock_names) {
+    poll_request = function(sock_names,timeout=-1L) {
       POLLIN <- private$.pbd_env$ZMQ.PO$POLLIN
       req <- list()
       r <- tryCatch(
         zmq.poll(private$sockets[sock_names],
                  rep(POLLIN,length(sock_names)),
+                 timeout=timeout,
                  MC=private$.pbd_env$ZMQ.MC),
         interrupt = function(e) "SIGINT"
       )
@@ -519,7 +546,7 @@ Kernel <- R6Class("Kernel",
       # Empty message queue from shell
       POLLIN <- private$.pbd_env$ZMQ.PO$POLLIN
       repeat {
-        r <- zmq.poll(c(private$sockets$shell),POLLIN,0L)
+        r <- zmq.poll(c(private$sockets$shell),POLLIN,timeout=0L)
         if(bitwAnd(zmq.poll.get.revents(1),POLLIN)){
           request <- private$get_message("shell")
           request_type <- request$header$msg_type
