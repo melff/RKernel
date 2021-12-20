@@ -34,11 +34,12 @@ Bytes <- function(...)TraitInstance(...,Class=BytesClass)
 
 #' @export
 to_json.Bytes <- function(x){
-    value <- x$get()
+    #value <- x$get()
     #value <- jsonlite::toJSON(value,auto_unbox=TRUE)
     #value <- as.character(value)
     #value <- gsub("\"","",value)
     # value <- gsub("\\\\","\\",value)
     #paste0("data:image/png;base64,",value)
-    value
+    #value
+    NULL
 }

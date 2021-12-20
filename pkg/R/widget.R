@@ -71,9 +71,12 @@ WidgetClass <- R6Class_("Widget",
         self$comm <- manager$new_comm("jupyter.widget")
         self[["_model_id"]] <- self$comm$id
         state <- self$get_state()
-        data <- list(state=state,'buffer_paths'=list())
+        buffer_paths <- attr(state,"buffer_paths")
+        buffers <- attr(state,"buffers")
+        data <- list(state=state,
+                     buffer_paths=buffer_paths)
         metadata <- list(version=jupyter_widgets_protocol_version)
-        self$comm$open(data=data,metadata=metadata)
+        self$comm$open(data=data,metadata=metadata,buffers=buffers)
         self$comm$handlers$open <- self$handle_comm_opened
         self$comm$handlers$msg <- self$handle_comm_msg
       } else print(self[["_model_id"]])
@@ -89,16 +92,26 @@ WidgetClass <- R6Class_("Widget",
     },
     get_state = function(keys=NULL,drop_defaults=FALSE){
       state <- list()
+      buffer_paths <- list()
+      buffers <- list()
       if(is.null(keys))
         keys <- names(self$traits)
       for(k in keys){
         if(k %in% self$traits_to_sync &&
           !(drop_defaults && self$traits[[k]]$is_default())){
-          state[[k]] <- to_json(self$traits[[k]])
-          # state[[k]] <- to_json(self[[k]])
+          if(inherits(self$traits[[k]],"Bytes")){
+            buffer_paths <- append(buffer_paths,list(list(k)))
+            bytes <- self$traits$value$get()
+            buffers <- append(buffers,list(bytes))
+          }
+          else
+            state[[k]] <- to_json(self$traits[[k]])
         }
       }
-      return(state)
+      res <- structure(state,
+                       buffer_paths=buffer_paths,
+                       buffers=buffers)
+      return(res)
     },
     set_state = function(state){
       keys <- names(state)
@@ -109,17 +122,22 @@ WidgetClass <- R6Class_("Widget",
       }
     },
     send_state = function(keys=NULL,drop_defaults=FALSE){
-      # cat("send_state")
       state <- self$get_state(keys)
       if(length(state)){
+        buffer_paths <- attr(state,"buffer_paths")
+        buffers <- attr(state,"buffers")
         msg <- list(method="update",
-                    state=state)
-        self$`_send`(msg)
+                    state=state,
+                    buffer_paths=buffer_paths)
+        # log_out("send_state")
+        # log_out(msg,use.print=TRUE)
+        # log_out(buffers,use.print=TRUE)
+        self$`_send`(msg,buffers=buffers)
       }
     },
-    send = function(content){
+    send = function(content,buffers=NULL){
       msg <- list(method="custom","content"=content)
-      self$`_send`(msg)
+      self$`_send`(msg,buffers=buffers)
     },
     display_data = function(){
       data <- list("text/plain" = class(self)[1])
@@ -160,9 +178,13 @@ WidgetClass <- R6Class_("Widget",
       self$callbacks$register(handler,remove)
     },
     `_comm` = NULL,
-    `_send` = function(msg){
-      if(!is.null(self$`_comm`))
-        self$`_comm`$send(msg)
+    `_send` = function(msg,buffers=NULL){
+      if(!is.null(self$`_comm`)){
+        # log_out("_send")
+        # log_out(msg,use.print=TRUE)
+        # log_out(buffers,use.print=TRUE)
+        self$`_comm`$send(msg,buffers=buffers)
+      }
     }
   ),
   active = list(

@@ -270,17 +270,18 @@ Kernel <- R6Class("Kernel",
       private$comm_parent <- msg
     },
 
-    send_comm_msg = function(id,data,metadata=emptyNamedList){
+    send_comm_msg = function(id,data,metadata=emptyNamedList,buffers=NULL){
       private$send_message(type="comm_msg",debug=FALSE,
                    parent=private$comm_parent,
                    socket_name="iopub",
                    content=list(
                      comm_id=id,
                      data=data),
-                   metadata=metadata)
+                   metadata=metadata,
+                   buffers=buffers)
     },
     
-    send_comm_open = function(id,target_name,data,metadata=emptyNamedList){
+    send_comm_open = function(id,target_name,data,metadata=emptyNamedList,buffers=NULL){
       private$send_message(type="comm_open",debug=FALSE,
                    parent=private$comm_parent,
                    socket_name="iopub",
@@ -289,25 +290,27 @@ Kernel <- R6Class("Kernel",
                      target_name=target_name,
                      target_module=NULL,
                      data=data),
-                   metadata=metadata)
+                   metadata=metadata,
+                   buffers=buffers)
     },
     
-    send_comm_close = function(id,data,metadata=emptyNamedList){
+    send_comm_close = function(id,data,metadata=emptyNamedList,buffers=NULL){
       private$send_message(type="comm_close",debug=FALSE,
                    parent=private$comm_parent,
                    socket_name="iopub",
                    content=list(
                      comm_id=id,
                      data=data),
-                   metadata=metadata)
+                   metadata=metadata,
+                   buffers=buffers)
     },
     
     log_out = function(message,...,use.print=FALSE){
       tstate <- tracingState(on=FALSE)
       if(use.print)
-        message <- capture.output(print(message))
+        message <- paste(capture.output(print(message)),collapse="\n")
       else message <- paste(message,...,collapse="")
-      cat(crayon::bgBlue(format(Sys.time()),message,"\n"),file=stderr())
+      cat(crayon::bgBlue(format(Sys.time()),"\n",message,"\n"),file=stderr())
       tracingState(on=tstate)
     }
 
@@ -416,24 +419,32 @@ Kernel <- R6Class("Kernel",
       return(msg)
     },
 
-    send_message = function(type, parent, socket_name, debug=FALSE, content, metadata=emptyNamedList){
+    send_message = function(type,parent,socket_name,debug=FALSE,content,
+                            metadata=emptyNamedList,buffers=NULL){
       msg <- private$msg_new(type,parent,content,metadata)
        if(debug) {
          msg_body <- msg[c("header","parent_header","metadata","content")]
          msg_body <- to_json(msg_body,auto_unbox=TRUE)
          self$log_out(prettify(msg_body))
+         self$log_out(buffers,use.print=TRUE)
+         # buffers <- append(buffers,list(as.raw(1:7)))
        }
       socket <- private$sockets[[socket_name]]
       wire_out <- private$wire_pack(msg)
+      wire_out <- append(wire_out,buffers)
       #zmq.send.multipart(socket,wire_out,serialize=FALSE)
+      # if(debug) cat("\nSending message to socket", socket_name)
       l <- length(wire_out)
       for(i in 1:l){
         flag <- if(i < l) private$.pbd_env$ZMQ.SR$SNDMORE 
                 else private$.pbd_env$ZMQ.SR$BLOCK
-        #if(debug) print(wire_out[[i]])
+        # if(debug) {
+        #   cat("\n i =",i)
+        #   print(wire_out[[i]])
+        # }
         zmq.msg.send(wire_out[[i]],socket,flag=flag,serialize=FALSE)
       }
-      #cat("Sent message to socket", socket_name)
+      # if(debug) cat("\nSent message to socket", socket_name)
     },
 
     wire_unpack = function(wire_in){

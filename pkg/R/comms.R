@@ -108,14 +108,20 @@ CommManagerClass <- R6Class("CommManager",
                 private$evaluator$stream(text,stream="stdout")
             }
         },
-        send = function(id,data,metadata=emptyNamedList){
-            private$kernel$send_comm_msg(id,data,metadata)  
+        send = function(id,data,metadata=emptyNamedList,buffers=NULL){
+            # log_out("comm_manager$send")
+            # log_out(data,use.print=TRUE)
+            # log_out(buffers,use.print=TRUE)
+            private$kernel$send_comm_msg(id,data,metadata,buffers=buffers)  
         },
-        send_open = function(id,target_name,data,metadata=emptyNamedList){
-            private$kernel$send_comm_open(id,target_name,data,metadata)  
+        send_open = function(id,target_name,data,metadata=emptyNamedList,buffers=NULL){
+            # log_out("comm_manager$send_open")
+            # log_out(data,use.print=TRUE)
+            # log_out(buffers,use.print=TRUE)
+            private$kernel$send_comm_open(id,target_name,data,metadata,buffers=buffers)  
         },
-        send_close = function(id,target_name,data=emptyNamedList,metadata=emptyNamedList){
-            private$kernel$send_comm_close(id,data,metadata)  
+        send_close = function(id,target_name,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
+            private$kernel$send_comm_close(id,data,metadata,buffers=buffers)  
         },
         list_targets = function() return(private$handlers)
     ),
@@ -149,18 +155,24 @@ CommClass <- R6Class("Comm",
             self$handlers <- handlers
         },
 
-        open = function(data,metadata=emptyNamedList){
+        open = function(data,metadata=emptyNamedList,buffers=NULL){
+            # log_out("comm$open")
+            # log_out(data,use.print=TRUE)
+            # log_out(buffers,use.print=TRUE)
             id <- self$id
             target_name <- self$target_name
-            private$manager$send_open(id,target_name,data,metadata)
+            private$manager$send_open(id,target_name,data,metadata,buffers=buffers)
         },
-        send = function(data,metadata=emptyNamedList){
+        send = function(data,metadata=emptyNamedList,buffers=NULL){
+            # log_out("comm$send")
+            # log_out(data,use.print=TRUE)
+            # log_out(buffers,use.print=TRUE)
             id <- self$id
-            private$manager$send(id,data,metadata)
+            private$manager$send(id,data,metadata,buffers=buffers)
         },
-        close = function(data,metadata=emptyNamedList){
+        close = function(data,metadata=emptyNamedList,buffers=NULL){
             id <- self$id
-            private$manager$send_close(id,data,metadata)
+            private$manager$send_close(id,data,metadata,buffers=buffers)
         }
     ),
     
