@@ -123,9 +123,9 @@ WidgetClass <- R6Class_("Widget",
     },
     send_state = function(keys=NULL,drop_defaults=FALSE){
       state <- self$get_state(keys)
-      if(length(state)){
-        buffer_paths <- attr(state,"buffer_paths")
-        buffers <- attr(state,"buffers")
+      buffer_paths <- attr(state,"buffer_paths")
+      buffers <- attr(state,"buffers")
+      if(length(state) || length(buffer_paths)){
         msg <- list(method="update",
                     state=state,
                     buffer_paths=buffer_paths)
