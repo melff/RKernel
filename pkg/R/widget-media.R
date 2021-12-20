@@ -14,8 +14,8 @@ ImageWidgetClass <- R6Class_("ImageWidget",
         `_view_name` = structure(Unicode("ImageView"),sync=TRUE),
         `_model_name` = structure(Unicode("ImageModel"),sync=TRUE),
         format = structure(Unicode("png"),sync=TRUE),
-        width = structure(Unicode(),sync=TRUE),
-        height = structure(Unicode(),sync=TRUE)
+        width = structure(Unicode(""),sync=TRUE),
+        height = structure(Unicode(""),sync=TRUE)
     )
 )
 
