@@ -19,14 +19,14 @@ OutputWidgetClass <- R6Class_("OutputWidget",
 
         initialize = function(...){
             super$initialize(...)
-            self$env <- new.env()
+            self$envir <- new.env()
             self$context <- Context$new(text_callback=self$handle_text,
                                         message_callback=self$handle_message,
                                         warning_callback=self$handle_warning,
                                         error_callback=self$handle_error,
                                         value_callback=self$handle_value,
                                         graphics_callback=self$handle_graphics,
-                                        envir=self$env,
+                                        envir=self$envir,
                                         enclos=list(
                                             display=self$display
                                         ))
