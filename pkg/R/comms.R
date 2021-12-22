@@ -37,7 +37,7 @@ CommManagerClass <- R6Class("CommManager",
                 handlers <- private$handlers[[target_name]]
                 comm <- Comm(target_name,
                              id,
-                             self,
+                             private$kernel,
                              handlers)
                 self$comms[[id]] <- comm
                 return(comm)
@@ -147,12 +147,11 @@ CommClass <- R6Class("Comm",
         
         initialize = function(target_name,
                               id = uuid(),
-                              manager = get_comm_manager(),
-                              handlers = manager$get_handlers(target_name)){
+                              kernel = get_current_kernel(),
+                              handlers){
             self$target_name <- target_name
             self$id <- id
-            private$manager <- manager
-            self$handlers <- handlers
+            private$kernel <- kernel
         },
 
         open = function(data,metadata=emptyNamedList,buffers=NULL){
@@ -161,23 +160,23 @@ CommClass <- R6Class("Comm",
             # log_out(buffers,use.print=TRUE)
             id <- self$id
             target_name <- self$target_name
-            private$manager$send_open(id,target_name,data,metadata,buffers=buffers)
+            private$kernel$send_comm_open(id,target_name,data,metadata,buffers=buffers)  
         },
         send = function(data,metadata=emptyNamedList,buffers=NULL){
             # log_out("comm$send")
             # log_out(data,use.print=TRUE)
             # log_out(buffers,use.print=TRUE)
             id <- self$id
-            private$manager$send(id,data,metadata,buffers=buffers)
+            private$kernel$send_comm_msg(id,data,metadata,buffers=buffers)  
         },
         close = function(data,metadata=emptyNamedList,buffers=NULL){
             id <- self$id
-            private$manager$send_close(id,data,metadata,buffers=buffers)
+            private$kernel$send_comm_close(id,data,metadata,buffers=buffers)  
         }
     ),
     
     private = list(
-        manager = list()
+        kernel = list()
     )
 )
 #' @export
