@@ -18,7 +18,7 @@ IntSliderClass <- R6Class_("IntSlider",
        orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
        readout = structure(Boolean(TRUE),sync=TRUE),
        readout_format = structure(Unicode("d"),sync=TRUE),
-       continuous_update = structure(Boolean(FALSE),sync=TRUE),
+       continuous_update = structure(Boolean(TRUE),sync=TRUE),
        disabled = structure(Boolean(FALSE),sync=TRUE),
        style = structure(R6Instance(SliderStyleClass),sync=TRUE)
    ))
@@ -42,7 +42,7 @@ IntRangeSliderClass <- R6Class_("IntRangeSlider",
        orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
        readout = structure(Boolean(TRUE),sync=TRUE),
        readout_format = structure(Unicode("d"),sync=TRUE),
-       continuous_update = structure(Boolean(FALSE),sync=TRUE),
+       continuous_update = structure(Boolean(TRUE),sync=TRUE),
        disabled = structure(Boolean(FALSE),sync=TRUE),
        style = structure(R6Instance(SliderStyleClass),sync=TRUE)
    ))
@@ -67,7 +67,7 @@ FloatSliderClass <- R6Class_("FloatSlider",
     orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
     readout = structure(Boolean(TRUE),sync=TRUE),
     readout_format = structure(Unicode(".2f"),sync=TRUE),
-    continuous_update = structure(Boolean(FALSE),sync=TRUE),
+    continuous_update = structure(Boolean(TRUE),sync=TRUE),
     disabled = structure(Boolean(FALSE),sync=TRUE),
     style = structure(R6Instance(SliderStyleClass),sync=TRUE)
    ))
@@ -89,7 +89,7 @@ FloatRangeSliderClass <- R6Class_("FloatRangeSlider",
        orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
        readout = structure(Boolean(TRUE),sync=TRUE),
        readout_format = structure(Unicode(".2f"),sync=TRUE),
-       continuous_update = structure(Boolean(FALSE),sync=TRUE),
+       continuous_update = structure(Boolean(TRUE),sync=TRUE),
        disabled = structure(Boolean(FALSE),sync=TRUE),
        style = structure(R6Instance(SliderStyleClass),sync=TRUE)
    ))
@@ -112,7 +112,7 @@ FloatLogSliderClass <- R6Class_("FloatLogSlider",
     orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
     readout = structure(Boolean(TRUE),sync=TRUE),
     readout_format = structure(Unicode(".3g"),sync=TRUE),
-    continuous_update = structure(Boolean(FALSE),sync=TRUE),
+    continuous_update = structure(Boolean(TRUE),sync=TRUE),
     disabled = structure(Boolean(FALSE),sync=TRUE),
     base = structure(Float(10.0),sync=TRUE),
     style = structure(R6Instance(SliderStyleClass),sync=TRUE)
