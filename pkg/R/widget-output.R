@@ -15,7 +15,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         outputs = structure(List(),sync=TRUE),
 
         context = NULL,
-        env = NULL,
+        envir = NULL,
 
         initialize = function(...){
             super$initialize(...)
@@ -202,6 +202,10 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             }
             else
                 character(0)
+        },
+        clear = function(){
+            self$display_index <- integer(0)
+            self$outputs <- list()
         }
     )
 )
