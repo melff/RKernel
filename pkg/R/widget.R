@@ -42,7 +42,6 @@ WidgetClass <- R6Class_("Widget",
     `_view_module_version` = structure(Unicode(character(0)),sync=TRUE),
     `_view_count` = structure(Unicode(integer(0)),sync=TRUE),
     traits_to_sync = character(0),
-    callbacks = list(),
     initialize = function(...,open=TRUE){
       super$initialize(...)
       for(tn in names(self$traits)){
@@ -55,7 +54,6 @@ WidgetClass <- R6Class_("Widget",
           self$observe(tn,handler)
         }
       }
-      self$callbacks <- CallbackDispatcher()
       kernel <- get_current_kernel()
       #browser()
       if(length(kernel)){
@@ -147,6 +145,7 @@ WidgetClass <- R6Class_("Widget",
           version_minor = 0,
           model_id = self[["_model_id"]]
         )
+      self$handle_displayed()
       return(data)
     },
     handle_comm_opened = function(comm,data){
@@ -154,7 +153,9 @@ WidgetClass <- R6Class_("Widget",
     },
     handle_comm_msg = function(comm,data){
       # print(data)
-      # cat("=====================\n")
+      # log_out("=====================\n")
+      # log_out(data,use.print=TRUE)
+      # log_out(str(data),use.print=TRUE)
       method <- data$method
       if(method=="update"){
         # cat("------------------\n")
@@ -170,12 +171,39 @@ WidgetClass <- R6Class_("Widget",
       }
     },
     handle_custom_msg = function(content){
-      value <- self$callbacks$run(self,content)
-      if(length(value))
-        return(value)
+      if("event" %in% names(content)){
+        event <- content$event
+        args <- content[names(content)!="event"]
+        self$handle_event(event,args)
+      } else
+        self$custom_msg_callbacks$run(content)
     },
+    custom_msg_callbacks = list(),
     on_msg = function(handler,remove=FALSE){
-      self$callbacks$register(handler,remove)
+      if(!length(self$custom_msg_callbacks))
+        self$custom_msg_callbacks <- CallbackDispatcher()
+      self$custom_msg_callbacks$register(handler,remove)
+    },
+    event_callbacks = list(),
+    on_event = function(event,handler,remove=FALSE){
+      if(!event %in% names(self$event_callbacks))
+        self$event_callbacks[[event]] <- CallbackDispatcher()
+      self$event_callbacks[[event]]$register(handler,remove)
+    },
+    handle_event = function(event,args){
+      event_callbacks <- self$event_callbacks[[event]]
+      if(inherits(event_callbacks,"CallbackDispatcher"))
+        do.call(event_callbacks$run,args)
+    },
+    displayed_callbacks = list(),
+    on_displayed = function(handler,remove=FALSE){
+      if(!length(self$displayed_callbacks))
+        self$displayed_callbacks <- CallbackDispatcher()
+      self$displayed_callbacks$register(handler,remove)
+    },
+    handle_displayed = function(){
+      if(inherits(self$displayed_callbacks,"CallbackDispatcher"))
+        self$displayed_callbacks$run()
     },
     `_comm` = NULL,
     `_send` = function(msg,buffers=NULL){
