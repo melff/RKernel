@@ -302,7 +302,7 @@ Kernel <- R6Class("Kernel",
                    buffers=buffers)
     },
     
-    send_comm_close = function(id,data,metadata=emptyNamedList,buffers=NULL){
+    send_comm_close = function(id,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
       private$send_message(type="comm_close",debug=FALSE,
                    parent=private$comm_parent,
                    socket_name="iopub",
