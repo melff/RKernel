@@ -339,7 +339,9 @@ Kernel <- R6Class("Kernel",
           services_to_keep[[i]] <- self$services[[i]]
       }
       self$services <- services_to_keep
-    }
+    },
+
+    current_request = list()
   ),
 
   private = list(
@@ -391,6 +393,7 @@ Kernel <- R6Class("Kernel",
 
     respond_shell = function(req,debug=FALSE){
       msg <- private$get_message("shell")
+      self$current_request <- msg
       if(!length(msg)) return(TRUE)
       private$send_message(type="status",
                            parent=msg,
