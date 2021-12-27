@@ -16,6 +16,11 @@ BoxClass <- R6Class_("Box",
             children <- children[[1]]
         self$children <- children
         #self$send_state()
+        self$on_displayed(self$notify_children_displayed)
+    },
+    notify_children_displayed = function(){
+        for(child in self$children)
+            child$handle_displayed()
     }
    )
 )
