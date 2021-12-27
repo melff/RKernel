@@ -1,3 +1,4 @@
+#' @importFrom uuid UUIDgenerate
 #' @include widget-dom.R
 
 #' @export

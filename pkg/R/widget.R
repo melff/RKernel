@@ -229,7 +229,7 @@ Widget <- function(...) WidgetClass$new(...)
 #' @export
 display_data.Widget <- function(x,...,
                            metadata=emptyNamedList,
-                           id=uuid::UUIDgenerate(),
+                           id=uuid(),
                            update=FALSE){
   d <- list(data=x$display_data())
   d$metadata <- metadata

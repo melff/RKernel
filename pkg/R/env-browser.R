@@ -1,4 +1,5 @@
 #' @importFrom htmltools htmlEscape
+#' @importFrom uuid UUIDgenerate
 
 str_ <- function(nm,envir){
     res <- capture.output(str(get(nm,envir)))
@@ -26,7 +27,7 @@ ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern,
 
 #' @export
 browse_env_fixed <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
-    mode = "any", id="browse_env", tgl_id=uuid::UUIDgenerate(),update=FALSE){
+    mode = "any", id="browse_env", tgl_id=UUIDgenerate(),update=FALSE){
     if (missing(envir)) 
         envir <- as.environment(pos)
     table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
@@ -85,7 +86,7 @@ Javascript(script)
 }
 
 browse_env <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
-    mode = "any", id=uuid::UUIDgenerate()){
+    mode = "any", id=UUIDgenerate()){
     if (missing(envir)) 
         envir <- as.environment(pos)
     table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,

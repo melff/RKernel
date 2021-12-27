@@ -1,4 +1,6 @@
-html_table <- function(x,id=uuid::UUIDgenerate(),
+#' @importFrom uuid UUIDgenerate
+
+html_table <- function(x,id=UUIDgenerate(),
                        use.rownames=TRUE,
                        html_class="display", 
                        expand=FALSE){
@@ -35,7 +37,7 @@ init_scrolling_table <- function(){
     raw_html(scrolling_table_css)
 }
 
-scrolling_table <- function(x,id=uuid::UUIDgenerate(),
+scrolling_table <- function(x,id=UUIDgenerate(),
                        use.rownames=TRUE,
                        expand=FALSE,
                        html_class=NULL,

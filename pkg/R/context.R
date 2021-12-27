@@ -1,3 +1,5 @@
+#' @importFrom uuid UUIDgenerate
+
 #' @export
 Context <- R6Class("Context",
    public = list(

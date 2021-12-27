@@ -1,4 +1,5 @@
 #' @importFrom repr mime2repr
+#' @importFrom uuid UUIDgenerate
 
 #' @export
 display <- function(...){
@@ -14,7 +15,7 @@ display_data <- function(x,...) UseMethod("display_data")
 #' @export
 display_data.default <- function(x,...,
                             metadata=emptyNamedList,
-                            id=uuid::UUIDgenerate(),
+                            id=UUIDgenerate(),
                             update=FALSE){
 
     if(missing(x)){
@@ -48,7 +49,7 @@ display_data.default <- function(x,...,
 #' @export
 display_data.htmlwidget <- function(x,...,
                             metadata=emptyNamedList,
-                            id=uuid::UUIDgenerate(),
+                            id=UUIDgenerate(),
                             update=FALSE){
 
     hash <- digest::digest(as.character(x))
@@ -109,7 +110,7 @@ display_data.recordedplot <- function(x,
                                       scale=getOption("jupyter.plot.scale",.5),
                                       units=getOption("jupyter.plot.units","in"),
                                       metadata=emptyNamedList,
-                                      id=uuid::UUIDgenerate(),
+                                      id=UUIDgenerate(),
                                       update=FALSE){
 
     rkernel_graphics_types <- getOption("jupyter.graphics.types",
@@ -232,7 +233,7 @@ remove_paged_classes <- function(x){
 
 #' @importFrom tools Rd2HTML Rd2txt Rd2latex
 display_data.help_files_with_topic <- function(x,...,
-                                          id=uuid::UUIDgenerate(),
+                                          id=UUIDgenerate(),
                                           update=FALSE){
 
     paths <- as.character(x)
@@ -302,7 +303,7 @@ display_data.help_files_with_topic <- function(x,...,
 
 #' @export
 display_data.hsearch <- function(x,..., 
-    id=uuid::UUIDgenerate(), 
+    id=UUIDgenerate(), 
     update=FALSE){
     
     matches <- x$matches
@@ -397,7 +398,7 @@ LaTeXMath <- function(text){
 }
 
 #' @export
-raw_html <- function(text,id=uuid::UUIDgenerate(),update=FALSE){
+raw_html <- function(text,id=UUIDgenerate(),update=FALSE){
     text <- paste(text,collapse="\n")
     display_data("text/plain"="",
             "text/html"=text,
@@ -409,7 +410,7 @@ raw_html <- function(text,id=uuid::UUIDgenerate(),update=FALSE){
 #' @export
 display_data.data.frame <- function(x,...,
                             metadata=emptyNamedList,
-                            id=uuid::UUIDgenerate(),
+                            id=UUIDgenerate(),
                             update=FALSE){
 
     rkernel_mime_types <- getOption("rkernel_mime_types",
@@ -452,7 +453,7 @@ add_to_head <- function(code){
 #' @export
 display_data.html_elem <- function(x,...,
                               metadata=emptyNamedList,
-                              id=uuid::UUIDgenerate(),
+                              id=UUIDgenerate(),
                               update=FALSE){
     text <- as.character(x)
     text <- paste(text,collapse="\n")
@@ -466,7 +467,7 @@ display_data.html_elem <- function(x,...,
 #' @export
 display_data.shiny.tag <- function(x,...,
                               metadata=emptyNamedList,
-                              id=uuid::UUIDgenerate(),
+                              id=UUIDgenerate(),
                               update=FALSE){
     text <- as.character(x)
     text <- paste(text,collapse="\n")
