@@ -45,8 +45,8 @@ CommManagerClass <- R6Class("CommManager",
             else warning(sprintf("Comm target '%s' not found",target_name))
         },
         handle_open = function(target_name,id,data){
-            private$kernel$log_out("handle_open")
-            private$kernel$log_out(data,use.print=TRUE)
+            # private$kernel$log_out("handle_open")
+            # private$kernel$log_out(data,use.print=TRUE)
             if(target_name %in% names(private$handlers)){
                 handlers <- private$handlers[[target_name]]
                 comm <- Comm(target_name,id,self,handlers)
@@ -67,13 +67,13 @@ CommManagerClass <- R6Class("CommManager",
                 self$comms[[id]] <- comm
             }
             else {
-                private$kernel$log_out("send_close")
+                # private$kernel$log_out("send_close")
                 self$send_close(id,target_name)
             }
         },
         handle_close = function(id,data){
-            private$kernel$log_out("handle_close")
-            private$kernel$log_out(data,use.print=TRUE)
+            # private$kernel$log_out("handle_close")
+            # private$kernel$log_out(data,use.print=TRUE)
             comm <- self$comms[[id]]
             handlers <- comm$handlers
             comm$data <- data

@@ -20,6 +20,7 @@ TraitClass <- R6Class_("Trait",
             self$value <- value
             if(length(self$observers) && notify){
                 for(observer in self$observers){
+                    # log_out(sprintf("Calling observer for name '%s' value %s",self$name,value))
                     if(is.function(observer))
                         observer(self$name,self,value)
                 }
@@ -106,7 +107,7 @@ HasTraits <- R6Class_("HasTraits",
           }
       },
       notify = function(tn,value){
-          # cat("notify",tn,value)
+          # log_out(sprintf("notify %s = %s",tn,value))
           if(length(self$observers) && tn %in% names(self$observers)){
               observers <- self$observers[[tn]]
               for(cb in observers){

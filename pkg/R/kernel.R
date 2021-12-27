@@ -453,8 +453,7 @@ Kernel <- R6Class("Kernel",
          msg_body <- msg[c("header","parent_header","metadata","content")]
          msg_body <- to_json(msg_body,auto_unbox=TRUE)
          self$log_out(prettify(msg_body))
-         self$log_out(buffers,use.print=TRUE)
-         # buffers <- append(buffers,list(as.raw(1:7)))
+         # self$log_out(buffers,use.print=TRUE)
        }
       socket <- private$sockets[[socket_name]]
       wire_out <- private$wire_pack(msg)
