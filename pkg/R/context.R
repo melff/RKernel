@@ -266,11 +266,14 @@ Context <- R6Class("Context",
 
           attach(self$enclos,name="RKernel::Context",
                  warn.conflicts=FALSE)
+          self$run_enter_hooks()
 
       },
       exit = function(){
           
           detach("RKernel::Context")
+          self$run_exit_hooks()
+          # log_out(search(),use.print=TRUE)
           sink()
           options(device=self$orig.device)
           if(self$orig.dev_num > 1 && self$orig.dev_num %in% dev.list()) dev.set(self$orig.dev_num)
@@ -283,6 +286,28 @@ Context <- R6Class("Context",
           suppressMessages(untrace(cat))
           suppressMessages(untrace(str))
           suppressMessages(untrace(print))
+      },
+
+      enter_hooks = list(),
+      run_enter_hooks = function(){
+          if(inherits(self$enter_hooks,"CallbackDispatcher"))
+              self$enter_hooks$run()
+      },
+      on_enter = function(handler,remove=FALSE){
+          if(!length(self$enter_hooks))
+              self$enter_hooks <- CallbackDispatcher()
+          self$enter_hooks$register(handler,remove)
+      },
+
+      exit_hooks = list(),
+      run_exit_hooks = function(){
+          if(inherits(self$exit_hooks,"CallbackDispatcher"))
+              self$exit_hooks$run()
+      },
+      on_exit = function(handler,remove=FALSE){
+          if(!length(self$exit_hooks))
+              self$exit_hooks <- CallbackDispatcher()
+          self$exit_hooks$register(handler,remove)
       }
    )
 )
