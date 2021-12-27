@@ -1,4 +1,4 @@
-#' @include json.R
+#' @include json.R utils.R
 
 #' @export
 CallbackDispatcherClass <- R6Class("CallbackDispatcher",
@@ -17,8 +17,9 @@ CallbackDispatcherClass <- R6Class("CallbackDispatcher",
         self$callbacks <- new
       },
       run = function(...){
+        # log_out(self$callbacks,use.print=TRUE)
         for(cb in self$callbacks){
-            cb(...)
+            if(is.function(cb))cb(...)
         }
       }
     )
@@ -44,13 +45,14 @@ WidgetClass <- R6Class_("Widget",
     traits_to_sync = character(0),
     initialize = function(...,open=TRUE){
       super$initialize(...)
+      handler <- function(tn,trait,value){
+            # print(str(list(tn=tn,trait=trait,value=value)))
+            # log_out(sprintf("observed change in trait '%s' to value '%s'",tn,value))
+            self$send_state(tn)
+      }
       for(tn in names(self$traits)){
         if(isTRUE(attr(self$traits[[tn]],"sync"))){
           self$traits_to_sync <- append(self$traits_to_sync,tn)
-          handler <- function(tn,trait,value){
-            # print(str(list(tn=tn,trait=trait,value=value)))
-            self$send_state(tn)
-          }
           self$observe(tn,handler)
         }
       }
