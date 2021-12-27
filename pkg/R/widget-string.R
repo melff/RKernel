@@ -3,7 +3,7 @@
 
 #' @export
 StringWidgetClass <- R6Class_("StringWidget",
-   inherit = DescriptionWidgetClass,
+   inherit = ValueWidgetClass,
    public = list(
     `_model_name` = structure(Unicode("StringModel"),sync=TRUE),
     value = structure(Unicode(character(0)),sync=TRUE),

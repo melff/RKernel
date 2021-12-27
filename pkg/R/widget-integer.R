@@ -1,14 +1,10 @@
-#' @include widget.R widget-description.R
+#' @include widget-value.R
 
 #' @export
 IntegerWidgetClass <- R6Class_("IntegerWidget",
-  inherit = DescriptionWidgetClass,
+  inherit = ValueWidgetClass,
   public = list(
-      value = structure(Integer(0L),sync=TRUE),
-      initialize = function(value,...){
-          super$initialize(...)
-          self$value <- value
-      }
+      value = structure(Integer(0L),sync=TRUE)
   )
 )
 
@@ -17,7 +13,7 @@ IntegerWidget <- function(value,...) IntegerWidgetClass$new(value=value,...)
 
 #' @export
 BoundedIntegerWidgetClass <- R6Class_("BoundedIntegerWidget",
-  inherit = DescriptionWidgetClass,
+  inherit = ValueWidgetClass,
   public = list(
       value = structure(Integer(0L),sync=TRUE),
       min = structure(Integer(0L),sync=TRUE),
@@ -59,7 +55,7 @@ BoundedIntegerWidget <- function(value,min,max,...)
 
 #' @export
 BoundedIntRangeWidgetClass <- R6Class_("BoundedIntRangeWidget",
-  inherit = DescriptionWidgetClass,
+  inherit = ValueWidgetClass,
   public = list(
       value = structure(Integer(c(0L,1L)),sync=TRUE),
       min = structure(Integer(0L),sync=TRUE),

@@ -1,8 +1,8 @@
-#' @include widget.R widget-description.R
+#' @include widget-value.R
 
 #' @export
 FloatWidgetClass <- R6Class_("FloatWidget",
-  inherit = DescriptionWidgetClass,
+  inherit = ValueWidgetClass,
   public = list(
       value = structure(Float(0L),sync=TRUE))
 )
@@ -12,7 +12,7 @@ FloatWidget <- function(value,...) FloatWidgetClass$new(value=value,...)
 
 #' @export
 BoundedFloatWidgetClass <- R6Class_("BoundedFloatWidget",
-  inherit = DescriptionWidgetClass,
+  inherit = ValueWidgetClass,
   public = list(
     value = structure(Float(0.0),sync=TRUE),
     min = structure(Float(0.0),sync=TRUE),
@@ -53,7 +53,7 @@ BoundedFloatWidget <- function(value,min,max,...)
 
 #' @export
 BoundedLogFloatWidgetClass <- R6Class_("BoundedLogFloatWidget",
-  inherit = DescriptionWidgetClass,
+  inherit = ValueWidgetClass,
   public = list(
     value = structure(Float(1.0),sync=TRUE),
     min = structure(Float(0.0),sync=TRUE),
@@ -96,7 +96,7 @@ BoundedLogFloatWidget <- function(value,min,max,base,...)
 
 #' @export
 BoundedFloatRangeWidgetClass <- R6Class_("BoundedFloatRangeWidget",
-  inherit = DescriptionWidgetClass,
+  inherit = ValueWidgetClass,
   public = list(
       value = structure(Float(c(0,1)),sync=TRUE),
       min = structure(Float(0),sync=TRUE),

@@ -2,7 +2,7 @@
 
 #' @export
 SelectionWidgetClass <- R6Class_("SelectionWidget",
-  inherit = DescriptionWidgetClass,
+  inherit = ValueWidgetClass,
   public = list(
       `_options_labels` = structure(Unicode(length=NA),sync=TRUE),
       `_options_values` = list(),

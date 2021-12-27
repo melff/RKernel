@@ -4,8 +4,12 @@
 MediaWidgetClass <- R6Class_("MediaWidget",
     inherit = DOMWidgetClass,
     public = list(
-        value = structure(Bytes(),sync=TRUE)
-))
+      value = structure(Bytes(),sync=TRUE),
+      on_change = function(handler,remove=FALSE){
+          self$observe("value",handler,remove)
+      }
+    )
+)
 
 #' @export
 ImageWidgetClass <- R6Class_("ImageWidget",

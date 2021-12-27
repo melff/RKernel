@@ -1,8 +1,8 @@
-#' @include widget.R widget-description.R
+#' @include widget-value.R
 
 #' @export
 CheckboxClass <- R6Class_("Checkbox",
-   inherit = DescriptionWidgetClass,
+   inherit = ValueWidgetClass,
    public = list(
     `_model_name` = structure(Unicode("CheckboxModel"),sync=TRUE),
     `_view_name` = structure(Unicode("CheckboxView"),sync=TRUE),
@@ -17,7 +17,7 @@ Checkbox <- function(...) CheckboxClass$new(...)
 
 #' @export
 ToggleButtonClass <- R6Class_("ToggleButton",
-   inherit = DescriptionWidgetClass,
+   inherit = ValueWidgetClass,
    public = list(
     `_model_name` = structure(Unicode("ToggleButtonModel"),sync=TRUE),
     `_view_name` = structure(Unicode("ToggleButtonView"),sync=TRUE),
@@ -35,7 +35,7 @@ ToggleButton <- function(...) ToggleButtonClass$new(...)
 
 #' @export
 ValidClass <- R6Class_("Valid",
-   inherit = DescriptionWidgetClass,
+   inherit = ValueWidgetClass,
    public = list(
     `_model_name` = structure(Unicode("ValidModel"),sync=TRUE),
     `_view_name` = structure(Unicode("ValidView"),sync=TRUE),
