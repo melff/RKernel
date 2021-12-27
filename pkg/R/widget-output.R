@@ -20,15 +20,15 @@ OutputWidgetClass <- R6Class_("OutputWidget",
 
         initialize = function(...){
             super$initialize(...)
-            self$envir <- new.env()
             self$context <- Context$new(text_callback=self$handle_text,
                                         message_callback=self$handle_message,
                                         warning_callback=self$handle_warning,
                                         error_callback=self$handle_error,
                                         value_callback=self$handle_value,
                                         graphics_callback=self$handle_graphics,
-                                        envir=self$envir,
-                                        enclos=list(
+                                        graphics_callback=handle_graphics,
+                                        envir=new.env(),
+                                        attachment=list(
                                             display=self$display
                                         ))
         },
@@ -216,4 +216,5 @@ OutputWidget <- function(...) OutputWidgetClass$new(...)
 
 
 #' @export
-with.OutputWidget <- function(data,expr,...) data$context$eval(substitute(expr))
+with.OutputWidget <- function(data,expr,enclos=parent.frame(),...)
+    data$context$eval(substitute(expr),enclos=enclos)

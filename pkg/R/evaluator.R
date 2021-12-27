@@ -79,7 +79,7 @@ Evaluator <- R6Class("Evaluator",
                                         value_callback=self$handle_value,
                                         graphics_callback=self$handle_graphics,
                                         envir=.GlobalEnv,
-                                        enclos=self$env)
+                                        attachment=self$env)
             
             self$start_help_system()
             assign("help_proc",self$help_proc,envir=self$env)
@@ -164,7 +164,7 @@ Evaluator <- R6Class("Evaluator",
             }
             else {
                 self$new_cell <- TRUE
-                self$context$evaluate(expressions)
+                self$context$evaluate(expressions,envir=.GlobalEnv)
 
                 if(length(self$saved.options)){
                     op <- self$saved.options

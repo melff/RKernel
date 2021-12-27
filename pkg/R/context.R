@@ -14,8 +14,11 @@ Context <- R6Class("Context",
        prev_text_output = NULL,
 
        envir = NULL,
-       enclos = NULL,
+       attachment = NULL,
 
+       id = character(0),
+       name = character(0),
+       
        initialize = function(text_callback=NULL,
                              message_callback=NULL,
                              warning_callback=NULL,
@@ -23,7 +26,7 @@ Context <- R6Class("Context",
                              value_callback=NULL,
                              graphics_callback=NULL,
                              envir=new.env(),
-                             enclos=NULL){
+                             attachment=new.env()){
            self$text_callback <- text_callback
            self$message_callback <- message_callback
            self$warning_callback <- warning_callback
@@ -33,30 +36,31 @@ Context <- R6Class("Context",
            self$connection <- textConnection(NULL,"wr",local=TRUE)
            self$init_graphics()
            self$envir <- envir
-           if(is.environment(enclos))
-               self$enclos <- enclos
-           else self$enclos <- new.env()
-           if(is.list(enclos)){
-               for(n in names(enclos))
-                   self$enclos[[n]] <- self$enclos[[n]]
-           }
-           # log_out(ls(enclos),use.print=TRUE)
+           self$attachment <- attachment
+           self$id <- UUIDgenerate()
+           self$name <- paste0("RKernel-context:",self$id)
        },
 
-       do = function(...){
+       do = function(...,envir=list(),enclos=parent.frame()){
            expr <- substitute(...)
            if(class(expr)=="{"){
                expressions <- as.list(expr[-1])
-               self$evaluate(expressions)
+               self$evaluate(expressions,enclos=enclos)
            }
            else
-               self$eval(expr)
+               self$eval(expr,envir=envir,enclos=enclos)
        },
-       eval = function(expr) self$evaluate(list(expr)),
-       evaluate = function(expressions){
+       eval = function(expr,envir=list(),enclos=parent.frame())
+           self$evaluate(list(expr),enclos=enclos),
+       evaluate = function(expressions,envir=list(),enclos=parent.frame()){
+           if(is.null(envir))
+               envir <- self$envir
            self$enter()
            # n <- length(expressions)
            # i <- 0
+           # log_out("context$evaluate")
+           # log_out(enclos,use.print=TRUE)
+           # log_out(ls(enclos),use.print=TRUE)
            for(expr in expressions){
                # i <- i + 1
                # log_out(sprintf("exressions[[%d]]",i))
@@ -64,7 +68,9 @@ Context <- R6Class("Context",
                ev <- list(value = NULL, visible = FALSE)
                ### See 'evaluate_call' in package "evaluate" (Yihui Xie et al.)
                try(ev <- withCallingHandlers(
-                       withVisible(eval(expr,envir=self$envir)),
+                       withVisible(eval(expr,
+                                        envir=envir,
+                                        enclos=enclos)),
                        error=self$eHandler,
                        warning=self$wHandler,
                        message=self$mHandler),silent=TRUE)
@@ -235,7 +241,8 @@ Context <- R6Class("Context",
 
       orig.device = NULL,
       orig.dev_num = 1,
-      enter = function(){
+
+      enter = function(enclos=parent.frame()){
 
           sink(self$connection,split=FALSE)
           self$orig.device <- options(device=self$device)
@@ -264,16 +271,22 @@ Context <- R6Class("Context",
                                  exit=self$str_exit_hook,
                                  print=FALSE))
 
-          attach(self$enclos,name="RKernel::Context",
+          attach(self$attachment,name=self$name,
                  warn.conflicts=FALSE)
+          # log_out(sprintf("Attached %s",self$name))
+          
           self$run_enter_hooks()
 
       },
       exit = function(){
           
-          detach("RKernel::Context")
           self$run_exit_hooks()
           # log_out(search(),use.print=TRUE)
+          if(self$name %in% search()){
+              # log_out(sprintf("Detaching %s",self$name))
+              context_pos <- match(self$name,search())
+              detach(pos=context_pos)
+          }
           sink()
           options(device=self$orig.device)
           if(self$orig.dev_num > 1 && self$orig.dev_num %in% dev.list()) dev.set(self$orig.dev_num)
@@ -349,4 +362,9 @@ get_name_el <- function(x){
 }
 
 #' @export
-with.Context <- function(data,expr,...) data$eval(substitute(expr))
+with.Context <- function(data,expr,enclos=parent.frame(),...){
+    # log_out("with.Context")
+    # log_out(enclos,use.print=TRUE)
+    # log_out(ls(enclos),use.print=TRUE)
+    data$eval(substitute(expr),enclos=enclos)
+}
