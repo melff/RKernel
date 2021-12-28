@@ -2,6 +2,13 @@
 #' @importFrom svglite svgstring
 #' @importFrom grDevices png
 
+check_help_port <- function(port){
+    url <- sprintf("http://127.0.0.1:%d/doc/html/index.html",port)
+    res <- try(curlGetHeaders(url))
+    if(inherits(res,"try-error")) return(FALSE)
+    if(attr(res,"status") == 200) return(TRUE)
+    return(FALSE)
+}
 
 #' @export
 Evaluator <- R6Class("Evaluator",
@@ -94,21 +101,27 @@ Evaluator <- R6Class("Evaluator",
         help_proc = integer(),
         help_url = character(),
 
-        start_help_system = function(help_port=NULL){
-            if(is.null(help_port)){
-                repeat{
-                    help_port <- tools::startDynamicHelp(TRUE)
-                    if(help_port > 0) break
-                }
-                port0 <- tools::startDynamicHelp(FALSE)
-                stopifnot(port0 == 0)
-            }
+        start_help_system = function(help_port=getOption("help.port",10001)){
+            # if(is.null(help_port)){
+            #     repeat{
+            #         help_port <- tools::startDynamicHelp(TRUE)
+            #         if(help_port > 0) break
+            #     }
+            #     port0 <- tools::startDynamicHelp(FALSE)
+            #     stopifnot(port0 == 0)
+            # }
             help_port <- as.integer(help_port)
-            self$help_proc  <- callr::r_bg(function(port){
-                options(help.ports=port)
-                tools::startDynamicHelp(TRUE)
-                repeat Sys.sleep(60)
-            },args=list(port=help_port))
+            if(!check_help_port(help_port)){
+                help_proc  <- callr::r_bg(function(port){
+                    options(help.ports=port)
+                    tools::startDynamicHelp(TRUE)
+                    repeat Sys.sleep(60)
+                },args=list(port=help_port))
+                repeat{
+                    if(help_proc$is_alive()) break
+                }
+                self$help_proc <- help_proc
+            }
             self$help_port <- help_port
             self$help_url <- paste0("http://127.0.0.1:",help_port)
         },
