@@ -35,6 +35,7 @@ Evaluator <- R6Class("Evaluator",
             #pos <- match("RKernel",search())
             assign("q",self$quit,envir=self$env)
             assign("quit",self$quit,envir=self$env)
+            assign("interactive",function()TRUE,envir=self$env)
             # assign("cell.options",self$cell.options,pos=pos)
             # assign("cell.par",self$cell.par,pos=pos)
             # 
