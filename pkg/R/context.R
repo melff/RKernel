@@ -130,7 +130,7 @@ Context <- R6Class("Context",
           if(self$graphics_active()){
               self$last_plot <- self$current_plot
               plt <- recordPlot()
-              do_send_plot <- !plot_is_empty(plt) && !identical(self$last_plot,plt) 
+              do_send_plot <- !plot_is_empty(plt) && !identical(self$last_plot,plt) && par("page")
               if(do_send_plot) {
                   update <- !self$plot_new_called
                   # log_out("update =",format(update))
@@ -145,7 +145,7 @@ Context <- R6Class("Context",
       graphics_par_usr = numeric(0),
 
       before_plot_new_hook = function(...){
-          if(self$graphics_active()){
+          if(self$graphics_active() && par("page")){
               self$handle_text()
           }
       },
