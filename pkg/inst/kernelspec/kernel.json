@@ -1,7 +1,5 @@
 {"argv": ["R",
-          "--no-restore-data",  
-          "--no-save", 
-          "--slave", 
+          "--vanilla", 
           "-e", 
           "RKernel::main()", 
           "--args", 
