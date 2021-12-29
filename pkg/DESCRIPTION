@@ -32,6 +32,7 @@ RoxygenNote: 7.1.1
 Collate: 
     'View.R'
     'aa-versions.R'
+    'callbacks.R'
     'comms.R'
     'context.R'
     'display.R'
