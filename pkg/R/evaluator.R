@@ -191,6 +191,8 @@ Evaluator <- R6Class("Evaluator",
                     self$saved.parms <- list()
                     do.call("par",op)
                 }
+
+                self$run_callbacks()
             }
         },
 
@@ -583,8 +585,18 @@ Evaluator <- R6Class("Evaluator",
         init_env_browser = function(){
             d <- init_env_browser()
             private$kernel$display_data(d$data)
-        }
+        },
 
+        callbacks = NULL,
+        run_callbacks = function(){
+            if(is.null(self$callbacks))
+                self$callbacks <- CallbackDispatcher()
+            else 
+                self$callbacks$run()
+        },
+        on_eval = function(handler,remove=FALSE){
+            self$callbacks$register(handler,remove=remove)
+        }
     ),
     
     private = list(
@@ -629,3 +641,7 @@ is_unexpected_string <- function(code)
 
 splitLines <- function(text) strsplit(text,"\n",fixed=TRUE)[[1]]
 
+get_evaluator <- function() {
+    kernel <- get_current_kernel()
+    kernel$evaluator
+}
