@@ -151,7 +151,7 @@ Kernel <- R6Class("Kernel",
     display_id = character(0),
     last_display = function() self$display_id,
     
-    display_data = function(data,metadata=emtpyNamedList,transient=NULL){
+    display_data = function(data,metadata=emptyNamedList,transient=NULL){
       #content <- list(data=data,transient=transient)
       #if(length(metadata))
       #  content$metadata <- metadata
@@ -523,11 +523,13 @@ Kernel <- R6Class("Kernel",
         parent_header <- parent$header
         session <- parent_header$session
         username <- parent_header$username
+        identities <- parent$identities
       }
       else {
         parent_header <- emptyNamedList
         session <- private$session
         username <- private$username
+        identities <- NULL
       }
       header <- list(
         msg_id = UUIDgenerate(),
@@ -540,7 +542,7 @@ Kernel <- R6Class("Kernel",
       list(header = header,
            parent_header = parent_header,
            content = content,
-           identities = parent$identities,
+           identities = identities,
            metadata = metadata)
     },
 
