@@ -37,6 +37,9 @@ init_scrolling_table <- function(){
     raw_html(scrolling_table_css)
 }
 
+.scrolling_table <- new.env()
+.scrolling_table$inited <- FALSE
+
 scrolling_table <- function(x,id=UUIDgenerate(),
                        use.rownames=TRUE,
                        expand=FALSE,
@@ -83,5 +86,14 @@ scrolling_table <- function(x,id=UUIDgenerate(),
                   table,
                   "</div>",
                   sep="\n")
+    if(!.scrolling_table$inited){
+        scrolling_table_css <- readLines(system.file("css/scrolling-table.css",
+                                                     package="RKernel"))
+        scrolling_table_css <- paste0(scrolling_table_css,collapse="\n")
+        scrolling_table_css <- paste("<style>",scrolling_table_css,"</style>",sep="\n")
+        html <- paste(scrolling_table_css,html,sep="\n")
+        .scrolling_table$inited <- TRUE
+    }
     raw_html(html,id=id)   
 }
+

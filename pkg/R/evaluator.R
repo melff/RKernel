@@ -49,7 +49,7 @@ Evaluator <- R6Class("Evaluator",
             # assign("Math",LaTeXMath,pos=pos)
             # assign("raw_html",raw_html,pos=pos)
             # assign("Page",Page,pos=pos)
-            # assign("View",View,pos=pos)
+            assign("View",View,envir=self$env)
             # assign("ls_str",ls_str,pos=pos)
             # 
             # assign("add_paged_classes",add_paged_classes,pos=pos)
@@ -578,11 +578,6 @@ Evaluator <- R6Class("Evaluator",
                 private$kernel$stream(text=text,
                                       stream="stdout")
             }
-        },
-
-        init_scrolling_table = function(){
-            d <- init_scrolling_table()
-            private$kernel$display_data(d$data)
         },
 
         init_env_browser = function(){
