@@ -1,6 +1,11 @@
-.env-browser-wrapper {
+.output_area .env-browser-wrapper {
     overflow: auto;
-    max-height: 300px
+    max-height: 300px;
+}
+
+.ui-dialog .env-browser-wrapper {
+    overflow: auto;
+    max-height: unset;
 }
 
 
@@ -10,7 +15,6 @@
  * } */
 
 table.env-browser {
-    width: 160ex;
     border-collapse: separate !important;
     border-spacing: 0;
 }
@@ -19,6 +23,24 @@ table.env-browser-head {
     position: sticky;
     top: 0;
 }
+
+.output_area table.env-browser {
+    width: 976px;
+}
+
+#pager-container table.env-browser {
+    width: 100%;
+}
+
+#pager #pager-container table.env-browser {
+    width: 1132px;
+}
+
+.ui-resizable table.env-browser {
+    width: 100%;
+}
+
+
 
 /* .env-browser .object-name-col {
  *     width: 15%;

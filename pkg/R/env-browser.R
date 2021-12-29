@@ -14,10 +14,8 @@ ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern,
         envir <- as.environment(pos)
     table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
                          pattern=pattern,mode=mode)
-    css <- env_browser_css(scoped=TRUE)
     html <- paste(
         "<div class='ls_str'>",
-        css,
         table,
         "</div>",
         sep="\n")
@@ -77,21 +75,25 @@ $( function() {
     raw_html(res,id=id,update=update)
 }
 
+#' @export
 remove_env_browser <- function(id="browse_env"){
-script_tmpl <- "$( function(){
+    script_tmpl <- "$( function(){
     $('#%s').remove()
 })"
-script <- sprintf(script_tmpl,id)
-Javascript(script)
+    script <- sprintf(script_tmpl,id)
+    Javascript(script)
 }
 
+#' @export
 browse_env <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
     mode = "any", id=UUIDgenerate()){
     if (missing(envir)) 
         envir <- as.environment(pos)
     table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
                                pattern=pattern,mode=mode)
-    d <- raw_html(table)
+    css <- env_browser_css()
+    html <- paste(css,table,sep="\n")
+    d <- raw_html(html)
     payload <- list(source="page",
                     data=d$data,
                     start=1)
@@ -113,8 +115,12 @@ init_env_browser <- function(){
     raw_html(env_browser_css())
 }
 
+.env_browser_table <- new.env()
+.env_browser_table$inited <- FALSE
+
+
 env_browser_table <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
-    mode = "any", id=NULL){
+    mode = "any", id=NULL, include_css = FALSE){
     if (missing(envir)) 
         envir <- as.environment(pos)
     nms <- ls(name, envir = envir, all.names = all.names, pattern = pattern)
@@ -185,7 +191,13 @@ env_browser_table <- function(pos = -1, name, envir, all.names = FALSE, pattern,
         result <- c(paste0("<div class='env-browser-wrapper' id='",id,"'>"),
                     result,
                     "</div>")
-    paste(result,collapse="\n")
+    html <- paste(result,collapse="\n")
+    if(!.env_browser_table$inited || include_css){
+        css <- env_browser_css()
+        html <- paste(css,html,sep="\n")
+        .env_browser_table$inited <- TRUE
+    }
+    html
 }
 
 output_wrapper <- function(on=TRUE){
@@ -212,4 +224,53 @@ ls_str_refresh <- function(on=TRUE){
                                          package="RKernel")
     }
     Javascript(file=ls_str_refresh.js)
+}
+
+
+.browse_env_dialog <- new.env()
+.browse_env_dialog$inited <- FALSE
+
+browse_env_dialog <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
+                              mode = "any") {
+    if (missing(envir)) 
+        envir <- as.environment(pos)    
+    dialog_tmpl <- "
+<div id=\"env-browser-dialog\" title=\"Environment browser\">
+%s
+</div>
+"
+
+    script_tmpl <- "
+<script>
+$( function() {
+    $( \"#env-browser-dialog\" ).dialog({
+                 height: 400,
+                 width: 900,
+                 classes: {
+                    \"ui-dialog\": \"env-browser-dialog\"
+                 }
+                 });
+  });
+</script>
+"    
+    if(!.browse_env_dialog$inited){
+        auto_refresh_browse_env_dialog()
+        .browse_env_dialog$inited <- TRUE
+    }
+
+    bt <- browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
+                                      pattern=pattern,mode=mode,include_css=TRUE,
+                                      id="ui-dialog-env-browser-table")
+    box_bt <- sprintf(dialog_tmpl,bt)
+    script_bt <- sprintf(script_tmpl)
+    html <- paste(box_bt,script_bt,sep="\n")
+    raw_html(html)
+}
+
+auto_refresh_browse_env_dialog <- function(){
+    refresh.js <- system.file("js/browse-env-dialog-refresh.js",
+                              package="RKernel")
+    refresh.js <- Javascript(file=refresh.js)
+    kernel <- get_current_kernel()
+    kernel$display_send(refresh.js)
 }
