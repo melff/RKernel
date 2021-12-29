@@ -1,0 +1,58 @@
+
+table.gridTable td {
+    background: white;
+}
+
+/* .gridTable thead {
+ *     border: 1px solid #cfcfcf !important;
+ * } */
+table.gridTable   {
+    border-collapse: collapse;
+}
+table.gridTable th,
+table.gridTable td {
+    border: 1px solid #cfcfcf !important;
+    padding: 0.2em 0.4em;
+}
+table.gridTable th {
+    background: #f7f7f7;
+    background-clip: padding-box;
+}
+
+/* .gridTable thead th {
+ *     border-left: 1px solid #cfcfcf !important;
+ *     border-right: 1px solid #cfcfcf !important;
+ *     border-bottom: 1px solid #cfcfcf !important;
+ *     border-top: none !important;
+ * } */
+
+table.gridTable thead th {
+    text-align: center;
+}
+
+table.gridTable tbody th {
+    text-align: right;
+}
+
+/* .gridTable th:after,
+ * .gridTable th:before {
+ *     content: '';
+ *     position: absolute;
+ *     background: #cfcfcf;
+ *     left: 0;
+ *     width: 100%;
+ * }
+ * 
+ * .gridTable th:before {
+ *     top: 0;
+ *     border-top: 1px solid #cfcfcf;
+ * }
+ * 
+ * .gridTable th:after {
+ *     bottom: -1px;
+ *     border-bottom: 1px solid #cfcfcf;
+ * } */
+
+td.td-left-aligned {
+    text-aligned: left !important;
+}

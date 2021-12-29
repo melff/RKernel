@@ -1,9 +1,13 @@
 #' @importFrom uuid UUIDgenerate
 
+.grid_table <- new.env()
+.grid_table$inited <- FALSE
+
 html_table <- function(x,id=UUIDgenerate(),
                        use.rownames=TRUE,
-                       html_class="display", 
-                       expand=FALSE){
+                       html_class="gridTable", 
+                       expand=FALSE,
+                       include_css=FALSE){
     x <- as.data.frame(x)
     rn <- row.names(x)
     nms <- names(x)
@@ -24,8 +28,16 @@ html_table <- function(x,id=UUIDgenerate(),
                       if(expand) " width='100%'" else "",
                       ">"),
                thead,tbody,"</table>")
-    table <- paste0(table,collapse="\n")
-    raw_html(table,id=id)   
+    html <- paste0(table,collapse="\n")
+    if(!.grid_table$inited || include_css){
+        grid_table_css <- readLines(system.file("css/grid-table.css",
+                                                     package="RKernel"))
+        grid_table_css <- paste0(grid_table_css,collapse="\n")
+        grid_table_css <- paste("<style>",grid_table_css,"</style>",sep="\n")
+        html <- paste(grid_table_css,html,sep="\n")
+        .grid_table$inited <- TRUE
+    }
+    raw_html(html,id=id)   
 }
 
 init_scrolling_table <- function(){
@@ -44,7 +56,8 @@ scrolling_table <- function(x,id=UUIDgenerate(),
                        use.rownames=TRUE,
                        expand=FALSE,
                        html_class=NULL,
-                       wrap_cells=NULL){
+                       wrap_cells=NULL,
+                       include_css=FALSE){
     x <- as.data.frame(x)
     rn <- row.names(x)
     nms <- names(x)
@@ -86,7 +99,7 @@ scrolling_table <- function(x,id=UUIDgenerate(),
                   table,
                   "</div>",
                   sep="\n")
-    if(!.scrolling_table$inited){
+    if(!.scrolling_table$inited || include_css){
         scrolling_table_css <- readLines(system.file("css/scrolling-table.css",
                                                      package="RKernel"))
         scrolling_table_css <- paste0(scrolling_table_css,collapse="\n")
