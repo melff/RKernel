@@ -269,23 +269,45 @@ display_data.help_files_with_topic <- function(x,...,
 
     if(length(paths) == 1){
         help_url <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(paths),".html")
-        text_html <- paste(paste0("<iframe src='",help_url,"'"),
-                           "style='width: 100%; height: 5000em;'",
-                           "id='manpage'",
-                           "frameborder='0' seamless>",
+        text_html <- paste(paste0(
+                           "<iframe src='",help_url,"'"),
+                           "style='width: 100%;'",
+                           "class='manpage'",
+                           "frameborder='0' seamless onload=window.parent.scrollTo(0,0)>",
                            "</iframe>",
                            sep="\n")
     } 
     else {
         help_url <- paste0(get_help_url(),"/library/NULL/help/",URLencode(topic,reserved=TRUE))
-        text_html <- paste(paste0("<iframe src='",help_url,"'"),
-                           "style='width: 100%; height: 5000em;'",
-                           "id='manpage'",
-                           "frameborder='0' seamless>",
+        text_html <- paste(paste0(
+                           "<iframe src='",help_url,"'"),
+                           "style='width: 100%;'",
+                           "class='manpage'",
+                           "frameborder='0' seamless onload=window.parent.scrollTo(0,0)>",
                            "</iframe>",
                            sep="\n")
     }
 
+    style <- '<style>
+    form.help-popout-button {
+         border-style:revert;
+    }
+    #pager-container form.help-popout-button {
+         display:none;
+    }
+    iframe.manpage {
+         height: 30rem;
+    }
+    #pager-container iframe.manpage {
+         height: 5000em;
+    }
+    </style>
+    '
+    popout_button <- '<form class="help-popout-button" action="%s" method="get" target="_blank">
+         <button type="submit">Open in new tab</button>
+    </form>'
+    popout_button <- sprintf(popout_button,help_url)
+    text_html <- paste(style,popout_button,text_html,sep="\n")
 
     mime_data <- list(
         "text/plain"=paste(text_plain,collapse="\n"),
@@ -294,7 +316,7 @@ display_data.help_files_with_topic <- function(x,...,
     )
 
     d <- list(data=mime_data)
-    d$metadata <- emptyNamedList
+    d$metadata <- list(height="40ex")
     d$transient <- list(display_id=id)
     if(update) cl <- "update_display_data"
     else cl <- "display_data"
@@ -347,11 +369,31 @@ display_data.hsearch <- function(x,...,
         help_search_url <- paste0(help_search_url,paste0("&package",type,"=",x$package))
     }
     text_html <- paste(paste0("<iframe src='",help_search_url,"'"),
-                        "style='width: 100%; height: 5000em;'",
-                        "id='manpage'",
+                        "style='width: 100%;'",
+                        "class='manpage'",
                         "frameborder='0' seamless onload=window.parent.scrollTo(0,0)>",
                         "</iframe>",
                         sep="\n")
+    style <- '<style>
+    form.help-popout-button {
+         border-style:revert;
+    }
+    #pager-container form.help-popout-button {
+         display:none;
+    }
+    iframe.manpage {
+         height: 30rem;
+    }
+    #pager-container iframe.manpage {
+         height: 5000em;
+    }
+    </style>
+    '
+    popout_button <- '<form class="help-popout-button" action="%s" method="get" target="_blank">
+         <button type="submit">Open in new tab</button>
+    </form>'
+    popout_button <- sprintf(popout_button,help_search_url)
+    text_html <- paste(style,popout_button,text_html,sep="\n")
 
     mime_data <- list("text/plain"=paste(text_plain,collapse="\n"),
                       "text/html"=paste(text_html,collapse="\n"))
