@@ -151,7 +151,7 @@ Evaluator <- R6Class("Evaluator",
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
                 # message(sprintf("Found magic '%s'",magic))
-                code <- gsub("^%%.+?\n\n","",code)
+                code <- gsub("^%%.+?\n","",code)
                 self$handle_magic(magic,code)
                 return()
             }
@@ -418,19 +418,19 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_magic = function(magic,code){
-            if(magic == "Math"){
+            if(tolower(magic) == "math"){
                 d <- LaTeXMath(code)
                 private$kernel$display_data(data=d$data,
                                             metadata=d$metadata,
                                             transient=d$transient)
             } 
-            else if (magic == "Javascript"){
+            else if (tolower(magic) == "javascript"){
                 d <- Javascript(code)
                 private$kernel$display_data(data=d$data,
                                             metadata=d$metadata,
                                             transient=d$transient)
             }
-            else if (magic == "html"){
+            else if (tolower(magic) == "html"){
                 d <- raw_html(code)
                 private$kernel$display_data(data=d$data,
                                             metadata=d$metadata,
