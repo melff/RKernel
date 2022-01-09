@@ -162,6 +162,8 @@ Kernel <- R6Class("Kernel",
       #   log_out("--",n,"--")
       #   log_out(data[[n]])
       # }
+      if(!length(transient))
+        transient <- emptyNamedList
       private$send_message(type="display_data",
                            parent=self$execute_request,
                            socket_name="iopub",
