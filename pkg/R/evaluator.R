@@ -96,7 +96,7 @@ Evaluator <- R6Class("Evaluator",
 
             assign("get_help_url",function()self$help_url,envir=self$env)
 
-            trace(example,tracer=quote(if(missing(run.donttest)) run.donttest<-TRUE))
+            suppressMessages(trace(example,tracer=quote(if(missing(run.donttest)) run.donttest<-TRUE),print=FALSE))
         },
 
         help_port = integer(),
