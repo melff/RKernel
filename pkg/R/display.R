@@ -431,6 +431,16 @@ Javascript <- function(text,file){
 }
 
 #' @export
+CSS <- function(text,file){
+    if(missing(text)){
+        text <- readLines(file)
+    }
+    text <- paste(text,collapse="\n")
+    text_html <- paste("<style>",text,"</style>",sep="\n")
+    display_data("text/html"=text_html)
+}
+
+#' @export
 LaTeXMath <- function(text){
     text <- paste(text,collapse="\n")
     text_plain <- paste("Math:",text,sep="\n")
