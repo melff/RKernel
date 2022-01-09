@@ -17,6 +17,7 @@
 .tableFixHead td {
     border: 1px solid #cfcfcf !important;
     padding: 0.2em 0.4em;
+    white-space: nowrap;
 }
 .tableFixHead th {
     background: #f7f7f7;

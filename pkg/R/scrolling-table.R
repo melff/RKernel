@@ -3,7 +3,16 @@
 .grid_table <- new.env()
 .grid_table$inited <- FALSE
 
-html_table <- function(x,id=UUIDgenerate(),
+get_grid_table_css <- function(){
+    grid_table_css <- readLines(system.file("css/grid-table.css",
+                                            package="RKernel"))
+    grid_table_css <- paste0(grid_table_css,collapse="\n")
+    grid_table_css <- paste("<style>",grid_table_css,"</style>",sep="\n")
+    .grid_table$inited <- TRUE
+    raw_html(grid_table_css)
+}
+
+grid_table <- function(x,id=UUIDgenerate(),
                        use.rownames=TRUE,
                        html_class="gridTable", 
                        expand=FALSE,
@@ -13,14 +22,15 @@ html_table <- function(x,id=UUIDgenerate(),
     nms <- names(x)
     x <- format(x)
     x <- as.matrix(x)
+    tbody <- structure(paste("<td>",x,"</td>"),dim=dim(x))
     if(use.rownames){
-        x <- cbind(rn,x)
+        firstCol <- paste0("<th>",rn,"</th>")
+        tbody <- cbind(firstCol,tbody)
         nms <- c("",nms)
     }
-    tbody <- structure(paste("<td>",x,"</td>"),dim=dim(x))
     tbody <- apply(tbody,1,function(row) paste0(c("<tr>",row,"</tr>"),collapse=""))
     tbody <- c("<tbody>",tbody,"</tbody>")
-    thead <- paste("<th>",nms,"</th>")
+    thead <- paste0("<th>",nms,"</th>")
     thead <- paste0(c("<tr>",thead,"</tr>"),collapse="")
     thead <- c("<thead>",thead,"</thead>")
     table <- c(paste0("<table id='",id,"'",
@@ -29,16 +39,15 @@ html_table <- function(x,id=UUIDgenerate(),
                       ">"),
                thead,tbody,"</table>")
     html <- paste0(table,collapse="\n")
-    if(!.grid_table$inited || include_css){
-        grid_table_css <- readLines(system.file("css/grid-table.css",
-                                                     package="RKernel"))
-        grid_table_css <- paste0(grid_table_css,collapse="\n")
-        grid_table_css <- paste("<style>",grid_table_css,"</style>",sep="\n")
+    if(include_css){
+        grid_table_css <- get_grid_table_css()$data[["text/html"]]
         html <- paste(grid_table_css,html,sep="\n")
-        .grid_table$inited <- TRUE
     }
     raw_html(html,id=id)   
 }
+
+.scrolling_table <- new.env()
+.scrolling_table$inited <- FALSE
 
 init_scrolling_table <- function(){
 
@@ -46,11 +55,10 @@ init_scrolling_table <- function(){
                                                  package="RKernel"))
     scrolling_table_css <- paste0(scrolling_table_css,collapse="\n")
     scrolling_table_css <- paste("<style>",scrolling_table_css,"</style>",sep="\n")
+    .scrolling_table$inited <- TRUE
     raw_html(scrolling_table_css)
 }
 
-.scrolling_table <- new.env()
-.scrolling_table$inited <- FALSE
 
 scrolling_table <- function(x,id=UUIDgenerate(),
                        use.rownames=TRUE,

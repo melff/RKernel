@@ -12,7 +12,11 @@ table.gridTable   {
 table.gridTable th,
 table.gridTable td {
     border: 1px solid #cfcfcf !important;
-    padding: 0.2em 0.4em;
+    /* padding: 0.2em 0.4em; */
+    padding: 4px 4px 1px 4px;
+    line-height: 18px;
+    white-space: nowrap;
+    text-align:right;
 }
 table.gridTable th {
     background: #f7f7f7;
