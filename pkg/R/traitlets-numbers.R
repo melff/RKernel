@@ -47,7 +47,7 @@ as.numeric.Integer <- function(x,...) as.numeric(x$value)
 
 
 #' @export
-to_json.Integer <- function(x) {
+to_json.Integer <- function(x,...) {
     len <- x$length
     if(is.finite(len) && len <= 1) {
         value <- x$get()

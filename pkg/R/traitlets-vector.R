@@ -24,7 +24,7 @@ VectorClass <- R6Class_("Vector",
 Vector <- function(...)TraitInstance(...,Class=VectorClass)
 
 #' @export
-to_json.Vector <- function(x){
+to_json.Vector <- function(x,...){
     unlist(lapply(x$get(),to_json))
 }
 
@@ -61,7 +61,7 @@ ListClass <- R6Class_("List",
 List <- function(...)TraitInstance(...,Class=ListClass)
 
 #' @export
-to_json.List <- function(x){
+to_json.List <- function(x,auto_unbox=TRUE,...){
     value <- lapply(x$get(),to_json)
     # if(length(value) == 1)
     #     value <- list(value)

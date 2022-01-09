@@ -146,9 +146,9 @@ HasTraits <- R6Class_("HasTraits",
 
 
 #' @export
-to_json.Trait <- function(x){
+to_json.Trait <- function(x,auto_unbox=TRUE,...){
     value <- x$get()
-    if(!length(value))
+    if(!length(value) && auto_unbox)
         character(0)
-    else to_json(value)
+    else to_json(value,auto_unbox=auto_unbox,...)
 }
