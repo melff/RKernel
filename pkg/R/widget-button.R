@@ -23,7 +23,11 @@ ButtonStyle <- function(...) ButtonStyleClass$new(...)
 ButtonClass <- R6Class_("Button",
    inherit = DOMWidgetClass,
    public = list(
+    `_model_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
+    `_model_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
     `_model_name` = structure(Unicode("ButtonModel"),sync=TRUE),
+    `_view_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
+    `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
     `_view_name` = structure(Unicode("ButtonView"),sync=TRUE),
     description = structure(Unicode(""),sync=TRUE),
     disabled = structure(Boolean(FALSE),sync=TRUE),

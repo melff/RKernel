@@ -70,13 +70,14 @@ WidgetClass <- R6Class_("Widget",
       for(k in keys){
         if(k %in% self$traits_to_sync &&
           !(drop_defaults && self$traits[[k]]$is_default())){
+          auto_unbox <- !isFALSE(attr(self$traits[[k]],"auto_unbox"))
           if(inherits(self$traits[[k]],"Bytes")){
             buffer_paths <- append(buffer_paths,list(list(k)))
             bytes <- self$traits$value$get()
             buffers <- append(buffers,list(bytes))
           }
           else
-            state[[k]] <- to_json(self$traits[[k]])
+            state[[k]] <- to_json(self$traits[[k]],auto_unbox=auto_unbox)
         }
       }
       res <- structure(state,
@@ -213,7 +214,7 @@ display_data.Widget <- function(x,...,
 }
 
 #' @export
-to_json.Widget <- function(x){
+to_json.Widget <- function(x,...){
   paste0("IPY_MODEL_",x[["_model_id"]])
 }
 

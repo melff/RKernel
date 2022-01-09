@@ -4,8 +4,12 @@
 BoxClass <- R6Class_("Box",
    inherit = DOMWidgetClass,
    public = list(
+    `_model_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
+    `_model_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
     `_model_name` = structure(Unicode("BoxModel"),sync=TRUE),
     `_view_name` = structure(Unicode("BoxView"),sync=TRUE),
+    `_view_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
+    `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
     children = structure(Vector(),sync=TRUE),
     box_style = structure(StrEnum(
         c("primary","success","info","warning","danger",""),

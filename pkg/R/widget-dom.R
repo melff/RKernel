@@ -2,15 +2,28 @@
 
 #' @export
 DOMWidgetClass <- R6Class_("DOMWidget",
-  inherit = CoreWidgetClass,
+  inherit = WidgetClass,
   public = list(
-    `_dom_classes` = structure(Vector(),sync=TRUE),
+    `_dom_classes` = structure(Unicode(length=NA),sync=TRUE,auto_unbox=FALSE),
+    `_model_module` = structure(Unicode("@jupyter-widgets/base"),sync=TRUE),
+    `_model_module_version` = structure(Unicode(jupyter_widgets_base_version),sync=TRUE),
+    `_model_name` = structure(Unicode("DOMWidgetModel"),sync=TRUE),
     layout = structure(R6Instance(LayoutClass),sync=TRUE),
     add_class = function(className){
-      self$`_dom_classes` <- as.list(unlist(union(self$`_dom_classes`),className))
+      if(!length(self$`_dom_classes`))
+          dom_classes <- className
+      else {
+          dom_classes <- self$`_dom_classes`
+          dom_classes <- union(dom_classes,className)
+      }
+      self$`_dom_classes` <- dom_classes
     },
     remove_class = function(className){
-      self$`_dom_classes` <- as.list(setdiff(unlist(self$`_dom_classes`),className))
+      if(length(self$`_dom_classes`)) {
+          dom_classes <- self$`_dom_classes`
+          dom_classes <- setdiff(dom_classes,className)
+          self$`_dom_classes` <- dom_classes
+      }
     }
   )
 )
