@@ -1,0 +1,206 @@
+.scrolling-table {
+   overflow: hidden;
+}
+
+.scrolling-table .widget-vslider {
+    width: 20px;
+    height: 100%;
+    background-color: #f7f7f7;
+    border-style: solid;
+    border-left-style: none;
+    border-width: 1px;
+    border-color: #d8d8d8;
+    margin: 0;
+}
+
+.scrolling-table .widget-hslider {
+    height: 20px;
+    width: 100%;
+    background-color: #f7f7f7;
+    border-style: solid;
+    border-top-style: none;
+    border-width: 1px;
+    border-color: #d8d8d8;
+    margin: 0;
+}
+
+.scrolling-table .widget-vslider .ui-slider-vertical {
+    width: 2px;
+    background-color: #f7f7f7;
+    border-style: none;
+}
+.scrolling-table .widget-hslider .ui-slider-horizontal {
+    height: 2px;
+    background-color: #f7f7f7;
+    border-style: none;
+}
+
+.scrolling-table .widget-vslider .ui-slider-handle {
+    border-radius: 0;
+    margin-left: 0;
+    margin-right: 0;
+    width: 18px;
+    background-color: white;
+}
+
+.scrolling-table .widget-hslider .ui-slider-handle {
+    border-radius: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    height: 18px;
+    background-color: white;
+}
+
+.scrolling-table .widget-vslider .ui-slider-handle.ui-state-default,
+.scrolling-table .widget-vslider .ui-slider-handle.ui-state-hover,
+.scrolling-table .widget-vslider .ui-slider-handle.ui-state-active{
+    border-radius: 0;
+    margin-left: 0;
+    margin-right: 0;
+    width: 18px;
+    background-color: white;
+    left: -8px;
+}
+
+.scrolling-table .widget-vslider .slider-container {
+    margin-top: 8px;
+    margin-bottom: 8px
+}
+
+.scrolling-table .widget-hslider .slider-container {
+    margin-left: 0px;
+    margin-right: 16px
+}
+
+.scrolling-table .widget-hslider .ui-slider-handle.ui-state-default,
+.scrolling-table .widget-hslider .ui-slider-handle.ui-state-hover,
+.scrolling-table .widget-hslider .ui-slider-handle.ui-state-active{
+    border-radius: 0;
+    margin-left: 0;
+    margin-right: 0;
+    height: 18px;
+    background-color: white;
+    top: -7px;
+}
+
+.scrolling-table .widget-html-content table {
+    width: 100%;
+    height: 100%;
+}
+
+.scrolling-table .widget-html-content table th,
+.scrolling-table .widget-html-content table td {
+    overflow: clip;
+}
+
+
+.scrolling-table .widget-html {
+    margin: 0;
+}
+
+.lm-Widget .scrolling-table .widget-html-content table {
+    height: calc(100% - 1px);
+    width: calc(100% - 1px);
+}
+.scrolling-table .lm-Widget .widget-html-content table {
+    height: calc(100% - 1px);
+    width: calc(100% - 1px);
+}
+
+button.scroll-lock,
+button.scroll-lock.mod-active{
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    border-style: none;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-color: #d8d8d8;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    display: inline-grid;
+}
+
+.jupyter-button.scroll-lock.mod-active,
+.jupyter-button.scroll-lock:active,
+.jupyter-button.scroll-lock:hover {
+    border-shadow: unset;
+}
+
+button.scroll-lock i.fa {
+    margin: auto;
+}
+
+button.scroll-up-button,
+button.scroll-down-button,
+button.scroll-left-button,
+button.scroll-right-button,
+button.page-up-button,
+button.page-down-button,
+button.page-left-button,
+button.page-right-button,
+button.col-plus-button,
+button.col-minus-button,
+button.row-plus-button,
+button.row-minus-button {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    border-style: none;    
+    border-color: #d8d8d8;
+    border-width: 1px;
+    display: inline;
+    line-height: 16px;
+}
+
+button.scroll-up-button,
+button.page-up-button,
+button.row-plus-button,
+button.row-minus-button {
+    border-top-style: solid;
+    border-right-style: solid;
+}
+
+button.row-plus-button,
+button.row-minus-button {
+    padding-top: 2px;    
+}
+
+button.scroll-down-button,
+button.page-down-button {
+    border-bottom-style: solid;
+    border-right-style: solid;
+}
+
+button.scroll-left-button,
+button.page-left-button,
+button.col-plus-button,
+button.col-minus-button {
+    padding-top: 2px;
+    border-bottom-style: solid;
+    border-left-style: solid;
+}
+
+button.scroll-right-button,
+button.page-right-button {
+    padding-top: 2px;
+    border-bottom-style: solid;
+    border-right-style: solid;
+}
+
+
+.scrollbar-inactive .ui-slider, 
+.scrollbar-inactive .scroll-left-button, 
+.scrollbar-inactive .scroll-right-button,
+.scrollbar-inactive .scroll-up-button,
+.scrollbar-inactive .scroll-down-button, 
+.scrollbar-inactive .page-left-button, 
+.scrollbar-inactive .page-right-button,
+.scrollbar-inactive .page-up-button,
+.scrollbar-inactive .page-down-button {
+    display: none;
+}
