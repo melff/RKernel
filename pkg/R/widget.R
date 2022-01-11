@@ -14,12 +14,16 @@ WidgetClass <- R6Class_("Widget",
     `_view_module_version` = structure(Unicode(character(0)),sync=TRUE),
     `_view_count` = structure(Unicode(integer(0)),sync=TRUE),
     traits_to_sync = character(0),
+    sync_suspended = FALSE,
     initialize = function(...,open=TRUE){
       super$initialize(...)
       handler <- function(tn,trait,value){
             # print(str(list(tn=tn,trait=trait,value=value)))
-            # log_out(sprintf("observed change in trait '%s' to value '%s'",tn,value))
-            self$send_state(tn)
+            #if(is.environment(value))
+            #  value <- capture.output(print(value))
+            #log_out(sprintf("observed change in trait '%s' to value '%s'",tn,value))
+            if(!self$sync_suspended)
+              self$send_state(tn)
       }
       for(tn in names(self$traits)){
         if(isTRUE(attr(self$traits[[tn]],"sync"))){
