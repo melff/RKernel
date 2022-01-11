@@ -13,6 +13,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         `_model_module_version` = structure(Unicode(jupyter_widgets_output_version),sync=TRUE),
 
         msg_id = structure(Unicode(""),sync=TRUE),
+        display_msg_id = "",
 
         context = NULL,
         envir = NULL,
@@ -41,6 +42,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                                         ))
             context$on_enter(self$enter)
             context$on_exit(self$exit)
+            #self$on_displayed(self$set_display_msg_id)
             self$context <- context
             self$envir <- context$envir
             self$append_output <- append_output
@@ -54,6 +56,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         },
         exit = function(){
             self$msg_id <- ""
+            # log_out(sprintf("msg_id set to '%s'",self$msg_id))
         },
         
         do = function(...) self$context$do(...),
@@ -198,13 +201,14 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         current_output = NULL,
         stream = function(text,stream_name) {
             if(!nzchar(text)) return()
+            #self$sync_suspended <- TRUE
             if(self$append_output){
+                l <- length(self$outputs)
                 if(!is.null(self$current_output) &&
                    identical(self$current_output$output_type, "stream") &&
-                   identical(self$current_output$name, stream_name)){
+                   identical(self$current_output$name, stream_name) && l > 0){
                     self$current_output$text <- paste0(self$current_output$text,
                                                        text)
-                    l <- length(self$outputs)
                     self$outputs[[l]] <- self$current_output
                 }
                 else {
@@ -214,10 +218,11 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                         text = text
                     )
                     outputs <- self$outputs
-                    l <- length(outputs)
                     outputs[[l+1]] <- self$current_output
                     self$outputs <- outputs
                 }
+                # kernel <- get_current_kernel()
+                # kernel$stream(text,stream_name)
             }
             else {
                 self$current_output <- list(
@@ -225,8 +230,13 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                     name = stream_name,
                     text = text
                 )
-                self$outputs <- list(self$current_output)
+                # log_out("\n\n================================================================\n")
+                #self$traits$outputs$set(list(self$current_output),notify=FALSE)
+                #self$send_state()
+                self$outputs[[1]] <- self$current_output
             }
+            #self$sync_suspended <- FALSE
+            #self$send_state("outputs")
         },
         display = function(...){
             d <- display_data(...)
@@ -278,6 +288,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             else {
                 self$outputs <- list(out_data)
                 self$current_output <- out_data
+                #self$send_state()
             }
         },
         last_display = function(){

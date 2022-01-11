@@ -125,18 +125,49 @@ mkWidget.numeric <- function(x,description=NULL,...){
        else stop("Inconsistent naming")    
        w <- FloatSlider(value=value,min=min,max=max,step=step)
    }
-   if(!missing(description)){
-           description <- as.character(description)
-           description_width <- paste0(nchar(description),"em")
-           w$description <- description
-           w$style$description_width <- description_width
-   }
+    if(!missing(description)){
+        description <- as.character(description)
+        description_width <- paste0(nchar(description),"ex")
+        w$description <- description
+        w$style$description_width <- description_width
+    }
    w
 }
 
 #' @export
-mkWidget.Fixed <- function(x) list(value=x)
+mkWidget.logical <- function(x,description=NULL,...){
+    w <- Checkbox()
+    if(!missing(description)){
+        description <- as.character(description)
+        description_width <- paste0(nchar(description),"ex")
+        w$description <- description
+        w$style$description_width <- description_width
+    }
+    w
+}
 
+#' @export
+mkWidget.character <- function(x,description=NULL,...){
+    if(length(x) == 1){
+        w <- TextWidget(x)
+    }
+    else {
+        w <- Dropdown(options=x,value=x[1])
+    }
+    if(!missing(description)){
+        description <- as.character(description)
+        description_width <- paste0(nchar(description),"ex")
+        w$description <- description
+        w$style$description_width <- description_width
+    }
+    w
+}
+
+#' @export
+mkWidget.Fixed <- function(x,...) list(value=x)
+
+#' @export
+mkWidget.ValueWidget <- function(x,...) x
 
 call_with_controls <- function(FUN,controls){
     args <- lapply(controls,"[[","value")
@@ -144,21 +175,34 @@ call_with_controls <- function(FUN,controls){
 }
 
 #' @export
-interactive_output <- function(FUN,controls,
-                               graphics_widget=NULL,
+interactive_output <- function(FUN,
+                               controls,
+                               out,
                                button=NULL,
-                               continuous_update=TRUE
+                               continuous_update=TRUE,
+                               autorun=TRUE,
+                               mime_type="text/plain"
                               ){
-    out <- OutputWidget(append_output=FALSE,
-                        graphics_widget=graphics_widget)
-    run <- function(...) with(out,
-         call_with_controls(FUN,controls))
-    for(cntrl in controls){
-        cntrl$on_change(run)
-        cntrl$continuous_update <- continuous_update
+    run <- function(...) {
+        with(out,{
+            #out$clear_output()
+            res <- call_with_controls(FUN,controls)
+            # For reasons I have not found out,
+            # 'print()'ing does not work with 
+            # Jupyter notebooks - but with JupyterLab and 
+            # Voila it does work.
+            d <- display_data(res)
+            d$data <- d$data[mime_type]
+            d
+        })
+    }
+    if(autorun){
+        for(cntrl in controls){
+            cntrl$on_change(run)
+            cntrl$continuous_update <- continuous_update
+        }
     }
     if(inherits(button,"Button"))
         button$on_click(run)
     run()
-    out
 }
