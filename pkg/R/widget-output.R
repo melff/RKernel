@@ -48,7 +48,8 @@ OutputWidgetClass <- R6Class_("OutputWidget",
 
         enter = function(){
             kernel <- get_current_kernel()
-            self$msg_id <- kernel$current_request$header$msg_id
+            parent <- kernel$get_parent("shell")
+            self$msg_id <- parent$header$msg_id
             # log_out(sprintf("msg_id set to '%s'",self$msg_id))
         },
         exit = function(){

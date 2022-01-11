@@ -73,9 +73,8 @@ Kernel <- R6Class("Kernel",
     execution_count = 1,
 
     execute_reply = function(msg){
-      self$execute_request <- msg
       private$send_message(type="execute_input",
-                           parent=msg,
+                           parent=private$parent$shell,
                            socket_name="iopub",
                            content=list(
                              code=msg$content$code,
@@ -91,7 +90,7 @@ Kernel <- R6Class("Kernel",
         content$payload <- payload
 
       private$send_message(type="execute_reply",
-                           parent=msg,
+                           parent=private$parent$shell,
                            socket="shell",
                            content=content)
       #cat("Sent a execute_reply ...\n")
@@ -103,18 +102,16 @@ Kernel <- R6Class("Kernel",
       if(aborted) private$clear_shell_queue()
     },
 
-    execute_request = character(0),
-
     clear_output = function(wait){
       private$send_message(type="clear_output",
-                                 parent=self$execute_request,
+                                 parent=private$parent$shell,
                                  socket_name="iopub",
                                  content=list(wait=wait))
     },
 
     stream = function(text,stream){
       private$send_message(type="stream",
-                           parent=self$execute_request,
+                           parent=private$parent$shell,
                            socket_name="iopub",
                            content=list(
                              name=stream,
@@ -126,7 +123,7 @@ Kernel <- R6Class("Kernel",
                       metadata=metadata,
                       execution_count=self$execution_count)
       private$send_message(type="execute_result",
-                           parent=self$execute_request,
+                           parent=private$parent$shell,
                            socket_name="iopub",
                            content=content)
     },
@@ -140,7 +137,7 @@ Kernel <- R6Class("Kernel",
       # log_out(sprintf("msg_type = %s",msg_type))
       
       private$send_message(type=msg_type,
-                           parent=self$execute_request,
+                           parent=private$parent$shell,
                            socket_name="iopub",
                            content=list(
                              data=d$data,
@@ -165,7 +162,7 @@ Kernel <- R6Class("Kernel",
       if(!length(transient))
         transient <- emptyNamedList
       private$send_message(type="display_data",
-                           parent=self$execute_request,
+                           parent=private$parent$shell,
                            socket_name="iopub",
                            content=list(
                              data=data,
@@ -176,7 +173,7 @@ Kernel <- R6Class("Kernel",
 
     update_display_data = function(data,metadata=emptyNamedList,transient){
       private$send_message(type="update_display_data",
-                           parent=self$execute_request,
+                           parent=private$parent$shell,
                            socket_name="iopub",
                            content=list(
                              data=data,
@@ -187,7 +184,7 @@ Kernel <- R6Class("Kernel",
 
     send_error = function(name,value,traceback){
             private$send_message(type="error",
-                           parent=self$execute_request,
+                           parent=private$parent$shell,
                            socket="iopub",
                            content=list(
                              ename = name,
@@ -210,7 +207,7 @@ Kernel <- R6Class("Kernel",
                          version = rversion),
                        banner = version$version.string)
       private$send_message(type="kernel_info_reply",
-                           parent=msg,
+                           parent=private$parent$shell,
                            socket_name="shell",
                            content=response)
       #cat("Sent a kernel_info_reply ...\n")
@@ -222,7 +219,7 @@ Kernel <- R6Class("Kernel",
       code <- msg$content$code
       status <- self$evaluator$code_is_complete(code)
       private$send_message(type="is_complete_reply",
-                           parent=msg,
+                           parent=private$parent$shell,
                            socket_name="shell",
                            content=list(
                              status=status,
@@ -235,7 +232,7 @@ Kernel <- R6Class("Kernel",
       cursor_pos <- msg$content$cursor_pos
       result <- self$evaluator$get_completions(code,cursor_pos)
       private$send_message(type="complete_reply",
-                           parent=msg,
+                           parent=private$parent$shell,
                            socket_name="shell",
                            content=list(
                              status="ok",
@@ -251,7 +248,7 @@ Kernel <- R6Class("Kernel",
         target_name <- msg$content$target_name
       comms <- self$comm_manager$get_comms(target_name)
       private$send_message(type="comm_info_reply",
-                           parent=msg,
+                           parent=private$parent$shell,
                            socket_name="shell",
                            content=list(
                              status="ok",
@@ -263,26 +260,23 @@ Kernel <- R6Class("Kernel",
       id <- msg$content$comm_id
       data <- msg$content$data
       self$comm_manager$handle_open(target_name,id,data)
-      private$comm_parent <- msg
     },
 
     handle_comm_msg = function(msg){
       id <- msg$content$comm_id
       data <- msg$content$data
       self$comm_manager$handle_msg(id,data)
-      private$comm_parent <- msg
     },
 
     handle_comm_close = function(msg){
       id <- msg$content$comm_id
       data <- msg$content$data
       self$comm_manager$handle_close(id,data)
-      private$comm_parent <- msg
     },
 
     send_comm_msg = function(id,data,metadata=emptyNamedList,buffers=NULL){
       private$send_message(type="comm_msg",debug=FALSE,
-                   parent=private$comm_parent,
+                   parent=private$parent$shell,
                    socket_name="iopub",
                    content=list(
                      comm_id=id,
@@ -293,7 +287,7 @@ Kernel <- R6Class("Kernel",
     
     send_comm_open = function(id,target_name,data,metadata=emptyNamedList,buffers=NULL){
       private$send_message(type="comm_open",debug=FALSE,
-                   parent=private$comm_parent,
+                   parent=private$parent$shell,
                    socket_name="iopub",
                    content=list(
                      comm_id=id,
@@ -306,7 +300,7 @@ Kernel <- R6Class("Kernel",
     
     send_comm_close = function(id,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
       private$send_message(type="comm_close",debug=FALSE,
-                   parent=private$comm_parent,
+                   parent=private$parent$shell,
                    socket_name="iopub",
                    content=list(
                      comm_id=id,
@@ -343,7 +337,9 @@ Kernel <- R6Class("Kernel",
       self$services <- services_to_keep
     },
 
-    current_request = list()
+    get_parent = function(channel="shell"){
+      return(private$parent[[channel]])
+    }
   ),
 
   private = list(
@@ -352,6 +348,8 @@ Kernel <- R6Class("Kernel",
     sockets = list(),
     zmqctx = list(),
     conn_info = list(),
+
+    parent = list(),
 
     poll_request = function(sock_names,timeout=-1L) {
       POLLIN <- private$.pbd_env$ZMQ.PO$POLLIN
@@ -386,6 +384,7 @@ Kernel <- R6Class("Kernel",
     respond_control = function(req){
       msg <- private$get_message("control")
       if(!length(msg)) return(TRUE)
+      private$parent$control <- msg
       if(msg$header$msg_type=="shutdown_request"){
         # cat("shutdown_request received")
         return(FALSE)
@@ -395,10 +394,10 @@ Kernel <- R6Class("Kernel",
 
     respond_shell = function(req,debug=FALSE){
       msg <- private$get_message("shell")
-      self$current_request <- msg
+      private$parent$shell <- msg
       if(!length(msg)) return(TRUE)
       private$send_message(type="status",
-                           parent=msg,
+                           parent=private$parent$shell,
                            socket_name="iopub",
                            content=list(
                              execution_state="busy"))
@@ -418,7 +417,7 @@ Kernel <- R6Class("Kernel",
              )
 
       private$send_message(type="status",
-                           parent=msg,
+                           parent=private$parent$shell,
                            socket_name="iopub",
                            content=list(
                              execution_state="idle"))
@@ -554,20 +553,19 @@ Kernel <- R6Class("Kernel",
       repeat {
         r <- zmq.poll(c(private$sockets$shell),POLLIN,timeout=0L)
         if(bitwAnd(zmq.poll.get.revents(1),POLLIN)){
-          request <- private$get_message("shell")
-          request_type <- request$header$msg_type
-          reply_type <- sub("_request","_reply",request_type,fixed=TRUE)
+          msg <- private$get_message("shell")
+          msg_type <- request$header$msg_type
+          reply_type <- sub("_request","_reply",msg_type,fixed=TRUE)
+          private$parent$shell <- msg
           private$send_message(type=reply_type,
-                           parent=request,
+                           parent=private$parent$shell,
                            socket_name="shell",
                            content=list(
                              status="aborted"))
         }
         else break
       }
-    },
-
-    comm_parent = list()
+    }
 
   )
 )
