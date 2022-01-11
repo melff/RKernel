@@ -4,6 +4,10 @@
 MediaWidgetClass <- R6Class_("MediaWidget",
     inherit = DOMWidgetClass,
     public = list(
+      `_model_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
+      `_model_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
+      `_view_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
+      `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
       value = structure(Bytes(),sync=TRUE),
       on_change = function(handler,remove=FALSE){
           self$observe("value",handler,remove)
