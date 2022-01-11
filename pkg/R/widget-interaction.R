@@ -206,3 +206,25 @@ interactive_output <- function(FUN,
         button$on_click(run)
     run()
 }
+
+#' @export
+mkWidgets <- function(...){
+    args <- list(...)
+    argnames <- names(args)
+    res <- list()
+    for(n in argnames){
+        x <- args[[n]]
+        res[[n]] <- mkWidget(x,description=n)
+    }
+    res
+}
+
+#' @export
+interact <- function(FUN,...,continuous_update=TRUE){
+    controls <- mkWidgets(...)
+    output <- OutputWidget(append_output=FALSE)
+    interactive_output(FUN=FUN,
+                       out=output,
+                       controls=controls)
+    display(VBox(c(controls,output)))
+}
