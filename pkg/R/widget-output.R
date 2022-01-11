@@ -232,6 +232,14 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             d <- display_data(...)
             self$display_send(d)
         },
+        clear_output = function(wait=FALSE){
+            self$sync_suspended <- TRUE
+            self$outputs <- list()
+            kernel <- get_current_kernel()
+            kernel$clear_output(wait=wait)
+            self$sync_suspended <- FALSE
+            self$send_state("outputs")
+        },
         display_index = integer(0),
         display_send = function(d){
             if(!(class(d)%in%c("display_data","update_display_data")))

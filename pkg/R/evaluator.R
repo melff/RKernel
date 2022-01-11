@@ -459,6 +459,10 @@ Evaluator <- R6Class("Evaluator",
                                   stream=stream)
         },
 
+        clear_output = function(wait=FALSE){
+            private$kernel$clear_output(wait=wait)
+        },
+
         set_last_value = function(x){
             pos <- match("RKernel",search())
             assign(".Last.value",x,pos=pos)
