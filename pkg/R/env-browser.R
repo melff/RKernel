@@ -7,6 +7,15 @@ str_ <- function(nm,envir){
     htmlEscape(trimws(res))
 }
 
+#' A HTML version of 'ls.str()'
+#'
+#' @param pos integer indicating \code{\link[base]{search}} path position, or -1 for the current environment.
+#' @param name an optional name indicating search path position, see \code{\link[base]{ls}}.
+#' @param envir the environment to look into
+#' @param all.names logical value, if FALSE objects with names that start with a dot are ignored
+#' @param pattern a character string, the pattern of the names of the objects to show
+#' @param mode a character string, the mode of the objects to be shown
+#' @seealso ls.str
 #' @export
 ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
     mode = "any"){
@@ -20,84 +29,6 @@ ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern,
         "</div>",
         sep="\n")
     raw_html(html)
-}
-
-
-#' @export
-browse_env_fixed <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
-    mode = "any", id="browse_env", tgl_id=UUIDgenerate(),update=FALSE){
-    if (missing(envir)) 
-        envir <- as.environment(pos)
-    table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
-                               pattern=pattern,mode=mode,id=id)
-    # div <- c(paste0("<div class='browse_env' id='",id,"'>"),
-    #          table,
-    #          "</div>")
-    div <- paste(table,collapse="\n")
-    script_tmpl <- "
-<script>
-$( function() {
-    $('#%s').detach()
-         .appendTo('body')
-         .css('position','fixed')
-         .css('left','calc(100perc - 100px)')
-         .css('top','130px')
-         .css('max-height','unset')
-         .resizable({
-             handles: 'e, s, w'
-             })
-         .draggable({
-             handle: 'thead'
-         })
-         .css('display','block')
-         .css('background-color','#fff')
-         .css('z-index','50')
-         .css('opacity','1');
-  });
-</script>
-"
-    rm_script_tmpl <- "
-<script>
-$( function() {
-    $('#%s').remove()
-  });
-</script>
-"
-
-    script <- sprintf(script_tmpl,id)
-    script <- sub("perc","%",script)
-    if(update){
-        rm_script <- sprintf(rm_script_tmpl,id)
-        res <- paste(rm_script,div,script,sep="\n")
-    }
-    else 
-        res <- paste(div,script,sep="\n")
-    raw_html(res,id=id,update=update)
-}
-
-#' @export
-remove_env_browser <- function(id="browse_env"){
-    script_tmpl <- "$( function(){
-    $('#%s').remove()
-})"
-    script <- sprintf(script_tmpl,id)
-    Javascript(script)
-}
-
-#' @export
-browse_env <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
-    mode = "any", id=UUIDgenerate()){
-    if (missing(envir)) 
-        envir <- as.environment(pos)
-    table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
-                               pattern=pattern,mode=mode)
-    css <- env_browser_css()
-    html <- paste(css,table,sep="\n")
-    d <- raw_html(html)
-    payload <- list(source="page",
-                    data=d$data,
-                    start=1)
-    structure(payload,class="payload")
 }
 
 
@@ -200,77 +131,4 @@ env_browser_table <- function(pos = -1, name, envir, all.names = FALSE, pattern,
     html
 }
 
-output_wrapper <- function(on=TRUE){
-    if(on){
-        js <- system.file("js/output-wrapper.js",
-                                         package="RKernel")
-    }
-    else {
-        js <- system.file("js/output-wrapper-off.js",
-                                         package="RKernel")
-    } 
-    Javascript(file=js)
-}
 
-
-
-ls_str_refresh <- function(on=TRUE){
-    if(on){
-        ls_str_refresh.js <- system.file("js/ls-str-refresh.js",
-                                         package="RKernel")
-    }
-    else {
-        ls_str_refresh.js <- system.file("js/ls-str-refresh-off.js",
-                                         package="RKernel")
-    }
-    Javascript(file=ls_str_refresh.js)
-}
-
-
-.browse_env_dialog <- new.env()
-.browse_env_dialog$inited <- FALSE
-
-browse_env_dialog <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
-                              mode = "any") {
-    if (missing(envir)) 
-        envir <- as.environment(pos)    
-    dialog_tmpl <- "
-<div id=\"env-browser-dialog\" title=\"Environment browser\">
-%s
-</div>
-"
-
-    script_tmpl <- "
-<script>
-$( function() {
-    $( \"#env-browser-dialog\" ).dialog({
-                 height: 400,
-                 width: 900,
-                 classes: {
-                    \"ui-dialog\": \"env-browser-dialog\"
-                 }
-                 });
-  });
-</script>
-"    
-    if(!.browse_env_dialog$inited){
-        auto_refresh_browse_env_dialog()
-        .browse_env_dialog$inited <- TRUE
-    }
-
-    bt <- browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
-                                      pattern=pattern,mode=mode,include_css=TRUE,
-                                      id="ui-dialog-env-browser-table")
-    box_bt <- sprintf(dialog_tmpl,bt)
-    script_bt <- sprintf(script_tmpl)
-    html <- paste(box_bt,script_bt,sep="\n")
-    raw_html(html)
-}
-
-auto_refresh_browse_env_dialog <- function(){
-    refresh.js <- system.file("js/browse-env-dialog-refresh.js",
-                              package="RKernel")
-    refresh.js <- Javascript(file=refresh.js)
-    kernel <- get_current_kernel()
-    kernel$display_send(refresh.js)
-}
