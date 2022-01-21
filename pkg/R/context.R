@@ -1,14 +1,31 @@
+#' Context Objects
+#'
+#' @description Objects of this class are used to capture textual and graphical
+#'    output, e.g. to display them in Jupyter notebook cells or dedicated
+#'    widgets.
 #' @importFrom uuid UUIDgenerate
-
 #' @export
 Context <- R6Class("Context",
    public = list(
        connection = NULL,
+       #' @field text_callback A function to be called when text ouput is captured or NULL. Should
+       #    be either specified by the constuctor or by inheriting classes.
        text_callback = NULL,
+       #' @field message_callback A function to be called when a message is captured or NULL. Should
+       #    be either specified by the constuctor or by inheriting classes.
        message_callback = NULL,
+       #' @field warning_callback A function to be called when a warning is captured or NULL. Should
+       #    be either specified by the constuctor or by inheriting classes.
        warning_callback = NULL,
+       #' @field error_callback A function to be called when a error is captured or NULL. Should
+       #    be either specified by the constuctor or by inheriting classes.
        error_callback = NULL,
+       #' @field graphics_callback A function to be called when graphics output is captured or NULL. Should
+       #    be either specified by the constuctor or by inheriting classes.
        graphics_callback = NULL,
+       #' @field value_callback A function or NULL. The function is called when expressions 
+       #'   evaluation returns a visble object. Should
+       #    be either specified by the constuctor or by inheriting classes.
        value_callback = NULL,
        text_output = NULL,
        prev_text_output = NULL,
@@ -41,6 +58,12 @@ Context <- R6Class("Context",
            self$name <- paste0("RKernel-context:",self$id)
        },
 
+       #' @description
+       #' Evaluate one or several expressions
+       #' @param ... A single expression or several expressions
+       #'   included in curly braces.
+       #' @param envir A list or an environment
+       #' @param enclos An enclosing an environment (see \code{\link{eval}}).
        do = function(...,envir=list(),enclos=parent.frame()){
            expr <- substitute(...)
            if(class(expr)=="{"){
@@ -50,8 +73,18 @@ Context <- R6Class("Context",
            else
                self$eval(expr,envir=envir,enclos=enclos)
        },
+       #' @description
+       #' Evaluate a single expression
+       #' @param expr A single expression.
+       #' @param envir A list or an environment
+       #' @param enclos An enclosing an environment (see \code{\link{eval}}).
        eval = function(expr,envir=list(),enclos=parent.frame())
            self$evaluate(list(expr),enclos=enclos),
+       #' @description
+       #' Evaluate a single expression
+       #' @param expressions A list of expressions.
+       #' @param envir A list or an environment
+       #' @param enclos An enclosing an environment (see \code{\link{eval}}).
        evaluate = function(expressions,envir=list(),enclos=parent.frame()){
            if(is.null(envir))
                envir <- self$envir
@@ -242,6 +275,9 @@ Context <- R6Class("Context",
       orig.device = NULL,
       orig.dev_num = 1,
 
+      #' @description A function that is called before a set of expressions
+      #'     is evaluated (e.g. in a notebook cell).
+      #' @param enclos An enclosing environment.
       enter = function(enclos=parent.frame()){
 
           sink(self$connection,split=FALSE)
@@ -278,6 +314,9 @@ Context <- R6Class("Context",
           self$run_enter_hooks()
 
       },
+
+      #' @description A function that is called after a set of expressions
+      #'     is evaluated (e.g. in a notebook cell).
       exit = function(){
           
           self$run_exit_hooks()
@@ -306,6 +345,10 @@ Context <- R6Class("Context",
           if(inherits(self$enter_hooks,"CallbackDispatcher"))
               self$enter_hooks$run()
       },
+      #' @description
+      #' Add a handler function to be called by the
+      #' \code{enter()} function, i.e. before a series of expression 
+      #' is evaluated.
       on_enter = function(handler,remove=FALSE){
           if(!length(self$enter_hooks))
               self$enter_hooks <- CallbackDispatcher()
@@ -317,6 +360,10 @@ Context <- R6Class("Context",
           if(inherits(self$exit_hooks,"CallbackDispatcher"))
               self$exit_hooks$run()
       },
+      #' @description
+      #' Add a handler function to be called by the
+      #' \code{exit()} function, i.e. after a series of expression 
+      #' has been evaluated.
       on_exit = function(handler,remove=FALSE){
           if(!length(self$exit_hooks))
               self$exit_hooks <- CallbackDispatcher()
@@ -361,6 +408,15 @@ get_name_el <- function(x){
     else deparse(x)
 }
 
+
+#' Evalute expressions within a context
+#'
+#' @description A method for the generic function "with" to be used with context
+#'     objects.
+#'
+#' @param data A Context object
+#' @param expr An expression (or a set of expression wrapped in curly braces).
+#' @param enclos An enclosing environment.
 #' @export
 with.Context <- function(data,expr,enclos=parent.frame(),...){
     # log_out("with.Context")
