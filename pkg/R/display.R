@@ -1,6 +1,5 @@
-#' @importFrom repr mime2repr
-#' @importFrom uuid UUIDgenerate
-
+#' Display an R Object
+#'
 #' @export
 display <- function(...){
     # log_out("display")
@@ -10,8 +9,19 @@ display <- function(...){
                         metadata=d$metadata)
 }
 
+#' Prepare an R Object for being displayed
+#'
+#' @description A generic function that prepares R objects for display using \code{display()}
+#'
+#' @param x An object to be prepared for display.
+#' @return An object of class "display_data"
+#' 
 #' @export
 display_data <- function(x,...) UseMethod("display_data")
+
+#' @describeIn display_data 
+#' @importFrom repr mime2repr
+#' @importFrom uuid UUIDgenerate
 #' @export
 display_data.default <- function(x,...,
                             metadata=emptyNamedList,
@@ -43,6 +53,8 @@ display_data.default <- function(x,...,
     structure(d,class=cl)
 }
 
+#' @describeIn display_data 
+#' @importFrom uuid UUIDgenerate
 #' @importFrom htmltools htmlEscape
 #' @importFrom digest digest
 #' @importFrom base64enc dataURI
@@ -102,6 +114,10 @@ display_data.htmlwidget <- function(x,...,
     structure(d,class=cl)
 }
 
+#' @describeIn display_data 
+#' @importFrom repr mime2repr
+#' @importFrom uuid UUIDgenerate
+#' @export
 display_data.recordedplot <- function(x,
                                       width=getOption("jupyter.plot.wdith",6),
                                       height=getOption("jupyter.plot.height",6),
@@ -156,28 +172,51 @@ getMatch <- function(x,match){
     res
 }
 
+#' @describeIn display_data 
 #' @export
 display_data.display_data <- function(x,...) x
 
+#' @describeIn display_data 
 #' @export
 display_data.update_display_data <- function(x,...) x
 
+
+#' Get the id of an object display
+#'
+#' @description This function returns the id of an object created by
+#'     \code{display_data()} or \code{update_display_data()}.
+#' 
+#' @param x An object of class "display_data" or "update_display_data"
+#' @return a character string with the id.
+#' 
 #' @export
 display_id <- function(x) UseMethod("display_id")
+
+#' @describeIn display_id
 #' @export
 display_id.display_data <- function(x) x$transient$display_id
+
+#' @describeIn display_id
 #' @export
 display_id.update_display_data <- function(x) x$transient$display_id
 
+#' @describeIn display_data 
 #' @export
 update.display_data <- function(object,...){
     id <- display_id(object)
     display_data(...,id=id,update=TRUE)
 }
 
-
+#' Display an object using the Jupyter notebook pager
+#'
+#' @description This function allows to display an \emph{R} object in the pager
+#'     of a Jupyter notebook. Note that acts like \code{display()} when Jupyter
+#'     Lab is used.
+#' 
 #' @export
 Page <- function(x,...) UseMethod("Page")
+
+#' @describeIn Page
 #' @export
 Page.default <- function(x,start=1,...){
     if(missing(x)){
@@ -193,6 +232,13 @@ Page.default <- function(x,start=1,...){
     structure(p,class="payload")
 }
 
+#' Add a Class to the 'Displayed' ones
+#'
+#' @description Add a class to those who are output using \code{display()} when
+#'     they are autoprinted, i.e. returned as the value of the last expression
+#'     in a Jupyter notebook cell.
+#'
+#' @param x A character string, the name of a class.
 #' @export
 add_displayed_classes <- function(x){
     if(is.character(x)) classes <- x
@@ -202,6 +248,14 @@ add_displayed_classes <- function(x){
         options(rkernel_displayed_classes=union(displayed_classes,classes))
     }
 }
+
+#' Remove a Class to the 'Displayed' ones
+#'
+#' @description Remove a class from those who are output using \code{display()} when
+#'     they are autoprinted, i.e. returned as the value of the last expression
+#'     in a Jupyter notebook cell.
+#'
+#' @param x A character string, the name of a class.
 #' @export
 remove_displayed_classes <- function(x){
     if(is.character(x)) classes <- x
@@ -212,6 +266,13 @@ remove_displayed_classes <- function(x){
     }
 }
 
+#' Add a Class to the 'Paged' ones
+#'
+#' @description Add a class to those who are output using \code{Page()} when
+#'     they are autoprinted, i.e. returned as the value of the last expression
+#'     in a Jupyter notebook cell.
+#'
+#' @param x A character string, the name of a class.
 #' @export
 add_paged_classes <- function(x){
     if(is.character(x)) classes <- x
@@ -221,6 +282,15 @@ add_paged_classes <- function(x){
         options(rkernel_paged_classes=union(paged_classes,classes))
     }
 }
+
+
+#' Remove a Class to the 'Paged' ones
+#'
+#' @description Remove a class from those who are output using \code{Page()} when
+#'     they are autoprinted, i.e. returned as the value of the last expression
+#'     in a Jupyter notebook cell.
+#'
+#' @param x A character string, the name of a class.
 #' @export
 remove_paged_classes <- function(x){
     if(is.character(x)) classes <- x
@@ -231,7 +301,10 @@ remove_paged_classes <- function(x){
     }
 }
 
+#' @describeIn display_data 
+#' @importFrom uuid UUIDgenerate
 #' @importFrom tools Rd2HTML Rd2txt Rd2latex
+#' @export 
 display_data.help_files_with_topic <- function(x,...,
                                           id=UUIDgenerate(),
                                           update=FALSE){
@@ -323,6 +396,7 @@ display_data.help_files_with_topic <- function(x,...,
     structure(d,class=cl)
 }
 
+#' @describeIn display_data 
 #' @export
 display_data.hsearch <- function(x,..., 
     id=UUIDgenerate(), 
@@ -346,8 +420,8 @@ display_data.hsearch <- function(x,...,
         text_plain <- c(text_plain,"Demos:","",text_out_grp$demo,"")
     }
 
-# http://127.0.0.1:10006/doc/html/Search?pattern=regression&
-#fields.alias=1&fields.title=1&fields.concept=1&ignore.case=1&types.help=1&types.vignette=1&types.demo=1
+    # http://127.0.0.1:10006/doc/html/Search?pattern=regression&
+    #fields.alias=1&fields.title=1&fields.concept=1&ignore.case=1&types.help=1&types.vignette=1&types.demo=1
 
     help_search_url <- paste0(get_help_url(),
                   "/doc/html/Search?pattern=",
@@ -418,6 +492,11 @@ format_item <- function(x){
 }
 
 
+#' Prepare Javascript to be sent to the frontend
+#'
+#' @param text A character string with Javascript code
+#' @param file Path of a file with Javascript code
+#' @return An S3 object of class "display_data" with mime data of type "application/javascript"
 #' @export
 Javascript <- function(text,file){
     if(missing(text)){
@@ -430,6 +509,13 @@ Javascript <- function(text,file){
             "application/javascript"=text)
 }
 
+#' Send CSS code to the frontend
+#'
+#' @description Send CSS code in a character string or a text file to the
+#'     frontend.
+#'
+#' @param text A character string with CSS styling information
+#' @param file Path of a file with CSS styling information
 #' @export
 CSS <- function(text,file){
     if(missing(text)){
@@ -440,6 +526,12 @@ CSS <- function(text,file){
     display_data("text/html"=text_html)
 }
 
+#' Send LaTeX math to the frontend
+#'
+#' @description Send LaTeX code for math in a character string to the
+#'     frontend to be formatted by MathJax 
+#'
+#' @param text A character string with LaTeX code for math
 #' @export
 LaTeXMath <- function(text){
     text <- paste(text,collapse="\n")
@@ -449,6 +541,14 @@ LaTeXMath <- function(text){
             "text/latex"=text_latex)
 }
 
+#' Send raw HTML code to the frontend
+#'
+#' @description Send raw HTML code in a character string to the
+#'     frontend
+#'
+#' @param text A character string with LaTeX code for math
+#' @param id A character string with the display id
+#' @param update A logical value, should an existing display_data option?
 #' @export
 raw_html <- function(text,id=UUIDgenerate(),update=FALSE){
     text <- paste(text,collapse="\n")
@@ -458,7 +558,9 @@ raw_html <- function(text,id=UUIDgenerate(),update=FALSE){
             update=update)
 }
 
-
+#' @describeIn display_data S3 method for class 'data.frame'
+#' @importFrom repr mime2repr
+#' @importFrom uuid UUIDgenerate
 #' @export
 display_data.data.frame <- function(x,...,
                             metadata=emptyNamedList,
@@ -490,18 +592,12 @@ display_data.data.frame <- function(x,...,
     structure(d,class=cl)
 }
 
+#' @describeIn display_data
 #' @export
 display_data.matrix <- display_data.data.frame
 
-#' @export
-add_to_head <- function(code){
-    script_tmpl <- "$('%s').appendTo(\"head\");"
-    code <- gsub("\n","\\ \n",code,fixed=TRUE)
-    script <- sprintf(script_tmpl,code)
-    print(script)
-    Javascript(script)
-}
 
+#' @describeIn display_data
 #' @export
 display_data.html_elem <- function(x,...,
                               metadata=emptyNamedList,
@@ -516,6 +612,7 @@ display_data.html_elem <- function(x,...,
             update=update)
 }
 
+#' @describeIn display_data
 #' @export
 display_data.shiny.tag <- function(x,...,
                               metadata=emptyNamedList,
@@ -530,6 +627,11 @@ display_data.shiny.tag <- function(x,...,
             update=update)
 }
 
+#' Create an alert in the frontend
+#'
+#' @description Creates Javascript code and sends it to the frontend that opens
+#'     an alert box in the browser.
+#' @param text A character string with the text that appears in the 
 #' @export
 alert <- function(text){
     alert.js <- sprintf("alert('%s')",text)
