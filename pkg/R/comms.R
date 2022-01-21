@@ -1,8 +1,13 @@
+#' A Manager for Comms
+#'
+#' @description Objects of this class are used internally to manage comms, they
+#'     are not meant to be called by end-users.
 #' @export
 CommManagerClass <- R6Class("CommManager",
     
     public=list(
 
+        #' @field comms A list of Comms.
         comms   = list(),
 
         initialize = function(kernel,evaluator){
@@ -10,6 +15,10 @@ CommManagerClass <- R6Class("CommManager",
             private$evaluator <- evaluator
         },
 
+        #' @description
+        #' Add a handler for a comm target
+        #' @param target_name A string, the name of the target
+        #' @param handlers A named list of handlers
         add_handlers = function(target_name,handlers){
             for(n in names(handlers)){
                 environment(handlers[[n]]) <- new.env(parent=environment(handlers[[n]]))
@@ -18,11 +27,24 @@ CommManagerClass <- R6Class("CommManager",
             }
             private$handlers[[target_name]] <- handlers
         },
+        #' @description
+        #' Remove the handlers of a comm target
+        #' @param target_name A string, the name of the target
         remove_handlers = function(target_name) {
             private$handlers[[target_name]] <- NULL
         },
+        #' @description
+        #' Check if handlers for a target exist
+        #' @param target_name A string, the name of the target
         has_handlers = function(target_name) target_name %in% names(private$handlers),
+        #' @description
+        #' Get the handlers for a target
+        #' @param target_name A string, the name of the target
         get_handlers = function(target_name) private$handlers[[target_name]],
+        #' @description
+        #' Get all comms or all comms related to a target
+        #' @param target_name A string, the name of the target or NULL. If NULL,
+        #     all comms are returned
         get_comms = function(target_name=NULL){
             comms <- list()
             for(c in self$comms){
@@ -31,6 +53,9 @@ CommManagerClass <- R6Class("CommManager",
             }
             return(comms)
         },
+        #' @description
+        #' Create a new comm related to a target
+        #' @param target_name A string, the name of the target
         new_comm = function(target_name){
             if(target_name %in% names(private$handlers)){
                 id <- uuid()
@@ -44,6 +69,11 @@ CommManagerClass <- R6Class("CommManager",
             }
             else warning(sprintf("Comm target '%s' not found",target_name))
         },
+        #' @description
+        #' Handle a 'comm open' request from the frontend
+        #' @param target_name A string, the name of the target
+        #' @param id A string, the comm id
+        #' @param data Data sent by the frontend
         handle_open = function(target_name,id,data){
             # private$kernel$log_out("handle_open")
             # private$kernel$log_out(data,use.print=TRUE)
@@ -71,6 +101,10 @@ CommManagerClass <- R6Class("CommManager",
                 self$send_close(id,target_name)
             }
         },
+        #' @description
+        #' Handle a 'comm close' request from the frontend
+        #' @param id A string, the comm id
+        #' @param data Data sent by the frontend
         handle_close = function(id,data){
             # private$kernel$log_out("handle_close")
             # private$kernel$log_out(data,use.print=TRUE)
@@ -91,6 +125,10 @@ CommManagerClass <- R6Class("CommManager",
                 private$evaluator$stream(text,stream="stdout")
             }
         },
+        #' @description
+        #' Handle a comm message from the frontend
+        #' @param id A string, the comm id
+        #' @param data Data sent by the frontend
         handle_msg = function(id,data){
             comm <- self$comms[[id]]
             handlers <- comm$handlers
@@ -110,18 +148,36 @@ CommManagerClass <- R6Class("CommManager",
                 private$evaluator$stream(text,stream="stdout")
             }
         },
+        #' @description
+        #' Send data to the frontend
+        #' @param id A string, the comm id
+        #' @param data A named list
+        #' @param metadata A named list
+        #' @param buffers A list of raw vectors or NULL
         send = function(id,data,metadata=emptyNamedList,buffers=NULL){
             # log_out("comm_manager$send")
             # log_out(data,use.print=TRUE)
             # log_out(buffers,use.print=TRUE)
             private$kernel$send_comm_msg(id,data,metadata,buffers=buffers)  
         },
+        #' @description
+        #' Send an 'open' request to the frontend
+        #' @param id A string, the comm id
+        #' @param data A named list
+        #' @param metadata A named list
+        #' @param buffers A list of raw vectors or NULL
         send_open = function(id,target_name,data,metadata=emptyNamedList,buffers=NULL){
             # log_out("comm_manager$send_open")
             # log_out(data,use.print=TRUE)
             # log_out(buffers,use.print=TRUE)
             private$kernel$send_comm_open(id,target_name,data,metadata,buffers=buffers)  
         },
+        #' @description
+        #' Send an 'close' request to the frontend
+        #' @param id A string, the comm id
+        #' @param data A named list
+        #' @param metadata A named list
+        #' @param buffers A list of raw vectors or NULL
         send_close = function(id,target_name,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
             private$kernel$send_comm_close(id,data,metadata,buffers=buffers)  
         },
@@ -134,18 +190,25 @@ CommManagerClass <- R6Class("CommManager",
         handlers = list()
     )
 )
+
+#' A constructor for objects in the 'CommManagerClass'
 #' @export
 CommManager <- function(...) CommManagerClass$new(...)
 
+
+#' Comms - connections between the kernel and the frontend
+#'
+#' @description This R6 Class provides for bidirectional communication between the R Kernel and
+#'    the Jupyter frontend, e.g. a Jupyter notebook
 #' @export
 CommClass <- R6Class("Comm",
 
     public = list(
 
+        #' @field id A character string, the comm id
         id = character(0),
+        #' @field target_name A character string, the target
         target_name = character(0),
-        handlers = list(),
-        data = list(),
         
         initialize = function(target_name,
                               id = uuid(),
@@ -156,6 +219,10 @@ CommClass <- R6Class("Comm",
             private$kernel <- kernel
         },
 
+        #' @description Open a comm
+        #' @param data A named list
+        #' @param metadata A named list
+        #' @param buffers A list of raw vectors or NULL
         open = function(data,metadata=emptyNamedList,buffers=NULL){
             # log_out("comm$open")
             # log_out(data,use.print=TRUE)
@@ -164,6 +231,10 @@ CommClass <- R6Class("Comm",
             target_name <- self$target_name
             private$kernel$send_comm_open(id,target_name,data,metadata,buffers=buffers)  
         },
+        #' @description Send data through a comm
+        #' @param data A named list
+        #' @param metadata A named list
+        #' @param buffers A list of raw vectors or NULL
         send = function(data,metadata=emptyNamedList,buffers=NULL){
             # log_out("comm$send")
             # log_out(data,use.print=TRUE)
@@ -171,6 +242,10 @@ CommClass <- R6Class("Comm",
             id <- self$id
             private$kernel$send_comm_msg(id,data,metadata,buffers=buffers)  
         },
+        #' @description Close a comm
+        #' @param data A named list
+        #' @param metadata A named list
+        #' @param buffers A list of raw vectors or NULL
         close = function(data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
             # log_out("comm$close")
             # log_out(data,use.print=TRUE)
@@ -183,9 +258,12 @@ CommClass <- R6Class("Comm",
         kernel = list()
     )
 )
+
+#' A constructor function for objects of class "CommClass"
 #' @export
 Comm <- function(...) CommClass$new(...)
 
+# Get the comm manager of the current kernel
 get_comm_manager <- function() {
     kernel <- get_current_kernel()
     kernel$comm_manager
