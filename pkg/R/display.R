@@ -333,54 +333,57 @@ display_data.help_files_with_topic <- function(x,...,
             help_url1 <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(file),".html")
             help_urls <- c(help_urls,help_url1)
         }
+
+        if(length(paths) == 1){
+            help_url <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(paths),".html")
+            text_html <- paste(paste0(
+                "<iframe src='",help_url,"'"),
+                "style='width: 100%;'",
+                "class='manpage'",
+                "frameborder='0' seamless onload=window.parent.scrollTo(0,0)>",
+                "</iframe>",
+                sep="\n")
+        } 
+        else {
+            help_url <- paste0(get_help_url(),"/library/NULL/help/",URLencode(topic,reserved=TRUE))
+            text_html <- paste(paste0(
+                "<iframe src='",help_url,"'"),
+                "style='width: 100%;'",
+                "class='manpage'",
+                "frameborder='0' seamless onload=window.parent.scrollTo(0,0)>",
+                "</iframe>",
+                sep="\n")
+        }
+
+        style <- '<style>
+                 form.help-popout-button {
+                      border-style:revert;
+                 }
+                 #pager-container form.help-popout-button {
+                      display:none;
+                 }
+                 iframe.manpage {
+                      height: 30rem;
+                 }
+                 #pager-container iframe.manpage {
+                      height: 5000em;
+                 }
+                 </style>
+                 '
+        popout_button <- '<form class="help-popout-button" action="%s" method="get" target="_blank">
+                               <button type="submit">Open in new tab</button>
+                          </form>'
+        popout_button <- sprintf(popout_button,help_url)
+        text_html <- paste(style,popout_button,text_html,sep="\n")
+
     } 
     else {
         text_plain <- paste(gettextf('No documentation for %s in specified packages and libraries:', sQuote(topic)),
-                      gettextf('you could try %s', sQuote(paste0('??', topic))), sep = '\n')
+                            gettextf('you could try %s', sQuote(paste0('??', topic))),
+                            sep = '\n')
+        text_html <- text_plain
         text_latex <- text_plain
     }
-
-    if(length(paths) == 1){
-        help_url <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(paths),".html")
-        text_html <- paste(paste0(
-                           "<iframe src='",help_url,"'"),
-                           "style='width: 100%;'",
-                           "class='manpage'",
-                           "frameborder='0' seamless onload=window.parent.scrollTo(0,0)>",
-                           "</iframe>",
-                           sep="\n")
-    } 
-    else {
-        help_url <- paste0(get_help_url(),"/library/NULL/help/",URLencode(topic,reserved=TRUE))
-        text_html <- paste(paste0(
-                           "<iframe src='",help_url,"'"),
-                           "style='width: 100%;'",
-                           "class='manpage'",
-                           "frameborder='0' seamless onload=window.parent.scrollTo(0,0)>",
-                           "</iframe>",
-                           sep="\n")
-    }
-
-    style <- '<style>
-    form.help-popout-button {
-         border-style:revert;
-    }
-    #pager-container form.help-popout-button {
-         display:none;
-    }
-    iframe.manpage {
-         height: 30rem;
-    }
-    #pager-container iframe.manpage {
-         height: 5000em;
-    }
-    </style>
-    '
-    popout_button <- '<form class="help-popout-button" action="%s" method="get" target="_blank">
-         <button type="submit">Open in new tab</button>
-    </form>'
-    popout_button <- sprintf(popout_button,help_url)
-    text_html <- paste(style,popout_button,text_html,sep="\n")
 
     mime_data <- list(
         "text/plain"=paste(text_plain,collapse="\n"),
