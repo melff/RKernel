@@ -8,10 +8,11 @@ It differs from the already existing [*IRKernel*](http://irkernel.github.io) by:
   - Ordinary console output appears via the "stdout" stream, which enables
     output colorized e.g. by
     [*crayon*](https://cran.r-project.org/package=crayon).
-  - Rich HTML/LaTeX output is strictly and is supported by a
-    dedicated `display()` function (yet to be implemented).
+  - Rich HTML/LaTeX output is strictly optional and is supported by a
+    dedicated `display()` function.
   - Error conditions created by `stop()` will not lead necessarily to a stop 
-    in the running of a Jupyter notebook.
+    in the running of a Jupyter notebook. This can be controlled by the option 
+    `rkernel_stop_on_error`.
   - Error and warning messages appear via the `stderr` stream, ordinary messages
     (created by `message()`) appear via the `stdout` stream. Consequently,
     "ordinary" messages (e.g. that appear while a package is loaded via
@@ -24,8 +25,10 @@ It differs from the already existing [*IRKernel*](http://irkernel.github.io) by:
   - Dynamic help works, including `help.start()`.
   - The polling loop allows for providing services e.g. with the "htmluv"
     package.
-  - [HTML widgets](https://cran.r-project.org/?package) can be included in
-    Jupyter notebooks and can interacted with even with Firefox.
+  - [HTML widgets](https://cran.r-project.org/?package) (partially) work. At the time of 
+    writing, "rbokeh" widgets work flawless when included into a Jupyter notebook. 
+    "plotly" and "d3plus" widgets only work with Firefox, but not with Google Chrome. 
+    This appears to be a Javascript issue.
   - It is possible to make use of the Widgets infrastructure provided by
     [*ipywidgets*](https://ipywidgets.readthedocs.io) to constructed interactive
     user interfaces. These can be used with jupyter notebooks, JupyterLab and
@@ -37,3 +40,4 @@ TODO:
 
   - [ ] Add documentation
   - [ ] Add example notebooks
+  - [ ] Make HTML widgets work more generally
