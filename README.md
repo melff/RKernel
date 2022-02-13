@@ -38,6 +38,8 @@ It differs from the already existing [*IRKernel*](http://irkernel.github.io) by:
     
 Some demonstration notebooks can be found [here](https://tmphub.elff.eu/user-redirect/).
     
+A widget demonstration can be found [here](https://tmphub.elff.eu/user-redirect/voila/render/RKernel-demo-interact-logistic-regression.ipynb)
+    
 TODO:
 
   - [ ] Add documentation
