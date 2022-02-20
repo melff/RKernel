@@ -315,7 +315,34 @@ remove_paged_classes <- function(x){
     }
 }
 
-#' @describeIn display_data 
+
+popout_button_style <- '<style>
+form.help-popout-button button {
+     border-style:solid;
+     border-width:1px;
+     border-radius:0;
+     border-color:#cfcfcf;
+}
+#pager-container form.help-popout-button {
+     display:none;
+}
+iframe.manpage {
+   border-style:solid;
+   border-width:1px;
+   border-color:#cfcfcf;
+   border-radius:2px;
+}
+#pager-container iframe.manpage {
+     height: 5000em;
+}
+</style>
+'
+popout_button <- '<form class="help-popout-button" action="%s" method="get" target="_blank">
+             <button type="submit">Open in new tab</button>
+</form>'
+
+
+#' @describeIn display_data S3 method for help pages
 #' @importFrom uuid UUIDgenerate
 #' @importFrom tools Rd2HTML Rd2txt Rd2latex
 #' @export 
@@ -334,6 +361,8 @@ display_data.help_files_with_topic <- function(x,...,
         text_latex <- character(0)
         help_urls <- character(0)
         help_labels <- character(0)
+        
+        help_page_height <- getOption("help_page_height","60ex")
 
         for(file in paths){
             pkgname <- basename(dirname(dirname(file)))
@@ -352,43 +381,24 @@ display_data.help_files_with_topic <- function(x,...,
             help_url <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(paths),".html")
             text_html <- paste(paste0(
                 "<iframe src='",help_url,"'"),
-                "style='width: 100%;'",
-                "class='manpage'",
-                "frameborder='0' seamless onload=window.parent.scrollTo(0,0)>",
+                "style='width:100%;height:",help_page_height,";'",
+                "class='manpage'>",
+                # "frameborder='0' onload=window.parent.scrollTo(0,0)>",
                 "</iframe>",
                 sep="\n")
         } 
         else {
             help_url <- paste0(get_help_url(),"/library/NULL/help/",URLencode(topic,reserved=TRUE))
-            text_html <- paste(paste0(
-                "<iframe src='",help_url,"'"),
-                "style='width: 100%;'",
-                "class='manpage'",
-                "frameborder='0' seamless onload=window.parent.scrollTo(0,0)>",
+            text_html <- paste(paste0("<iframe src='",help_url,"'"),
+                "style='width:100%;height:",help_page_height,"'",
+                "class='manpage'>",
+                # "frameborder='0' onload=window.parent.scrollTo(0,0)>",
                 "</iframe>",
                 sep="\n")
         }
 
-        style <- '<style>
-                 form.help-popout-button {
-                      border-style:revert;
-                 }
-                 #pager-container form.help-popout-button {
-                      display:none;
-                 }
-                 iframe.manpage {
-                      height: 30rem;
-                 }
-                 #pager-container iframe.manpage {
-                      height: 5000em;
-                 }
-                 </style>
-                 '
-        popout_button <- '<form class="help-popout-button" action="%s" method="get" target="_blank">
-                               <button type="submit">Open in new tab</button>
-                          </form>'
         popout_button <- sprintf(popout_button,help_url)
-        text_html <- paste(style,popout_button,text_html,sep="\n")
+        text_html <- paste(text_html,popout_button_style,popout_button,sep="\n")
 
     } 
     else {
@@ -405,15 +415,49 @@ display_data.help_files_with_topic <- function(x,...,
         "text/latex"=paste(text_latex,collapse="\n")
     )
 
+
     d <- list(data=mime_data)
-    d$metadata <- list(height="40ex")
+    d$metadata <- emptyNamedList
     d$transient <- list(display_id=id)
     if(update) cl <- "update_display_data"
     else cl <- "display_data"
     structure(d,class=cl)
 }
 
-#' @describeIn display_data 
+#' @export
+help.start <- function(update = FALSE, 
+                       gui = "irrelevant", 
+                       browser = getOption("browser"), 
+                       remote = NULL){
+    help_url <- paste0(get_help_url(),"/doc/html/index.html")
+    text_html <- paste(paste0("<iframe src='",help_url,"'"),
+        "style='width:100%;height:60ex;'",
+        "class='manpage'>",
+        # "onload=window.parent.scrollTo(0,0)>",
+        "</iframe>",
+        sep="\n")
+    popout_button <- sprintf(popout_button,help_url)
+    text_html <- paste(text_html,popout_button_style,popout_button,sep="\n")
+    mime_data <- list(
+        "text/plain"=character(0),
+        "text/html"=paste(text_html,collapse="\n"),
+        "text/latex"=character(0)
+    )
+
+    d <- list(data=mime_data)
+    d$metadata <- emptyNamedList
+    d$transient <- list(display_id=UUIDgenerate())
+    if(update) cl <- "update_display_data"
+    else cl <- "display_data"
+    structure(d,class=cl)
+}
+
+help_start <- help.start
+
+
+
+
+
 #' @describeIn display_data S3 method for results of 'help.search()'
 #' @export
 display_data.hsearch <- function(x,..., 

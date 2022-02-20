@@ -72,7 +72,7 @@ Evaluator <- R6Class("Evaluator",
                     rkernel_stop_on_error=TRUE)
 
 
-            add_paged_classes(c("help_files_with_topic","packageIQR","hsearch"))
+            add_displayed_classes(c("help_files_with_topic","packageIQR","hsearch"))
             add_displayed_classes(c("htmlwidget","html_elem","shiny.tag"))
 
             private$comm_dispatcher <- private$kernel$comm_dispatcher
@@ -84,60 +84,15 @@ Evaluator <- R6Class("Evaluator",
                                         value_callback=private$handle_value,
                                         graphics_callback=private$handle_graphics,
                                         envir=.GlobalEnv,
-            
-            self$start_help_system()
-            assign("help_proc",self$help_proc,envir=self$env)
-            assign("help_port",self$help_port,envir=self$env)
-            assign("help.start",self$help_start,envir=self$env)
-
-            assign("get_help_url",function()self$help_url,envir=self$env)
+                                        attachment=private$env)
 
             suppressMessages(trace(example,tracer=quote(if(missing(run.donttest)) run.donttest<-TRUE),print=FALSE))
-        },
-
-        help_port = integer(),
-        help_proc = integer(),
-        help_url = character(),
-
-        start_help_system = function(help_port=getOption("help.port",10001)){
-            # if(is.null(help_port)){
-            #     repeat{
-            #         help_port <- tools::startDynamicHelp(TRUE)
-            #         if(help_port > 0) break
-            #     }
-            #     port0 <- tools::startDynamicHelp(FALSE)
-            #     stopifnot(port0 == 0)
-            # }
-            help_port <- as.integer(help_port)
-            if(!check_help_port(help_port)){
-                help_proc  <- callr::r_bg(function(port){
-                    options(help.ports=port)
-                    tools::startDynamicHelp(TRUE)
-                    repeat Sys.sleep(60)
-                },args=list(port=help_port))
-                repeat{
-                    if(help_proc$is_alive()) break
-                }
-                self$help_proc <- help_proc
-            }
-            self$help_port <- help_port
-            self$help_url <- paste0("http://127.0.0.1:",help_port)
-        },
             if(file.exists("RKernel-startup.R"))
                 source("RKernel-startup.R")
 
-        help_start = function(update = FALSE, 
-                              gui = "irrelevant", 
-                              browser = getOption("browser"), 
-                              remote = NULL){
-            if(is.null(remote))
-                remote <- self$help_url
-            utils::help.start(update=update,
-                              gui=gui,
-                              browser=browser,
-                              remote=remote)
+            private$start_help_system()
+            assign("help.start",help.start,envir=private$env)
         },
-
         #' @description
         #' Shut the session down
         shutdown = function(){
