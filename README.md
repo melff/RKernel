@@ -22,7 +22,7 @@ It differs from the already existing [*IRKernel*](http://irkernel.github.io) by:
     plot to which the curve is added was created by code in a previous cell. 
   - It is based on the [*R6*](https://cran.r-project.org/package=R6) package
     instead of S4 reference classes.
-  - ~Dynamic help works, including `help.start()`.~ (This works only if Jupyter is used *locally*.)
+  - Dynamic help works, including `help.start() - thanks to [jupyter-server-proxy](https://pypi.org/project/jupyter-server-proxy/)
   - The polling loop allows for providing services e.g. with the "htmluv"
     package.
   - [HTML widgets](https://cran.r-project.org/?package) (partially) work. At the time of 
