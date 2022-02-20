@@ -396,8 +396,9 @@ Evaluator <- R6Class("Evaluator",
             # log_out("handle_text")
             # log_out(text,use.print=TRUE)
             text <- paste(text,collapse="\n")
-            private$kernel$stream(text = text,
-                                  stream = "stdout")
+            if(nzchar(text))
+                private$kernel$stream(text = text,
+                                      stream = "stdout")
         },
 
         last_plot_id = character(),
