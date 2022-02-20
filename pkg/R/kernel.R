@@ -39,7 +39,7 @@ Kernel <- R6Class("Kernel",
       comm_manager <- CommManager(self,evaluator)
       self$comm_manager <- comm_manager
       self$evaluator <- evaluator
-      self$evaluator$comm_manager <- comm_manager
+      # self$evaluator$comm_manager <- comm_manager
       kernel$current <- self
     },
 
@@ -50,9 +50,9 @@ Kernel <- R6Class("Kernel",
       self$evaluator$startup()
       continue <- TRUE
       while(continue) {
-        self$run_services()
+        private$run_services()
         rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
-        if(length(self$services) > 0) 
+        if(length(private$services) > 0) 
           poll_timeout <- rkernel_poll_timeout 
         else 
           poll_timeout <- -1L
@@ -68,38 +68,6 @@ Kernel <- R6Class("Kernel",
                shell=private$respond_shell(req))
       }
       self$evaluator$shutdown()
-    },
-
-    execution_count = 1,
-
-    execute_reply = function(msg){
-      private$send_message(type="execute_input",
-                           parent=private$parent$shell,
-                           socket_name="iopub",
-                           content=list(
-                             code=msg$content$code,
-                             execution_count=self$execution_count))
-      self$evaluator$eval(msg$content$code)
-      payload <- self$evaluator$get_payload(clear=TRUE)
-      payload <- check_page_payload(payload)
-      status <- self$evaluator$get_status(reset=TRUE)
-      aborted <- self$evaluator$is_aborted(reset=TRUE)
-      content <- list(status = status,
-                      execution_count = self$execution_count)
-      if(length(payload))
-        content$payload <- payload
-
-      private$send_message(type="execute_reply",
-                           parent=private$parent$shell,
-                           socket="shell",
-                           content=content)
-      #cat("Sent a execute_reply ...\n")
-      # message("Code:", msg$content$code)
-      #message("Store history:", msg$content$store_history)
-      #message("Execution count:", self$execution_count)
-      if(msg$content$store_history)
-        self$execution_count <- self$execution_count + 1
-      if(aborted) private$clear_shell_queue()
     },
 
     clear_output = function(wait){
@@ -121,7 +89,7 @@ Kernel <- R6Class("Kernel",
     execute_result = function(data,metadata=emptyNamedList){
       content <- list(data=data,
                       metadata=metadata,
-                      execution_count=self$execution_count)
+                      execution_count=private$execution_count)
       private$send_message(type="execute_result",
                            parent=private$parent$shell,
                            socket_name="iopub",
@@ -143,10 +111,8 @@ Kernel <- R6Class("Kernel",
                              data=d$data,
                              metadata=d$metadata,
                              transient=d$transient))
-      self$display_id <- d$transient$display_id
+      private$display_id <- d$transient$display_id
     },
-    display_id = character(0),
-    last_display = function() self$display_id,
     
     display_data = function(data,metadata=emptyNamedList,transient=NULL){
       #content <- list(data=data,transient=transient)
@@ -192,6 +158,112 @@ Kernel <- R6Class("Kernel",
                              traceback = traceback
                            ))
     },
+
+    send_comm_msg = function(id,data,metadata=emptyNamedList,buffers=NULL){
+      private$send_message(type="comm_msg",debug=FALSE,
+                   parent=private$parent$shell,
+                   socket_name="iopub",
+                   content=list(
+                     comm_id=id,
+                     data=data),
+                   metadata=metadata,
+                   buffers=buffers)
+    },
+    
+    send_comm_open = function(id,target_name,data,metadata=emptyNamedList,buffers=NULL){
+      private$send_message(type="comm_open",debug=FALSE,
+                   parent=private$parent$shell,
+                   socket_name="iopub",
+                   content=list(
+                     comm_id=id,
+                     target_name=target_name,
+                     target_module=NULL,
+                     data=data),
+                   metadata=metadata,
+                   buffers=buffers)
+    },
+    
+    send_comm_close = function(id,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
+      private$send_message(type="comm_close",debug=FALSE,
+                   parent=private$parent$shell,
+                   socket_name="iopub",
+                   content=list(
+                     comm_id=id,
+                     data=data),
+                   metadata=metadata,
+                   buffers=buffers)
+    },
+    
+    log_out = function(message,...,use.print=FALSE){
+      tstate <- tracingState(on=FALSE)
+      if(use.print)
+        message <- paste(capture.output(print(message)),collapse="\n")
+      else message <- paste(message,...,collapse="")
+      cat(crayon::bgBlue(format(Sys.time()),"\n",message,"\n"),file=stderr())
+      tracingState(on=tstate)
+    },
+    
+    add_service = function(run,init=NULL){
+      if(is.function(init)) init()
+      if(is.function(run))
+        private$services <- append(private$services,run)
+    },
+
+    remove_service = function(run){
+      services_to_keep <- list()
+      for(i in seq_along(private$services)){
+        if(!identical(run,private$services[[i]])) 
+          services_to_keep[[i]] <- private$services[[i]]
+      }
+      private$services <- services_to_keep
+    },
+
+    get_parent = function(channel="shell"){
+      return(private$parent[[channel]])
+    },
+
+    get_conn_info = function(){
+      return(private$conn_info)
+    }
+  ),
+
+  private = list(
+
+
+    execution_count = 1,
+
+    execute_reply = function(msg){
+      private$send_message(type="execute_input",
+                           parent=private$parent$shell,
+                           socket_name="iopub",
+                           content=list(
+                             code=msg$content$code,
+                             execution_count=private$execution_count))
+      self$evaluator$eval(msg$content$code)
+      payload <- self$evaluator$get_payload(clear=TRUE)
+      payload <- check_page_payload(payload)
+      status <- self$evaluator$get_status(reset=TRUE)
+      aborted <- self$evaluator$is_aborted(reset=TRUE)
+      content <- list(status = status,
+                      execution_count = private$execution_count)
+      if(length(payload))
+        content$payload <- payload
+
+      private$send_message(type="execute_reply",
+                           parent=private$parent$shell,
+                           socket="shell",
+                           content=content)
+      #cat("Sent a execute_reply ...\n")
+      # message("Code:", msg$content$code)
+      #message("Store history:", msg$content$store_history)
+      #message("Execution count:", private$execution_count)
+      if(msg$content$store_history)
+        private$execution_count <- private$execution_count + 1
+      if(aborted) private$clear_shell_queue()
+    },
+
+    display_id = character(0),
+    last_display = function() private$display_id,
 
     kernel_info_reply = function(msg){
       rversion <- paste0(version$major,".",version$minor)
@@ -274,75 +346,13 @@ Kernel <- R6Class("Kernel",
       self$comm_manager$handle_close(id,data)
     },
 
-    send_comm_msg = function(id,data,metadata=emptyNamedList,buffers=NULL){
-      private$send_message(type="comm_msg",debug=FALSE,
-                   parent=private$parent$shell,
-                   socket_name="iopub",
-                   content=list(
-                     comm_id=id,
-                     data=data),
-                   metadata=metadata,
-                   buffers=buffers)
-    },
-    
-    send_comm_open = function(id,target_name,data,metadata=emptyNamedList,buffers=NULL){
-      private$send_message(type="comm_open",debug=FALSE,
-                   parent=private$parent$shell,
-                   socket_name="iopub",
-                   content=list(
-                     comm_id=id,
-                     target_name=target_name,
-                     target_module=NULL,
-                     data=data),
-                   metadata=metadata,
-                   buffers=buffers)
-    },
-    
-    send_comm_close = function(id,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
-      private$send_message(type="comm_close",debug=FALSE,
-                   parent=private$parent$shell,
-                   socket_name="iopub",
-                   content=list(
-                     comm_id=id,
-                     data=data),
-                   metadata=metadata,
-                   buffers=buffers)
-    },
-    
-    log_out = function(message,...,use.print=FALSE){
-      tstate <- tracingState(on=FALSE)
-      if(use.print)
-        message <- paste(capture.output(print(message)),collapse="\n")
-      else message <- paste(message,...,collapse="")
-      cat(crayon::bgBlue(format(Sys.time()),"\n",message,"\n"),file=stderr())
-      tracingState(on=tstate)
-    },
-    
     services = list(),
-    add_service = function(run,init=NULL){
-      if(is.function(init)) init()
-      if(is.function(run))
-        self$services <- append(self$services,run)
-    },
+
     run_services = function(){
-      for(service in self$services)
+      for(service in private$services)
         service()
     },
-    remove_service = function(run){
-      services_to_keep <- list()
-      for(i in seq_along(self$services)){
-        if(!identical(run,self$services[[i]])) 
-          services_to_keep[[i]] <- self$services[[i]]
-      }
-      self$services <- services_to_keep
-    },
 
-    get_parent = function(channel="shell"){
-      return(private$parent[[channel]])
-    }
-  ),
-
-  private = list(
 
     .pbd_env = new.env(),
     sockets = list(),
@@ -406,14 +416,14 @@ Kernel <- R6Class("Kernel",
       # cat("Got a", msg$header$msg_type, "request ...\n")
       # do_stuff ...
       switch(msg$header$msg_type,
-             comm_open = self$handle_comm_open(msg),
-             comm_msg = self$handle_comm_msg(msg),
-             comm_close = self$handle_comm_close(msg),
-             execute_request = self$execute_reply(msg),
-             is_complete_request = self$is_complete_reply(msg),
-             kernel_info_request = self$kernel_info_reply(msg),
-             complete_request = self$complete_reply(msg),
-             comm_info_request = self$comm_info_reply(msg)
+             comm_open = private$handle_comm_open(msg),
+             comm_msg = private$handle_comm_msg(msg),
+             comm_close = private$handle_comm_close(msg),
+             execute_request = private$execute_reply(msg),
+             is_complete_request = private$is_complete_reply(msg),
+             kernel_info_request = private$kernel_info_reply(msg),
+             complete_request = private$complete_reply(msg),
+             comm_info_request = private$comm_info_reply(msg)
              )
 
       private$send_message(type="status",

@@ -2,6 +2,8 @@
 #'
 #' @description Objects of this class are used internally to manage comms, they
 #'     are not meant to be called by end-users.
+#' @details  See the documentation 
+#'   of \href{https://jupyter-client.readthedocs.io/en/latest/messaging.html#custom-messages}{Jupyter custom messages}.
 #' @export
 CommManagerClass <- R6Class("CommManager",
     
@@ -10,6 +12,10 @@ CommManagerClass <- R6Class("CommManager",
         #' @field comms A list of Comms.
         comms   = list(),
 
+        #' @description
+        #' Set up internal fields
+        #' @param kernel Reference to the relevant kernel
+        #' @param evaluator Reference to the relevant evaluator
         initialize = function(kernel,evaluator){
             private$kernel <- kernel
             private$evaluator <- evaluator
@@ -17,7 +23,7 @@ CommManagerClass <- R6Class("CommManager",
 
         #' @description
         #' Add a handler for a comm target
-        #' @param target_name A string, the name of the target
+        #' @param target_name A string, the name of the target.
         #' @param handlers A named list of handlers
         add_handlers = function(target_name,handlers){
             for(n in names(handlers)){
@@ -163,6 +169,7 @@ CommManagerClass <- R6Class("CommManager",
         #' @description
         #' Send an 'open' request to the frontend
         #' @param id A string, the comm id
+        #' @param target_name A string, the name of the target
         #' @param data A named list
         #' @param metadata A named list
         #' @param buffers A list of raw vectors or NULL
@@ -178,9 +185,11 @@ CommManagerClass <- R6Class("CommManager",
         #' @param data A named list
         #' @param metadata A named list
         #' @param buffers A list of raw vectors or NULL
-        send_close = function(id,target_name,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
+        send_close = function(id,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
             private$kernel$send_comm_close(id,data,metadata,buffers=buffers)  
         },
+        #' @description
+        #' Return a list of targets
         list_targets = function() return(private$handlers)
     ),
     
@@ -200,6 +209,8 @@ CommManager <- function(...) CommManagerClass$new(...)
 #'
 #' @description This R6 Class provides for bidirectional communication between the R Kernel and
 #'    the Jupyter frontend, e.g. a Jupyter notebook
+#' @details Objects of this class are used to communicate to the frontend via
+#' \href{https://jupyter-client.readthedocs.io/en/latest/messaging.html#custom-messages}{custom messages}.
 #' @export
 CommClass <- R6Class("Comm",
 
@@ -209,14 +220,24 @@ CommClass <- R6Class("Comm",
         id = character(0),
         #' @field target_name A character string, the target
         target_name = character(0),
+        #' @field handlers A list of handler functions
+        handlers = list(),
+        #' @field data A list of data
+        data = list(),
         
+        #' @description Initialize a 'Comm' object
+        #' @param target_name A string, the name of the target
+        #' @param id A string, the comm id
+        #' @param kernel The relevant kernel
+        #' @param handlers A list of handler functions
         initialize = function(target_name,
                               id = uuid(),
                               kernel = get_current_kernel(),
-                              handlers){
+                              handlers = list()){
             self$target_name <- target_name
             self$id <- id
             private$kernel <- kernel
+            self$handlers <- handlers
         },
 
         #' @description Open a comm

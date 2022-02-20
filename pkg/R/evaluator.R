@@ -10,46 +10,43 @@ check_help_port <- function(port){
     return(FALSE)
 }
 
+#' The Evaluator Class
+#'
+#' @description An object of this class provides the context in which
+#'   Jupyter notebook cells are run -- i.e. the expression within are
+#'   evaluated. Usually there is only one of such objects needed.
 #' @export
 Evaluator <- R6Class("Evaluator",
     public = list(
- 
-        nframes = -1,
-        aborted = FALSE,
-        status = "ok",
-        payload = list(),
-        results = list(),
-        env = list(),
-        comm_manager = list(),
-
-        context = list(),
-
+        #' @description
+        #' Initialize the object
+        #' @param kernel The kernel to which this evaluator belongs
         initialize = function(kernel){
             private$kernel <- kernel
         },
-
+        #' @decription
+        #' Prepare the object for evaluating expressions
         startup = function(...) {
 
-            self$env <- new.env()
-            #attach(self$env,name="RKernel")
+            private$env <- new.env()
+            #attach(private$env,name="RKernel")
             #pos <- match("RKernel",search())
-            assign("q",self$quit,envir=self$env)
-            assign("quit",self$quit,envir=self$env)
-            assign("interactive",function()TRUE,envir=self$env)
-            # assign("cell.options",self$cell.options,pos=pos)
-            # assign("cell.par",self$cell.par,pos=pos)
+            assign("q",self$quit,envir=private$env)
+            assign("quit",self$quit,envir=private$env)
+            assign("interactive",function()TRUE,envir=private$env)
+            # assign("cell.options",private$cell.options,pos=pos)
+            # assign("cell.par",private$cell.par,pos=pos)
             # 
-            assign("display",self$display,envir=self$env)
-            # assign("display",display,envir=self$env)
+            # assign("display",self$display,envir=private$env)
+            # assign("display",display,envir=private$env)
             # assign("stream",self$stream,pos=pos)
-            # #assign("cat",self$cat,pos=pos)
-            # #assign("print",self$print,pos=pos)
+            # #assign("cat",private$cat,pos=pos)
             # 
             # assign("Javascript",Javascript,pos=pos)
             # assign("Math",LaTeXMath,pos=pos)
             # assign("raw_html",raw_html,pos=pos)
             # assign("Page",Page,pos=pos)
-            assign("View",View,envir=self$env)
+            assign("View",View,envir=private$env)
             # assign("ls_str",ls_str,pos=pos)
             # 
             # assign("add_paged_classes",add_paged_classes,pos=pos)
@@ -80,14 +77,13 @@ Evaluator <- R6Class("Evaluator",
 
             private$comm_dispatcher <- private$kernel$comm_dispatcher
 
-            self$context <- Context$new(text_callback=self$handle_text,
-                                        message_callback=self$handle_message,
-                                        warning_callback=self$handle_warning,
-                                        error_callback=self$handle_error,
-                                        value_callback=self$handle_value,
-                                        graphics_callback=self$handle_graphics,
+            private$context <- Context$new(text_callback=private$handle_text,
+                                        message_callback=private$handle_message,
+                                        warning_callback=private$handle_warning,
+                                        error_callback=private$handle_error,
+                                        value_callback=private$handle_value,
+                                        graphics_callback=private$handle_graphics,
                                         envir=.GlobalEnv,
-                                        attachment=self$env)
             
             self$start_help_system()
             assign("help_proc",self$help_proc,envir=self$env)
@@ -140,99 +136,244 @@ Evaluator <- R6Class("Evaluator",
                               remote=remote)
         },
 
+        #' @description
+        #' Shut the session down
         shutdown = function(){
             base::q()
         },
-
-        new_cell = TRUE,
-        eval = function(code,...,silent=FALSE){
+        #' @description
+        #' Evaluate R code
+        #' @param code A string with R code
+        #' @param ... Other arguments, currently ignored
+        eval = function(code,...){
             
-            perc_match <- getMatch(code,regexec("^%%(.+?)\n\n",code))
+            perc_match <- getMatch(code,regexec("^%%(.+?)\n",code))
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
                 # message(sprintf("Found magic '%s'",magic))
                 code <- gsub("^%%.+?\n","",code)
-                self$handle_magic(magic,code)
+                private$handle_magic(magic,code)
                 return()
             }
 
             if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
                 rm(var_dic_list,envir=.GlobalEnv)
             #pos <- match("RKernel",search())
-            #assign("var_dic_list",self$var_dic_list,pos=pos)
+            #assign("var_dic_list",private$var_dic_list,pos=pos)
 
-            if(self$nframes < 0){
-                getnframes <- function(e) self$nframes <- sys.nframe()
+            if(private$nframes < 0){
+                getnframes <- function(e) private$nframes <- sys.nframe()
                 tryCatch(evalq(stop()),
                     error = getnframes)
             }
 
-            self$results <- list()
-            if(self$aborted) return(self$results)
+            private$results <- list()
+            if(private$aborted) return(private$results)
 
             expressions <- try(parse(text=code),silent=TRUE)
             if(inherits(expressions,"try-error")){
                 condition <- attr(expressions,"condition")
-                self$status <- "error"
+                private$status <- "error"
                 private$kernel$stream(text=condition$message,
                                       stream="stderr")
             }
             else {
-                self$new_cell <- TRUE
-                self$context$evaluate(expressions,envir=.GlobalEnv)
+                private$new_cell <- TRUE
+                private$context$evaluate(expressions,envir=.GlobalEnv)
 
-                if(length(self$saved.options)){
-                    op <- self$saved.options
-                    self$saved.options <- list()
+                if(length(private$saved.options)){
+                    op <- private$saved.options
+                    private$saved.options <- list()
                     do.call("options",op)
                 }
-                if(length(self$saved.parms)){
-                    op <- self$saved.parms
-                    self$saved.parms <- list()
+                if(length(private$saved.parms)){
+                    op <- private$saved.parms
+                    private$saved.parms <- list()
                     do.call("par",op)
                 }
 
-                self$run_callbacks()
+                private$run_callbacks()
             }
         },
-
-        add_result = function(result){
-            self$results <- append(self$results,list(result))
-        },
-
-        add_payload = function(payload){
-            self$payload <- append(self$payload,list(payload))
-        },
-
+        #' @description
+        #' Get the payload associated with the result returned from running a Jupyter cell
+        #' @param clear A logical value, whether the payload list should be cleared after returning it.
         get_payload = function(clear=FALSE){
-            payload <- self$payload
+            payload <- private$payload
             if(clear)
-                self$payload <- list()
+                private$payload <- list()
             return(payload)
         },
-
+        #' @description
+        #' Get the execution status ("ok", "error", or "aborted")
+        #' @param reset A logical value, whether the status should be reset to "ok" after returning it.
         get_status = function(reset=FALSE){
-            status <- self$status
+            status <- private$status
             if(reset)
-                self$status <- "ok"
+                private$status <- "ok"
             return(status)
         },
 
         set_status = function(status){
-            self$status <- status
+            private$status <- status
         },
 
         is_aborted = function(reset=FALSE){
-            aborted <- self$aborted
+            aborted <- private$aborted
             if(reset)
-                self$aborted <- FALSE
+                private$aborted <- FALSE
             return(aborted)
         },
 
         quit = function(...){
             payload <- list(source="ask_exit",
                             keepkernel=FALSE)
-            self$add_payload(payload)
+            private$add_payload(payload)
+        },
+
+        display = function(...){
+            d <- display_data(...)
+            private$kernel$display_data(data=d$data,
+                                        metadata=d$metadata,
+                                        transient=d$transient)
+        },
+
+        stream = function(text, stream=c("stdout","stderr")){
+            stream <- match.arg(stream)
+            private$kernel$stream(text=text,
+                                  stream=stream)
+        },
+
+        clear_output = function(wait=FALSE){
+            private$kernel$clear_output(wait=wait)
+        },
+
+        set_last_value = function(x){
+            pos <- match("RKernel",search())
+            assign(".Last.value",x,pos=pos)
+        },
+
+        code_is_complete = function(code){
+            status <- tryCatch({
+                parse(text=code)
+                "complete"
+            },
+            error = conditionMessage)
+            if(is_unexpected_end(status) || is_unexpected_string(status))
+                return("incomplete")
+            else if(status!="complete")
+                return("invalid")
+            else return("complete")
+        },
+        
+        get_completions = function(code,cursor_pos){
+            if(!private$completions_inited) private$init_completions()
+
+# FIXME Rare error message
+#Warning in max(which(cursor_pos <= line_end)) :
+#  no non-missing arguments to max; returning -Inf
+#Error in checkHT(n, dx <- dim(x)) : 
+#  invalid 'n' -  must contain at least one non-missing element, got none.
+#Calls: <Anonymous> ... <Anonymous> -> <Anonymous> -> head.default -> checkHT
+
+
+            lines <- splitLines(code)
+            llines <- nchar(lines)
+            line_end <- cumsum(llines)
+            line_start <- head(c(0,line_end),-1)
+            i <- max(which(cursor_pos <= line_end))
+            pos <- cursor_pos - line_start[i] + 1
+            line <- lines[i]
+            private$cf$assignLinebuffer(line)
+            private$cf$assignEnd(pos)
+            match_info <- private$cf$guessTokenFromLine(update=FALSE)
+            private$cf$guessTokenFromLine()
+            private$cf$completeToken()
+
+            matches <- private$cf$retrieveCompletions()
+            start <- line_start[i] + match_info$start
+            end <- start + nchar(match_info$token)
+
+            return(list(
+                matches = matches,
+                start = start,
+                end = end
+            ))
+        },
+
+        on_eval = function(handler,remove=FALSE){
+            private$callbacks$register(handler,remove=remove)
+        }
+    ),
+    
+    private = list(
+        kernel=list(),
+        comm_dispatcher=list(),
+        output=list(),
+
+        nframes = -1,
+        aborted = FALSE,
+        status = "ok",
+        payload = list(),
+        results = list(),
+        env = list(),
+        comm_manager = list(),
+
+        context = list(),
+
+
+        help_port = integer(),
+        help_proc = integer(),
+        help_url = character(),
+
+        start_local_help_system = function(help_port=getOption("help.port",10001)){
+            help_port <- as.integer(help_port)
+            if(!check_help_port(help_port)){
+                help_proc  <- callr::r_bg(function(port){
+                    options(help.ports=port)
+                    tools::startDynamicHelp(TRUE)
+                    repeat Sys.sleep(60)
+                },args=list(port=help_port))
+                repeat{
+                    if(help_proc$is_alive()) break
+                }
+                private$help_proc <- help_proc
+            }
+            #private$help_port <- help_port
+            private$help_url <- paste0("http://127.0.0.1:",help_port)
+            #assign("help_proc",private$help_proc,envir=private$env)
+            #assign("help_port",private$help_port,envir=private$env)
+
+            assign("get_help_url",function()private$help_url,envir=private$env)
+        },
+        start_proxied_help_system = function(help_url=getOption("proxied_help_url",
+                                                           "/RHelp")){
+            private$help_url <- help_url
+            assign("get_help_url",function()private$help_url,envir=private$env)
+        },
+        start_help_system = function(){
+            if(isTRUE(getOption("rkernel_help_system")=="proxy"))
+                private$start_proxied_help_system()
+            else
+                private$start_local_help_system()
+        },
+        
+        # help_start = function(update = FALSE, 
+        #                       gui = "irrelevant", 
+        #                       browser = getOption("browser"), 
+        #                       remote = NULL){
+        #     if(is.null(remote))
+        #         remote <- private$help_url
+        #     utils::help.start(update=update,
+        #                       gui=gui,
+        #                       browser=browser,
+        #                       remote=remote)
+        # },
+
+        new_cell = TRUE,
+
+        add_payload = function(payload){
+            private$payload <- append(private$payload,list(payload))
         },
 
         pager = function(files,header,title,delete.file){
@@ -245,7 +386,7 @@ Evaluator <- R6Class("Evaluator",
             }
             text <- paste(text,collapse="\n")
             p <- Page("text/plain"=text)
-            self$add_payload(unclass(p))
+            private$add_payload(unclass(p))
         },
 
         handle_text = function(text) {
@@ -262,7 +403,7 @@ Evaluator <- R6Class("Evaluator",
         handle_graphics = function(plt,update=FALSE) {
 
             # log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
-            new_display <- !update || self$new_cell && !getOption("jupyter.update.graphics",TRUE)
+            new_display <- !update || private$new_cell && !getOption("jupyter.update.graphics",TRUE)
             
             width      <- getOption("jupyter.plot.width",6)
             height     <- getOption("jupyter.plot.height",6)
@@ -293,11 +434,11 @@ Evaluator <- R6Class("Evaluator",
 
             if(new_display) {
                 id <- UUIDgenerate()
-                self$last_plot_id <- id
+                private$last_plot_id <- id
                 cls <- "display_data"
             }
             else {
-                id <- self$last_plot_id
+                id <- private$last_plot_id
                 cls <- "update_display_data"
             } 
 
@@ -309,7 +450,7 @@ Evaluator <- R6Class("Evaluator",
             # log_out(str(d),use.print=TRUE)
             private$kernel$display_send(d)
 
-            self$new_cell <- FALSE
+            private$new_cell <- FALSE
 
         },
 
@@ -344,14 +485,14 @@ Evaluator <- R6Class("Evaluator",
                 call <- deparse(call)[[1]]
                 text <- paste0("Error in ",call,":\n",text,"\n")
             }
-            self$status <- "error"
+            private$status <- "error"
             private$kernel$stream(text = text,
                                   stream = "stderr")
             stop_on_error <- getOption("rkernel_stop_on_error")
             if(stop_on_error){
                 calls <- sys.calls()
-                self$aborted <- TRUE
-                #drop_prev <- self$nframes - 2
+                private$aborted <- TRUE
+                #drop_prev <- private$nframes - 2
                 #calls <- tail(calls,-drop_prev)
                 calls <- tail(calls,-15)
                 calls <- head(calls,-3)
@@ -378,7 +519,7 @@ Evaluator <- R6Class("Evaluator",
                     payload <- list(source="page",
                                     data=displayed$data,
                                     start=1)
-                    self$add_payload(payload)
+                    private$add_payload(payload)
                 }
                 else if(any(class(x) %in% getOption("rkernel_displayed_classes"))){
                     d <- display_data(x)
@@ -404,7 +545,7 @@ Evaluator <- R6Class("Evaluator",
                                                        transient=x$transient)
                 }
                 else if(inherits(x,"payload")){
-                    self$add_payload(unclass(x))
+                    private$add_payload(unclass(x))
                 }
                 else {
                     text <- capture.output(print(x))
@@ -442,91 +583,22 @@ Evaluator <- R6Class("Evaluator",
         handle_interrupt = function(i){
             private$kernel$stream(text = "<interrupted>",
                                   stream = "stderr")
-            self$status <- "aborted"
-            self$aborted <- TRUE
+            private$status <- "aborted"
+            private$aborted <- TRUE
         },
 
-        display = function(...){
-            d <- display_data(...)
-            private$kernel$display_data(data=d$data,
-                                        metadata=d$metadata,
-                                        transient=d$transient)
-        },
-
-        stream = function(text, stream=c("stdout","stderr")){
-            stream <- match.arg(stream)
-            private$kernel$stream(text=text,
-                                  stream=stream)
-        },
-
-        clear_output = function(wait=FALSE){
-            private$kernel$clear_output(wait=wait)
-        },
-
-        set_last_value = function(x){
-            pos <- match("RKernel",search())
-            assign(".Last.value",x,pos=pos)
-        },
-
-        code_is_complete = function(code){
-            status <- tryCatch({
-                parse(text=code)
-                "complete"
-            },
-            error = conditionMessage)
-            if(is_unexpected_end(status) || is_unexpected_string(status))
-                return("incomplete")
-            else if(status!="complete")
-                return("invalid")
-            else return("complete")
-        },
 
         completions_inited = FALSE,
         cf = list(),
 
         init_completions = function(){
             utils_ns <- asNamespace('utils')
-            self$cf$assignLinebuffer <- get(".assignLinebuffer",utils_ns)
-            self$cf$assignEnd <- get(".assignEnd",utils_ns)
-            self$cf$guessTokenFromLine <- get(".guessTokenFromLine",utils_ns)
-            self$cf$completeToken <- get(".completeToken",utils_ns)
-            self$cf$retrieveCompletions <- get(".retrieveCompletions",utils_ns)
-            self$completions_inited <- TRUE
-        },
-        
-        get_completions = function(code,cursor_pos){
-            if(!self$completions_inited) self$init_completions()
-
-# FIXME Rare error message
-#Warning in max(which(cursor_pos <= line_end)) :
-#  no non-missing arguments to max; returning -Inf
-#Error in checkHT(n, dx <- dim(x)) : 
-#  invalid 'n' -  must contain at least one non-missing element, got none.
-#Calls: <Anonymous> ... <Anonymous> -> <Anonymous> -> head.default -> checkHT
-
-
-            lines <- splitLines(code)
-            llines <- nchar(lines)
-            line_end <- cumsum(llines)
-            line_start <- head(c(0,line_end),-1)
-            i <- max(which(cursor_pos <= line_end))
-            pos <- cursor_pos - line_start[i] + 1
-            line <- lines[i]
-            self$cf$assignLinebuffer(line)
-            self$cf$assignEnd(pos)
-            match_info <- self$cf$guessTokenFromLine(update=FALSE)
-            self$cf$guessTokenFromLine()
-            self$cf$completeToken()
-
-            matches <- self$cf$retrieveCompletions()
-            start <- line_start[i] + match_info$start
-            end <- start + nchar(match_info$token)
-
-            return(list(
-                matches = matches,
-                start = start,
-                end = end
-            ))
+            private$cf$assignLinebuffer <- get(".assignLinebuffer",utils_ns)
+            private$cf$assignEnd <- get(".assignEnd",utils_ns)
+            private$cf$guessTokenFromLine <- get(".guessTokenFromLine",utils_ns)
+            private$cf$completeToken <- get(".completeToken",utils_ns)
+            private$cf$retrieveCompletions <- get(".retrieveCompletions",utils_ns)
+            private$completions_inited <- TRUE
         },
 
         var_dic_list = function(){ 
@@ -553,7 +625,7 @@ Evaluator <- R6Class("Evaluator",
         saved.options = list(),
         cell.options = function(...){
             op <- options()
-            self$saved.options <- op
+            private$saved.options <- op
             args <- list(...)
             nms <- names(args)
             op[nms] <- args
@@ -563,7 +635,7 @@ Evaluator <- R6Class("Evaluator",
         saved.parms = list(),
         cell.par = function(...){
             op <- par(no.readonly=TRUE)
-            self$saved.parms <- op
+            private$saved.parms <- op
             args <- list(...)
             nms <- names(args)
             op[nms] <- args
@@ -586,27 +658,14 @@ Evaluator <- R6Class("Evaluator",
             }
         },
 
-        init_env_browser = function(){
-            d <- init_env_browser()
-            private$kernel$display_data(d$data)
-        },
-
         callbacks = NULL,
         run_callbacks = function(){
-            if(is.null(self$callbacks))
-                self$callbacks <- CallbackDispatcher()
+            if(is.null(private$callbacks))
+                private$callbacks <- CallbackDispatcher()
             else 
-                self$callbacks$run()
-        },
-        on_eval = function(handler,remove=FALSE){
-            self$callbacks$register(handler,remove=remove)
+                private$callbacks$run()
         }
-    ),
-    
-    private = list(
-        kernel=list(),
-        comm_dispatcher=list(),
-        output=list()
+
     )
 
 )

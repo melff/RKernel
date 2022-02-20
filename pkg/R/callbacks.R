@@ -27,6 +27,7 @@ CallbackDispatcherClass <- R6Class("CallbackDispatcher",
       },
       #' @description
       #' Run all registered callback functions
+      #' @param ... Aruments passed on to the handler functions
       run = function(...){
         # log_out(self$callbacks,use.print=TRUE)
         for(cb in self$callbacks){

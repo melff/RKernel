@@ -9,7 +9,7 @@ display <- function(...){
                         metadata=d$metadata)
 }
 
-#' Prepare an R Object for being displayed
+#' Prepare an R Object for Being Displayed
 #'
 #' @description A generic function that prepares R objects for display using \code{display()}
 #'
@@ -19,7 +19,13 @@ display <- function(...){
 #' @export
 display_data <- function(x,...) UseMethod("display_data")
 
-#' @describeIn display_data 
+#' @describeIn display_data Default method
+#'
+#' @param metadata A list with named elements, containing metadata
+#' @param id An identifier string
+#' @param update A logical value, whether a new display item should be created
+#'               or an existing one should be updated
+#' 
 #' @importFrom repr mime2repr
 #' @importFrom uuid UUIDgenerate
 #' @export
@@ -53,7 +59,7 @@ display_data.default <- function(x,...,
     structure(d,class=cl)
 }
 
-#' @describeIn display_data 
+#' @describeIn display_data S3 method for html widgets
 #' @importFrom uuid UUIDgenerate
 #' @importFrom htmltools htmlEscape
 #' @importFrom digest digest
@@ -114,12 +120,20 @@ display_data.htmlwidget <- function(x,...,
     structure(d,class=cl)
 }
 
-#' @describeIn display_data 
+#' @describeIn display_data S3 method for plots saved with 'recordPlot()'
+#'
+#' @param width Width of the diplayed plot 
+#' @param height Height of the displayed plot
+#' @param pointssize Point size, see \code{\link[grDevices]{png}}
+#' @param resolution Resolution in ppi, see \code{\link[grDevices]{png}}
+#' @param scale The amount by which the plots are scaled in the frontend
+#' @param units Units of width and height, see \code{\link[grDevices]{png}}
+#' 
 #' @importFrom repr mime2repr
 #' @importFrom uuid UUIDgenerate
 #' @export
 display_data.recordedplot <- function(x,
-                                      width=getOption("jupyter.plot.wdith",6),
+                                      width=getOption("jupyter.plot.width",6),
                                       height=getOption("jupyter.plot.height",6),
                                       pointsize=getOption("jupyter.plot.pointsize",12),
                                       resolution=getOption("jupyter.plot.res",150),
@@ -172,11 +186,11 @@ getMatch <- function(x,match){
     res
 }
 
-#' @describeIn display_data 
+#' @describeIn display_data S3 method for "display_data" objects
 #' @export
 display_data.display_data <- function(x,...) x
 
-#' @describeIn display_data 
+#' @describeIn display_data S3 method for "update_display_data" objects 
 #' @export
 display_data.update_display_data <- function(x,...) x
 
@@ -192,15 +206,15 @@ display_data.update_display_data <- function(x,...) x
 #' @export
 display_id <- function(x) UseMethod("display_id")
 
-#' @describeIn display_id
+#' @describeIn display_id S3 method for "display_data" objects
 #' @export
 display_id.display_data <- function(x) x$transient$display_id
 
-#' @describeIn display_id
+#' @describeIn display_id S3 method for "update_display_data" objects
 #' @export
 display_id.update_display_data <- function(x) x$transient$display_id
 
-#' @describeIn display_data 
+#' @describeIn display_data "update" method for "display_data" objects
 #' @export
 update.display_data <- function(object,...){
     id <- display_id(object)
@@ -216,7 +230,7 @@ update.display_data <- function(object,...){
 #' @export
 Page <- function(x,...) UseMethod("Page")
 
-#' @describeIn Page
+#' @describeIn Page S3 default method -- calls \code{display_data} and marks it as pager payload
 #' @export
 Page.default <- function(x,start=1,...){
     if(missing(x)){
@@ -232,7 +246,7 @@ Page.default <- function(x,start=1,...){
     structure(p,class="payload")
 }
 
-#' Add a Class to the 'Displayed' ones
+#' Add a Class to the 'Displayed' Ones
 #'
 #' @description Add a class to those who are output using \code{display()} when
 #'     they are autoprinted, i.e. returned as the value of the last expression
@@ -249,7 +263,7 @@ add_displayed_classes <- function(x){
     }
 }
 
-#' Remove a Class to the 'Displayed' ones
+#' Remove a Class to the 'Displayed' Ones
 #'
 #' @description Remove a class from those who are output using \code{display()} when
 #'     they are autoprinted, i.e. returned as the value of the last expression
@@ -266,7 +280,7 @@ remove_displayed_classes <- function(x){
     }
 }
 
-#' Add a Class to the 'Paged' ones
+#' Add a Class to the 'Paged' Ones
 #'
 #' @description Add a class to those who are output using \code{Page()} when
 #'     they are autoprinted, i.e. returned as the value of the last expression
@@ -284,7 +298,7 @@ add_paged_classes <- function(x){
 }
 
 
-#' Remove a Class to the 'Paged' ones
+#' Remove a Class to the 'Paged' Ones
 #'
 #' @description Remove a class from those who are output using \code{Page()} when
 #'     they are autoprinted, i.e. returned as the value of the last expression
@@ -400,6 +414,7 @@ display_data.help_files_with_topic <- function(x,...,
 }
 
 #' @describeIn display_data 
+#' @describeIn display_data S3 method for results of 'help.search()'
 #' @export
 display_data.hsearch <- function(x,..., 
     id=UUIDgenerate(), 
@@ -595,12 +610,12 @@ display_data.data.frame <- function(x,...,
     structure(d,class=cl)
 }
 
-#' @describeIn display_data
+#' @describeIn display_data S3 method for matrices
 #' @export
 display_data.matrix <- display_data.data.frame
 
 
-#' @describeIn display_data
+#' @describeIn display_data S3 method for "html_elem" objects (see \code{\link[memisc]{html}})
 #' @export
 display_data.html_elem <- function(x,...,
                               metadata=emptyNamedList,
@@ -615,7 +630,7 @@ display_data.html_elem <- function(x,...,
             update=update)
 }
 
-#' @describeIn display_data
+#' @describeIn display_data S3 methods for \link{shiny} objects
 #' @export
 display_data.shiny.tag <- function(x,...,
                               metadata=emptyNamedList,
