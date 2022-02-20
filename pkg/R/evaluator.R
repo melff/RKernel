@@ -123,6 +123,8 @@ Evaluator <- R6Class("Evaluator",
             self$help_port <- help_port
             self$help_url <- paste0("http://127.0.0.1:",help_port)
         },
+            if(file.exists("RKernel-startup.R"))
+                source("RKernel-startup.R")
 
         help_start = function(update = FALSE, 
                               gui = "irrelevant", 
