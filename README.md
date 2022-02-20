@@ -16,13 +16,13 @@ It differs from the already existing [*IRKernel*](http://irkernel.github.io) by:
   - Error and warning messages appear via the `stderr` stream, ordinary messages
     (created by `message()`) appear via the `stdout` stream. Consequently,
     "ordinary" messages (e.g. that appear while a package is loaded via
-    `library()`) are less unobstrusive, while error messages clearly stand out. 
+    `library()`) are less obtrusive, while error messages clearly stand out. 
   - Graphics can be "updated", so that e.g. `curve(gamma(x),add=TRUE)` 
     works as expected even when the 
     plot to which the curve is added was created by code in a previous cell. 
   - It is based on the [*R6*](https://cran.r-project.org/package=R6) package
     instead of S4 reference classes.
-  - Dynamic help works, including `help.start()`.
+  - ~Dynamic help works, including `help.start()`.~ (This works only if Jupyter is used *locally*.)
   - The polling loop allows for providing services e.g. with the "htmluv"
     package.
   - [HTML widgets](https://cran.r-project.org/?package) (partially) work. At the time of 
@@ -43,5 +43,6 @@ A widget demonstration can be found [here](https://tmphub.elff.eu/user-redirect/
 TODO:
 
   - [ ] Add documentation
+  - [ ] Make HTML help work on servers
   - [ ] Add example notebooks
   - [ ] Make HTML widgets work more generally
