@@ -1,7 +1,7 @@
 Package: RKernel
-Title: A basic R kernel for Jupyter
+Title: Yet another R kernel for Jupyter
 Version: 0.4
-Date: 2022-01-21
+Date: 2022-02-22
 Authors@R: c(
     person('Martin', 'Elff', 
            email = 'martin@elff.eu',
@@ -38,6 +38,7 @@ Collate:
     'display.R'
     'env-browser.R'
     'evaluator.R'
+    'install_RHelp_server.R'
     'installspec.R'
     'json.R'
     'kernel.R'
