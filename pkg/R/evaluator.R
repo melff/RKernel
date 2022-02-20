@@ -523,6 +523,12 @@ Evaluator <- R6Class("Evaluator",
                                             metadata=d$metadata,
                                             transient=d$transient)
             } 
+            else if (tolower(magic) == "css"){
+                d <- CSS(code)
+                private$kernel$display_data(data=d$data,
+                                            metadata=d$metadata,
+                                            transient=d$transient)
+            }
             else if (tolower(magic) == "javascript"){
                 d <- Javascript(code)
                 private$kernel$display_data(data=d$data,
