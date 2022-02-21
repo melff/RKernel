@@ -43,6 +43,6 @@ A widget demonstration can be found [here](https://tmphub.elff.eu/user-redirect/
 TODO:
 
   - [ ] Add documentation
-  - [ ] Make HTML help work on servers
+  - [x] Make HTML help work on servers
   - [ ] Add example notebooks
   - [ ] Make HTML widgets work more generally
