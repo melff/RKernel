@@ -1,12 +1,13 @@
 #' @export
-View <- function(x,title) UseMethod("View")
+View <- function(x,
+                 title=deparse(substitute(x)),
+                 ...)
+{
 
+    # cls <- class(x)
+    # title <- paste0(cls,": ",title)
 
-# str_ <- function(nm,envir) chartr(r"(\)",r"(\\)",
-#           trimws(capture.output(str(get(nm,envir)))))
-
-
-#' @export
-View.default <- function(x,title){
-    scrolling_table(x)
+    virtable_widget(x)
+    
 }
+
