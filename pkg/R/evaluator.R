@@ -24,7 +24,7 @@ Evaluator <- R6Class("Evaluator",
         initialize = function(kernel){
             private$kernel <- kernel
         },
-        #' @decription
+        #' @description
         #' Prepare the object for evaluating expressions
         startup = function(...) {
 
@@ -170,29 +170,29 @@ Evaluator <- R6Class("Evaluator",
                 private$status <- "ok"
             return(status)
         },
-
+        #' @description
+        #' Set the execution status
+        #' @param status A character string, the status to be set ("ok", "error", or "aborted")
         set_status = function(status){
             private$status <- status
         },
-
+        #' @description
+        #' Check whether the evaluation of expression is aborted - if TRUE, the execution of the notebook is aborted
+        #' instead of running to the end (if the user has requested to run all cells of the notebook).
+        #' @param reset A logical value, whether the status should be reset to FALSE after returning it.
         is_aborted = function(reset=FALSE){
             aborted <- private$aborted
             if(reset)
                 private$aborted <- FALSE
             return(aborted)
         },
-
+        #' @description
+        #' Quit the R session in the kernel. Roughly equivalent to \code{\link[base]{quit}}, but
+        #' tells the kernel manager of the jupyter server to shut down the kernel.
         quit = function(...){
             payload <- list(source="ask_exit",
                             keepkernel=FALSE)
             private$add_payload(payload)
-        },
-
-        display = function(...){
-            d <- display_data(...)
-            private$kernel$display_data(data=d$data,
-                                        metadata=d$metadata,
-                                        transient=d$transient)
         },
 
         stream = function(text, stream=c("stdout","stderr")){
