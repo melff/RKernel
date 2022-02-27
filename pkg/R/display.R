@@ -431,7 +431,7 @@ help.start <- function(update = FALSE,
                        remote = NULL){
     help_url <- paste0(get_help_url(),"/doc/html/index.html")
     text_html <- paste(paste0("<iframe src='",help_url,"'"),
-        "style='width:100%;height:60ex;'",
+        "style='width:100%;height:70ex;'",
         "class='manpage'>",
         # "onload=window.parent.scrollTo(0,0)>",
         "</iframe>",
