@@ -564,7 +564,7 @@ Kernel <- R6Class("Kernel",
         r <- zmq.poll(c(private$sockets$shell),POLLIN,timeout=0L)
         if(bitwAnd(zmq.poll.get.revents(1),POLLIN)){
           msg <- private$get_message("shell")
-          msg_type <- request$header$msg_type
+          msg_type <- msg$header$msg_type
           reply_type <- sub("_request","_reply",msg_type,fixed=TRUE)
           private$parent$shell <- msg
           private$send_message(type=reply_type,
