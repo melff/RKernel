@@ -424,6 +424,19 @@ display_data.help_files_with_topic <- function(x,...,
     structure(d,class=cl)
 }
 
+#' Start interactive help system
+#'
+#' @description A variant of 'help.start()' that works when called from inside a
+#'     Jupyter notebook.
+#'
+#' @param update A logical value. This formal argument exists for compatibility
+#'     reasons only.
+#' @param gui A character string. This formal argument exists for compatibility
+#'     reasons only.
+#' @param browser A character string. This formal argument exists for compatibility
+#'     reasons only.
+#' @param remote A character string. This formal argument exists for compatibility
+#'     reasons only.
 #' @export
 help.start <- function(update = FALSE, 
                        gui = "irrelevant", 
