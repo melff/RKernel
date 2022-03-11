@@ -426,7 +426,7 @@ display_data.help_files_with_topic <- function(x,...,
 
 #' Start interactive help system
 #'
-#' @description A variant of 'help.start()' that works when called from inside a
+#' @description A variant of \code{\link[utils]{help.start}} that works when called from inside a
 #'     Jupyter notebook.
 #'
 #' @param update A logical value. This formal argument exists for compatibility

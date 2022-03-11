@@ -1,3 +1,7 @@
+#' Install an RHelp server module
+#'
+#' @description Install a Python module that provides for an R process being
+#'     started when needed to display R help pages.
 #' @export
 install_RHelp_server <- function(){
     RHelp_module_dir <- system.file("RHelp",package="RKernel")

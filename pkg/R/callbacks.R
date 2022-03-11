@@ -37,6 +37,6 @@ CallbackDispatcherClass <- R6Class("CallbackDispatcher",
     )
 )
 
-#' A constructor function for objects of class "CallbackDispatcherClass"
+#' @rdname CallbackDispatcherClass 
 #' @export
 CallbackDispatcher <- function(...) CallbackDispatcherClass$new(...)
