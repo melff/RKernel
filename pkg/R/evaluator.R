@@ -34,8 +34,6 @@ Evaluator <- R6Class("Evaluator",
             assign("q",self$quit,envir=private$env)
             assign("quit",self$quit,envir=private$env)
             assign("interactive",function()TRUE,envir=private$env)
-            # assign("cell.options",private$cell.options,pos=pos)
-            # assign("cell.par",private$cell.par,pos=pos)
             # 
             # assign("display",self$display,envir=private$env)
             # assign("display",display,envir=private$env)
@@ -260,7 +258,27 @@ Evaluator <- R6Class("Evaluator",
 
         on_eval = function(handler,remove=FALSE){
             private$callbacks$register(handler,remove=remove)
+        },
+
+
+        cell.options = function(...){
+            op <- options()
+            private$saved.options <- op
+            args <- list(...)
+            nms <- names(args)
+            op[nms] <- args
+            do.call("options",op)
+        },
+
+        cell.par = function(...){
+            op <- par(no.readonly=TRUE)
+            private$saved.parms <- op
+            args <- list(...)
+            nms <- names(args)
+            op[nms] <- args
+            do.call("par",op)
         }
+
     ),
     
     private = list(
@@ -587,24 +605,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         saved.options = list(),
-        cell.options = function(...){
-            op <- options()
-            private$saved.options <- op
-            args <- list(...)
-            nms <- names(args)
-            op[nms] <- args
-            do.call("options",op)
-        },
-
         saved.parms = list(),
-        cell.par = function(...){
-            op <- par(no.readonly=TRUE)
-            private$saved.parms <- op
-            args <- list(...)
-            nms <- names(args)
-            op[nms] <- args
-            do.call("par",op)
-        },
 
         cat = function (..., file = "", sep = " ", fill = FALSE, labels = NULL, 
                         append = FALSE){
@@ -671,4 +672,18 @@ splitLines <- function(text) strsplit(text,"\n",fixed=TRUE)[[1]]
 get_evaluator <- function() {
     kernel <- get_current_kernel()
     kernel$evaluator
+}
+
+#' Set options or graphics parameters locally for the current jupyter notebook cell
+#' @export
+cell.options <- function(...){
+    e <- get_evaluator()
+    e$cell.options(...)
+}
+
+#' @rdname cell.options 
+#' @export
+cell.par <- function(...){
+    e <- get_evaluator()
+    e$cell.par(...)
 }
