@@ -26,6 +26,7 @@ Evaluator <- R6Class("Evaluator",
         },
         #' @description
         #' Prepare the object for evaluating expressions
+        #' @param ... Any kind of arguments, ignored.
         startup = function(...) {
 
             private$env <- new.env()
@@ -187,27 +188,30 @@ Evaluator <- R6Class("Evaluator",
         #' @description
         #' Quit the R session in the kernel. Roughly equivalent to \code{\link[base]{quit}}, but
         #' tells the kernel manager of the jupyter server to shut down the kernel.
+        #' @param ... Any kind of argument, ignored.
         quit = function(...){
             payload <- list(source="ask_exit",
                             keepkernel=FALSE)
             private$add_payload(payload)
         },
-
+        #' @description
+        #' Stream text to the frontend.
+        #' @param text Text to be sent to the frontend
+        #' @param stream A string to select the stream -- either "stout" or "stderr"
         stream = function(text, stream=c("stdout","stderr")){
             stream <- match.arg(stream)
             private$kernel$stream(text=text,
                                   stream=stream)
         },
-
+        #' @description
+        #' Clear the current output cell in the frontend.
+        #' @param wait Logical value, whether to wait until output is cleared.
         clear_output = function(wait=FALSE){
             private$kernel$clear_output(wait=wait)
         },
-
-        set_last_value = function(x){
-            pos <- match("RKernel",search())
-            assign(".Last.value",x,pos=pos)
-        },
-
+        #' @description
+        #' Check whether code is syntactically complete.
+        #' @param code A character string with code to be checked.
         code_is_complete = function(code){
             status <- tryCatch({
                 parse(text=code)
@@ -220,7 +224,11 @@ Evaluator <- R6Class("Evaluator",
                 return("invalid")
             else return("complete")
         },
-        
+        #' @description
+        #' Provide completion for code given at point.
+        #' @param code A character string with code to be checked for
+        #'    completions.
+        #' @param cursor_pos An integer, the current position of the cursor.
         get_completions = function(code,cursor_pos){
             if(!private$completions_inited) private$init_completions()
 
@@ -255,12 +263,17 @@ Evaluator <- R6Class("Evaluator",
                 end = end
             ))
         },
-
+        #' @description
+        #' Set a handler to be called when an expression has been evaluated.
+        #' @param handler A function.
+        #' @param remove A logical value, whether the handler should be
+        #'    removed.
         on_eval = function(handler,remove=FALSE){
             private$callbacks$register(handler,remove=remove)
         },
-
-
+        #' @description
+        #' Set options locally for the current jupyter notebook cell
+        #' @param ... Options, see \code{\link{options}}.
         cell.options = function(...){
             op <- options()
             private$saved.options <- op
@@ -269,7 +282,9 @@ Evaluator <- R6Class("Evaluator",
             op[nms] <- args
             do.call("options",op)
         },
-
+        #' @description
+        #' Set graphics parameters locally for the current jupyter notebook cell
+        #' @param ... Graphics parameters, see \code{\link{options}}.
         cell.par = function(...){
             op <- par(no.readonly=TRUE)
             private$saved.parms <- op
@@ -675,6 +690,7 @@ get_evaluator <- function() {
 }
 
 #' Set options or graphics parameters locally for the current jupyter notebook cell
+#' @param ... Options, see \code{\link{options}}.
 #' @export
 cell.options <- function(...){
     e <- get_evaluator()
@@ -682,6 +698,7 @@ cell.options <- function(...){
 }
 
 #' @rdname cell.options 
+#' @param ... Graphics parameters, see \code{\link{options}}.
 #' @export
 cell.par <- function(...){
     e <- get_evaluator()
