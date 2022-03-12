@@ -12,11 +12,18 @@ WIRE_DELIM <- charToRaw("<IDS|MSG>")
 
 kernel <- new.env()
 
+#' The Kernel Class
+#'
+#' @description An object of this class handles the low-level communication with
+#'   the Jupyter frontend or kernel manager. There should only be one object of this
+#'   class in existence.
 #' @export
 Kernel <- R6Class("Kernel",
 
   public = list(
-
+    #' @description
+    #' Initialize the kernel
+    #' @param conn_info A listh with the connection info from the front-end
     initialize = function(conn_info){
       .zmqopt_init(envir = private)
       private$zmqctx <- zmq.ctx.new()
@@ -43,9 +50,12 @@ Kernel <- R6Class("Kernel",
       kernel$current <- self
     },
 
+    #' @field evaluator See \code{\link{Evaluator}}.
     evaluator = list(),
+    #' @field comm_manager See \code{\link{CommManagerClass}}.
     comm_manager = list(),
-
+    #' @description
+    #' Run the kernel.
     run = function(){
       self$evaluator$startup()
       continue <- TRUE
@@ -69,14 +79,19 @@ Kernel <- R6Class("Kernel",
       }
       self$evaluator$shutdown()
     },
-
+    #' @description
+    #' Clear the current output cell in the frontend.
+    #' @param wait Logical value, whether to wait until output is cleared.
     clear_output = function(wait){
       private$send_message(type="clear_output",
                                  parent=private$parent$shell,
                                  socket_name="iopub",
                                  content=list(wait=wait))
     },
-
+    #' @description
+    #' Stream text to the frontend.
+    #' @param text Text to be sent to the frontend
+    #' @param stream A string to select the stream -- either "stout" or "stderr"
     stream = function(text,stream){
       private$send_message(type="stream",
                            parent=private$parent$shell,
@@ -85,7 +100,10 @@ Kernel <- R6Class("Kernel",
                              name=stream,
                              text=text))
     },
-
+    #' @description
+    #' Send execution results to the frontend
+    #' @param data Execution result in rich format
+    #' @param metadata A list with metadata
     execute_result = function(data,metadata=emptyNamedList){
       content <- list(data=data,
                       metadata=metadata,
@@ -95,7 +113,10 @@ Kernel <- R6Class("Kernel",
                            socket_name="iopub",
                            content=content)
     },
-
+    #' @description
+    #' Send rich format data to the frontend
+    #' @param d A list that is either a member of class "display_data" or
+    #'          "update_display_data".
     display_send = function(d){
       if(class(d)%in%c("display_data","update_display_data"))
         msg_type <- class(d)
@@ -113,7 +134,11 @@ Kernel <- R6Class("Kernel",
                              transient=d$transient))
       private$display_id <- d$transient$display_id
     },
-    
+    #' @description
+    #' Send rich format data to the frontend
+    #' @param data A list with mime-type members.
+    #' @param metadata A named list with metadata.
+    #' @param transient An optional list with the current display id.
     display_data = function(data,metadata=emptyNamedList,transient=NULL){
       #content <- list(data=data,transient=transient)
       #if(length(metadata))
@@ -136,7 +161,11 @@ Kernel <- R6Class("Kernel",
                              transient=transient
                            ))
     },
-
+    #' @description
+    #' Update rich format data to the frontend
+    #' @param data A list with mime-type members.
+    #' @param metadata A named list with metadata.
+    #' @param transient An list with the current display id.
     update_display_data = function(data,metadata=emptyNamedList,transient){
       private$send_message(type="update_display_data",
                            parent=private$parent$shell,
@@ -147,7 +176,11 @@ Kernel <- R6Class("Kernel",
                              transient=transient
                            ))
     },
-
+    #' @description
+    #' Send an error message and traceback to the frontend.
+    #' @param name A string, the error name.
+    #' @param value A string, the value of the error message.
+    #' @param traceback A character vector with the traceback.
     send_error = function(name,value,traceback){
             private$send_message(type="error",
                            parent=private$parent$shell,
@@ -158,7 +191,12 @@ Kernel <- R6Class("Kernel",
                              traceback = traceback
                            ))
     },
-
+    #' @description
+    #' Send a message via a comm.
+    #' @param id A string that identifies the comm.
+    #' @param data A list with data.
+    #' @param metadata An optional list with metadata.
+    #' @param buffers An optional list of raw vectors.
     send_comm_msg = function(id,data,metadata=emptyNamedList,buffers=NULL){
       private$send_message(type="comm_msg",debug=FALSE,
                    parent=private$parent$shell,
@@ -169,7 +207,13 @@ Kernel <- R6Class("Kernel",
                    metadata=metadata,
                    buffers=buffers)
     },
-    
+    #' @description
+    #' Open a comm in the frontend.
+    #' @param id A string that identifies the comm.
+    #' @param target_name A string that identifies a group of related comms.
+    #' @param data A list with data.
+    #' @param metadata An optional list with metadata.
+    #' @param buffers An optional list of raw vectors.
     send_comm_open = function(id,target_name,data,metadata=emptyNamedList,buffers=NULL){
       private$send_message(type="comm_open",debug=FALSE,
                    parent=private$parent$shell,
@@ -182,7 +226,12 @@ Kernel <- R6Class("Kernel",
                    metadata=metadata,
                    buffers=buffers)
     },
-    
+    #' @description
+    #' Close a comm in the frontend.
+    #' @param id A string that identifies the comm.
+    #' @param data A list with data.
+    #' @param metadata An optional list with metadata.
+    #' @param buffers An optional list of raw vectors.
     send_comm_close = function(id,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
       private$send_message(type="comm_close",debug=FALSE,
                    parent=private$parent$shell,
@@ -193,7 +242,12 @@ Kernel <- R6Class("Kernel",
                    metadata=metadata,
                    buffers=buffers)
     },
-    
+    #' @description
+    #' Show a message in the Jupyter server log
+    #' @param message A string or object to be shown in the log.
+    #' @param ... More character strings, pasted to the message.
+    #' @param use.print Logical, whether the function 'print()' should applied
+    #'        to the message.
     log_out = function(message,...,use.print=FALSE){
       tstate <- tracingState(on=FALSE)
       if(use.print)
@@ -202,13 +256,19 @@ Kernel <- R6Class("Kernel",
       cat(crayon::bgBlue(format(Sys.time()),"\n",message,"\n"),file=stderr())
       tracingState(on=tstate)
     },
-    
+    #' @description
+    #' Add a service to the kernel, i.e. a function that is called in each
+    #' iteration of the kernel event loop.
+    #' @param run A function to be run in each loop iteration.
+    #' @param init A function to be run once in the first iteration.
     add_service = function(run,init=NULL){
       if(is.function(init)) init()
       if(is.function(run))
         private$services <- append(private$services,run)
     },
-
+    #' @description
+    #' Remove a service from the kernel.
+    #' @param run The function to be removed.
     remove_service = function(run){
       services_to_keep <- list()
       for(i in seq_along(private$services)){
@@ -217,11 +277,14 @@ Kernel <- R6Class("Kernel",
       }
       private$services <- services_to_keep
     },
-
+    #' @description
+    #' The parent of the message currently sent.
+    #' @param channel A string, the relevant input channel.
     get_parent = function(channel="shell"){
       return(private$parent[[channel]])
     },
-
+    #' @description
+    #' Return the current connection info.
     get_conn_info = function(){
       return(private$conn_info)
     }
