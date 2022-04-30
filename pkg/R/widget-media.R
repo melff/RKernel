@@ -1,5 +1,9 @@
+#' Media widgets
+#' @description Classes and constructors to wrap media into widgets
 #' @include widget-dom.R
+#' @name MediaWidget
 
+#' @rdname MediaWidget
 #' @export
 MediaWidgetClass <- R6Class_("MediaWidget",
     inherit = DOMWidgetClass,
@@ -15,6 +19,7 @@ MediaWidgetClass <- R6Class_("MediaWidget",
     )
 )
 
+#' @rdname MediaWidget 
 #' @export
 ImageWidgetClass <- R6Class_("ImageWidget",
     inherit = MediaWidgetClass,
@@ -27,5 +32,9 @@ ImageWidgetClass <- R6Class_("ImageWidget",
     )
 )
 
+#' @describeIn MediaWidget The ImageWidget constructor function
+#' @param format A character string, the format of the image
+#' @param width The width of the image in pixels
+#' @param height The height of the image in pixels
 #' @export
-ImageWidget <- function(...) ImageWidgetClass$new(...)
+ImageWidget <- function(format="png",width,height) ImageWidgetClass$new(formal,width,height)
