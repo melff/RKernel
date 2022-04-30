@@ -1,7 +1,8 @@
 #' A Dispatcher for Callbacks
 #'
 #' @description Objects in this class are collections of callbacks functions
-#'     usually related to certain events
+#'     usually related to certain events. The function \code{CallbackDispachter} can be
+#'     used as an constructor
 #'
 #' @export
 CallbackDispatcherClass <- R6Class("CallbackDispatcher",
@@ -37,6 +38,6 @@ CallbackDispatcherClass <- R6Class("CallbackDispatcher",
     )
 )
 
-#' @rdname CallbackDispatcherClass 
+#' @describeIn CallbackDispatcherClass The constructor function, returns an Object of Class "CallbackDispatcherClass" 
 #' @export
 CallbackDispatcher <- function(...) CallbackDispatcherClass$new(...)
