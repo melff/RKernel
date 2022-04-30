@@ -1,13 +1,21 @@
+#' Controls for Interactive Widgets
+#'
+#' @description A set of functions that can be used to create interactive
+#'     widgets and to interact with widgets.
+#'
+#' @details The function \code{mkWidget} is a generic function that creates a
+#'     widget that allows to manipulate the arguments of a function that is
+#'     called in an interactive widget. This generic function is called by the
+#'     function \code{\link{mWidgets}}. The function \code{Fixed} marks a value
+#'     as fixed, so that \code{mkWidget} returns it as is.
+#' 
 #' @include widget-output.R widget-value.R
-
 #' @importFrom Cairo Cairo Cairo.capture
 #' @importFrom png writePNG
-
-#' @export
-Fixed <- function(x) structure(x,class="Fixed")
-
 #' @export
 mkWidget <- function(x,...) UseMethod("mkWidget")
+
+#' @describeIn mkWidget S3 method for integer numbers
 #' @export
 mkWidget.integer <- function(x,description=NULL,...){
    if(length(x) == 1L){
@@ -71,6 +79,7 @@ mkWidget.integer <- function(x,description=NULL,...){
    w
 }
 
+#' @describeIn mkWidget S3 method for floating point numbers
 #' @export
 mkWidget.numeric <- function(x,description=NULL,...){
    if(length(x) == 1L){
@@ -134,6 +143,7 @@ mkWidget.numeric <- function(x,description=NULL,...){
    w
 }
 
+#' @describeIn mkWidget S3 method for logical numbers
 #' @export
 mkWidget.logical <- function(x,description=NULL,...){
     w <- Checkbox()
@@ -146,6 +156,7 @@ mkWidget.logical <- function(x,description=NULL,...){
     w
 }
 
+#' @describeIn mkWidget S3 method for character strings
 #' @export
 mkWidget.character <- function(x,description=NULL,...){
     if(length(x) == 1){
@@ -163,17 +174,42 @@ mkWidget.character <- function(x,description=NULL,...){
     w
 }
 
+#' @describeIn mkWidget S3 method for objects 
 #' @export
 mkWidget.Fixed <- function(x,...) list(value=x)
 
+#' @describeIn mkWidget S3 method for objects 
 #' @export
 mkWidget.ValueWidget <- function(x,...) x
+
+#' @rdname mkWidget
+#' @export
+Fixed <- function(x) structure(x,class="Fixed")
+
+#' Interactions Using Widgets
+#'
+#' @description A variety of functions to create interactive function calls
+#' @name interaction
+NULL
 
 call_with_controls <- function(FUN,controls){
     args <- lapply(controls,"[[","value")
     do.call(FUN,args)
 }
 
+#' @rdname interaction
+#' @param FUN A function to called with arguments manipulated using interactive
+#'     widgets.
+#' @param controls A list of controlling widgets, usually created with the
+#'     function \code{mkwidgets}
+#' @param out An output widget, i.e. a widget in class "OutputWidget"
+#' @param button An (optional) button widget; when clicked, the function
+#'     \code{FUN} is called.
+#' @param continous_update A logical value, if \code{TRUE} the function
+#'     \code{FUN} is called whenever one of the controlling widgets changes a
+#'     value
+#' @param mime_type A character string that specifies the mime type as whith the
+#'     return value of \code{FUN} is displayed.
 #' @export
 interactive_output <- function(FUN,
                                controls,
@@ -207,6 +243,9 @@ interactive_output <- function(FUN,
     run()
 }
 
+#' @rdname interaction
+#' @param ... Named arguments, transformed into widgets using the generic
+#'     function code \code{mkWidget}.
 #' @export
 mkWidgets <- function(...){
     args <- list(...)
@@ -219,6 +258,9 @@ mkWidgets <- function(...){
     res
 }
 
+
+#' @rdname interaction
+#' @eval interact
 #' @export
 interact <- function(FUN,...,continuous_update=TRUE){
     controls <- mkWidgets(...)

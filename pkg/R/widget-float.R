@@ -1,5 +1,13 @@
+#' Widgets for Floating Point Numbers
+#' @description An R6 class and a constructor function for the creation of
+#'     widgets that can be used to manipulate floating point numbers
+#' @details The function \code{FloatWidget} creates objects of the R6 Class
+#'     "FloatWidgetClass", which in turn have the S3 class attribute "FloatWidget"
 #' @include widget-value.R
+#' @name FloatWidget
+NULL
 
+#' @rdname FloatWidget
 #' @export
 FloatWidgetClass <- R6Class_("FloatWidget",
   inherit = ValueWidgetClass,
@@ -7,9 +15,21 @@ FloatWidgetClass <- R6Class_("FloatWidget",
       value = structure(Float(0L),sync=TRUE))
 )
 
+#' @rdname FloatWidget
+#' @param value The floating point value
+#' @param ... Other arguments, passed to the superclass initializer
 #' @export
 FloatWidget <- function(value,...) FloatWidgetClass$new(value=value,...)
 
+#' Widgets for Bounded Floating Point Numbers
+#' @description An R6 class and a constructor function for the creation of
+#'     widgets that can be used to manipulate floating point numbers that are bounded within an interval
+#' @details The function \code{BoundedFloatWidget} creates objects of the R6 Class
+#'     "BoundedFloatWidgetClass", which in turn have the S3 class attribute "BoundedFloatWidget"
+#' @name BounedFloatWidget
+NULL
+
+#' @rdname BoundedFloatWidget
 #' @export
 BoundedFloatWidgetClass <- R6Class_("BoundedFloatWidget",
   inherit = ValueWidgetClass,
@@ -44,6 +64,11 @@ BoundedFloatWidgetClass <- R6Class_("BoundedFloatWidget",
     })
 )
 
+#' @rdname BoundedFloatWidget
+#' @param value The floating point value
+#' @param min The lower bound of the interval
+#' @param max The upper bound of the interval
+#' @param ... Other arguments, passed to the superclass initializer
 #' @export
 BoundedFloatWidget <- function(value,min,max,...) 
     BoundedFloatWidgetClass$new(value=value,
@@ -51,6 +76,17 @@ BoundedFloatWidget <- function(value,min,max,...)
                                 max=max,
                                 ...)
 
+#' Widgets for Bounded Floating Point Numbers on a logarithmic scale
+#' @description An R6 class and a constructor function for the creation of
+#'     widgets that can be used to manipulate floating point numbers that are
+#'     bounded within an interval on an logarithmic scale
+#' @details The function \code{BoundedLogFloatWidget} creates objects of the R6
+#'     Class "BoundedLogFloatWidgetClass", which in turn have the S3 class
+#'     attribute "BoundedLogFloatWidget"
+#' @name BounedLogFloatWidget
+NULL
+
+#' @rdname BoundedLogFloatWidget
 #' @export
 BoundedLogFloatWidgetClass <- R6Class_("BoundedLogFloatWidget",
   inherit = ValueWidgetClass,
@@ -86,6 +122,12 @@ BoundedLogFloatWidgetClass <- R6Class_("BoundedLogFloatWidget",
     })
 )
 
+#' @rdname BoundedLogFloatWidget
+#' @param value The floating point value
+#' @param min The lower bound of the interval
+#' @param max The upper bound of the interval
+#' @param base The base of the logarithm
+#' @param ... Other arguments, passed to the superclass initializer
 #' @export
 BoundedLogFloatWidget <- function(value,min,max,base,...) 
     BoundedLogFloatWidgetClass$new(value=value,
@@ -94,6 +136,17 @@ BoundedLogFloatWidget <- function(value,min,max,base,...)
                                    base=base,
                                    ...)
 
+#' Widgets for Floating Point Number Ranges
+#' @description An R6 class and a constructor function for the creation of
+#'     widgets that can be used to manipulate floating pairs of point numbers
+#'     that are bounded within an interval, where a pair defines a number range.
+#' @details The function \code{BoundedFloatRangeWidget} creates objects of the R6
+#'     Class "BoundedFloatRangeWidgetClass", which in turn have the S3 class
+#'     attribute "BoundedFloatRangeWidget"
+#' @name BoundedFloatRangeWidget
+NULL
+
+#' @rdname BoundedFloatRangeWidget
 #' @export
 BoundedFloatRangeWidgetClass <- R6Class_("BoundedFloatRangeWidget",
   inherit = ValueWidgetClass,
@@ -137,6 +190,11 @@ BoundedFloatRangeWidgetClass <- R6Class_("BoundedFloatRangeWidget",
       })
   )
 
+#' @rdname BoundedFloatRangeWidget
+#' @param value A pair of floating point values
+#' @param min The lower bound of the enclosing interval
+#' @param max The upper bound of the enclosing interval
+#' @param ... Other arguments, passed to the superclass initializer
 #' @export
 BoundedFloatRangeWidget <- function(value,min,max,...) 
     BoundedFloatRangeWidgetClass$new(value=value,
@@ -144,7 +202,14 @@ BoundedFloatRangeWidget <- function(value,min,max,...)
                                   max=max,
                                   ...)
 
+#' Widgets for Text Elements with Floating Point Numbers
+#' @description An R6 class and a constructor function for the creation of
+#'     widgets that can be used to manipulate floating point numbers
+#' @details The function \code{FloatText} creates objects of the R6 Class
+#'     "FloatTextClass", which in turn have the S3 class attribute "FloatText"
+#' @name FloatText
 
+#' @rdname FloatText
 #' @export
 FloatTextClass <- R6Class_("FloatText",
    inherit = FloatWidgetClass,
@@ -156,9 +221,21 @@ FloatTextClass <- R6Class_("FloatText",
        step = structure(Float(1.0),sync=TRUE)
    ))
 
+#' @rdname FloatText
+#' @param value Initial value of the floating point number
+#' @param step Increment by which the number is increased or decreased by the
+#'     text field controls
 #' @export
 FloatText <- function(value=0,step=.1,...) FloatTextClass$new(value=value,step=step,...)
 
+#' Widgets for Text Elements with Floating Point Numbers Bounded within an Interval
+#' @description An R6 class and a constructor function for the creation of
+#'     widgets that can be used to manipulate floating point numbers
+#' @details The function \code{BoundedFloatText} creates objects of the R6 Class
+#'     "BoundedFloatTextClass", which in turn have the S3 class attribute "BoundedFloatText"
+#' @name BoundedFloatText
+
+#' @rdname BoundedFloatText
 #' @export
 BoundedFloatTextClass <- R6Class_("BoundedFloatText",
    inherit = BoundedFloatWidgetClass,
@@ -170,6 +247,13 @@ BoundedFloatTextClass <- R6Class_("BoundedFloatText",
        step = structure(Float(1.0),sync=TRUE)
    ))
 
+
+#' @rdname BoundedFloatText
+#' @param value Initial value of the floating point number
+#' @param min Lower limit of the enclosing interval
+#' @param max Upper limit of the enclosing interval
+#' @param step Increment by which the number is increased or decreased by the
+#'     text field controls
 #' @export
 BoundedFloatText <- function(value=0,min=0,max=100,step=.1,...) 
     BoundedFloatTextClass$new(value=value,min=min,max=max,step=step,...)

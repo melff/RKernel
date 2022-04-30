@@ -1,5 +1,12 @@
+#' Widgets for Integer Numbers
+#' @description An R6 class and a constructor function for the creation of
+#'     widgets that can be used to manipulate integer numbers
+#' @details The function \code{IntegerWidget} creates objects of the R6 Class
+#'     "IntegerWidgetClass", which in turn have the S3 class attribute "IntegerWidget"
 #' @include widget-value.R
+#' @name IntegerWidget
 
+#' @rdname IntegerWidget
 #' @export
 IntegerWidgetClass <- R6Class_("IntegerWidget",
   inherit = ValueWidgetClass,
@@ -8,9 +15,21 @@ IntegerWidgetClass <- R6Class_("IntegerWidget",
   )
 )
 
+#' @rdname IntegerWidget
+#' @param value The integer value
+#' @param ... Other arguments, passed to the superclass initializer
 #' @export
 IntegerWidget <- function(value,...) IntegerWidgetClass$new(value=value,...)
 
+#' Widgets for Bounded Integer Numbers
+#' @description An R6 class and a constructor function for the creation of
+#'     widgets that can be used to manipulate integer numbers that are bounded within an interval
+#' @details The function \code{BoundedIntegerWidget} creates objects of the R6 Class
+#'     "BoundedIntegerWidgetClass", which in turn have the S3 class attribute "BoundedIntegerWidget"
+#' @name BounedIntegerWidget
+NULL
+
+#' @rdname BoundedIntegerWidget
 #' @export
 BoundedIntegerWidgetClass <- R6Class_("BoundedIntegerWidget",
   inherit = ValueWidgetClass,
@@ -45,6 +64,11 @@ BoundedIntegerWidgetClass <- R6Class_("BoundedIntegerWidget",
       })
   )
 
+#' @rdname BoundedIntegerWidget
+#' @param value The integer value
+#' @param min The lower bound of the interval
+#' @param max The upper bound of the interval
+#' @param ... Other arguments, passed to the superclass initializer
 #' @export
 BoundedIntegerWidget <- function(value,min,max,...) 
     BoundedIntegerWidgetClass$new(value=value,
@@ -52,9 +76,13 @@ BoundedIntegerWidget <- function(value,min,max,...)
                                   max=max,
                                   ...)
 
-
+#' @rdname BoundedIntegerRangeWidget
+#' @param value A pair of integer values
+#' @param min The lower bound of the enclosing interval
+#' @param max The upper bound of the enclosing interval
+#' @param ... Other arguments, passed to the superclass initializer
 #' @export
-BoundedIntRangeWidgetClass <- R6Class_("BoundedIntRangeWidget",
+BoundedIntegerRangeWidgetClass <- R6Class_("BoundedIntegerRangeWidget",
   inherit = ValueWidgetClass,
   public = list(
       value = structure(Integer(c(0L,1L)),sync=TRUE),
@@ -96,15 +124,28 @@ BoundedIntRangeWidgetClass <- R6Class_("BoundedIntRangeWidget",
       })
   )
 
+#' @rdname BoundedIntegerRangeWidget
+#' @param value A pair of integer values
+#' @param min The lower bound of the enclosing interval
+#' @param max The upper bound of the enclosing interval
+#' @param ... Other arguments, passed to the superclass initializer
 #' @export
-BoundedIntRangeWidget <- function(value,min,max,...) 
-    BoundedIntRangeWidgetClass$new(value=value,
+BoundedIntegerRangeWidget <- function(value,min,max,...) 
+    BoundedIntegerRangeWidgetClass$new(value=value,
                                   min=min,
                                   max=max,
                                   ...)
 
+#' Widgets for Text Elements with Integer Numbers
+#' @description An R6 class and a constructor function for the creation of
+#'     widgets that can be used to manipulate integer numbers
+#' @details The function \code{IntegerText} creates objects of the R6 Class
+#'     "IntegerTextClass", which in turn have the S3 class attribute "IntegerText"
+#' @name IntegerText
+
+#' @rdname IntegerText
 #' @export
-IntTextClass <- R6Class_("IntText",
+IntegerTextClass <- R6Class_("IntegerText",
    inherit = IntegerWidgetClass,
    public = list(
        `_model_name` = structure(Unicode("IntTextModel"),sync=TRUE),
@@ -114,11 +155,23 @@ IntTextClass <- R6Class_("IntText",
        step = structure(Integer(1L),sync=TRUE)
    ))
 
+#' @rdname IntegerText
+#' @param value Initial value of the integer number
+#' @param step Increment by which the number is increased or decreased by the
+#'     text field controls
 #' @export
-IntText <- function(value=0,step=1,...) IntTextClass$new(value=value,step=step,...)
+IntegerText <- function(value=0,step=1,...) IntegerTextClass$new(value=value,step=step,...)
 
+#' Widgets for Text Elements with Integer Numbers Bounded within an Interval
+#' @description An R6 class and a constructor function for the creation of
+#'     widgets that can be used to manipulate integer numbers
+#' @details The function \code{BoundedIntegerText} creates objects of the R6 Class
+#'     "BoundedIntegerTextClass", which in turn have the S3 class attribute "BoundedIntegerText"
+#' @name BoundedIntegerText
+
+#' @rdname BoundedIntegerText
 #' @export
-BoundedIntTextClass <- R6Class_("BoundedIntText",
+BoundedIntegerTextClass <- R6Class_("BoundedIntegerText",
    inherit = BoundedIntegerWidgetClass,
    public = list(
        `_model_name` = structure(Unicode("BoundedIntTextModel"),sync=TRUE),
@@ -128,6 +181,12 @@ BoundedIntTextClass <- R6Class_("BoundedIntText",
        step = structure(Integer(1L),sync=TRUE)
    ))
 
+#' @rdname BoundedIntegerText
+#' @param value Initial value of the integer number
+#' @param min Lower limit of the enclosing interval
+#' @param max Upper limit of the enclosing interval
+#' @param step Increment by which the number is increased or decreased by the
+#'     text field controls
 #' @export
-BoundedIntText <- function(value=0,min=0,max=100,step=1,...) 
-    IntTextClass$new(value=value,min=min,max=max,step=step,...)
+BoundedIntegerText <- function(value=0,min=0,max=100,step=1,...) 
+    IntegerTextClass$new(value=value,min=min,max=max,step=step,...)

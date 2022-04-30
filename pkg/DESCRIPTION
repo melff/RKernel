@@ -21,14 +21,17 @@ Imports:
     svglite,
     repr,
     htmltools,
-    callr
+    callr,
+    Cairo,
+    png,
+    base64enc
 Depends:
     R (>= 3.0.1)
 Suggests:
     roxygen2
 SystemRequirements:
     jupyter
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Collate: 
     'View.R'
     'aa-versions.R'

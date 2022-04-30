@@ -1,19 +1,40 @@
+#' Box Containers
+#'
+#' @description Classes and constructor functions to create box container widgets
+#'
+#' @details \code{VBox} creates vertical boxes, \code{HBox} creates horizontal boxes,
+#'     \code{GridBox} creates a grid box. In a vertical box widgets are arranged one below the other,
+#'     in a horizontal box widgets are arranged side-by-side, in a grid box widget are arraned in a
+#'     grid.
+#' 
 #' @include widget.R widget-description.R
+#' @name Boxes
 
+#' @rdname Boxes
 #' @export
 BoxClass <- R6Class_("Box",
    inherit = DOMWidgetClass,
    public = list(
+    #' @field _model_module Name of the Javascript module with the model
     `_model_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
+    #' @field _model_module_version Version of the module where the model is defined
     `_model_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
+    #' @field _model_name Name of the Javascript model in the frontend
     `_model_name` = structure(Unicode("BoxModel"),sync=TRUE),
+    #' @field _view_name Name of the Javascript model view in the frontend
     `_view_name` = structure(Unicode("BoxView"),sync=TRUE),
+    #' @field _view_module Name of the module where the view is defined
     `_view_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
+    #' @field _view_module_version Version of the module where the view is defined
     `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
+    #' @field children A generic vector with the widgets in the container
     children = structure(Vector(),sync=TRUE),
+    #' @field button_style The string that describes the button style
     box_style = structure(StrEnum(
         c("primary","success","info","warning","danger",""),
         default="")),
+    #' @description An initializer function
+    #' @param children A list of widgets
     initialize = function(children=list(),...){
         super$initialize(...)
         if(length(children)==1 && is.list(children[[1]]))
@@ -22,6 +43,7 @@ BoxClass <- R6Class_("Box",
         #self$send_state()
         self$on_displayed(self$notify_children_displayed)
     },
+    #' @description Notifies children that they are displayed
     notify_children_displayed = function(){
         for(child in self$children)
             child$handle_displayed()
@@ -50,42 +72,54 @@ ContainerClass_new <- function(Class,...){
     do.call(Class$new,call_args)
 }
 
+#' @describeIn Boxes A baseline box constructor
 #' @export
 Box <- function(...) ContainerClass_new(Class=BoxClass,...)
 
+#' @rdname Boxes
 #' @export
 HBoxClass <- R6Class_("HBox",
     inherit = BoxClass,
     public=list(
+        #' @field _model_name Name of the Javascript model in the frontend
         `_model_name` = structure(Unicode("HBoxModel"),sync=TRUE),
+        #' @field _view_name Name of the Javascript model view in the frontend
         `_view_name` = structure(Unicode("HBoxView"),sync=TRUE)
     )
 )
 
+#' @describeIn Boxes A horizontal box constructor
 #' @export
 HBox <- function(...) ContainerClass_new(Class=HBoxClass,...)
 
+#' @rdname Boxes
 #' @export
 VBoxClass <- R6Class_("VBox",
     inherit = BoxClass,
     public=list(
+        #' @field _model_name Name of the Javascript model in the frontend
         `_model_name` = structure(Unicode("VBoxModel"),sync=TRUE),
+        #' @field _view_name Name of the Javascript model view in the frontend
         `_view_name` = structure(Unicode("VBoxView"),sync=TRUE)
     )
 )
 
+#' @describeIn Boxes A vertical box constructor
 #' @export
 VBox <- function(...) ContainerClass_new(Class=VBoxClass,...)
 
-
+#' @rdname Boxes
 #' @export
 GridBoxClass <- R6Class_("GridBox",
     inherit = BoxClass,
     public=list(
+        #' @field _model_name Name of the Javascript model in the frontend
         `_model_name` = structure(Unicode("GridBoxModel"),sync=TRUE),
+        #' @field _view_name Name of the Javascript model view in the frontend
         `_view_name` = structure(Unicode("GridBoxView"),sync=TRUE)
     )
 )
 
+#' @describeIn Boxes A grid box constructor
 #' @export
 GridBox <- function(...) ContainerClass_new(Class=GridBoxClass,...)
