@@ -262,11 +262,21 @@ mkWidgets <- function(...){
 #' @rdname interaction
 #' @eval interact
 #' @export
-interact <- function(FUN,...,continuous_update=TRUE){
+interact <- function(FUN,...,continuous_update=TRUE,
+                     graphics=FALSE){
     controls <- mkWidgets(...)
-    output <- OutputWidget(append_output=FALSE)
+    if(graphics){
+        gw_res <- (getOption("jupyter.plot.res") *
+                   getOption("jupyter.plot.scale"))
+        gw_h <- getOption("jupyter.plot.height") * gw_res
+        gw_w <- getOption("jupyter.plot.width") * gw_res
+        gw <- ImageWidget(width=gw_w,height=gw_h)
+    }
+    else gw <- NULL
+    output <- OutputWidget(append_output=FALSE,
+                           graphics_widget=gw)
     interactive_output(FUN=FUN,
                        out=output,
                        controls=controls)
-    display(VBox(c(controls,output)))
+    display(VBox(c(controls,gw,output)))
 }
