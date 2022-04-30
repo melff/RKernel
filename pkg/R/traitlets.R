@@ -1,15 +1,37 @@
+#' R6 Objects That Are Not Locked
+#'
+#' @description This function calls the R6 class constructor in such a way that
+#'   new members can be added to the created objects.
+#'
+#' @param lock_objects A logical value, indicates whether objects should be
+#'     locked. See \code{\link[R6]{R6Class}}.
+#' 
 #' @include json.R
-
 #' @export
 R6Class_ <- function(...,lock_objects=FALSE)
              R6Class(...,
                      lock_objects=lock_objects)
 
+
+#' Traitlets
+#'
+#' @description The class \code{TraitClass} brings (some of) the functionality of the
+#'     \href{https://traitlets.readthedocs.io/}{traitlets framework} on which
+#'     the \href{https://ipywidgets.readthedocs.io}{ipywidgets framework} is
+#'     based to \emph{R}.
+#'
+#' @name Traitlets
+
+#' @rdname Traitlets
 #' @export
 TraitClass <- R6Class_("Trait",
    public=list(
-       name = character(0),
+       #' @field value The value of the trait
        value = NULL,
+       #' @description
+       #' Set the value of the trait
+       #' @param value The value to be set
+       #' @param notify Logical; whether to call notification callbacks
        set = function(value,notify=FALSE){
             if(length(self$validators)){
                 for(validator in self$validators){
@@ -26,20 +48,42 @@ TraitClass <- R6Class_("Trait",
                 }
             }
        },
+       #' @description Get the trait value
        get = function() self$value,
-       is_default = function() self$value == self$initial,
+       #' @field observers A list of functions to be called as notification callbacks
        observers = list(),
+       #' @field validators A list of functions to check the validity of a
+       #     trait value. Usually called by the 'set()' and 'initialize()' methods
        validators = list(),
+       #' @description Initialize the trait, i.e. set an initial value
+       #' @param initial The initial value
+       #' @param coerce Logical; whether to coerce the initial value
+       #'    to the approriate mode.
        initialize = function(initial,coerce=TRUE){
             validator <- self$validator
             if(is.function(validator) && !missing(initial)){
                 self$value <- validator(initial)
                 self$validators <- list(validator)
             }
+            else if(!missing(initial))
+                self$value <- initial
        }
    )
 )
 
+
+#' @describeIn Traitlets A Baseline Trait Constructor
+#'
+#' @export
+Trait <- function(...)TraitInstance(...,Class=TraitClass)
+
+
+#' @describeIn Traitlets A "Delayed Constructor" for Traits, to be used by constructors of derived classes.
+#'
+#' @description The function \code{TraitInstance}  returns information needed by a
+#'     \code{\link{HasTraits}} object to construct a \code{\link{TraitClass}}
+#'     object.
+#' @param Class An R6 Class that inherits from "TraitClass"
 #' @export
 TraitInstance <- function(Class,...){
     structure(
@@ -48,10 +92,6 @@ TraitInstance <- function(Class,...){
             Class=Class),
         class="TraitInstance")
 }
-
-#' @export
-Trait <- function(...)TraitInstance(...,Class=TraitClass)
-
 
 as_property <- function(self) {
     #self <- force(self)
@@ -65,12 +105,19 @@ as_property <- function(self) {
     return(res)
 }
 
+#' The Base Class of Objects with Traits
+#'
+#' @description Objects in class HasTraits have traits as components
+#'    that are correctly initialized using delayed construction with
+#'    the \code{\link{TraitInstance}} function.
+#' 
 #' @export
 HasTraits <- R6Class_("HasTraits",
   public=list(
+      #' @field traits A list of traits 
       traits=list(),
-      properties=list(),
-      envs = list(),
+      #' @description Initialize an object
+      #' @param ... Initializsing values
       initialize=function(...){
           initials <- list(...)
           # print(class(self))
@@ -106,6 +153,10 @@ HasTraits <- R6Class_("HasTraits",
               makeActiveBinding(tn, property, self)
           }
       },
+      #' @description
+      #' Notify observers about a trait being set to a value.
+      #' @param tn A string, the name of the trait.
+      #' @param value The value to which the trait is set.
       notify = function(tn,value){
           # log_out(sprintf("notify %s = %s",tn,value))
           if(length(self$observers) && tn %in% names(self$observers)){
@@ -116,35 +167,47 @@ HasTraits <- R6Class_("HasTraits",
               }
           }
       },
+      #' @field observers A list of observers, i.e. callback functions called by
+      #' the \code{notify} method.
       observers = list(),
-      observe=function(tn,handler,remove=FALSE){
+      #' @description Install or remove an observer function.
+      #' @param tn A string, the name of a trait.
+      #' @param observer A callback function
+      #' @param remove A logical value, indicates whether the observer is to be removed
+      #'    or added
+      observe=function(tn,observer,remove=FALSE){
           callbacks_in <- self$observers[[tn]]
           callbacks_out <- list()
-          for(h in callbacks_in){
-              if(!identical(h,handler))
-                  callbacks_out <- append(callbacks_out,h)
+          for(cb in callbacks_in){
+              if(!identical(cb,observer))
+                  callbacks_out <- append(callbacks_out,cb)
           }
           if(!remove)
-              callbacks_out <- append(callbacks_out,handler)
+              callbacks_out <- append(callbacks_out,observer)
           self$observers[[tn]] <- callbacks_out
       },
-      validate=function(tn,handler,remove=FALSE){
+      #' @description Install or remove the validator function of a trait.
+      #' @param tn A string, the name of a trait.
+      #' @param validator A callback function
+      #' @param remove A logical value, indicates whether the validator is to be removed
+      #'    or added
+      validate=function(tn,validator,remove=FALSE){
           trait <- self$traits[[tn]]
           callbacks_in <- trait$validators
           callbacks_out <- list()
-          for(h in callbacks_in){
-              if(!identical(h,handler))
-                  callbacks_out <- append(callbacks_out,h)
+          for(cb in callbacks_in){
+              if(!identical(cb,validator))
+                  callbacks_out <- append(callbacks_out,cb)
           }
           if(!remove)
-              callbacks_out <- append(callbacks_out,handler)
+              callbacks_out <- append(callbacks_out,validator)
           trait$validators <- callbacks_out
           self$traits[[tn]] <- trait
       }
   )
 )
 
-
+#' @describeIn to_json S3 method for 'TraitClass' objects, i.e. traitlets.
 #' @export
 to_json.Trait <- function(x,auto_unbox=TRUE,...){
     value <- x$get()
