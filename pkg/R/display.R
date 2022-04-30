@@ -567,7 +567,10 @@ format_item <- function(x){
 }
 
 
-#' Prepare Javascript to be sent to the frontend
+#' Send Javascript to the frontend
+#'
+#' @description Send Javascript code in a character string or a text file to the
+#'     frontend.
 #'
 #' @param text A character string with Javascript code
 #' @param file Path of a file with Javascript code
@@ -575,7 +578,8 @@ format_item <- function(x){
 #' @export
 Javascript <- function(text,file){
     if(missing(text)){
-        text <- readLines(file)
+        if(!missing(file))
+            text <- readLines(file)
     }
     text <- paste(text,collapse="\n")
     # text_plain <- paste("Javascript: ",text,sep="\n")
