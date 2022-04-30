@@ -208,7 +208,7 @@ call_with_controls <- function(FUN,controls){
 #' @param continous_update A logical value, if \code{TRUE} the function
 #'     \code{FUN} is called whenever one of the controlling widgets changes a
 #'     value
-#' @param mime_type A character string that specifies the mime type as whith the
+#' @param mime_type A character string that specifies the mime type as which the
 #'     return value of \code{FUN} is displayed.
 #' @export
 interactive_output <- function(FUN,
@@ -245,7 +245,7 @@ interactive_output <- function(FUN,
 
 #' @rdname interaction
 #' @param ... Named arguments, transformed into widgets using the generic
-#'     function code \code{mkWidget}.
+#'     function \code{\link{mkWidget}}.
 #' @export
 mkWidgets <- function(...){
     args <- list(...)
@@ -260,7 +260,8 @@ mkWidgets <- function(...){
 
 
 #' @rdname interaction
-#' @eval interact
+#' @param graphics Logical, whether graphics output is expected, in which case
+#'   an "ImageWidget" object is created to receive the graphics output.
 #' @export
 interact <- function(FUN,...,continuous_update=TRUE,
                      graphics=FALSE){
