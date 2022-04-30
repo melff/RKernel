@@ -15,7 +15,7 @@ str_ <- function(nm,envir){
 #' @param all.names logical value, if FALSE objects with names that start with a dot are ignored
 #' @param pattern a character string, the pattern of the names of the objects to show
 #' @param mode a character string, the mode of the objects to be shown
-#' @seealso ls.str
+#' @seealso \code{\link{ls.str}}
 #' @export
 ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
     mode = "any"){
