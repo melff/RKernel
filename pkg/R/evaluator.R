@@ -103,7 +103,7 @@ Evaluator <- R6Class("Evaluator",
         #' @param ... Other arguments, currently ignored
         eval = function(code,...){
             
-            perc_match <- getMatch(code,regexec("^%%(.+?)\n",code))
+            perc_match <- getMatch(code,regexec("^%%([a-zA-Z0-9]+)\n",code))
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
                 # message(sprintf("Found magic '%s'",magic))
