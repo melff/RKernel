@@ -1,6 +1,10 @@
+#' Widgets to receive output
+#' @description Classes and constructors to wrap output created by code
 #' @importFrom uuid UUIDgenerate
 #' @include widget-dom.R
+#' @name OutputWidget
 
+#' @rdname OutputWidget
 #' @export
 OutputWidgetClass <- R6Class_("OutputWidget",
     inherit = DOMWidgetClass,
@@ -14,7 +18,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
 
         msg_id = structure(Unicode(""),sync=TRUE),
         display_msg_id = "",
-
+        #' @field context An object from class "Context" -- see \code{\link{Context}}
         context = NULL,
         envir = NULL,
         append_output = TRUE,
@@ -59,8 +63,18 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             # log_out(sprintf("msg_id set to '%s'",self$msg_id))
         },
         
+        #' @description 
+        #' Evaluate one or several expresions
+        #' @param ... A single expression or several expressions
+        #'   included in curly braces.
         do = function(...) self$context$do(...),
+        #' @description
+        #' Evaluate a single expression
+        #' @param expr A single expression.
         eval = function(expr) self$context$eval(expr),
+        #' @description
+        #' Evaluate a single expression
+        #' @param expressions A list of expressions.
         evaluate = function(expressions) self$context$evaluate(expressions),
 
         handle_text = function(text) {
@@ -186,10 +200,14 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                 }
             }
         },
+        #' @description 
+        #' Show textual output in the widget area, see \code{\link{cat}}.
         cat = function(...,sep=" "){
             text <- paste(...,sep=sep)
             self$stream(text,"stdout")
         },
+        #' @description 
+        #' Show printed output in the widget area, see \code{\link{print}}
         print = function(x,...){
             text <- capture.output(print(x,...))
             self$stream(text,"stdout")
@@ -238,6 +256,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             #self$sync_suspended <- FALSE
             #self$send_state("outputs")
         },
+        #' @description A variant of \code{\link{display}} for output within a display widget.
         display = function(...){
             d <- display_data(...)
             self$display_send(d)
@@ -306,10 +325,24 @@ OutputWidgetClass <- R6Class_("OutputWidget",
     )
 )
 
+#' @rdname OutputWidget
+#' @param append_output Logical value, whether new output is appended to existing
+#'    output in the widget or the output is overwritten
+#' @param graphics_widget A widget to receive graphics output, should be an
+#'    "ImageWidget" object or NULL.
+#' @param ... Other arguments, ignored.
 #' @export
-OutputWidget <- function(...) OutputWidgetClass$new(...)
+OutputWidget <- function(append_output=FALSE,graphics_widget=NULL,...) 
+                   OutputWidgetClass$new(append_output=output_output,
+                                         graphics_widget=graphics_widget,
+                                         ...)
 
 
+#' @rdname OutputWidget
+#' @param data An "OutputWidget" object
+#' @param expr An expression to evaluate, or a sequence of expression, 
+#'    encapsulated by curly braces.
+#' @param enclos An enclosing environment.
 #' @export
 with.OutputWidget <- function(data,expr,enclos=parent.frame(),...)
     data$context$eval(substitute(expr),enclos=enclos)
