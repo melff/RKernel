@@ -1,7 +1,11 @@
-#' @importFrom jsonlite fromJSON toJSON
 
-# The following is adapted from IRKernel/R/installspec.r
+
+
+#' Install the R Kernel spec
+#'
+#' @importFrom jsonlite fromJSON toJSON
 #' @export
+# The following is adapted from IRKernel/R/installspec.r
 installspec <- function(){
    kernelspec_srcdir <- system.file("kernelspec",package="RKernel")
    tmp_dir <- tempfile()
