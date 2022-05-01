@@ -80,12 +80,12 @@ virtable_widget <- function(x,
                           scroll_right_button,
                           page_right_button)
     
-    row_pagesize_control <- BoundedIntText(value=row_pagesize,
+    row_pagesize_control <- BoundedIntegerText(value=row_pagesize,
                                            min=1L,max=nrow(x),
                                            description="Rows",
                                            description_tooltip = 
                                                "Number of rows being shown")
-    col_pagesize_control <- BoundedIntText(value=col_pagesize,
+    col_pagesize_control <- BoundedIntegerText(value=col_pagesize,
                                            min=1L,max=ncol(x),
                                            description="Columns",
                                            description_tooltip = 
