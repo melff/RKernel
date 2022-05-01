@@ -37,4 +37,5 @@ ImageWidgetClass <- R6Class_("ImageWidget",
 #' @param width The width of the image in pixels
 #' @param height The height of the image in pixels
 #' @export
-ImageWidget <- function(format="png",width,height) ImageWidgetClass$new(formal,width,height)
+ImageWidget <- function(format="png",width,height)
+    ImageWidgetClass$new(format=format,width=width,height=height)
