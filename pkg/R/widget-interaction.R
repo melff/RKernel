@@ -250,10 +250,13 @@ interactive_output <- function(FUN,
 mkWidgets <- function(...){
     args <- list(...)
     argnames <- names(args)
+    arglabels <- format(argnames)
     res <- list()
-    for(n in argnames){
+    for(i in seq_along(argnames)){
+        n <- argnames[i]
         x <- args[[n]]
-        res[[n]] <- mkWidget(x,description=n)
+        l <- arglabels[i]
+        res[[n]] <- mkWidget(x,description=l)
     }
     res
 }
@@ -271,6 +274,8 @@ interact <- function(FUN,...,continuous_update=TRUE,
                    getOption("jupyter.plot.scale"))
         gw_h <- getOption("jupyter.plot.height") * gw_res
         gw_w <- getOption("jupyter.plot.width") * gw_res
+        gw_h <- paste0(gw_h,"px")
+        gw_w <- paste0(gw_w,"px")
         gw <- ImageWidget(width=gw_w,height=gw_h)
     }
     else gw <- NULL
