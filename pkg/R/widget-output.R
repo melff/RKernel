@@ -333,7 +333,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
 #' @param ... Other arguments, ignored.
 #' @export
 OutputWidget <- function(append_output=FALSE,graphics_widget=NULL,...) 
-                   OutputWidgetClass$new(append_output=output_output,
+                   OutputWidgetClass$new(append_output=append_output,
                                          graphics_widget=graphics_widget,
                                          ...)
 
