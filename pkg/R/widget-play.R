@@ -9,7 +9,7 @@
 #' @rdname Play
 #' @export
 PlayClass <- R6Class_("Play",
-   inherit = BoundedIntegerWidgetClass,
+   inherit = BoundedIntWidgetClass,
    public = list(
        `_model_name` = structure(Unicode("PlayModel"),sync=TRUE),
        `_view_name` = structure(Unicode("PlayView"),sync=TRUE),

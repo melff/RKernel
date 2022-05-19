@@ -10,7 +10,7 @@ ProgressStyleClass <- R6Class_("ProgrssStyle",
 
 #' @export
 IntProgressClass <- R6Class_("IntProgress",
-   inherit = BoundedIntegerWidgetClass,
+   inherit = BoundedIntWidgetClass,
    public = list(
        `_model_name` = structure(Unicode("IntProgressModel"),sync=TRUE),
        `_view_name` = structure(Unicode("ProgressView"),sync=TRUE),

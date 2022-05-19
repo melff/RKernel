@@ -10,7 +10,7 @@ SliderStyleClass <- R6Class_("SliderStyle",
 
 #' @export
 IntSliderClass <- R6Class_("IntSlider",
-   inherit = BoundedIntegerWidgetClass,
+   inherit = BoundedIntWidgetClass,
    public = list(
        `_model_name` = structure(Unicode("IntSliderModel"),sync=TRUE),
        `_view_name` = structure(Unicode("IntSliderView"),sync=TRUE),
@@ -33,8 +33,8 @@ IntSlider <- function(value=0L,min=0L,max=100L,...)
 
 
 #' @export
-IntegerRangeSliderClass <- R6Class_("IntegerRangeSlider",
-   inherit = BoundedIntegerRangeWidgetClass,
+IntRangeSliderClass <- R6Class_("IntRangeSlider",
+   inherit = BoundedIntRangeWidgetClass,
    public = list(
        `_model_name` = structure(Unicode("IntRangeSliderModel"),sync=TRUE),
        `_view_name` = structure(Unicode("IntRangeSliderView"),sync=TRUE),
