@@ -86,6 +86,10 @@ Evaluator <- R6Class("Evaluator",
                                         attachment=private$env)
 
             suppressMessages(trace(example,tracer=quote(if(missing(run.donttest)) run.donttest<-TRUE),print=FALSE))
+            home_dir <- Sys.getenv("HOME")
+            jupyter_config <- file.path(home_dir,".jupyter","RKernel-config.R")
+            if(file.exists(jupyter_config)) 
+                source(jupyter_config)
             if(file.exists("RKernel-startup.R"))
                 source("RKernel-startup.R")
 
