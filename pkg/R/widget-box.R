@@ -90,7 +90,12 @@ HBoxClass <- R6Class_("HBox",
 
 #' @describeIn Boxes A horizontal box constructor
 #' @export
-HBox <- function(...) ContainerClass_new(Class=HBoxClass,...)
+HBox <- function(...,wrap=FALSE) {
+    box <- ContainerClass_new(Class=HBoxClass,...)
+    if(wrap && !length(box$layout$flex_flow))
+        box$layout$flex_flow <- "wrap"
+    box
+}
 
 #' @rdname Boxes
 #' @export
@@ -106,7 +111,12 @@ VBoxClass <- R6Class_("VBox",
 
 #' @describeIn Boxes A vertical box constructor
 #' @export
-VBox <- function(...) ContainerClass_new(Class=VBoxClass,...)
+VBox <- function(...,wrap=FALSE) {
+    box <- ContainerClass_new(Class=VBoxClass,...)
+    if(wrap && !length(box$layout$flex_flow))
+        box$layout$flex_flow <- "wrap"
+    box
+}
 
 #' @rdname Boxes
 #' @export
