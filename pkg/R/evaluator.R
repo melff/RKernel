@@ -336,12 +336,15 @@ Evaluator <- R6Class("Evaluator",
 
             assign("get_help_url",function()private$help_url,envir=private$env)
         },
-        start_proxied_help_system = function(help_url=getOption("proxied_help_url",
+        start_proxied_help_system = function(help_url=paste0(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"),
                                                            "/RHelp")){
             private$help_url <- help_url
             assign("get_help_url",function()private$help_url,envir=private$env)
         },
         start_help_system = function(){
+            if(nzchar(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")) &&
+               !length(getOption("rkernel_help_system")))
+                options(rkernel_help_system="proxy")
             if(isTRUE(getOption("rkernel_help_system")=="proxy"))
                 private$start_proxied_help_system()
             else
