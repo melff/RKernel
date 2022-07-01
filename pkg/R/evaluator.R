@@ -68,6 +68,7 @@ Evaluator <- R6Class("Evaluator",
                     jupyter.plot.units="in",
                     jupyter.plot.scale=0.5,
                     jupyter.update.graphics=TRUE,
+                    repos=c(CRAN="https://cloud.r-project.org"),
                     rkernel_stop_on_error=TRUE)
 
 
