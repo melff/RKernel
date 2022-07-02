@@ -68,6 +68,7 @@ Evaluator <- R6Class("Evaluator",
                     jupyter.plot.units="in",
                     jupyter.plot.scale=0.5,
                     jupyter.update.graphics=TRUE,
+                    pager=private$pager,
                     repos=c(CRAN="https://cloud.r-project.org"),
                     rkernel_stop_on_error=TRUE)
 
@@ -376,9 +377,21 @@ Evaluator <- R6Class("Evaluator",
         },
 
         pager = function(files,header,title,delete.file){
-            text <- c(header,"",title,"")
-            for(file in files){
-                text <- c(text,readLines(file))
+
+            tmp_h <- character(length(files))
+            tmp_h[] <- header
+            header <- tmp_h
+            
+            if(length(title))
+                text <- title
+            else
+                text <- character(0)
+            
+            for(i in seq_along(files)){
+                file <- files[i]
+                tmp <- readLines(file)
+                tmp <- c(header[i],tmp)
+                text <- c(text,tmp)
             }
             if(delete.file){
                 file.remove(files)
