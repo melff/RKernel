@@ -228,10 +228,10 @@ Context <- R6Class("Context",
        id = character(0),
        name = character(0),
 
-       handle_text = function(new_line=FALSE){
+       handle_text = function(){
            if(!is.function(private$text_callback)) return()
-           if(isIncomplete(private$connection) || new_line)
-               cat("\n",file=private$connection)
+           # if(!isIncomplete(private$connection) || TRUE)
+           cat("\n",file=private$connection)
            private$prev_text_output <- private$text_output
            private$text_output <- textConnectionValue(private$connection)
            if(is.function(private$text_callback)){
@@ -356,7 +356,7 @@ Context <- R6Class("Context",
           private$handle_graphics()
       },
       print_exit_hook = function(){
-          private$handle_text(new_line=TRUE)
+          private$handle_text()
       },
 
       str_depth = 0,
