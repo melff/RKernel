@@ -250,7 +250,8 @@ Evaluator <- R6Class("Evaluator",
             llines <- nchar(lines)
             line_end <- cumsum(llines)
             line_start <- head(c(0,line_end),-1)
-            i <- max(which(cursor_pos <= line_end))
+            suppressWarnings(i <- max(which(cursor_pos <= line_end)))
+            if(!is.finite(i)) return(NULL)
             pos <- cursor_pos - line_start[i] + 1
             line <- lines[i]
             private$cf$assignLinebuffer(line)
