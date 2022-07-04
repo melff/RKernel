@@ -38,6 +38,7 @@ Collate:
     'callbacks.R'
     'comms.R'
     'context.R'
+    'dictionary.R'
     'display.R'
     'env-browser.R'
     'evaluator.R'
