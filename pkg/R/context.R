@@ -89,6 +89,7 @@ Context <- R6Class("Context",
                        error=private$eHandler,
                        warning=private$wHandler,
                        message=private$mHandler),silent=TRUE)
+               envir$.Last.value <- ev$value
                private$handle_text()
                private$handle_graphics()
                if(is.function(private$value_callback)){
