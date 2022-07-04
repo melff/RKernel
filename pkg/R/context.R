@@ -92,14 +92,15 @@ Context <- R6Class("Context",
                private$handle_text()
                private$handle_graphics()
                if(is.function(private$value_callback)){
-                   # log_out("handling return value")
-                   try(ev <- withCallingHandlers(
+                   try(withCallingHandlers(
                            private$value_callback(ev$value,ev$visible),
                            error=private$eHandler,
                            warning=private$wHandler,
                            message=private$mHandler),silent=TRUE)
-                   private$handle_text()
-                   private$handle_graphics()
+                   if(ev$visible){
+                       private$handle_text()
+                       private$handle_graphics()
+                   }
                }
            }
            self$exit()
@@ -242,7 +243,9 @@ Context <- R6Class("Context",
                    current_text_output <- private$text_output
                if(length(current_text_output)){
                    current_text_output <- paste(current_text_output,collapse="\n")
-                   private$text_callback(current_text_output)
+                   # KLUDGE Ignore empty lines of output
+                   if(!identical(current_text_output,"\n"))
+                       private$text_callback(current_text_output)
                }
            }
        },
