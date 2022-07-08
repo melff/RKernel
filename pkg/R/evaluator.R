@@ -251,21 +251,13 @@ Evaluator <- R6Class("Evaluator",
         get_completions = function(code,cursor_pos){
             if(!private$completions_inited) private$init_completions()
 
-# FIXME Rare error message
-#Warning in max(which(cursor_pos <= line_end)) :
-#  no non-missing arguments to max; returning -Inf
-#Error in checkHT(n, dx <- dim(x)) : 
-#  invalid 'n' -  must contain at least one non-missing element, got none.
-#Calls: <Anonymous> ... <Anonymous> -> <Anonymous> -> head.default -> checkHT
-
-
             lines <- splitLines(code)
-            llines <- nchar(lines)
-            line_end <- cumsum(llines)
-            line_start <- head(c(0,line_end),-1)
-            suppressWarnings(i <- max(which(cursor_pos <= line_end)))
-            if(!is.finite(i)) return(NULL)
-            pos <- cursor_pos - line_start[i] + 1
+            line_length <- nchar(lines)
+            line_start <- head(c(0,cumsum(line_length + 1)),-1)
+            line_end <- line_start + line_length
+            suppressWarnings(i <- which(line_start <= cursor_pos & cursor_pos <= line_end))
+            if(!length(i) || !is.finite(i)) return(NULL)
+            pos <- cursor_pos - line_start[i] 
             line <- lines[i]
             private$cf$assignLinebuffer(line)
             private$cf$assignEnd(pos)
@@ -278,7 +270,7 @@ Evaluator <- R6Class("Evaluator",
             end <- start + nchar(match_info$token)
 
             return(list(
-                matches = matches,
+                matches = as.list(matches),
                 start = start,
                 end = end
             ))
