@@ -302,7 +302,7 @@ Kernel <- R6Class("Kernel",
                            content=list(
                              code=msg$content$code,
                              execution_count=private$execution_count))
-      self$evaluator$eval(msg$content$code)
+      self$evaluator$eval_cell(msg$content$code)
       payload <- self$evaluator$get_payload(clear=TRUE)
       payload <- check_page_payload(payload)
       status <- self$evaluator$get_status(reset=TRUE)

@@ -719,3 +719,10 @@ alert <- function(text){
     kernel$display_data(data=d$data,
                         metadata=d$metadata)
 }
+
+print_ <- function (x, ...) {
+    if(any(class(x) %in% getOption("rkernel_displayed_classes"))){
+        display(x)
+    }
+    else UseMethod("print")
+}

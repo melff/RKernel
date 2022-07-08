@@ -45,6 +45,7 @@ Evaluator <- R6Class("Evaluator",
             # assign("Math",LaTeXMath,pos=pos)
             # assign("raw_html",raw_html,pos=pos)
             # assign("Page",Page,pos=pos)
+            ## assign("print",private$print,envir=private$env)
             assign("View",View,envir=private$env)
             # assign("ls_str",ls_str,pos=pos)
             # 
@@ -57,6 +58,8 @@ Evaluator <- R6Class("Evaluator",
             # if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
             #     rm(var_dic_list,envir=.GlobalEnv)
             # assign("var_dic_list",self$var_dic_list,pos=pos)
+            assign("In",self$cells,envir=private$env)
+            assign("Out",self$cell_results,envir=private$env)
 
             options(pager=self$pager,
                     crayon.enabled=TRUE,crayon.colors=256L,
@@ -107,7 +110,7 @@ Evaluator <- R6Class("Evaluator",
         #' Evaluate R code
         #' @param code A string with R code
         #' @param ... Other arguments, currently ignored
-        eval = function(code,...){
+        eval_cell = function(code,...){
             
             perc_match <- getMatch(code,regexec("^%%([a-zA-Z0-9]+)\n",code))
             if(length(perc_match) > 1){
@@ -141,7 +144,14 @@ Evaluator <- R6Class("Evaluator",
             }
             else {
                 private$new_cell <- TRUE
+                self$cell_no <- self$cell_no + 1
                 private$context$evaluate(expressions,envir=.GlobalEnv)
+                current_value <- private$context$last.value
+                self$cells[[self$cell_no]] <- code
+                self$cell_results[[self$cell_no]] <- current_value$value
+                assign("In",self$cells,envir=private$env)
+                assign("Out",self$cell_results,envir=private$env)
+                assign(".Last.value",current_value$value,envir=private$env)
 
                 if(length(private$saved.options)){
                     op <- private$saved.options
@@ -157,6 +167,9 @@ Evaluator <- R6Class("Evaluator",
                 private$run_callbacks()
             }
         },
+        cell_no = 0,
+        cells = dictionary(),
+        cell_results = dictionary(),
         #' @description
         #' Get the payload associated with the result returned from running a Jupyter cell
         #' @param clear A logical value, whether the payload list should be cleared after returning it.
@@ -528,6 +541,8 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_value = function(x,visible) {
+            # log_out("handle_value")
+            # log_out(visible,use.print=TRUE)
             if(visible){
                 if(any(class(x) %in% getOption("rkernel_paged_classes"))){
                     displayed <- display_data(x)

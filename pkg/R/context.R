@@ -89,7 +89,7 @@ Context <- R6Class("Context",
                        error=private$eHandler,
                        warning=private$wHandler,
                        message=private$mHandler),silent=TRUE)
-               envir$.Last.value <- ev$value
+               self$last.value <- ev
                private$handle_text()
                private$handle_graphics()
                if(is.function(private$value_callback)){
@@ -106,7 +106,7 @@ Context <- R6Class("Context",
            }
            self$exit()
        },
-
+      last.value = NULL,
       #' @description A function that is called before a set of expressions
       #'     is evaluated (e.g. in a notebook cell).
       #' @param enclos An enclosing environment.
