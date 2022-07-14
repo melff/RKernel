@@ -2,6 +2,7 @@
 #' @importFrom pbdZMQ zmq.socket zmq.bind zmq.ctx.new zmq.getsockopt zmq.setsockopt
 #' @importFrom pbdZMQ zmq.poll zmq.poll.get.revents zmq.msg.recv zmq.msg.send
 #' @importFrom pbdZMQ zmq.recv.multipart zmq.send.multipart .zmqopt_init
+#' @importFrom pbdZMQ ZMQ.MC
 #' @importFrom digest hmac
 #' @importFrom uuid UUIDgenerate
 #' @importFrom jsonlite prettify
@@ -69,7 +70,10 @@ Kernel <- R6Class("Kernel",
         req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
         if(!length(req)) next
         #Sys.sleep(1)
-        if(req$abort) break
+        ## if(req$abort) break
+        if(req$interrupt) {
+          next
+        }
         # print(req$socket_name)
         if(!length(req$socket_name)) next
         continue <- switch(req$socket_name,
@@ -302,7 +306,10 @@ Kernel <- R6Class("Kernel",
                            content=list(
                              code=msg$content$code,
                              execution_count=private$execution_count))
-      self$evaluator$eval_cell(msg$content$code)
+      tryCatch(self$evaluator$eval_cell(msg$content$code),
+                    interrupt=function(e)e)
+      #if(is.character(r) && identical(r[1],"interrupted"))
+      #  log_out("Interrupt in evaluation")
       payload <- self$evaluator$get_payload(clear=TRUE)
       payload <- check_page_payload(payload)
       status <- self$evaluator$get_status(reset=TRUE)
@@ -431,14 +438,16 @@ Kernel <- R6Class("Kernel",
         zmq.poll(private$sockets[sock_names],
                  rep(POLLIN,length(sock_names)),
                  timeout=timeout,
-                 MC=private$.pbd_env$ZMQ.MC),
+                 MC=ZMQ.MC(check.eintr=TRUE)),
         interrupt = function(e) "SIGINT"
       )
-      req$abort <- identical(r[1],"SIGINT") 
-      for(i in seq_along(sock_names)){
-        if(bitwAnd(zmq.poll.get.revents(i),POLLIN)){
-          req$socket_name <- sock_names[i]
-          break
+      req$interrupt <- identical(r[1L],"SIGINT") 
+      if(!req$interrupt){
+        for(i in seq_along(sock_names)){
+          if(bitwAnd(zmq.poll.get.revents(i),POLLIN)){
+            req$socket_name <- sock_names[i]
+            break
+          }
         }
       }
       return(req)
@@ -624,7 +633,8 @@ Kernel <- R6Class("Kernel",
       # Empty message queue from shell
       POLLIN <- private$.pbd_env$ZMQ.PO$POLLIN
       repeat {
-        r <- zmq.poll(c(private$sockets$shell),POLLIN,timeout=0L)
+        r <- zmq.poll(c(private$sockets$shell),POLLIN,timeout=0L,
+                      MC=ZMQ.MC(check.eintr=TRUE))
         if(bitwAnd(zmq.poll.get.revents(1),POLLIN)){
           msg <- private$get_message("shell")
           msg_type <- msg$header$msg_type
