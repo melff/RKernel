@@ -306,14 +306,14 @@ Kernel <- R6Class("Kernel",
                            content=list(
                              code=msg$content$code,
                              execution_count=private$execution_count))
-      tryCatch(self$evaluator$eval_cell(msg$content$code),
-                    interrupt=function(e)e)
-      #if(is.character(r) && identical(r[1],"interrupted"))
-      #  log_out("Interrupt in evaluation")
+      r <- tryCatch(self$evaluator$eval_cell(msg$content$code),
+                    interrupt=function(e)"interrupted")
       payload <- self$evaluator$get_payload(clear=TRUE)
       payload <- check_page_payload(payload)
       status <- self$evaluator$get_status(reset=TRUE)
       aborted <- self$evaluator$is_aborted(reset=TRUE)
+      if(is.character(r) && identical(r[1],"interrupted"))
+        aborted <- TRUE
       content <- list(status = status,
                       execution_count = private$execution_count)
       if(length(payload))
