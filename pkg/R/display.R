@@ -141,7 +141,8 @@ display_data.recordedplot <- function(x,
                                       units=getOption("jupyter.plot.units","in"),
                                       metadata=emptyNamedList,
                                       id=UUIDgenerate(),
-                                      update=FALSE){
+                                      update=FALSE,
+                                      ...){
 
     rkernel_graphics_types <- getOption("jupyter.graphics.types",
                                         c("image/png","application/pdf"))
