@@ -252,12 +252,14 @@ Kernel <- R6Class("Kernel",
     #' @param ... More character strings, pasted to the message.
     #' @param use.print Logical, whether the function 'print()' should applied
     #'        to the message.
-    log_out = function(message,...,use.print=FALSE){
+    log_out = function(message,...,use.print=FALSE,use.str=FALSE){
       tstate <- tracingState(on=FALSE)
       if(use.print)
         message <- paste(capture.output(print(message)),collapse="\n")
+      else if(use.str)
+        message <- paste(capture.output(str(message)),collapse="\n")
       else message <- paste(message,...,collapse="")
-      cat(crayon::bgBlue(format(Sys.time()),"\n",message,"\n"),file=stderr())
+      cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),file=stderr())
       tracingState(on=tstate)
     },
     #' @description
