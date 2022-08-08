@@ -156,6 +156,7 @@ Evaluator <- R6Class("Evaluator",
             else {
                 private$new_cell <- TRUE
                 self$cell_no <- self$cell_no + 1
+                # log_out(sprintf("== BEGIN CELL [%d] ==",self$cell_no))
                 private$context$evaluate(expressions,envir=.GlobalEnv)
                 current_value <- private$context$last.value
                 self$cells[[self$cell_no]] <- code
@@ -174,8 +175,10 @@ Evaluator <- R6Class("Evaluator",
                     private$saved.parms <- list()
                     do.call("par",op)
                 }
+                # log_out(sprintf("... running callbacks",self$cell_no))
 
                 private$run_callbacks()
+                # log_out(sprintf("== END CELL [%d] ==",self$cell_no))
             }
         },
         cell_no = 0,

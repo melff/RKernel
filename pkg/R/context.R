@@ -79,9 +79,12 @@ Context <- R6Class("Context",
            for(expr in expressions){
                # i <- i + 1
                # log_out(sprintf("exressions[[%d]]",i))
+               # expr_src <- paste(deparse(expr),collapse="\n")
+               # log_out(expr_src)
                # expr <- expressions[[i]]
                ev <- list(value = NULL, visible = FALSE)
                ### See 'evaluate_call' in package "evaluate" (Yihui Xie et al.)
+               # log_out("Starting evaluation ...")
                try(ev <- withCallingHandlers(
                        withVisible(eval(expr,
                                         envir=envir,
@@ -90,9 +93,11 @@ Context <- R6Class("Context",
                        warning=private$wHandler,
                        message=private$mHandler),silent=TRUE)
                self$last.value <- ev
+               # log_out("Finished evaluation ...")
                private$handle_text()
                private$handle_graphics()
                if(is.function(private$value_callback)){
+                   # log_out("Start handling values ...")
                    try(withCallingHandlers(
                            private$value_callback(ev$value,ev$visible),
                            error=private$eHandler,
@@ -102,6 +107,7 @@ Context <- R6Class("Context",
                        private$handle_text()
                        private$handle_graphics()
                    }
+                   # log_out("Done ...")
                }
            }
            self$exit()
@@ -112,14 +118,9 @@ Context <- R6Class("Context",
       #' @param enclos An enclosing environment.
       enter = function(enclos=parent.frame()){
 
+          # log_out("entering ...")
           sink(private$connection,split=FALSE)
           private$orig.device <- options(device=private$device)
-          if(private$dev_num == 0 || !(private$dev_num %in% dev.list()))
-              private$device()
-          if(private$dev_num > 1 && private$dev_num %in% dev.list() && dev.cur() != private$dev_num){
-              private$orig.dev_num <- dev.cur()
-              dev.set(private$dev_num)
-          }
 
           setHook('plot.new',private$plot_new_hook)
           setHook('grid.newpage',private$plot_new_hook)
@@ -174,6 +175,7 @@ Context <- R6Class("Context",
               suppressMessages(untrace(str))
               suppressMessages(untrace(print))
           }
+          # log_out("exited ...")
       },
 
       #' @description
@@ -257,22 +259,27 @@ Context <- R6Class("Context",
 
       handle_graphics = function(){
           if(!is.function(private$graphics_callback)) return()
-          # log_out("Context$handle_graphics()")
           if(private$graphics_active()){
+              # log_out("Context$handle_graphics()")
               private$last_plot <- private$current_plot
               plt <- recordPlot()
-              do_send_plot <- !plot_is_empty(plt) && !identical(private$last_plot,plt) && par("page")
+              same_plt <- identical(non_empty_plot_calls(private$last_plot),
+                                    non_empty_plot_calls(plt))
+              do_send_plot <- !plot_is_empty(plt) && !same_plt || private$plot_new_page
               if(do_send_plot) {
+                  # log_out("Context$handle_graphics(): do_send_plot")
                   update <- !private$plot_new_called
                   # log_out("update =",format(update))
                   private$graphics_callback(plt,update=update)
                   private$current_plot <- plt
                   private$plot_new_called <- FALSE
+                  private$plot_new_page <- FALSE
               }
           } #else log_out("graphics not active ...")
       },
 
       plot_new_called = FALSE,
+      plot_new_page = FALSE,
       graphics_par_usr = numeric(0),
 
       before_plot_new_hook = function(...){
@@ -282,12 +289,17 @@ Context <- R6Class("Context",
       },
 
       plot_new_hook = function(...){
-          # log_out("plot_new_hook")
+          # log_out("Context$plot_new_hook")
           # log_out("private$dev_num==",private$dev_num)
           # log_out("dev.cur()==",dev.cur())
           if(private$graphics_active()){
-              private$plot_new_called <- TRUE
               private$graphics_par_usr <- par("usr")
+              private$plot_new_called <- TRUE
+              new_page <- par("page")
+              if(new_page) {
+                  log_out("new page required")
+                  private$plot_new_page <- TRUE
+              } 
           } #else log_out("graphics not active ...")
       },
 
@@ -430,6 +442,13 @@ plot_calls <- function(plt){
     if(!length(plt)) return(NULL)
     plt <- lapply(plt,"[[",1)
     sapply(plt,get_name_el)
+}
+
+non_empty_plot_calls <- function(plt){
+    if(!length(plt)) return(NULL)
+    pcalls <- plot_calls(plt)
+    empty <- pcalls %in% empty_plot_calls
+    pcalls[!empty]
 }
 
 get_name_el <- function(x){
