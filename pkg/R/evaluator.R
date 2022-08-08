@@ -1,5 +1,4 @@
 #' @importFrom utils capture.output
-#' @importFrom svglite svgstring
 #' @importFrom grDevices png
 
 check_help_port <- function(port){
