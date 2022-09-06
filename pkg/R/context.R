@@ -297,7 +297,7 @@ Context <- R6Class("Context",
               private$plot_new_called <- TRUE
               new_page <- par("page")
               if(new_page) {
-                  log_out("new page required")
+                  # log_out("new page required")
                   private$plot_new_page <- TRUE
               } 
           } #else log_out("graphics not active ...")
