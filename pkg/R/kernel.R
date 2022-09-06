@@ -43,6 +43,7 @@ Kernel <- R6Class("Kernel",
         zmq.bind(private$sockets[[s]],url_with_port)
       }
       private$conn_info <- conn_info
+      private$pid <- Sys.getpid()
       evaluator <- Evaluator$new(self)
       comm_manager <- CommManager(self,evaluator)
       self$comm_manager <- comm_manager
@@ -293,11 +294,16 @@ Kernel <- R6Class("Kernel",
     #' Return the current connection info.
     get_conn_info = function(){
       return(private$conn_info)
+    },
+    is_child = function(){
+      # Check if the current process is a fork from the original kernel process
+      return(Sys.getpid()!=private$pid)
     }
   ),
 
   private = list(
 
+    pid = 0,
 
     execution_count = 1,
 
@@ -309,12 +315,14 @@ Kernel <- R6Class("Kernel",
                              code=msg$content$code,
                              execution_count=private$execution_count))
       r <- tryCatch(self$evaluator$eval_cell(msg$content$code),
-                    interrupt=function(e)"interrupted")
+                    error=function(e)"errored",
+                    interrupt=function(e)"interrupted"
+                    )
       payload <- self$evaluator$get_payload(clear=TRUE)
       payload <- check_page_payload(payload)
       status <- self$evaluator$get_status(reset=TRUE)
       aborted <- self$evaluator$is_aborted(reset=TRUE)
-      if(is.character(r) && identical(r[1],"interrupted"))
+      if(is.character(r) && (identical(r[1],"errored") || identical(r[1],"interrupted")))
         aborted <- TRUE
       content <- list(status = status,
                       execution_count = private$execution_count)
@@ -434,6 +442,7 @@ Kernel <- R6Class("Kernel",
     parent = list(),
 
     poll_request = function(sock_names,timeout=-1L) {
+      if(self$is_child()) return(TRUE)
       POLLIN <- private$.pbd_env$ZMQ.PO$POLLIN
       req <- list()
       r <- tryCatch(
@@ -456,6 +465,7 @@ Kernel <- R6Class("Kernel",
     },
 
     respond_hb = function(req){
+      if(self$is_child()) return(TRUE)
       data <- zmq.msg.recv(private$sockets$hb,
                            flags=private$.pbd_env$ZMQ.SR$BLOCK,
                            unserialize=FALSE)
@@ -509,6 +519,7 @@ Kernel <- R6Class("Kernel",
     },
 
     get_message = function(socket_name){
+      if(self$is_child()) return(NULL)
       socket <- private$sockets[[socket_name]]
       #wire_in <- zmq.recv.multipart(socket,
       #                              unserialize=FALSE)
@@ -536,6 +547,7 @@ Kernel <- R6Class("Kernel",
 
     send_message = function(type,parent,socket_name,debug=FALSE,content,
                             metadata=emptyNamedList,buffers=NULL){
+      if(self$is_child()) return(NULL)
       msg <- private$msg_new(type,parent,content,metadata)
        if(debug) {
          msg_body <- msg[c("header","parent_header","metadata","content")]
