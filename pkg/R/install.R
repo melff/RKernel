@@ -18,12 +18,15 @@ installspec <- function(){
    tmp_dir <- tempfile()
    dir.create(tmp_dir)
    file.copy(kernelspec_srcdir,tmp_dir,recursive=TRUE)
-   json_tmpfile <- file.path(tmp_dir,"kernelspec","kernel.json")
-   kernelspec <- fromJSON(json_tmpfile)
+   
+   json_infile <- file.path(tmp_dir,"kernelspec","RKernel.json")
+   json_outfile <- file.path(tmp_dir,"kernelspec","kernel.json")
+   kernelspec <- fromJSON(json_infile)
    # Put the absolute path of the current interpreter
    kernelspec$argv[[1]] <- file.path(R.home("bin"),"R")
    write(toJSON(kernelspec,pretty=TRUE,auto_unbox=TRUE),
-         file=json_tmpfile)
+         file=json_outfile)
+   unlink(json_infile)
    jupyter_call <- c(
        "jupyter",
        "kernelspec",
@@ -34,6 +37,26 @@ installspec <- function(){
        file.path(tmp_dir,"kernelspec")
    )
    exit_code <- system2(jupyter_call)
+
+   json_infile <- file.path(tmp_dir,"kernelspec","RKernel1blas.json")
+   json_outfile <- file.path(tmp_dir,"kernelspec","kernel.json")
+   kernelspec <- fromJSON(json_infile)
+   # Put the absolute path of the current interpreter
+   kernelspec$argv[[1]] <- file.path(R.home("bin"),"R")
+   write(toJSON(kernelspec,pretty=TRUE,auto_unbox=TRUE),
+         file=json_outfile)
+   unlink(json_infile)
+   jupyter_call <- c(
+       "jupyter",
+       "kernelspec",
+       "install",
+       "--replace",
+       "--name","rkernel1blas",
+       "--user",
+       file.path(tmp_dir,"kernelspec")
+   )
+   exit_code <- system2(jupyter_call)
+
    unlink(tmp_dir,recursive=TRUE)
    invisible(exit_code)
 }

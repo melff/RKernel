@@ -1,0 +1,15 @@
+{"argv": ["R",
+          "--slave",
+          "--vanilla", 
+          "-e", 
+          "RKernel::main()", 
+          "--args", 
+          "{connection_file}"],
+ "display_name":"R (RKernel, single-threaded openblas)",
+ "env": {
+     "OPENBLAS_NUM_THREADS": "1",
+     "GOTO_NUM_THREADS":     "1",
+     "OMP_NUM_THREADS":      "1"
+ },
+ "language":"R"
+}
