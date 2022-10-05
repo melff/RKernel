@@ -452,12 +452,15 @@ Evaluator <- R6Class("Evaluator",
             mime_metadata <- list()
 
             for(mime in rkernel_graphics_types){
-                repr_func <- mime2repr[[mime]]
-                mime_data[[mime]] <- repr_func(plt,
-                                          width=width,
-                                          height=height,
-                                          pointsize=pointsize,
-                                          res=resolution)
+                # repr_func <- mime2repr[[mime]]
+                mime_data[[mime]] <- mime_graphics(plt,
+                                                   mime=mime,
+                                                   width=width,
+                                                   height=height,
+                                                   pointsize=pointsize,
+                                                   scale=scale,
+                                                   res=resolution,
+                                                   units=units)
                 mime_metadata[[mime]] <- list(
                     width=width*resolution*scale,
                     height=height*resolution*scale)

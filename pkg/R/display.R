@@ -152,11 +152,14 @@ display_data.recordedplot <- function(x,
 
     for(mime in rkernel_graphics_types){
         repr_func <- mime2repr[[mime]]
-        mime_data[[mime]] <- repr_func(x,
-                                       width=width,
-                                       height=height,
-                                       pointsize=pointsize,
-                                       res=resolution)
+        mime_data[[mime]] <- mime_graphics(x,
+                                           mime=mime,
+                                           width=width,
+                                           height=height,
+                                           pointsize=pointsize,
+                                           scale=scale,
+                                           res=resolution,
+                                           units=units)
         mime_metadata[[mime]] <- list(
             width=width*resolution*scale,
             height=height*resolution*scale)

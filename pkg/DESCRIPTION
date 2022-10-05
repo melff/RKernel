@@ -42,6 +42,7 @@ Collate:
     'display.R'
     'env-browser.R'
     'evaluator.R'
+    'graphics.R'
     'install.R'
     'json.R'
     'kernel.R'

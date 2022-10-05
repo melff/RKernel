@@ -89,18 +89,26 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             width      <- getOption("jupyter.plot.width",6)
             height     <- getOption("jupyter.plot.height",6)
             pointsize  <- getOption("jupyter.plot.pointsize",12)
-            resolution <- getOption("jupyter.plot.res",150)
+            res        <- getOption("jupyter.plot.res",150)
             scale      <- getOption("jupyter.plot.scale",0.5)
             units      <- getOption("jupyter.plot.units","units")
-            Cairo(type="raster",
-                  width=width,
-                  height=height,
-                  units=units,
-                  dpi=resolution/scale)
-            replayPlot(plt)
-            raster <- Cairo.capture()
-            dev.off()
-            graphics_widget$value <- writePNG(raster)
+            # Cairo(type="raster",
+            #       width=width,
+            #       height=height,
+            #       units=units,
+            #       dpi=resolution/scale)
+            # replayPlot(plt)
+            # raster <- Cairo.capture()
+            # dev.off()
+            # graphics_widget$value <- writePNG(raster)
+            graphics_widget$value <- mime_graphics(plt,
+                                                   mime="image/png",
+                                                   width=width,
+                                                   height=height,
+                                                   pointsize=pointsize,
+                                                   scale=scale,
+                                                   res=res,
+                                                   units=units)
         },
         
         last_plot_id = character(0),

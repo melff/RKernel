@@ -10,8 +10,6 @@
 #'     as fixed, so that \code{mkWidget} returns it as is.
 #' 
 #' @include widget-output.R widget-value.R
-#' @importFrom Cairo Cairo Cairo.capture
-#' @importFrom png writePNG
 #' @export
 mkWidget <- function(x,...) UseMethod("mkWidget")
 
