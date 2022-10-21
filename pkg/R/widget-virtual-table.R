@@ -21,8 +21,8 @@ get_virtable_widget_css <- function(){
 #' @export
 virtable_widget <- function(x,
         pagesize=getOption("rkernel_view_size",c(10,10))){
-    row_pagesize <- pagesize[1]
-    col_pagesize <- pagesize[2]
+    row_pagesize <- min(pagesize[1],nrow(x))
+    col_pagesize <- min(pagesize[2],ncol(x))
     if(is.na(col_pagesize))
         col_pagesize <- ncol(x)
 
@@ -204,16 +204,16 @@ virtable_widget <- function(x,
     }
     
     col_pagesize_increase <- function(...){
-        col_pagesize_control$value <- col_pagesize_control$value + 1L
+        col_pagesize_control$value <- min(col_pagesize_control$value + 1L,ncol(x))
     }
     col_pagesize_decrease <- function(...){
-        col_pagesize_control$value <- col_pagesize_control$value - 1L
+        col_pagesize_control$value <- max(col_pagesize_control$value - 1L,1L)
     }
     row_pagesize_increase <- function(...){
-        row_pagesize_control$value <- row_pagesize_control$value + 1L
+        row_pagesize_control$value <- min(row_pagesize_control$value + 1L,nrow(x))
     }
     row_pagesize_decrease <- function(...){
-        row_pagesize_control$value <- row_pagesize_control$value - 1L
+        row_pagesize_control$value <- max(row_pagesize_control$value - 1L,1L)
     }
     
     update_content <- function(...){
