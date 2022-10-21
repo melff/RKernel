@@ -272,8 +272,8 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         clear_output = function(wait=FALSE){
             self$sync_suspended <- TRUE
             self$outputs <- list()
-            kernel <- get_current_kernel()
-            kernel$clear_output(wait=wait)
+            # kernel <- get_current_kernel()
+            # kernel$clear_output(wait=wait)
             self$sync_suspended <- FALSE
             self$send_state("outputs")
         },

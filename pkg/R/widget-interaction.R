@@ -215,11 +215,12 @@ interactive_output <- function(FUN,
                                button=NULL,
                                continuous_update=TRUE,
                                autorun=TRUE,
+                               clear=FALSE,
                                mime_type="text/plain"
                               ){
     run <- function(...) {
         with(out,{
-            #out$clear_output()
+            if(clear) out$clear_output()
             res <- call_with_controls(FUN,controls)
             # For reasons I have not found out,
             # 'print()'ing does not work with 
