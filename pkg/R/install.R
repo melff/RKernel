@@ -13,7 +13,7 @@ install <- function(){
 #' @importFrom jsonlite fromJSON toJSON
 #' @export
 # The following is adapted from IRKernel/R/installspec.r
-installspec <- function(){
+installspec <- function(user=TRUE,prefix=NULL){
    kernelspec_srcdir <- system.file("kernelspec",package="RKernel")
    tmp_dir <- tempfile()
    dir.create(tmp_dir)
@@ -33,7 +33,8 @@ installspec <- function(){
        "install",
        "--replace",
        "--name","rkernel",
-       "--user",
+       if(user) "--user" else NULL,
+       if(length(prefix)) paste0("--prefix=",prefix),
        file.path(tmp_dir,"kernelspec")
    )
    exit_code <- system2(jupyter_call)
@@ -52,7 +53,8 @@ installspec <- function(){
        "install",
        "--replace",
        "--name","rkernel1blas",
-       "--user",
+       if(user) "--user" else NULL,
+       if(length(prefix)) paste0("--prefix=",prefix),
        file.path(tmp_dir,"kernelspec")
    )
    exit_code <- system2(jupyter_call)
