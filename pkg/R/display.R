@@ -21,6 +21,9 @@ display_data <- function(x,...) UseMethod("display_data")
 
 #' @describeIn display_data Default method
 #'
+#' @param x An object
+#' @param ... Optional arguments tagged by mime types with mime data
+#' @param data A list with named elements, containing mime data
 #' @param metadata A list with named elements, containing metadata
 #' @param id An identifier string
 #' @param update A logical value, whether a new display item should be created
@@ -30,13 +33,16 @@ display_data <- function(x,...) UseMethod("display_data")
 #' @importFrom uuid UUIDgenerate
 #' @export
 display_data.default <- function(x,...,
-                            metadata=emptyNamedList,
-                            id=UUIDgenerate(),
-                            update=FALSE){
+                                 data,
+                                 metadata=emptyNamedList,
+                                 id=UUIDgenerate(),
+                                 update=FALSE){
 
     if(missing(x)){
-        if(!length(metadata)) metadata <- emptyNamedList
-        d <- list(data=list(...))
+        if(missing(data))
+            d <- list(data=list(...))
+        else
+            d <- list(data=data)
     } 
     else {
         rkernel_mime_types <- getOption("rkernel_mime_types",
@@ -52,12 +58,15 @@ display_data.default <- function(x,...,
         }
         d <- list(data=mime_data)
     }
+    if(!length(metadata))
+        metadata <- emptyNamedList
     d$metadata <- metadata
     d$transient <- list(display_id=id)
     if(update) cl <- "update_display_data"
     else cl <- "display_data"
     structure(d,class=cl)
 }
+
 
 #' @describeIn display_data S3 method for html widgets
 #' @importFrom uuid UUIDgenerate
@@ -622,6 +631,43 @@ LaTeXMath <- function(text){
     text_latex <- paste0("$$",text,"$$")
     display_data("text/plain"=text_plain,
             "text/latex"=text_latex)
+}
+
+#' Send a graphics file to the frontend
+#'
+#' @description Send embed the contents of an png, jpeg, pdf, or svg file in
+#'      the frontend or add a link to it
+#'      (sending raw data and urls soon to be added)
+#' 
+#' @param jpeg The path to a jpeg file
+#' @param pdf The path to a pdf file
+#' @param png The path to a png file
+#' @param svg The path to a svg file
+#' @export
+Graphics <- function(jpeg,pdf,png,svg){
+    data <- list()
+    metadata <- list()
+    if(!missing(jpeg)){
+        data[["image/jpeg"]] <- readBin(jpeg, raw(), file.info(jpeg)$size)
+        metadata[["image/jpeg"]] <- list(width=attr(jpeg,"width"),
+                                         height=attr(jpeg,"height"))
+    }
+    if(!missing(pdf)){
+        data[["application/pdf"]] <- readBin(pdf, raw(), file.info(pdf)$size)
+        metadata[["application/pdf"]] <- list(width=attr(pdf,"width"),
+                                              height=attr(pdf,"height"))
+    }
+    if(!missing(png)){
+        data[["image/png"]] <- readBin(png, raw(), file.info(png)$size)
+        metadata[["image/png"]] <- list(width=attr(png,"width"),
+                                        height=attr(png,"height"))
+    }
+    if(!missing(svg)){
+        data[["image/svg+xml"]] <- readChar(svg, file.info(png)$size,useBytes=TRUE)
+        metadata[["image/svg+xml"]] <- list(width=attr(svg,"width"),
+                                            height=attr(svg,"height"))
+    }
+    display_data(data=data,metadata=metadata)
 }
 
 #' Send raw HTML code to the frontend
