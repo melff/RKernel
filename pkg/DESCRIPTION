@@ -22,7 +22,6 @@ Imports:
     repr,
     htmltools,
     callr,
-    Cairo,
     png,
     base64enc
 Depends:
