@@ -663,7 +663,7 @@ Graphics <- function(jpeg,pdf,png,svg){
                                         height=attr(png,"height"))
     }
     if(!missing(svg)){
-        data[["image/svg+xml"]] <- readChar(svg, file.info(png)$size,useBytes=TRUE)
+        data[["image/svg+xml"]] <- readChar(svg, file.info(svg)$size,useBytes=TRUE)
         metadata[["image/svg+xml"]] <- list(width=attr(svg,"width"),
                                             height=attr(svg,"height"))
     }
