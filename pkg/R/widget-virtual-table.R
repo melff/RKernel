@@ -238,7 +238,7 @@ virtable_widget <- function(x,
         i <- seq.int(from=row.from,to=row.to)
         j <- seq.int(from=col.from,to=col.to)
         
-        st <- grid_table(format(x[i,j]),id=id,include_css=FALSE)
+        st <- grid_table(fmt_tab_section(x,i,j),id=id,include_css=FALSE)
         tab_container$value <- st$data[["text/html"]]
         
         paging_message <- NULL
@@ -301,3 +301,16 @@ virtable_widget <- function(x,
     
     outerbox
 }
+
+#' @export
+fmt_tab_section <- function(x,i,j) UseMethod("fmt_tab_section")
+
+#' @export
+fmt_tab_section.default <- function(x,i,j) format(x[i,j])
+
+#' @export
+fmt_tab_section.tbl_df <- function(x,i,j)  
+    format(
+        structure(
+            as.data.frame(x[i,j]),
+            row.names=as.character(i)))
