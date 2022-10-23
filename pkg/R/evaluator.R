@@ -530,7 +530,7 @@ Evaluator <- R6Class("Evaluator",
                 private$aborted <- TRUE
                 #drop_prev <- private$nframes - 2
                 #calls <- tail(calls,-drop_prev)
-                calls <- tail(calls,-15)
+                calls <- tail(calls,-15-7)
                 calls <- head(calls,-3)
                 calls <- limitedLabels(calls)
                 if(length(calls))
