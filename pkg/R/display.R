@@ -381,9 +381,9 @@ display_data.help_files_with_topic <- function(x,...,
             pkgname <- basename(dirname(dirname(file)))
             Rd <- getHelpFile(file)
             text_plain1 <- capture.output(Rd2txt(Rd, package = pkgname, outputEncoding = 'UTF-8'))
-            text_latex1 <- capture.output(Rd2latex(Rd, package = pkgname, outputEncoding = 'UTF-8'))
+            # text_latex1 <- capture.output(Rd2latex(Rd, package = pkgname, outputEncoding = 'UTF-8'))
             text_plain <- c(text_plain,text_plain1)
-            text_latex <- c(text_latex,text_latex1)
+            # text_latex <- c(text_latex,text_latex1)
             help_label1 <- paste0(pkgname,"::",topic)
             help_labels <- c(help_labels,help_label1)
             help_url1 <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(file),".html")
@@ -419,13 +419,13 @@ display_data.help_files_with_topic <- function(x,...,
                             gettextf('you could try %s', sQuote(paste0('??', topic))),
                             sep = '\n')
         text_html <- text_plain
-        text_latex <- text_plain
+        # text_latex <- text_plain
     }
 
     mime_data <- list(
         "text/plain"=paste(text_plain,collapse="\n"),
         "text/html"=paste(text_html,collapse="\n"),
-        "text/latex"=paste(text_latex,collapse="\n")
+        "text/latex"="" # paste(text_latex,collapse="\n")
     )
 
 
@@ -467,7 +467,7 @@ help.start <- function(update = FALSE,
     mime_data <- list(
         "text/plain"=character(0),
         "text/html"=paste(text_html,collapse="\n"),
-        "text/latex"=character(0)
+        "text/latex"=""
     )
 
     d <- list(data=mime_data)
