@@ -261,10 +261,9 @@ Context <- R6Class("Context",
           if(private$graphics_active()){
               private$last_plot <- private$current_plot
               plt <- recordPlot()
-              do_send_plot <- !plot_is_empty(plt) && !identical(private$last_plot,plt) && par("page")
+              do_send_plot <- !plot_is_empty(plt) && !compare_plots(private$last_plot,plt) && par("page")
               if(do_send_plot) {
                   update <- !private$plot_new_called
-                  # log_out("update =",format(update))
                   private$graphics_callback(plt,update=update)
                   private$current_plot <- plt
                   private$plot_new_called <- FALSE
@@ -412,30 +411,18 @@ empty_plot_calls <- c("palette",
                                   "plot_new",
                                   "plot_window")))
 
-plot_is_empty <- function(plt) {
-    if(!length(plt)) return(TRUE)
-    pcalls <- plot_calls(plt)
-    # log_out(pcalls,use.print=TRUE)
-    # log_out(empty_plot_calls,use.print=TRUE)
-    # log_out(pcalls%in%empty_plot_calls,use.print=TRUE)
-    if(!length(pcalls)) return(TRUE)
-    res <- all(pcalls %in% empty_plot_calls)
-    # log_out(res)
-    return(res)
-}
-
 plot_calls <- function(plt){
     plt <- plt[[1]]
     plt <- lapply(plt,"[[",2)
     if(!length(plt)) return(NULL)
-    plt <- lapply(plt,"[[",1)
-    sapply(plt,get_name_el)
+    lapply(plt,"[[",1)
 }
 
 non_empty_plot_calls <- function(plt){
     if(!length(plt)) return(NULL)
     pcalls <- plot_calls(plt)
-    empty <- pcalls %in% empty_plot_calls
+    pcnames <- sapply(pcalls,get_name_el)
+    empty <- pcnames %in% empty_plot_calls
     pcalls[!empty]
 }
 
@@ -444,6 +431,33 @@ get_name_el <- function(x){
     else deparse(x)
 }
 
+is_base_graphics <- function(plt){
+    plt1 <- plt[[1]][[1]][[2]][[1]]
+    get_name_el(plt1) == "C_plot_new"
+}
+
+compare_plots <- function(plt1,plt2){
+    if((length(plt1) > 0) != (length(plt2) > 0)) return(FALSE)
+    if(is_base_graphics(plt1) != is_base_graphics(plt2)) return(FALSE)
+    if(!is_base_graphics(plt1)) return(identical(plt1[[3]],plt2[[3]]))
+    else {
+        ne1 <- non_empty_plot_calls(plt1)
+        ne2 <- non_empty_plot_calls(plt2)
+        if(!identical(ne1,ne2)) return(FALSE)
+        else {
+            log_out(ne1)
+            return(identical(plt1[[2]],plt2[[2]]))
+        }
+    }
+}
+
+plot_is_empty <- function(plt){
+    if(!length(plt)) return(FALSE)
+    else {
+        ne <- non_empty_plot_calls(plt)
+        return(length(ne) == 0)
+    }
+}
 
 #' Evalute expressions within a context
 #'
