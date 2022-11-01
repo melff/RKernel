@@ -176,6 +176,14 @@ Context <- R6Class("Context",
           }
       },
 
+      clear_graphics = function(){
+          private$current_plot <- NULL
+      },
+      clear_text = function(){
+          private$text_output <- NULL
+      },
+
+
       #' @description
       #' Add or remove a handler function to be called by the
       #' \code{enter()} function, i.e. before a series of expression 
@@ -258,17 +266,16 @@ Context <- R6Class("Context",
       handle_graphics = function(){
           if(!is.function(private$graphics_callback)) return()
           # log_out("Context$handle_graphics()")
+          private$last_plot <- private$current_plot
           if(private$graphics_active()){
-              private$last_plot <- private$current_plot
               plt <- recordPlot()
-              do_send_plot <- !plot_is_empty(plt) && !compare_plots(private$last_plot,plt) && par("page")
-              if(do_send_plot) {
+              if(par("page") && plot_has_changed(current=plt,last=private$last_plot)) {
                   update <- !private$plot_new_called
                   private$graphics_callback(plt,update=update)
                   private$current_plot <- plt
                   private$plot_new_called <- FALSE
-              }
-          } #else log_out("graphics not active ...")
+              } # else log_out("Not sending plot - no changes detected")
+          } # else log_out("graphics not active ...")
       },
 
       plot_new_called = FALSE,
@@ -451,11 +458,36 @@ compare_plots <- function(plt1,plt2){
     }
 }
 
-plot_is_empty <- function(plt){
-    if(!length(plt)) return(FALSE)
+plot_has_changed <- function(current,last){
+    if(!length(current)) {
+        # log_out("Current plot is NULL")
+        return(FALSE)
+    }
+    ne1 <- non_empty_plot_calls(current)
+    if(!length(ne1)) {
+        # log_out("Current plot is empty")
+        return(FALSE)
+    }
+    if(is_base_graphics(current)){
+        if(!length(last)) return(TRUE)
+        else if(!is_base_graphics(last)) return(TRUE)
+        else {
+            ne2 <- non_empty_plot_calls(last)
+            if(!identical(ne1,ne2)) return(TRUE)
+            else {
+                # log_out(digest::sha1(last[[2]]))
+                # log_out(digest::sha1(current[[2]]))
+                return(!identical(current[[2]],last[[2]]))
+                # return(!identical(current[1:2],last[1:2]))
+                # return(!identical(current[2],last[2]))
+                # return(!identical(current,last))
+            }
+        }
+    }
     else {
-        ne <- non_empty_plot_calls(plt)
-        return(length(ne) == 0)
+        if(is_base_graphics(last)) return(TRUE)
+        else if(!length(last)) return(TRUE)
+        else return(identical(current[[3]],last[[3]])) 
     }
 }
 
