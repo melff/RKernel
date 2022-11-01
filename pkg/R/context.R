@@ -271,9 +271,9 @@ Context <- R6Class("Context",
           if(!is.function(private$graphics_callback)) return()
           # log_out("Context$handle_graphics()")
           private$last_plot <- private$current_plot
-          if(private$graphics_active()){
+          if(private$graphics_active() && par("page")){
               plt <- recordPlot()
-              if(par("page") && plot_has_changed(current=plt,last=private$last_plot)) {
+              if(plot_has_changed(current=plt,last=private$last_plot)) {
                   update <- !private$plot_new_called
                   private$graphics_callback(plt,update=update)
                   private$current_plot <- plt
@@ -473,7 +473,7 @@ compare_plots <- function(plt1,plt2){
 }
 
 plot_has_changed <- function(current,last){
-    if(!length(current)) {
+    if(!length(current) || !length(current)[[1]]) {
         # log_out("Current plot is NULL")
         return(FALSE)
     }
