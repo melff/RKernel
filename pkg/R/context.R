@@ -121,8 +121,12 @@ Context <- R6Class("Context",
               dev.set(private$dev_num)
           }
 
+          private$saved_hooks$plot.new            <- getHook('plot.new')
+          private$saved_hooks$grid.newpage        <- getHook('grid.newpage')
+          private$saved_hooks$before.plot.new     <- getHook('before.plot.new')
+          private$saved_hooks$before.grid.newpage <- getHook('before.grid.newpage')
           setHook('plot.new',private$plot_new_hook)
-          setHook('grid.newpage',private$plot_new_hook)
+          setHook('grid.newpage',private$grid_newpage_hook)
           setHook('before.plot.new',private$before_plot_new_hook)
           setHook('before.grid.newpage',private$before_plot_new_hook)
 
@@ -164,10 +168,10 @@ Context <- R6Class("Context",
           options(device=private$orig.device)
           if(private$orig.dev_num > 1 && private$orig.dev_num %in% dev.list()) dev.set(private$orig.dev_num)
 
-          setHook('plot.new',NULL,"replace")
-          setHook('grid.newpage',NULL,"replace")
-          setHook('before.plot.new',NULL,"replace")
-          setHook('before.grid.newpage',NULL,"replace")
+          setHook('plot.new',           private$saved_hooks$plot.new           ,"replace")
+          setHook('grid.newpage',       private$saved_hooks$grid.newpage       ,"replace")
+          setHook('before.plot.new',    private$saved_hooks$before.plot.new    ,"replace")
+          setHook('before.grid.newpage',private$saved_hooks$before.grid.newpage,"replace")
 
           if(!isTRUE(getOption("rkernel_no_output_hooks"))){
               suppressMessages(untrace(cat))
@@ -296,6 +300,16 @@ Context <- R6Class("Context",
               private$graphics_par_usr <- par("usr")
           } #else log_out("graphics not active ...")
       },
+
+
+      grid_newpage_hook = function(...){
+          # log_out("grid_newpage_hook")
+          if(private$graphics_active()){
+              private$plot_new_called <- TRUE
+          } 
+      },
+
+      saved_hooks = list(),
 
       dev_filename = character(0),
       dev_name = character(),
