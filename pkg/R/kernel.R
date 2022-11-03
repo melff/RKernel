@@ -314,10 +314,11 @@ Kernel <- R6Class("Kernel",
                            content=list(
                              code=msg$content$code,
                              execution_count=private$execution_count))
-      r <- tryCatch(self$evaluator$eval_cell(msg$content$code),
-                    error=function(e)"errored",
-                    interrupt=function(e)"interrupted"
-                    )
+      # r <- tryCatch(self$evaluator$eval_cell(msg$content$code),
+      #               error=function(e)"errored",
+      #               interrupt=function(e)"interrupted"
+      #               )
+      r <- self$evaluator$eval_cell(msg$content$code)
       payload <- self$evaluator$get_payload(clear=TRUE)
       payload <- check_page_payload(payload)
       status <- self$evaluator$get_status(reset=TRUE)

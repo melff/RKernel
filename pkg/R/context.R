@@ -33,11 +33,11 @@ Context <- R6Class("Context",
            private$value_callback <- value_callback
            private$graphics_callback <- graphics_callback
            private$connection <- textConnection(NULL,"wr",local=TRUE)
-           private$init_graphics()
            private$envir <- envir
            private$attachment <- attachment
            private$id <- UUIDgenerate()
            private$name <- paste0("RKernel-context:",private$id)
+           private$evaluator <- get_evaluator()
        },
 
        #' @description
@@ -113,22 +113,6 @@ Context <- R6Class("Context",
       enter = function(enclos=parent.frame()){
 
           sink(private$connection,split=FALSE)
-          private$orig.device <- options(device=private$device)
-          if(private$dev_num == 0 || !(private$dev_num %in% dev.list()))
-              private$device()
-          if(private$dev_num > 1 && private$dev_num %in% dev.list() && dev.cur() != private$dev_num){
-              private$orig.dev_num <- dev.cur()
-              dev.set(private$dev_num)
-          }
-
-          private$saved_hooks$plot.new            <- getHook('plot.new')
-          private$saved_hooks$grid.newpage        <- getHook('grid.newpage')
-          private$saved_hooks$before.plot.new     <- getHook('before.plot.new')
-          private$saved_hooks$before.grid.newpage <- getHook('before.grid.newpage')
-          setHook('plot.new',private$plot_new_hook)
-          setHook('grid.newpage',private$grid_newpage_hook)
-          setHook('before.plot.new',private$before_plot_new_hook)
-          setHook('before.grid.newpage',private$before_plot_new_hook)
 
           if(!isTRUE(getOption("rkernel_no_output_hooks"))){
               suppressMessages(trace(print,
@@ -149,6 +133,13 @@ Context <- R6Class("Context",
                  warn.conflicts=FALSE)
           # log_out(sprintf("Attached %s",private$name))
           
+          if(private$evaluator$graphics_active()){
+              if(length(private$current_plot))
+                  replayPlot(private$current_plot)
+              else
+                  plot.new()
+          }
+
           private$run_enter_hooks()
 
       },
@@ -164,14 +155,12 @@ Context <- R6Class("Context",
               context_pos <- match(private$name,search())
               detach(pos=context_pos)
           }
-          sink()
-          options(device=private$orig.device)
-          if(private$orig.dev_num > 1 && private$orig.dev_num %in% dev.list()) dev.set(private$orig.dev_num)
 
-          setHook('plot.new',           private$saved_hooks$plot.new           ,"replace")
-          setHook('grid.newpage',       private$saved_hooks$grid.newpage       ,"replace")
-          setHook('before.plot.new',    private$saved_hooks$before.plot.new    ,"replace")
-          setHook('before.grid.newpage',private$saved_hooks$before.grid.newpage,"replace")
+          if(private$evaluator$graphics_active()){
+                private$current_plot <- recordPlot()
+          }
+
+          sink()
 
           if(!isTRUE(getOption("rkernel_no_output_hooks"))){
               suppressMessages(untrace(cat))
@@ -245,6 +234,7 @@ Context <- R6Class("Context",
        handle_text = function(){
            if(!is.function(private$text_callback)) return()
            # if(!isIncomplete(private$connection) || TRUE)
+           log_out("Context$text()")
            cat("\n",file=private$connection)
            private$prev_text_output <- private$text_output
            private$text_output <- textConnectionValue(private$connection)
@@ -262,98 +252,22 @@ Context <- R6Class("Context",
                }
            }
        },
-      graphics_active = function(){
-          res <- private$dev_num > 1 && private$dev_num == dev.cur()
-          return(res)
-      },
 
       handle_graphics = function(){
           if(!is.function(private$graphics_callback)) return()
-          # log_out("Context$handle_graphics()")
+          log_out("Context$handle_graphics()")
+          log_out("dev.cur()==",dev.cur())
           private$last_plot <- private$current_plot
-          if(private$graphics_active() && par("page")){
-              plt <- recordPlot()
-              if(plot_has_changed(current=plt,last=private$last_plot)) {
-                  update <- !private$plot_new_called
-                  private$graphics_callback(plt,update=update)
-                  private$current_plot <- plt
-                  private$plot_new_called <- FALSE
-              } # else log_out("Not sending plot - no changes detected")
-          } # else log_out("graphics not active ...")
-      },
-
-      plot_new_called = FALSE,
-      graphics_par_usr = numeric(0),
-
-      before_plot_new_hook = function(...){
-          if(private$graphics_active() && par("page")){
-              private$handle_text()
-          }
-      },
-
-      plot_new_hook = function(...){
-          # log_out("plot_new_hook")
-          # log_out("private$dev_num==",private$dev_num)
-          # log_out("dev.cur()==",dev.cur())
-          if(private$graphics_active()){
-              private$plot_new_called <- TRUE
-              private$graphics_par_usr <- par("usr")
-          } #else log_out("graphics not active ...")
-      },
-
-
-      grid_newpage_hook = function(...){
-          # log_out("grid_newpage_hook")
-          if(private$graphics_active()){
-              private$plot_new_called <- TRUE
+          plt <- recordPlot()
+          if(plot_has_changed(current=plt,last=private$last_plot)) {
+          # if(!plot_is_empty(plt)){
+              private$graphics_callback(plt)
+              private$current_plot <- plt
           } 
       },
 
-      saved_hooks = list(),
-
-      dev_filename = character(0),
-      dev_name = character(),
-      dev_num = 0,
-      device = list(),
       last_plot = NULL,
       current_plot = NULL,
-
-      init_graphics = function(){
-          os <- .Platform$OS.type
-          sysname <- Sys.info()[["sysname"]]
-          if(os == "unix" && sysname=="Darwin")
-              os <- "osx"
-          private$dev_filename <- switch(os,
-                                      windows="NUL",
-                                      osx=NULL,
-                                      unix="/dev/null")
-          private$dev_name <- switch(os,
-                                  windows="png",
-                                  osx="pdf",
-                                  unix="png")
-          private$device <- function(filename = NULL,
-                                 width = getOption("jupyter.plot.width",6),
-                                 height = getOption("jupyter.plot.height",6),
-                                 res = getOption("jupyter.plot.res",96),
-                                 pointsize = getOption("jupyter.plot.pointsize",12),
-                                 units = getOption("jupyter.plot.units","in"),
-                                 ...){
-              dev <- get(private$dev_name)
-              if(is.null(filename))
-                  dev(filename=private$dev_filename,
-                      width=width,
-                      height=height,
-                      res=res,
-                      units=units,
-                      ...)
-              private$dev_num <- dev.cur()
-              dev.control(displaylist="enable")
-              
-              # log_out('private$device')
-              # log_out("private$dev_num==",private$dev_num)
-
-          }
-      },
 
       enter_hooks = list(),
       run_enter_hooks = function(){
@@ -368,7 +282,7 @@ Context <- R6Class("Context",
       },
 
       cat_hook = function(){
-          # log_out("cat_hook")
+          log_out("cat_hook")
           private$handle_graphics()
       },
       cat_exit_hook = function(){
@@ -377,21 +291,23 @@ Context <- R6Class("Context",
       },
 
       print_hook = function(){
+          log_out("print_hook")
           private$handle_graphics()
       },
       print_exit_hook = function(){
+          log_out("print_exit_hook")
           private$handle_text()
       },
 
       str_depth = 0,
       str_hook = function(){
-          # log_out("str_hook")
+          log_out("str_hook")
           private$str_depth <- private$str_depth + 1
           if(private$str_depth == 1)
               suppressMessages(untrace(cat))
       },
       str_exit_hook = function(){
-          # log_out("str_exit_hook")
+          log_out("str_exit_hook")
           if(private$str_depth == 1){
               private$handle_text()
               suppressMessages(trace(cat,
@@ -402,22 +318,20 @@ Context <- R6Class("Context",
           private$str_depth <- private$str_depth - 1
       },
 
-      orig.device = NULL,
-      orig.dev_num = 1,
+      evaluator = NULL,
 
-
-       mHandler = function(m) {
-           private$message_callback(m)
-           invokeRestart("muffleMessage")
-       },
-       wHandler = function(w){
-           private$warning_callback(w)
-           if (getOption("warn") >= 2) return()
-           invokeRestart("muffleWarning")
-       },
-       eHandler = function(e) {
-           private$error_callback(e)
-       }
+      mHandler = function(m) {
+          private$message_callback(m)
+          invokeRestart("muffleMessage")
+      },
+      wHandler = function(w){
+          private$warning_callback(w)
+          if (getOption("warn") >= 2) return()
+          invokeRestart("muffleWarning")
+      },
+      eHandler = function(e) {
+          private$error_callback(e)
+      }
    )
 )
 
@@ -472,14 +386,22 @@ compare_plots <- function(plt1,plt2){
     }
 }
 
+plot_is_empty <- function(plt){
+    if(!length(plt) || !length(plt)[[1]]) {
+        return(TRUE)
+    }
+    ne1 <- non_empty_plot_calls(plt)
+    return(length(ne1) == 0)
+}
+
 plot_has_changed <- function(current,last){
     if(!length(current) || !length(current)[[1]]) {
-        # log_out("Current plot is NULL")
+        log_out("Current plot is NULL")
         return(FALSE)
     }
     ne1 <- non_empty_plot_calls(current)
     if(!length(ne1)) {
-        # log_out("Current plot is empty")
+        log_out("Current plot is empty")
         return(FALSE)
     }
     if(is_base_graphics(current)){

@@ -110,6 +110,9 @@ Evaluator <- R6Class("Evaluator",
             
             private$start_help_system()
             assign("help.start",help.start,envir=private$env)
+
+            private$init_graphics()
+
         },
         #' @description
         #' Shut the session down
@@ -153,9 +156,17 @@ Evaluator <- R6Class("Evaluator",
                                       stream="stderr")
             }
             else {
+
+                if(private$dev_num == 0 || !(private$dev_num %in% dev.list()))
+                    private$device()
+                if(private$dev_num > 1 && private$dev_num %in% dev.list() && dev.cur() != private$dev_num){
+                    private$orig.dev_num <- dev.cur()
+                    dev.set(private$dev_num)
+                }
+
                 private$new_cell <- TRUE
                 self$cell_no <- self$cell_no + 1
-                # log_out(sprintf("== BEGIN CELL [%d] ==",self$cell_no))
+                log_out(sprintf("== BEGIN CELL [%d] ==",self$cell_no))
                 private$context$evaluate(expressions,envir=.GlobalEnv)
                 current_value <- private$context$last.value
                 self$cells[[self$cell_no]] <- code
@@ -177,7 +188,7 @@ Evaluator <- R6Class("Evaluator",
                 # log_out(sprintf("... running callbacks",self$cell_no))
 
                 private$run_callbacks()
-                # log_out(sprintf("== END CELL [%d] ==",self$cell_no))
+                log_out(sprintf("== END CELL [%d] ==",self$cell_no))
             }
         },
         cell_no = 0,
@@ -317,8 +328,11 @@ Evaluator <- R6Class("Evaluator",
             nms <- names(args)
             op[nms] <- args
             do.call("par",op)
-        }
+        },
 
+        graphics_active = function(){
+            dev.cur() == private$dev_num
+        }
     ),
     
     private = list(
@@ -430,6 +444,82 @@ Evaluator <- R6Class("Evaluator",
                                       stream = "stdout")
             }
         },
+
+        init_graphics = function(){
+            os <- .Platform$OS.type
+            sysname <- Sys.info()[["sysname"]]
+            if(os == "unix" && sysname=="Darwin")
+                os <- "osx"
+            private$dev_filename <- switch(os,
+                                           windows="NUL",
+                                           osx=NULL,
+                                           unix="/dev/null")
+            private$dev_name <- switch(os,
+                                       windows="png",
+                                       osx="pdf",
+                                       unix="png")
+            private$device <- function(filename = NULL,
+                                       width = getOption("jupyter.plot.width",6),
+                                       height = getOption("jupyter.plot.height",6),
+                                       res = getOption("jupyter.plot.res",96),
+                                       pointsize = getOption("jupyter.plot.pointsize",12),
+                                       units = getOption("jupyter.plot.units","in"),
+                                       ...){
+                dev <- get(private$dev_name)
+                if(is.null(filename))
+                    dev(filename=private$dev_filename,
+                        width=width,
+                        height=height,
+                        res=res,
+                        units=units,
+                        ...)
+                private$dev_num <- dev.cur()
+                dev.control(displaylist="enable")
+                
+                log_out('private$device')
+                log_out("private$dev_num==",private$dev_num)
+
+            }
+            setHook('plot.new',private$plot_new_hook)
+            setHook('grid.newpage',private$grid_newpage_hook)
+            setHook('before.plot.new',private$before_plot_new_hook)
+            setHook('before.grid.newpage',private$before_plot_new_hook)
+        },
+
+
+        plot_new_called = FALSE,
+        graphics_par_usr = numeric(0),
+
+        before_plot_new_hook = function(...){
+            if(self$graphics_active()){
+                # if(par("page"))
+                #     private$context$handle_text()
+                dev.control(displaylist="enable")
+            }
+        },
+
+        plot_new_hook = function(...){
+            log_out("plot_new_hook")
+            log_out("private$dev_num==",private$dev_num)
+            log_out("dev.cur()==",dev.cur())
+            if(self$graphics_active()){
+                private$plot_new_called <- TRUE
+                private$graphics_par_usr <- par("usr")
+            } #else log_out("graphics not active ...")
+        },
+
+
+        grid_newpage_hook = function(...){
+          # log_out("grid_newpage_hook")
+            if(self$graphics_active()){
+                private$plot_new_called <- TRUE
+            } 
+        },
+
+        dev_filename = character(0),
+        dev_name = character(),
+        dev_num = 0,
+        device = NULL,
 
         last_plot_id = character(),
 
