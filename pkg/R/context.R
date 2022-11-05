@@ -68,18 +68,18 @@ Context <- R6Class("Context",
                # expr <- expressions[[i]]
                # ev <- list(value = NULL, visible = FALSE)
                ### See 'evaluate_call' in package "evaluate" (Yihui Xie et al.)
-               ev <- withCallingHandlers(
-                       withVisible(eval(expr,
-                                        envir=envir,
-                                        enclos=enclos)),
-                       error=private$eHandler,
-                       warning=private$wHandler,
-                       message=private$mHandler)
+               ev <- withVisible(try(withCallingHandlers(
+                               eval(expr,
+                                    envir=envir,
+                                    enclos=enclos),
+                               error=private$eHandler,
+                               warning=private$wHandler,
+                               message=private$mHandler),silent=TRUE))
                self$last.value <- ev
                cat("\n",file=private$connection)
-               private$run_eval_hooks()
+               private$handle_event("eval")
                try(withCallingHandlers(
-                   private$run_result_hooks(ev$value,ev$visible),
+                   private$handle_event("result",ev$value,ev$visible),
                    error=private$eHandler,
                    warning=private$wHandler,
                    message=private$mHandler),silent=TRUE)
@@ -104,7 +104,7 @@ Context <- R6Class("Context",
            # log_out(sprintf("Attached %s",private$name))
            
 
-           private$run_enter_hooks()
+           private$handle_event("enter")
 
        },
 
@@ -113,7 +113,7 @@ Context <- R6Class("Context",
        exit = function(){
            
            log_out("context$exit")
-           private$run_exit_hooks()
+           private$handle_event("exit")
            # log_out(search(),use.print=TRUE)
            if(private$name %in% search()){
               # log_out(sprintf("Detaching %s",private$name))
@@ -133,9 +133,9 @@ Context <- R6Class("Context",
        #' @param handler A handler function
        #' @param remove A logical value, whether the handler should be removed or added
        on_enter = function(handler,remove=FALSE){
-           if(!length(private$enter_hooks))
-               private$enter_hooks <- CallbackDispatcher()
-           private$enter_hooks$register(handler,remove)
+           if(is.function(handler)){
+               private$on_event("enter",handler=handler,remove=remove)
+           }
        },
 
        #' @description
@@ -145,57 +145,62 @@ Context <- R6Class("Context",
        #' @param handler A handler function
        #' @param remove A logical value, whether the handler should be removed or added
        on_exit = function(handler,remove=FALSE){
-           if(!length(private$exit_hooks))
-               private$exit_hooks <- CallbackDispatcher()
-           private$exit_hooks$register(handler,remove)
+           if(is.function(handler)){
+               private$on_event("exit",handler=handler,remove=remove)
+           }
        },
 
        on_eval = function(handler,remove=FALSE){
-           if(!length(private$eval_hooks))
-               private$eval_hooks <- CallbackDispatcher()
-           private$eval_hooks$register(handler,remove)
+           if(is.function(handler)){
+               private$on_event("eval",handler=handler,remove=remove)
+           }
        },
 
        on_result = function(handler,remove=FALSE){
-           if(!length(private$result_hooks))
-               private$result_hooks <- CallbackDispatcher()
-           private$result_hooks$register(handler,remove)
+           if(is.function(handler)){
+               private$on_event("result",handler=handler,remove=remove)
+           }
        },
 
        on_print = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
-               prh <- private$handlers[["print"]]
-               prh$register(handler,remove=remove)
+               private$on_event("print",handler=handler,remove=remove)
            }
            if(is.function(exit)){
-               prh <- private$handlers[["print_exit"]]
-               prh$register(handler,remove=remove)
+               private$on_event("print_exit",handler=exit,remove=remove)
            }
        },
 
        on_cat = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
-               prh <- private$handlers[["cat"]]
-               prh$register(handler,remove=remove)
+               private$on_event("cat",handler=handler,remove=remove)
            }
            if(is.function(exit)){
-               prh <- private$handlers[["cat_exit"]]
-               prh$register(handler,remove=remove)
+               private$on_event("cat_exit",handler=exit,remove=remove)
            }
        },
-
 
        on_str = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
-               prh <- private$handlers[["str"]]
-               prh$register(handler,remove=remove)
+               private$on_event("str",handler=handler,remove=remove)
            }
            if(is.function(exit)){
-               prh <- private$handlers[["str_exit"]]
-               prh$register(handler,remove=remove)
+               private$on_event("str_exit",handler=exit,remove=remove)
            }
        },
 
+       on_error = function(handler=NULL,remove=FALSE){
+           private$on_event("error",handler=handler,remove=remove)
+       },
+
+       on_warning = function(handler=NULL,remove=FALSE){
+           private$on_event("warning",handler=handler,remove=remove)
+       },
+
+       on_message = function(handler=NULL,remove=FALSE){
+           private$on_event("message",handler=handler,remove=remove)
+       },
+       
        get_text = function(){
            private$prev_text_output <- private$text_output
            private$text_output <- textConnectionValue(private$connection)
@@ -252,6 +257,14 @@ Context <- R6Class("Context",
            }
        },
 
+       on_event = function(type,handler=NULL,remove=FALSE){
+           if(is.function(handler)){
+               if(!length(private$handlers[[type]]))
+                   private$handlers[[type]] <- CallbackDispatcher()
+               prh <- private$handlers[[type]]
+               prh$register(handler,remove=remove)
+           }
+       },
 
        connection = NULL,
        # A function to be called when text ouput is captured or NULL. Should
@@ -291,22 +304,33 @@ Context <- R6Class("Context",
                private$result_hooks$run(...)
        },
 
+       handle_event = function(type,...){
+           log_out(sprintf("Context: Handling event type \"%s\"",type))
+           if(length(private$handlers[[type]])){
+               prh <- private$handlers[[type]]
+               prh$run(...)
+           }
+       },
+       
        evaluator = NULL,
 
+      
        mHandler = function(m) {
-           log_out(m,use.print=TRUE)
+           # log_out(m,use.print=TRUE)
+           private$handle_event("message",m)
            # textio_hooks$message$run()
            invokeRestart("muffleMessage")
        },
        wHandler = function(w){
-           log_out(w,use.print=TRUE)
+           # log_out(w,use.print=TRUE)
            # textio_hooks$warning$run()
+           private$handle_event("warning",w)
            if (getOption("warn") >= 2) return()
            invokeRestart("muffleWarning")
        },
        eHandler = function(e) {
            # textio_hooks$error$run()
-           log_out(e,use.print=TRUE)
+           private$handle_event("error",e)
        }
    )
 )
@@ -338,9 +362,6 @@ init_hooks <- function(){
     textio_hooks$cat_exit <- CallbackDispatcher()
     textio_hooks$str <- CallbackDispatcher()
     textio_hooks$str_exit <- CallbackDispatcher()
-    textio_hooks$error <- CallbackDispatcher()
-    textio_hooks$warning <- CallbackDispatcher()
-    textio_hooks$message <- CallbackDispatcher()
     graphics_hooks$before_plot_new <- CallbackDispatcher()
     graphics_hooks$plot_new <- CallbackDispatcher()
     orig_funs$print <- print

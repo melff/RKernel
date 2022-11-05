@@ -85,6 +85,9 @@ Evaluator <- R6Class("Evaluator",
             
             private$context$on_eval(private$handle_text)
             private$context$on_result(private$handle_result)
+            private$context$on_message(private$handle_message)
+            private$context$on_warning(private$handle_warning)
+            private$context$on_error(private$handle_error)
 
             suppressMessages(trace(example,tracer=quote(if(missing(run.donttest)) run.donttest<-TRUE),
                                    print=FALSE))
@@ -500,6 +503,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_warning = function(w) {
+            log_out("Evaluator: handle_warning")
             text <- conditionMessage(w)
             text <- paste(text,collapse="\n")
             call <- conditionCall(w)
