@@ -60,10 +60,10 @@ Context <- R6Class("Context",
                envir <- private$envir
            self$enter()
            # n <- length(expressions)
-           i <- 0
+           # i <- 0
            sink(private$connection,split=FALSE)
            for(expr in expressions){
-               i <- i + 1
+               # i <- i + 1
                # log_out(sprintf("exressions[[%d]]",i))
                # expr <- expressions[[i]]
                # ev <- list(value = NULL, visible = FALSE)
@@ -218,14 +218,20 @@ Context <- R6Class("Context",
            } else return("")
        },
 
-       get_graphics = function(){
-           private$last_plot <- private$current_plot
-           plt <- recordPlot()
-           if(plot_has_changed(current=plt,last=private$last_plot)) {
-          # if(!plot_is_empty(plt)){
-               private$current_plot <- plt
-               return(plt)
-           } else return(NULL)
+       get_graphics = function(always = FALSE){
+           if(!graphics$current$is_active()) {
+               log_out("graphics not active")
+               return(NULL)
+           }
+           else {
+               plt <- recordPlot()
+               private$last_plot <- private$current_plot
+               if(always || plot_has_changed(current=plt,last=private$last_plot)) {
+               # if(!plot_is_empty(plt)){
+                   private$current_plot <- plt
+                   return(plt)
+               } else return(NULL)
+           }
        }
 
 

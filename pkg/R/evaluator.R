@@ -9,6 +9,8 @@ check_help_port <- function(port){
     return(FALSE)
 }
 
+evaluator <- new.env()
+
 #' The Evaluator Class
 #'
 #' @description An object of this class provides the context in which
@@ -22,6 +24,7 @@ Evaluator <- R6Class("Evaluator",
         #' @param kernel The kernel to which this evaluator belongs
         initialize = function(kernel){
             private$kernel <- kernel
+            evaluator$current <- self
         },
         #' @description
         #' Prepare the object for evaluating expressions
@@ -83,11 +86,13 @@ Evaluator <- R6Class("Evaluator",
             private$context <- Context$new(envir=.GlobalEnv,
                                            attachment=private$env)
             
-            private$context$on_eval(private$handle_text)
+            private$context$on_eval(private$handle_eval)
             private$context$on_result(private$handle_result)
             private$context$on_message(private$handle_message)
             private$context$on_warning(private$handle_warning)
             private$context$on_error(private$handle_error)
+
+            private$graphics <- GraphicsDevice$new(self)
 
             suppressMessages(trace(example,tracer=quote(if(missing(run.donttest)) run.donttest<-TRUE),
                                    print=FALSE))
@@ -318,17 +323,14 @@ Evaluator <- R6Class("Evaluator",
             nms <- names(args)
             op[nms] <- args
             do.call("par",op)
-        },
-
-        graphics_active = function(){
-            dev.cur() == private$dev_num
         }
+
     ),
     
     private = list(
         kernel=list(),
         comm_dispatcher=list(),
-        output=list(),
+        graphics = list(),
 
         nframes = -1,
         aborted = FALSE,
@@ -424,6 +426,11 @@ Evaluator <- R6Class("Evaluator",
             private$add_payload(unclass(p))
         },
 
+        handle_eval = function() {
+            private$handle_text()
+            private$handle_graphics()
+        },
+
         handle_text = function() {
             # log_out(sprintf("handle_text(%s)",text))
             text <- private$context$get_text()
@@ -438,8 +445,14 @@ Evaluator <- R6Class("Evaluator",
 
         last_plot_id = character(),
 
-        handle_graphics = function(plt,update=FALSE) {
 
+        handle_graphics = function() {
+
+            plt <- private$context$get_graphics()
+            if(!length(plt)) return(NULL)
+
+            update <- FALSE
+            
             # log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
             new_display <- !update || private$new_cell && !getOption("jupyter.update.graphics",TRUE)
             

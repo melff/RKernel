@@ -48,7 +48,6 @@ Kernel <- R6Class("Kernel",
       comm_manager <- CommManager(self,evaluator)
       self$comm_manager <- comm_manager
       self$evaluator <- evaluator
-      # self$evaluator$comm_manager <- comm_manager
       kernel$current <- self
       init_hooks()
     },

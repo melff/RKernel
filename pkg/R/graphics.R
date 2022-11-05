@@ -44,10 +44,12 @@ mime_graphics <- function(plt,mime,width,height,pointsize,scale,res,units="in"){
     return(graphics_data)
 }
 
-Graphics <- R6Class("RKernel_Graphics",
+graphics <- new.env()
+
+GraphicsDevice <- R6Class("GraphicsDevice",
     public = list(
-        initialize = function(kernel){
-            private$kernel <- kernel
+        initialize = function(evaluator){
+            private$evaluator <- evaluator
             os <- .Platform$OS.type
             sysname <- Sys.info()[["sysname"]]
             if(os == "unix" && sysname=="Darwin")
@@ -60,35 +62,18 @@ Graphics <- R6Class("RKernel_Graphics",
                                        windows="png",
                                        osx="pdf",
                                        unix="png")
-            private$device <- function(filename = NULL,
-                                       width = getOption("jupyter.plot.width",6),
-                                       height = getOption("jupyter.plot.height",6),
-                                       res = getOption("jupyter.plot.res",96),
-                                       pointsize = getOption("jupyter.plot.pointsize",12),
-                                       units = getOption("jupyter.plot.units","in"),
-                                       ...){
-                dev <- get(private$dev_name)
-                if(is.null(filename))
-                    dev(filename=private$dev_filename,
-                        width=width,
-                        height=height,
-                        res=res,
-                        units=units,
-                        ...)
-                private$dev_num <- dev.cur()
-                dev.control(displaylist="enable")
-                
-                log_out('private$device')
-                log_out("private$dev_num==",private$dev_num)
-
-            }
             setHook('plot.new',private$plot_new_hook)
             setHook('grid.newpage',private$plot_new_hook)
             setHook('before.plot.new',private$before_plot_new_hook)
             setHook('before.grid.newpage',private$before_plot_new_hook)
+            graphics$current <- self
+            private$device()
         },
         is_active = function(){
             private$dev_num == dev.cur()
+        },
+        activate = function(){
+            private$device()
         },
         new_page = function(){
             isTRUE(private$plot_new_called)
@@ -96,11 +81,12 @@ Graphics <- R6Class("RKernel_Graphics",
     ),
     private = list(
 
+        evaluator = NULL,
         plot_new_called = FALSE,
         graphics_par_usr = numeric(0),
 
         before_plot_new_hook = function(...){
-            if(self$graphics_active()){
+            if(self$is_active()){
                 graphics_hooks$before_plot_new$run()
                 dev.control(displaylist="enable")
             }
@@ -114,13 +100,34 @@ Graphics <- R6Class("RKernel_Graphics",
                 graphics_hooks$plot_new$run()
                 private$plot_new_called <- TRUE
                 private$graphics_par_usr <- par("usr")
-                
             } #else log_out("graphics not active ...")
         },
 
         dev_filename = character(0),
         dev_name = character(),
         dev_num = 0,
-        device = NULL
+        device = function(filename = NULL,
+                          width = getOption("jupyter.plot.width",6),
+                          height = getOption("jupyter.plot.height",6),
+                          res = getOption("jupyter.plot.res",96),
+                          pointsize = getOption("jupyter.plot.pointsize",12),
+                          units = getOption("jupyter.plot.units","in"),
+                          ...){
+            dev <- get(private$dev_name)
+            if(is.null(filename))
+                dev(filename=private$dev_filename,
+                    width=width,
+                    height=height,
+                    res=res,
+                    units=units,
+                    ...)
+            private$dev_num <- dev.cur()
+            dev.control(displaylist="enable")
+            
+            log_out('private$device')
+            log_out("private$dev_num==",private$dev_num)
+
+        }
     )
 )
+
