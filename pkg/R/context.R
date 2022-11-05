@@ -18,21 +18,9 @@ Context <- R6Class("Context",
        #' @param envir An optional environment within which expressions are evaluated
        #' @param attachment An optional environment that is attached while an expression is evaluated within 
        #'   the context.
-       initialize = function(text_callback=NULL,
-                             message_callback=NULL,
-                             warning_callback=NULL,
-                             error_callback=NULL,
-                             value_callback=NULL,
-                             graphics_callback=NULL,
-                             envir=new.env(),
+       initialize = function(envir=new.env(),
                              attachment=new.env()){
-           private$text_callback <- text_callback
-           private$message_callback <- message_callback
-           private$warning_callback <- warning_callback
-           private$error_callback <- error_callback
-           private$value_callback <- value_callback
-           private$graphics_callback <- graphics_callback
-           private$connection <- textConnection(NULL,"wr",local=TRUE)
+           private$connection <- textConnection(NULL,"w",local=TRUE)
            private$envir <- envir
            private$attachment <- attachment
            private$id <- UUIDgenerate()
@@ -72,157 +60,207 @@ Context <- R6Class("Context",
                envir <- private$envir
            self$enter()
            # n <- length(expressions)
-           # i <- 0
-           # log_out("context$evaluate")
-           # log_out(enclos,use.print=TRUE)
-           # log_out(ls(enclos),use.print=TRUE)
+           i <- 0
+           sink(private$connection,split=FALSE)
            for(expr in expressions){
-               # i <- i + 1
+               i <- i + 1
                # log_out(sprintf("exressions[[%d]]",i))
                # expr <- expressions[[i]]
-               ev <- list(value = NULL, visible = FALSE)
+               # ev <- list(value = NULL, visible = FALSE)
                ### See 'evaluate_call' in package "evaluate" (Yihui Xie et al.)
-               try(ev <- withCallingHandlers(
+               ev <- withCallingHandlers(
                        withVisible(eval(expr,
                                         envir=envir,
                                         enclos=enclos)),
                        error=private$eHandler,
                        warning=private$wHandler,
-                       message=private$mHandler),silent=TRUE)
+                       message=private$mHandler)
                self$last.value <- ev
-               private$handle_text()
-               private$handle_graphics()
-               if(is.function(private$value_callback)){
-                   try(withCallingHandlers(
-                           private$value_callback(ev$value,ev$visible),
-                           error=private$eHandler,
-                           warning=private$wHandler,
-                           message=private$mHandler),silent=TRUE)
-                   if(ev$visible){
-                       private$handle_text()
-                       private$handle_graphics()
-                   }
-               }
+               cat("\n",file=private$connection)
+               private$run_eval_hooks()
+               # if(is.function(private$value_callback)){
+               #     try(withCallingHandlers(
+               #         private$value_callback(ev$value,ev$visible),
+               #         error=private$eHandler,
+               #         warning=private$wHandler,
+               #         message=private$mHandler),silent=TRUE)
+               #     if(ev$visible){
+               #         private$run_visible_hooks()
+               #     }
+               # }
            }
-           self$exit()
+           sink()
+          self$exit()
        },
-      last.value = NULL,
-      #' @description A function that is called before a set of expressions
-      #'     is evaluated (e.g. in a notebook cell).
-      #' @param enclos An enclosing environment.
-      enter = function(enclos=parent.frame()){
+       last.value = NULL,
+       #' @description A function that is called before a set of expressions
+       #'     is evaluated (e.g. in a notebook cell).
+       #' @param enclos An enclosing environment.
+       enter = function(enclos=parent.frame()){
 
-          sink(private$connection,split=FALSE)
+           # log_out("context$enter")
+           # log_out(sprintf("Open syncs: %d",sink.number()))
 
-          if(!isTRUE(getOption("rkernel_no_output_hooks"))){
-              suppressMessages(trace(print,
-                                     private$print_hook,
-                                     exit=private$print_exit_hook,
-                                     print=FALSE))
-              suppressMessages(trace(cat,
-                                     private$cat_hook,
-                                     exit=private$cat_exit_hook,
-                                     print=FALSE))
-              suppressMessages(trace(str,
-                                     private$str_hook,
-                                     exit=private$str_exit_hook,
-                                     print=FALSE))
-          }
+           #sink(private$connection,split=FALSE)
+           # sink("RKernel.out",split=FALSE)
 
-          attach(private$attachment,name=private$name,
-                 warn.conflicts=FALSE)
-          # log_out(sprintf("Attached %s",private$name))
-          
-          if(private$evaluator$graphics_active()){
-              if(length(private$current_plot))
-                  replayPlot(private$current_plot)
-              else
-                  plot.new()
-          }
+           attach(private$attachment,name=private$name,
+                  warn.conflicts=FALSE)
+           # log_out(sprintf("Attached %s",private$name))
+           
 
-          private$run_enter_hooks()
+           private$run_enter_hooks()
 
-      },
+       },
 
-      #' @description A function that is called after a set of expressions
-      #'     is evaluated (e.g. in a notebook cell).
-      exit = function(){
-          
-          private$run_exit_hooks()
-          # log_out(search(),use.print=TRUE)
-          if(private$name %in% search()){
+       #' @description A function that is called after a set of expressions
+       #'     is evaluated (e.g. in a notebook cell).
+       exit = function(){
+           
+           log_out("context$exit")
+           private$run_exit_hooks()
+           # log_out(search(),use.print=TRUE)
+           if(private$name %in% search()){
               # log_out(sprintf("Detaching %s",private$name))
-              context_pos <- match(private$name,search())
-              detach(pos=context_pos)
-          }
-
-          if(private$evaluator$graphics_active()){
-                private$current_plot <- recordPlot()
-          }
-
-          sink()
-
-          if(!isTRUE(getOption("rkernel_no_output_hooks"))){
-              suppressMessages(untrace(cat))
-              suppressMessages(untrace(str))
-              suppressMessages(untrace(print))
-          }
-      },
-
-      clear_graphics = function(){
-          private$current_plot <- NULL
-      },
-      clear_text = function(){
-          private$text_output <- NULL
-      },
+               context_pos <- match(private$name,search())
+               detach(pos=context_pos)
+           }
 
 
-      #' @description
-      #' Add or remove a handler function to be called by the
-      #' \code{enter()} function, i.e. before a series of expression 
-      #' is evaluated.
-      #' @param handler A handler function
-      #' @param remove A logical value, whether the handler should be removed or added
-      on_enter = function(handler,remove=FALSE){
-          if(!length(private$enter_hooks))
-              private$enter_hooks <- CallbackDispatcher()
-          private$enter_hooks$register(handler,remove)
-      },
+           # sink()
 
-      #' @description
-      #' Add or remove a handler function to be called by the
-      #' \code{exit()} function, i.e. after a series of expression 
-      #' has been evaluated.
-      #' @param handler A handler function
-      #' @param remove A logical value, whether the handler should be removed or added
-      on_exit = function(handler,remove=FALSE){
-          if(!length(private$exit_hooks))
-              private$exit_hooks <- CallbackDispatcher()
-          private$exit_hooks$register(handler,remove)
-      }
+       },
+
+       #' @description
+       #' Add or remove a handler function to be called by the
+       #' \code{enter()} function, i.e. before a series of expression 
+       #' is evaluated.
+       #' @param handler A handler function
+       #' @param remove A logical value, whether the handler should be removed or added
+       on_enter = function(handler,remove=FALSE){
+           if(!length(private$enter_hooks))
+               private$enter_hooks <- CallbackDispatcher()
+           private$enter_hooks$register(handler,remove)
+       },
+
+       #' @description
+       #' Add or remove a handler function to be called by the
+       #' \code{exit()} function, i.e. after a series of expression 
+       #' has been evaluated.
+       #' @param handler A handler function
+       #' @param remove A logical value, whether the handler should be removed or added
+       on_exit = function(handler,remove=FALSE){
+           if(!length(private$exit_hooks))
+               private$exit_hooks <- CallbackDispatcher()
+           private$exit_hooks$register(handler,remove)
+       },
+
+       on_eval = function(handler,remove=FALSE){
+           if(!length(private$eval_hooks))
+               private$eval_hooks <- CallbackDispatcher()
+           private$eval_hooks$register(handler,remove)
+       },
+
+       on_visible_result = function(handler,remove=FALSE){
+           if(!length(private$visible_hooks))
+               private$visible_hooks <- CallbackDispatcher()
+           private$visible_hooks$register(handler,remove)
+       },
+
+       on_print = function(handler=NULL,exit=NULL,remove=FALSE){
+           if(is.function(handler)){
+               prh <- private$handlers[["print"]]
+               prh$register(handler,remove=remove)
+           }
+           if(is.function(exit)){
+               prh <- private$handlers[["print_exit"]]
+               prh$register(handler,remove=remove)
+           }
+       },
+
+       on_cat = function(handler=NULL,exit=NULL,remove=FALSE){
+           if(is.function(handler)){
+               prh <- private$handlers[["cat"]]
+               prh$register(handler,remove=remove)
+           }
+           if(is.function(exit)){
+               prh <- private$handlers[["cat_exit"]]
+               prh$register(handler,remove=remove)
+           }
+       },
+
+
+       on_str = function(handler=NULL,exit=NULL,remove=FALSE){
+           if(is.function(handler)){
+               prh <- private$handlers[["str"]]
+               prh$register(handler,remove=remove)
+           }
+           if(is.function(exit)){
+               prh <- private$handlers[["str_exit"]]
+               prh$register(handler,remove=remove)
+           }
+       },
+
+       get_text = function(){
+           private$prev_text_output <- private$text_output
+           private$text_output <- textConnectionValue(private$connection)
+           nlines <- length(private$prev_text_output)
+           if(nlines > 0)
+               current_text_output <- tail(private$text_output,-nlines)
+           else
+               current_text_output <- private$text_output
+           if(length(current_text_output)){
+               current_text_output <- paste(current_text_output,collapse="\n")
+              # KLUDGE Ignore empty lines of output
+               if(!identical(current_text_output,"\n"))
+                   return(current_text_output)
+               else return("")
+           } else return("")
+       },
+
+       get_graphics = function(){
+           private$last_plot <- private$current_plot
+           plt <- recordPlot()
+           if(plot_has_changed(current=plt,last=private$last_plot)) {
+          # if(!plot_is_empty(plt)){
+               private$current_plot <- plt
+               return(plt)
+           } else return(NULL)
+       }
+
+
    ),
    private = list(
+
+       handlers = list(),
+       saved_handlers = list(),
+
+       init_hooks = function(){
+           nms <- ls(envir=textio_hooks)
+           for(nm in nms)
+               private$handlers[[nm]] <- CallbackDispatcher()
+       },
+       
+       install_hooks = function(){
+           nms <- ls(envir=textio_hooks)
+           for(nm in nms){
+               handlers <- private$handlers[[nm]]$copy_handlers()
+               private$saved_handlers[[nm]] <- textio_hooks[[nm]]$shift_handlers(handlers)
+           }
+       },
+
+       restore_hooks = function(){
+           nms <- ls(envir=textio_hooks)
+           for(nm in nms){
+               handlers <- private$saved_handlers[[nm]]
+               textio_hooks[[nm]]$shift_handlers(handlers)
+           }
+       },
+
 
        connection = NULL,
        # A function to be called when text ouput is captured or NULL. Should
        #    be either specified by the constuctor or by inheriting classes.
-       text_callback = NULL,
-       #  A function to be called when a message is captured or NULL. Should
-       #    be either specified by the constuctor or by inheriting classes.
-       message_callback = NULL,
-       #  A function to be called when a warning is captured or NULL. Should
-       #    be either specified by the constuctor or by inheriting classes.
-       warning_callback = NULL,
-       #  A function to be called when a error is captured or NULL. Should
-       #    be either specified by the constuctor or by inheriting classes.
-       error_callback = NULL,
-       # A function to be called when graphics output is captured or NULL. Should
-       #    be either specified by the constuctor or by inheriting classes.
-       graphics_callback = NULL,
-       # A function or NULL. The function is called when expressions 
-       #   evaluation returns a visble object. Should
-       #   be either specified by the constuctor or by inheriting classes.
-       value_callback = NULL,
        
        text_output = NULL,
        prev_text_output = NULL,
@@ -231,201 +269,52 @@ Context <- R6Class("Context",
        id = character(0),
        name = character(0),
 
-       handle_text = function(){
-           if(!is.function(private$text_callback)) return()
-           # if(!isIncomplete(private$connection) || TRUE)
-           log_out("Context$text()")
-           cat("\n",file=private$connection)
-           private$prev_text_output <- private$text_output
-           private$text_output <- textConnectionValue(private$connection)
-           if(is.function(private$text_callback)){
-               nlines <- length(private$prev_text_output)
-               if(nlines > 0)
-                   current_text_output <- tail(private$text_output,-nlines)
-               else
-                   current_text_output <- private$text_output
-               if(length(current_text_output)){
-                   current_text_output <- paste(current_text_output,collapse="\n")
-                   # KLUDGE Ignore empty lines of output
-                   if(!identical(current_text_output,"\n"))
-                       private$text_callback(current_text_output)
-               }
-           }
+       last_plot = NULL,
+       current_plot = NULL,
+
+       enter_hooks = list(),
+       run_enter_hooks = function(){
+           if(inherits(private$enter_hooks,"CallbackDispatcher"))
+               private$enter_hooks$run()
        },
 
-      handle_graphics = function(){
-          if(!is.function(private$graphics_callback)) return()
-          log_out("Context$handle_graphics()")
-          log_out("dev.cur()==",dev.cur())
-          private$last_plot <- private$current_plot
-          plt <- recordPlot()
-          if(plot_has_changed(current=plt,last=private$last_plot)) {
-          # if(!plot_is_empty(plt)){
-              private$graphics_callback(plt)
-              private$current_plot <- plt
-          } 
-      },
+       exit_hooks = list(),
+       run_exit_hooks = function(){
+           if(inherits(private$exit_hooks,"CallbackDispatcher"))
+               private$exit_hooks$run()
+       },
 
-      last_plot = NULL,
-      current_plot = NULL,
+       eval_hooks = list(),
+       run_eval_hooks = function(){
+           if(inherits(private$eval_hooks,"CallbackDispatcher"))
+               private$eval_hooks$run()
+       },
 
-      enter_hooks = list(),
-      run_enter_hooks = function(){
-          if(inherits(private$enter_hooks,"CallbackDispatcher"))
-              private$enter_hooks$run()
-      },
+       visible_hooks = list(),
+       run_visible_hooks = function(){
+           if(inherits(private$visible_hooks,"CallbackDispatcher"))
+               private$visible_hooks$run()
+       },
 
-      exit_hooks = list(),
-      run_exit_hooks = function(){
-          if(inherits(private$exit_hooks,"CallbackDispatcher"))
-              private$exit_hooks$run()
-      },
+       evaluator = NULL,
 
-      cat_hook = function(){
-          log_out("cat_hook")
-          private$handle_graphics()
-      },
-      cat_exit_hook = function(){
-          # log_out("cat_exit_hook")
-          private$handle_text()
-      },
-
-      print_hook = function(){
-          log_out("print_hook")
-          private$handle_graphics()
-      },
-      print_exit_hook = function(){
-          log_out("print_exit_hook")
-          private$handle_text()
-      },
-
-      str_depth = 0,
-      str_hook = function(){
-          log_out("str_hook")
-          private$str_depth <- private$str_depth + 1
-          if(private$str_depth == 1)
-              suppressMessages(untrace(cat))
-      },
-      str_exit_hook = function(){
-          log_out("str_exit_hook")
-          if(private$str_depth == 1){
-              private$handle_text()
-              suppressMessages(trace(cat,
-                                     private$cat_hook,
-                                     exit=private$cat_exit_hook,
-                                     print=FALSE))
-          }
-          private$str_depth <- private$str_depth - 1
-      },
-
-      evaluator = NULL,
-
-      mHandler = function(m) {
-          private$message_callback(m)
-          invokeRestart("muffleMessage")
-      },
-      wHandler = function(w){
-          private$warning_callback(w)
-          if (getOption("warn") >= 2) return()
-          invokeRestart("muffleWarning")
-      },
-      eHandler = function(e) {
-          private$error_callback(e)
-      }
+       mHandler = function(m) {
+           log_out(m,use.print=TRUE)
+           # textio_hooks$message$run()
+           invokeRestart("muffleMessage")
+       },
+       wHandler = function(w){
+           log_out(w,use.print=TRUE)
+           # textio_hooks$warning$run()
+           if (getOption("warn") >= 2) return()
+           invokeRestart("muffleWarning")
+       },
+       eHandler = function(e) {
+           # textio_hooks$error$run()
+           log_out(e,use.print=TRUE)
+       }
    )
 )
-
-# cf. 'graphics.r' in package "evaluate" (Yihui Xie et al.)
-empty_plot_calls <- c("palette",
-                      "palette2",
-                      paste0("C_",c("layout",
-                                  "par",
-                                  "clip",
-                                  "strWidth",
-                                  "strHeight",
-                                  "plot_new",
-                                  "plot_window")))
-
-plot_calls <- function(plt){
-    plt <- plt[[1]]
-    plt <- lapply(plt,"[[",2)
-    if(!length(plt)) return(NULL)
-    lapply(plt,"[[",1)
-}
-
-non_empty_plot_calls <- function(plt){
-    if(!length(plt)) return(NULL)
-    pcalls <- plot_calls(plt)
-    pcnames <- sapply(pcalls,get_name_el)
-    empty <- pcnames %in% empty_plot_calls
-    pcalls[!empty]
-}
-
-get_name_el <- function(x){
-    if(length(x$name)) x$name 
-    else deparse(x)
-}
-
-is_base_graphics <- function(plt){
-    plt1 <- plt[[1]][[1]][[2]][[1]]
-    get_name_el(plt1) == "C_plot_new"
-}
-
-compare_plots <- function(plt1,plt2){
-    if((length(plt1) > 0) != (length(plt2) > 0)) return(FALSE)
-    if(is_base_graphics(plt1) != is_base_graphics(plt2)) return(FALSE)
-    if(!is_base_graphics(plt1)) return(identical(plt1[[3]],plt2[[3]]))
-    else {
-        ne1 <- non_empty_plot_calls(plt1)
-        ne2 <- non_empty_plot_calls(plt2)
-        if(!identical(ne1,ne2)) return(FALSE)
-        else {
-            log_out(ne1)
-            return(identical(plt1[[2]],plt2[[2]]))
-        }
-    }
-}
-
-plot_is_empty <- function(plt){
-    if(!length(plt) || !length(plt)[[1]]) {
-        return(TRUE)
-    }
-    ne1 <- non_empty_plot_calls(plt)
-    return(length(ne1) == 0)
-}
-
-plot_has_changed <- function(current,last){
-    if(!length(current) || !length(current)[[1]]) {
-        log_out("Current plot is NULL")
-        return(FALSE)
-    }
-    ne1 <- non_empty_plot_calls(current)
-    if(!length(ne1)) {
-        log_out("Current plot is empty")
-        return(FALSE)
-    }
-    if(is_base_graphics(current)){
-        if(!length(last)) return(TRUE)
-        else if(!is_base_graphics(last)) return(TRUE)
-        else {
-            ne2 <- non_empty_plot_calls(last)
-            if(!identical(ne1,ne2)) return(TRUE)
-            else {
-                # log_out(digest::sha1(last[[2]]))
-                # log_out(digest::sha1(current[[2]]))
-                return(!identical(current[[2]],last[[2]]))
-                # return(!identical(current[1:2],last[1:2]))
-                # return(!identical(current[2],last[2]))
-                # return(!identical(current,last))
-            }
-        }
-    }
-    else {
-        if(is_base_graphics(last)) return(TRUE)
-        else if(!length(last)) return(TRUE)
-        else return(identical(current[[3]],last[[3]])) 
-    }
-}
 
 #' Evalute expressions within a context
 #'
@@ -441,4 +330,37 @@ with.Context <- function(data,expr,enclos=parent.frame(),...){
     # log_out(enclos,use.print=TRUE)
     # log_out(ls(enclos),use.print=TRUE)
     data$eval(substitute(expr),enclos=enclos)
+}
+
+
+textio_hooks <- new.env()
+graphics_hooks <- new.env()
+orig_funs <- new.env()
+init_hooks <- function(){
+    textio_hooks$print <- CallbackDispatcher()
+    textio_hooks$print_exit <- CallbackDispatcher()
+    textio_hooks$cat <- CallbackDispatcher()
+    textio_hooks$cat_exit <- CallbackDispatcher()
+    textio_hooks$str <- CallbackDispatcher()
+    textio_hooks$str_exit <- CallbackDispatcher()
+    textio_hooks$error <- CallbackDispatcher()
+    textio_hooks$warning <- CallbackDispatcher()
+    textio_hooks$message <- CallbackDispatcher()
+    graphics_hooks$before_plot_new <- CallbackDispatcher()
+    graphics_hooks$plot_new <- CallbackDispatcher()
+    orig_funs$print <- print
+    orig_funs$cat <- cat
+    orig_funs$str <- str
+    # suppressMessages(trace(print,
+    #                        textio_hooks$print$run,
+    #                        exit=textio_hooks$print_exit$run,
+    #                        print=FALSE))
+    # suppressMessages(trace(cat,
+    #                        textio_hooks$cat$run,
+    #                        exit=textio_hooks$cat_exit$run,
+    #                        print=FALSE))
+    # suppressMessages(trace(str,
+    #                        textio_hooks$str$run,
+    #                        exit=textio_hooks$str_exit$run,
+                           # print=FALSE))
 }

@@ -80,16 +80,13 @@ Evaluator <- R6Class("Evaluator",
 
             private$comm_dispatcher <- private$kernel$comm_dispatcher
 
-            private$context <- Context$new(text_callback=private$handle_text,
-                                        message_callback=private$handle_message,
-                                        warning_callback=private$handle_warning,
-                                        error_callback=private$handle_error,
-                                        value_callback=private$handle_value,
-                                        graphics_callback=private$handle_graphics,
-                                        envir=.GlobalEnv,
-                                        attachment=private$env)
+            private$context <- Context$new(envir=.GlobalEnv,
+                                           attachment=private$env)
+            
+            private$context$on_eval(private$handle_text)
 
-            suppressMessages(trace(example,tracer=quote(if(missing(run.donttest)) run.donttest<-TRUE),print=FALSE))
+            suppressMessages(trace(example,tracer=quote(if(missing(run.donttest)) run.donttest<-TRUE),
+                                   print=FALSE))
             home_dir <- Sys.getenv("HOME")
             jupyter_config <- file.path(home_dir,".jupyter","RKernel-config.R")
             if(file.exists(jupyter_config)) 
@@ -111,8 +108,6 @@ Evaluator <- R6Class("Evaluator",
             private$start_help_system()
             assign("help.start",help.start,envir=private$env)
 
-            private$init_graphics()
-
         },
         #' @description
         #' Shut the session down
@@ -125,6 +120,7 @@ Evaluator <- R6Class("Evaluator",
         #' @param ... Other arguments, currently ignored
         eval_cell = function(code,...){
             
+            log_out("eval_cell")
             perc_match <- getMatch(code,regexec("^%%([a-zA-Z0-9]+)\n",code))
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
@@ -157,13 +153,6 @@ Evaluator <- R6Class("Evaluator",
             }
             else {
 
-                if(private$dev_num == 0 || !(private$dev_num %in% dev.list()))
-                    private$device()
-                if(private$dev_num > 1 && private$dev_num %in% dev.list() && dev.cur() != private$dev_num){
-                    private$orig.dev_num <- dev.cur()
-                    dev.set(private$dev_num)
-                }
-
                 private$new_cell <- TRUE
                 self$cell_no <- self$cell_no + 1
                 log_out(sprintf("== BEGIN CELL [%d] ==",self$cell_no))
@@ -185,9 +174,6 @@ Evaluator <- R6Class("Evaluator",
                     private$saved.parms <- list()
                     do.call("par",op)
                 }
-                # log_out(sprintf("... running callbacks",self$cell_no))
-
-                private$run_callbacks()
                 log_out(sprintf("== END CELL [%d] ==",self$cell_no))
             }
         },
@@ -434,8 +420,9 @@ Evaluator <- R6Class("Evaluator",
             private$add_payload(unclass(p))
         },
 
-        handle_text = function(text) {
+        handle_text = function() {
             # log_out(sprintf("handle_text(%s)",text))
+            text <- private$context$get_text()
             # log_out("handle_text")
             # log_out(text,use.print=TRUE)
             if(nzchar(text)){
@@ -444,82 +431,6 @@ Evaluator <- R6Class("Evaluator",
                                       stream = "stdout")
             }
         },
-
-        init_graphics = function(){
-            os <- .Platform$OS.type
-            sysname <- Sys.info()[["sysname"]]
-            if(os == "unix" && sysname=="Darwin")
-                os <- "osx"
-            private$dev_filename <- switch(os,
-                                           windows="NUL",
-                                           osx=NULL,
-                                           unix="/dev/null")
-            private$dev_name <- switch(os,
-                                       windows="png",
-                                       osx="pdf",
-                                       unix="png")
-            private$device <- function(filename = NULL,
-                                       width = getOption("jupyter.plot.width",6),
-                                       height = getOption("jupyter.plot.height",6),
-                                       res = getOption("jupyter.plot.res",96),
-                                       pointsize = getOption("jupyter.plot.pointsize",12),
-                                       units = getOption("jupyter.plot.units","in"),
-                                       ...){
-                dev <- get(private$dev_name)
-                if(is.null(filename))
-                    dev(filename=private$dev_filename,
-                        width=width,
-                        height=height,
-                        res=res,
-                        units=units,
-                        ...)
-                private$dev_num <- dev.cur()
-                dev.control(displaylist="enable")
-                
-                log_out('private$device')
-                log_out("private$dev_num==",private$dev_num)
-
-            }
-            setHook('plot.new',private$plot_new_hook)
-            setHook('grid.newpage',private$grid_newpage_hook)
-            setHook('before.plot.new',private$before_plot_new_hook)
-            setHook('before.grid.newpage',private$before_plot_new_hook)
-        },
-
-
-        plot_new_called = FALSE,
-        graphics_par_usr = numeric(0),
-
-        before_plot_new_hook = function(...){
-            if(self$graphics_active()){
-                # if(par("page"))
-                #     private$context$handle_text()
-                dev.control(displaylist="enable")
-            }
-        },
-
-        plot_new_hook = function(...){
-            log_out("plot_new_hook")
-            log_out("private$dev_num==",private$dev_num)
-            log_out("dev.cur()==",dev.cur())
-            if(self$graphics_active()){
-                private$plot_new_called <- TRUE
-                private$graphics_par_usr <- par("usr")
-            } #else log_out("graphics not active ...")
-        },
-
-
-        grid_newpage_hook = function(...){
-          # log_out("grid_newpage_hook")
-            if(self$graphics_active()){
-                private$plot_new_called <- TRUE
-            } 
-        },
-
-        dev_filename = character(0),
-        dev_name = character(),
-        dev_num = 0,
-        device = NULL,
 
         last_plot_id = character(),
 
@@ -757,32 +668,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         saved.options = list(),
-        saved.parms = list(),
-
-        cat = function (..., file = "", sep = " ", fill = FALSE, labels = NULL, 
-                        append = FALSE){
-            if(!missing(file))
-                base::cat(...,file,sep,fill,labels,append)
-            else {
-                text <- paste(...,sep=sep)
-                if(fill){
-                    width <- if(is.numeric(fill)) fill else getOption("width")
-                    text <- strwrap(text,width=width)
-                    text <- paste(text,collapse="\n")
-                }
-                private$kernel$stream(text=text,
-                                      stream="stdout")
-            }
-        },
-
-        callbacks = NULL,
-        run_callbacks = function(){
-            if(is.null(private$callbacks))
-                private$callbacks <- CallbackDispatcher()
-            else 
-                private$callbacks$run()
-        }
-
+        saved.parms = list()
     )
 
 )

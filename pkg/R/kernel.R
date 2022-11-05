@@ -50,6 +50,7 @@ Kernel <- R6Class("Kernel",
       self$evaluator <- evaluator
       # self$evaluator$comm_manager <- comm_manager
       kernel$current <- self
+      init_hooks()
     },
 
     #' @field evaluator See \code{\link{Evaluator}}.
@@ -254,14 +255,14 @@ Kernel <- R6Class("Kernel",
     #' @param use.print Logical, whether the function 'print()' should applied
     #'        to the message.
     log_out = function(message,...,use.print=FALSE,use.str=FALSE){
-      tstate <- tracingState(on=FALSE)
+      #tstate <- tracingState(on=FALSE)
       if(use.print)
-        message <- paste(capture.output(print(message)),collapse="\n")
+        message <- paste(capture.output(orig_funs$print(message)),collapse="\n")
       else if(use.str)
-        message <- paste(capture.output(str(message)),collapse="\n")
+        message <- paste(capture.output(orig_funs$str(message)),collapse="\n")
       else message <- paste(message,...,collapse="")
-      cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),file=stderr())
-      tracingState(on=tstate)
+      orig_funs$cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),file=stderr())
+      #tracingState(on=tstate)
     },
     #' @description
     #' Add a service to the kernel, i.e. a function that is called in each
