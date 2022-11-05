@@ -84,6 +84,7 @@ Evaluator <- R6Class("Evaluator",
                                            attachment=private$env)
             
             private$context$on_eval(private$handle_text)
+            private$context$on_result(private$handle_result)
 
             suppressMessages(trace(example,tracer=quote(if(missing(run.donttest)) run.donttest<-TRUE),
                                    print=FALSE))
@@ -549,8 +550,8 @@ Evaluator <- R6Class("Evaluator",
             }
         },
 
-        handle_value = function(x,visible) {
-            # log_out("handle_value")
+        handle_result = function(x,visible) {
+            # log_out("handle_result")
             # log_out(visible,use.print=TRUE)
             if(visible){
                 if(any(class(x) %in% getOption("rkernel_paged_classes"))){

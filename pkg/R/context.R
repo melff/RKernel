@@ -78,16 +78,11 @@ Context <- R6Class("Context",
                self$last.value <- ev
                cat("\n",file=private$connection)
                private$run_eval_hooks()
-               # if(is.function(private$value_callback)){
-               #     try(withCallingHandlers(
-               #         private$value_callback(ev$value,ev$visible),
-               #         error=private$eHandler,
-               #         warning=private$wHandler,
-               #         message=private$mHandler),silent=TRUE)
-               #     if(ev$visible){
-               #         private$run_visible_hooks()
-               #     }
-               # }
+               try(withCallingHandlers(
+                   private$run_result_hooks(ev$value,ev$visible),
+                   error=private$eHandler,
+                   warning=private$wHandler,
+                   message=private$mHandler),silent=TRUE)
            }
            sink()
           self$exit()
@@ -161,10 +156,10 @@ Context <- R6Class("Context",
            private$eval_hooks$register(handler,remove)
        },
 
-       on_visible_result = function(handler,remove=FALSE){
-           if(!length(private$visible_hooks))
-               private$visible_hooks <- CallbackDispatcher()
-           private$visible_hooks$register(handler,remove)
+       on_result = function(handler,remove=FALSE){
+           if(!length(private$result_hooks))
+               private$result_hooks <- CallbackDispatcher()
+           private$result_hooks$register(handler,remove)
        },
 
        on_print = function(handler=NULL,exit=NULL,remove=FALSE){
@@ -290,10 +285,10 @@ Context <- R6Class("Context",
                private$eval_hooks$run()
        },
 
-       visible_hooks = list(),
-       run_visible_hooks = function(){
-           if(inherits(private$visible_hooks,"CallbackDispatcher"))
-               private$visible_hooks$run()
+       result_hooks = list(),
+       run_result_hooks = function(...){
+           if(inherits(private$result_hooks,"CallbackDispatcher"))
+               private$result_hooks$run(...)
        },
 
        evaluator = NULL,
