@@ -138,7 +138,6 @@ display_data.htmlwidget <- function(x,...,
 #' @param scale The amount by which the plots are scaled in the frontend
 #' @param units Units of width and height, see \code{\link[grDevices]{png}}
 #' 
-#' @importFrom repr mime2repr
 #' @importFrom uuid UUIDgenerate
 #' @export
 display_data.recordedplot <- function(x,
@@ -160,7 +159,6 @@ display_data.recordedplot <- function(x,
     mime_metadata <- list()
 
     for(mime in rkernel_graphics_types){
-        repr_func <- mime2repr[[mime]]
         mime_data[[mime]] <- mime_graphics(x,
                                            mime=mime,
                                            width=width,

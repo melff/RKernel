@@ -43,7 +43,7 @@ compare_plots <- function(plt1,plt2){
         ne2 <- non_empty_plot_calls(plt2)
         if(!identical(ne1,ne2)) return(FALSE)
         else {
-            log_out(ne1)
+            # log_out(ne1)
             return(identical(plt1[[2]],plt2[[2]]))
         }
     }
@@ -59,24 +59,24 @@ plot_is_empty <- function(plt){
 
 plot_has_changed <- function(current,last){
     if(!length(current) || !length(current)[[1]]) {
-        log_out("Current plot is NULL")
+        # log_out("Current plot is NULL")
         return(FALSE)
     }
     ne1 <- non_empty_plot_calls(current)
     if(!length(ne1)) {
-        log_out("Current plot is empty")
+        # log_out("Current plot is empty")
         return(FALSE)
     }
     if(is_base_graphics(current)){
         if(!length(last)) {
-            log_out("Last plot is NULL")
+            # log_out("Last plot is NULL")
             return(TRUE)
         }
         else if(!is_base_graphics(last)) return(TRUE)
         else {
             ne2 <- non_empty_plot_calls(last)
             if(!length(ne2)){
-                log_out("Last plot is empty")
+                # log_out("Last plot is empty")
                 return(TRUE)
             }
             if(!identical(ne1,ne2)) return(TRUE)

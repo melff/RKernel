@@ -61,7 +61,6 @@ Context <- R6Class("Context",
            self$enter()
            # n <- length(expressions)
            # i <- 0
-           sink(private$connection,split=FALSE)
            for(expr in expressions){
                # i <- i + 1
                # log_out(sprintf("exressions[[%d]]",i))
@@ -85,10 +84,10 @@ Context <- R6Class("Context",
                    warning=private$wHandler,
                    message=private$mHandler),silent=TRUE)
            }
-           sink()
-          self$exit()
+           self$exit()
        },
        last.value = NULL,
+       current_plot = NULL,
        #' @description A function that is called before a set of expressions
        #'     is evaluated (e.g. in a notebook cell).
        #' @param enclos An enclosing environment.
@@ -96,7 +95,6 @@ Context <- R6Class("Context",
 
            # log_out("context$enter")
            # log_out(sprintf("Open syncs: %d",sink.number()))
-
            #sink(private$connection,split=FALSE)
            # sink("RKernel.out",split=FALSE)
 
@@ -106,6 +104,7 @@ Context <- R6Class("Context",
            
 
            private$handle_event("enter")
+           sink(private$connection,split=FALSE)
 
        },
 
@@ -113,7 +112,7 @@ Context <- R6Class("Context",
        #'     is evaluated (e.g. in a notebook cell).
        exit = function(){
            
-           log_out("context$exit")
+           # log_out("context$exit")
            private$handle_event("exit")
            # log_out(search(),use.print=TRUE)
            if(private$name %in% search()){
@@ -122,8 +121,7 @@ Context <- R6Class("Context",
                detach(pos=context_pos)
            }
 
-
-           # sink()
+           sink()
 
        },
 
@@ -203,8 +201,10 @@ Context <- R6Class("Context",
        },
        
        get_text = function(){
+           # log_out("get_text")
            private$prev_text_output <- private$text_output
            private$text_output <- textConnectionValue(private$connection)
+           # log_out(sprintf("text_output = %s\n",paste(private$text_output,collapse="\n")))
            nlines <- length(private$prev_text_output)
            if(nlines > 0)
                current_text_output <- tail(private$text_output,-nlines)
@@ -220,8 +220,8 @@ Context <- R6Class("Context",
        },
 
        get_graphics = function(always = FALSE){
-           log_out("get_graphics")
-           log_out("dev.cur()==",dev.cur())
+           # log_out("get_graphics")
+           # log_out("dev.cur()==",dev.cur())
            # dev.control(displaylist ="enable")
            if(!graphics$current$is_active()) {
                return(NULL)
@@ -229,15 +229,14 @@ Context <- R6Class("Context",
            else if(par("page")) {
                plt <- recordPlot()
                new_page <- graphics$current$new_page(reset=TRUE)
-               private$last_plot <- private$current_plot
+               private$last_plot <- self$current_plot
                if(always || plot_has_changed(current=plt,last=private$last_plot)) {
                # if(!plot_is_empty(plt)){
-                   private$current_plot <- plt
+                   self$current_plot <- plt
                    return(structure(plt,new_page=new_page))
                } else return(NULL)
            } else return(NULL)
        }
-
 
    ),
    private = list(
@@ -288,7 +287,6 @@ Context <- R6Class("Context",
        name = character(0),
 
        last_plot = NULL,
-       current_plot = NULL,
 
        enter_hooks = list(),
        run_enter_hooks = function(){
@@ -315,7 +313,7 @@ Context <- R6Class("Context",
        },
 
        handle_event = function(type,...){
-           log_out(sprintf("Context: Handling event type \"%s\"",type))
+           # log_out(sprintf("Context: Handling event type \"%s\"",type))
            if(length(private$handlers[[type]])){
                prh <- private$handlers[[type]]
                prh$run(...)
@@ -340,6 +338,9 @@ Context <- R6Class("Context",
        },
        eHandler = function(e) {
            # textio_hooks$error$run()
+           # error_text <- conditionMessage(e)
+           # error_text <- paste(c("ERROR",error_text),collapse="\n")
+           # log_out(error_text)
            private$handle_event("error",e)
        }
    )

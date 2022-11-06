@@ -68,6 +68,7 @@ GraphicsDevice <- R6Class("GraphicsDevice",
             setHook('before.grid.newpage',private$before_plot_new_hook)
             graphics$current <- self
             private$device()
+            private$empty_plot <- recordPlot()
         },
         is_active = function(){
             private$dev_num == dev.cur()
@@ -80,6 +81,24 @@ GraphicsDevice <- R6Class("GraphicsDevice",
             if(reset)
                 private$plot_new_called <- FALSE
             return(result)
+        },
+        clear = function(){
+            replayPlot(private$empty_plot)
+        },
+        push = function(plt){
+            n <- length(private$plot_stack)
+            private$plot_stack[[n+1]] <- recordPlot()
+            if(inherits(plt,"recordedplot"))
+                replayPlot(plt)
+            else
+                replayPlot(private$empty_plot)
+        },
+        pop = function(){
+            n <- length(private$plot_stack)
+            retval <- recordPlot()
+            plt <- private$plot_stack[[n]]
+            replayPlot(plt)
+            private$plot_stack[[n]] <- NULL
         }
     ),
     private = list(
@@ -96,9 +115,9 @@ GraphicsDevice <- R6Class("GraphicsDevice",
         },
 
         plot_new_hook = function(...){
-            log_out("plot_new_hook")
-            log_out("private$dev_num==",private$dev_num)
-            log_out("dev.cur()==",dev.cur())
+            # log_out("plot_new_hook")
+            # log_out("private$dev_num==",private$dev_num)
+            # log_out("dev.cur()==",dev.cur())
             if(self$is_active()){
                 graphics_hooks$plot_new$run()
                 private$plot_new_called <- TRUE
@@ -130,7 +149,9 @@ GraphicsDevice <- R6Class("GraphicsDevice",
             # log_out('private$device')
             # log_out("private$dev_num==",private$dev_num)
 
-        }
+        },
+        empty_plot = NULL,
+        plot_stack = NULL
     )
 )
 

@@ -45,8 +45,8 @@ CallbackDispatcherClass <- R6Class("CallbackDispatcher",
       run = function(...){
         # log_out(private$callbacks,use.print=TRUE)
           if(!private$suspended){
-              for(cb in private$callbacks){
-                  if(is.function(cb))cb(...)
+              for(cbkfun in private$callbacks){
+                  if(is.function(cbkfun))cbkfun(...)
               }
           }
       }

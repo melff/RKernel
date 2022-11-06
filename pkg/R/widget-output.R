@@ -30,37 +30,37 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             super$initialize(...)
             if(inherits(graphics_widget,"ImageWidget")){
                 self$graphics_widget <- graphics_widget
-                handle_graphics <- self$handle_graphics_image
             }
-            else
-                handle_graphics <- self$handle_graphics_display
-            context <- Context$new(text_callback=self$handle_text,
-                                        message_callback=self$handle_message,
-                                        warning_callback=self$handle_warning,
-                                        error_callback=self$handle_error,
-                                        value_callback=self$handle_value,
-                                        graphics_callback=handle_graphics,
-                                        envir=new.env(),
-                                        attachment=list(
-                                            display=self$display
-                                        ))
+            context <- Context$new(envir=new.env(),
+                                   attachment=list(
+                                       display=self$display
+                                   ))
             context$on_enter(self$enter)
             context$on_exit(self$exit)
+
+            context$on_eval(self$handle_eval)
+            context$on_result(self$handle_result)
+            context$on_message(self$handle_message)
+            context$on_warning(self$handle_warning)
+            context$on_error(self$handle_error)
+
             #self$on_displayed(self$set_display_msg_id)
             self$context <- context
             self$envir <- context$envir
             self$append_output <- append_output
+            private$kernel <- get_current_kernel()
         },
 
         enter = function(){
-            kernel <- get_current_kernel()
-            parent <- kernel$get_parent("shell")
+            parent <- private$kernel$get_parent("shell")
             self$msg_id <- parent$header$msg_id
+            graphics$current$push(self$context$current_plot )
             # log_out(sprintf("msg_id set to '%s'",self$msg_id))
         },
         exit = function(){
             self$msg_id <- ""
             # log_out(sprintf("msg_id set to '%s'",self$msg_id))
+            self$context$current_plot <- graphics$current$pop()
         },
         
         #' @description 
@@ -77,21 +77,39 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         #' @param expressions A list of expressions.
         evaluate = function(expressions) self$context$evaluate(expressions),
 
-        handle_text = function(text) {
+        handle_eval = function() {
+            # log_out("Widget-context: handle_eval")
+            self$handle_text()
+            self$handle_graphics()
+        },
+        
+        handle_text = function() {
+            text <- self$context$get_text()
             text <- paste(text,collapse="\n")
             self$stream(text = text,
                         stream = "stdout")
         },
+        handle_graphics = function(){
+            if(inherits(self$graphics_widget,"ImageWidget")){
+                self$handle_graphics_widget()
+            } else self$handle_graphics_display()
+        },
 
-        handle_graphics_image = function(plt,update=FALSE){
+        handle_graphics_widget = function(){
+            # log_out("Widget-context: handle_graphics_widget")
             graphics_widget <- self$graphics_widget
-            if(!inherits(graphics_widget,"ImageWidget")) return()
+            if(!inherits(graphics_widget,"ImageWidget")) return(NULL)
+
+            plt <- self$context$get_graphics()
+            if(!length(plt)) return(NULL)
+            
             width      <- getOption("jupyter.plot.width",6)
             height     <- getOption("jupyter.plot.height",6)
             pointsize  <- getOption("jupyter.plot.pointsize",12)
             res        <- getOption("jupyter.plot.res",150)
             scale      <- getOption("jupyter.plot.scale",0.5)
             units      <- getOption("jupyter.plot.units","units")
+            
             # Cairo(type="raster",
             #       width=width,
             #       height=height,
@@ -112,9 +130,20 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         },
         
         last_plot_id = character(0),
-        handle_graphics_display = function(plt,update=FALSE) {
+        handle_graphics_display = function() {
+            # log_out("Widget-context: handle_graphics_display")
 
-            update <- update && getOption("jupyter.update.graphics",TRUE)
+            plt <- self$context$get_graphics()
+            if(!length(plt)) return(NULL)
+
+            update <-  (length(self$last_plot_id)>0)
+            if(update){
+                id <- self$last_plot_id
+            } 
+            else {
+                id <- UUIDgenerate()
+                self$last_plot_id <- id
+            } 
             # log_out(sprintf("OutputWidget$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
 
             width      <- getOption("jupyter.plot.width",6)
@@ -124,20 +153,10 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             scale      <- getOption("jupyter.plot.scale",0.5)
             units      <- getOption("jupyter.plot.units","units")
 
-            rkernel_graphics_types <- getOption("jupyter.graphics.types")
-
             # log_out("OutputWidget$graphics_send")
             # log_out("  -- update = ",if(update)"TRUE"else"FALSE")
             # log_out("  -- id = ",self$last_plot_id)
 
-            update <- update && (length(self$last_plot_id)>0)
-            if(update){
-                id <- self$last_plot_id
-            } 
-            else {
-                id <- UUIDgenerate()
-                self$last_plot_id <- id
-            } 
             # log_out("  -- update = ",if(update)"TRUE"else"FALSE")
             # log_out("  -- id = ",id)
 
@@ -184,11 +203,14 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                 call <- deparse(call)[[1]]
                 text <- paste0("Error in ",call,":\n",text,"\n")
             }
+            # log_out(text)
             self$stream(text = text,
                         stream = "stderr")
         },
 
-        handle_value = function(x,visible) {
+        handle_result = function(x,visible) {
+            # log_out("handle_result")
+            # log_out(visible,use.print=TRUE)
             if(visible){
                 if(any(class(x) %in% getOption("rkernel_displayed_classes"))){
                     d <- display_data(x)
@@ -330,6 +352,9 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             self$display_index <- integer(0)
             self$outputs <- list()
         }
+    ),
+    private = list(
+        kernel=list()
     )
 )
 

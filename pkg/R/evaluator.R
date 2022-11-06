@@ -129,7 +129,7 @@ Evaluator <- R6Class("Evaluator",
         #' @param ... Other arguments, currently ignored
         eval_cell = function(code,...){
             
-            log_out("eval_cell")
+            # log_out("eval_cell")
             perc_match <- getMatch(code,regexec("^%%([a-zA-Z0-9]+)\n",code))
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
@@ -164,7 +164,7 @@ Evaluator <- R6Class("Evaluator",
 
                 private$new_cell <- TRUE
                 self$cell_no <- self$cell_no + 1
-                log_out(sprintf("== BEGIN CELL [%d] ==",self$cell_no))
+                # log_out(sprintf("== BEGIN CELL [%d] ==",self$cell_no))
                 private$context$evaluate(expressions,envir=.GlobalEnv)
                 current_value <- private$context$last.value
                 self$cells[[self$cell_no]] <- code
@@ -183,7 +183,7 @@ Evaluator <- R6Class("Evaluator",
                     private$saved.parms <- list()
                     do.call("par",op)
                 }
-                log_out(sprintf("== END CELL [%d] ==",self$cell_no))
+                # log_out(sprintf("== END CELL [%d] ==",self$cell_no))
             }
         },
         cell_no = 0,
@@ -464,13 +464,12 @@ Evaluator <- R6Class("Evaluator",
             units      <- getOption("jupyter.plot.units","units")
 
 
-            rkernel_graphics_types <- getOption("jupyter.graphics.types")
+            rkernel_graphics_types <- getOption("jupyter.graphics.types","image/png")
 
             mime_data <- list()
             mime_metadata <- list()
 
             for(mime in rkernel_graphics_types){
-                # repr_func <- mime2repr[[mime]]
                 mime_data[[mime]] <- mime_graphics(plt,
                                                    mime=mime,
                                                    width=width,
@@ -516,7 +515,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_warning = function(w) {
-            log_out("Evaluator: handle_warning")
+            # log_out("Evaluator: handle_warning")
             text <- conditionMessage(w)
             text <- paste(text,collapse="\n")
             call <- conditionCall(w)
