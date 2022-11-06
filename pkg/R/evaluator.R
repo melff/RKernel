@@ -451,7 +451,7 @@ Evaluator <- R6Class("Evaluator",
             plt <- private$context$get_graphics()
             if(!length(plt)) return(NULL)
 
-            update <- FALSE
+            update <- !isTRUE(attr(plt,"new_page"))
             
             # log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
             new_display <- !update || private$new_cell && !getOption("jupyter.update.graphics",TRUE)

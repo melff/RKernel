@@ -3,7 +3,7 @@ mime_graphics <- function(plt,mime,width,height,pointsize,scale,res,units="in"){
     grapics_data <- NULL
     if(mime=="image/png"){
         tf <- tempfile(fileext=".png")
-        png(file=tf,
+        png(filename=tf,
             width=width,
             height=height,
             units=units,
@@ -14,7 +14,7 @@ mime_graphics <- function(plt,mime,width,height,pointsize,scale,res,units="in"){
     }
     else if(mime=="image/jpeg"){
         tf <- tempfile(fileext=".jpeg")
-        jpeg(file=tf,
+        jpeg(filename=tf,
             width=width,
             height=height,
             units=units,
@@ -25,7 +25,7 @@ mime_graphics <- function(plt,mime,width,height,pointsize,scale,res,units="in"){
     }
     else if(mime=="image/svg+xml"){
         tf <- tempfile(fileext=".svg")
-        svg(file=tf,
+        svg(filename=tf,
             width=width,
             height=height)
         replayPlot(plt)
@@ -75,8 +75,11 @@ GraphicsDevice <- R6Class("GraphicsDevice",
         activate = function(){
             private$device()
         },
-        new_page = function(){
-            isTRUE(private$plot_new_called)
+        new_page = function(reset=FALSE){
+            result <- isTRUE(private$plot_new_called)
+            if(reset)
+                private$plot_new_called <- FALSE
+            return(result)
         }
     ),
     private = list(
@@ -88,7 +91,7 @@ GraphicsDevice <- R6Class("GraphicsDevice",
         before_plot_new_hook = function(...){
             if(self$is_active()){
                 graphics_hooks$before_plot_new$run()
-                dev.control(displaylist="enable")
+                # dev.control(displaylist="enable")
             }
         },
 
@@ -124,8 +127,8 @@ GraphicsDevice <- R6Class("GraphicsDevice",
             private$dev_num <- dev.cur()
             dev.control(displaylist="enable")
             
-            log_out('private$device')
-            log_out("private$dev_num==",private$dev_num)
+            # log_out('private$device')
+            # log_out("private$dev_num==",private$dev_num)
 
         }
     )

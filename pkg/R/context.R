@@ -68,6 +68,7 @@ Context <- R6Class("Context",
                # expr <- expressions[[i]]
                # ev <- list(value = NULL, visible = FALSE)
                ### See 'evaluate_call' in package "evaluate" (Yihui Xie et al.)
+               # dev.control(displaylist ="enable")
                ev <- withVisible(try(withCallingHandlers(
                                eval(expr,
                                     envir=envir,
@@ -219,19 +220,22 @@ Context <- R6Class("Context",
        },
 
        get_graphics = function(always = FALSE){
+           log_out("get_graphics")
+           log_out("dev.cur()==",dev.cur())
+           # dev.control(displaylist ="enable")
            if(!graphics$current$is_active()) {
-               log_out("graphics not active")
                return(NULL)
            }
-           else {
+           else if(par("page")) {
                plt <- recordPlot()
+               new_page <- graphics$current$new_page(reset=TRUE)
                private$last_plot <- private$current_plot
                if(always || plot_has_changed(current=plt,last=private$last_plot)) {
                # if(!plot_is_empty(plt)){
                    private$current_plot <- plt
-                   return(plt)
+                   return(structure(plt,new_page=new_page))
                } else return(NULL)
-           }
+           } else return(NULL)
        }
 
 
