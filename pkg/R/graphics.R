@@ -50,6 +50,8 @@ GraphicsDevice <- R6Class("GraphicsDevice",
     public = list(
         initialize = function(evaluator){
             private$evaluator <- evaluator
+            em <- get_current_event_manager()
+            private$event_manager <- em
             os <- .Platform$OS.type
             sysname <- Sys.info()[["sysname"]]
             if(os == "unix" && sysname=="Darwin")
@@ -66,6 +68,8 @@ GraphicsDevice <- R6Class("GraphicsDevice",
             setHook('grid.newpage',private$plot_new_hook)
             setHook('before.plot.new',private$before_plot_new_hook)
             setHook('before.grid.newpage',private$before_plot_new_hook)
+            em$init_handlers("plot_new")
+            em$init_handlers("before_plot_new")
             graphics$current <- self
             private$device()
             private$empty_plot <- recordPlot()
@@ -104,12 +108,13 @@ GraphicsDevice <- R6Class("GraphicsDevice",
     private = list(
 
         evaluator = NULL,
+        event_manager = NULL,
         plot_new_called = FALSE,
         graphics_par_usr = numeric(0),
 
         before_plot_new_hook = function(...){
             if(self$is_active()){
-                graphics_hooks$before_plot_new$run()
+                private$event_manager$send("before_plot_new",...)
                 # dev.control(displaylist="enable")
             }
         },
@@ -119,9 +124,9 @@ GraphicsDevice <- R6Class("GraphicsDevice",
             # log_out("private$dev_num==",private$dev_num)
             # log_out("dev.cur()==",dev.cur())
             if(self$is_active()){
-                graphics_hooks$plot_new$run()
                 private$plot_new_called <- TRUE
                 private$graphics_par_usr <- par("usr")
+                private$event_manager$send("plot_new",...)
             } #else log_out("graphics not active ...")
         },
 

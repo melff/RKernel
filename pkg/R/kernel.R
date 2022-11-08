@@ -49,7 +49,7 @@ Kernel <- R6Class("Kernel",
       self$comm_manager <- comm_manager
       self$evaluator <- evaluator
       kernel$current <- self
-      init_hooks()
+      private$save_textout()
     },
 
     #' @field evaluator See \code{\link{Evaluator}}.
@@ -256,11 +256,11 @@ Kernel <- R6Class("Kernel",
     log_out = function(message,...,use.print=FALSE,use.str=FALSE){
       #tstate <- tracingState(on=FALSE)
       if(use.print)
-        message <- paste(capture.output(orig_funs$print(message)),collapse="\n")
+        message <- paste(capture.output(private$orig_print(message)),collapse="\n")
       else if(use.str)
-        message <- paste(capture.output(orig_funs$str(message)),collapse="\n")
+        message <- paste(capture.output(private$orig_str(message)),collapse="\n")
       else message <- paste(message,...,collapse="")
-      orig_funs$cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),file=stderr())
+      private$orig_cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),file=stderr())
       #tracingState(on=tstate)
     },
     #' @description
@@ -663,6 +663,16 @@ Kernel <- R6Class("Kernel",
         }
         else break
       }
+    },
+
+    orig_print = NULL,
+    orig_cat = NULL,
+    orig_str = NULL,
+
+    save_textout = function(){
+      private$orig_print <- print
+      private$orig_cat <- cat
+      private$orig_str <- str
     }
 
   )

@@ -202,6 +202,7 @@ Context <- R6Class("Context",
        
        get_text = function(){
            # log_out("get_text")
+           cat("\n",file=private$connection)
            private$prev_text_output <- private$text_output
            private$text_output <- textConnectionValue(private$connection)
            # log_out(sprintf("text_output = %s\n",paste(private$text_output,collapse="\n")))
@@ -363,31 +364,3 @@ with.Context <- function(data,expr,enclos=parent.frame(),...){
 }
 
 
-textio_hooks <- new.env()
-graphics_hooks <- new.env()
-orig_funs <- new.env()
-init_hooks <- function(){
-    textio_hooks$print <- CallbackDispatcher()
-    textio_hooks$print_exit <- CallbackDispatcher()
-    textio_hooks$cat <- CallbackDispatcher()
-    textio_hooks$cat_exit <- CallbackDispatcher()
-    textio_hooks$str <- CallbackDispatcher()
-    textio_hooks$str_exit <- CallbackDispatcher()
-    graphics_hooks$before_plot_new <- CallbackDispatcher()
-    graphics_hooks$plot_new <- CallbackDispatcher()
-    orig_funs$print <- print
-    orig_funs$cat <- cat
-    orig_funs$str <- str
-    # suppressMessages(trace(print,
-    #                        textio_hooks$print$run,
-    #                        exit=textio_hooks$print_exit$run,
-    #                        print=FALSE))
-    # suppressMessages(trace(cat,
-    #                        textio_hooks$cat$run,
-    #                        exit=textio_hooks$cat_exit$run,
-    #                        print=FALSE))
-    # suppressMessages(trace(str,
-    #                        textio_hooks$str$run,
-    #                        exit=textio_hooks$str_exit$run,
-                           # print=FALSE))
-}

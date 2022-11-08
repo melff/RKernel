@@ -117,6 +117,8 @@ Evaluator <- R6Class("Evaluator",
             private$start_help_system()
             assign("help.start",help.start,envir=private$env)
 
+            private$init_hooks()
+
         },
         #' @description
         #' Shut the session down
@@ -342,7 +344,6 @@ Evaluator <- R6Class("Evaluator",
 
         context = list(),
 
-
         help_port = integer(),
         help_proc = integer(),
         help_url = character(),
@@ -432,8 +433,8 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_text = function() {
-            # log_out(sprintf("handle_text(%s)",text))
             text <- private$context$get_text()
+            # log_out(sprintf("handle_text(%s)",text))
             # log_out("handle_text")
             # log_out(text,use.print=TRUE)
             if(nzchar(text)){
@@ -685,7 +686,74 @@ Evaluator <- R6Class("Evaluator",
         },
 
         saved.options = list(),
-        saved.parms = list()
+        saved.parms = list(),
+
+        event_manager = NULL,
+        
+        before_print_hook = function(){
+            private$event_manager$send("before_print")
+        },
+        print_hook = function(){
+            # log_out("evaluator$print_hook")
+            private$event_manager$send("print")
+        },
+        before_cat_hook = function(){
+            private$event_manager$send("before_cat")
+        },
+        cat_hook = function(){
+            # log_out("evaluator$cat_hook")
+            private$event_manager$send("cat")
+        },
+        before_str_hook = function(){
+            private$str_depth <- private$str_depth + 1
+            if(private$str_depth == 1){
+                em <- private$event_manager
+                em$suspend("before_print")
+                em$suspend("print")
+                em$suspend("before_cat")
+                em$suspend("cat")
+            }
+        },
+        str_hook = function(){
+            if(private$str_depth == 1){
+                private$handle_text()
+                em <- private$event_manager
+                em$activate("before_print")
+                em$activate("print")
+                em$activate("before_cat")
+                em$activate("cat")
+            }
+            private$str_depth <- private$str_depth - 1
+        },
+        str_depth = 0,
+        
+        init_hooks = function(){
+            em <- get_current_event_manager()
+            private$event_manager <- em
+
+            em$assure_handlers("before_print")
+            em$assure_handlers("print")
+            em$assure_handlers("before_cat")
+            em$assure_handlers("cat")
+
+            suppressMessages(trace(print,
+                                   private$before_print_hook,
+                                   exit=private$print_hook,
+                                   print=FALSE))
+            suppressMessages(trace(cat,
+                                   private$before_cat_hook,
+                                   exit=private$cat_hook,
+                                   print=FALSE))
+            suppressMessages(trace(str,
+                                   private$before_str_hook,
+                                   exit=private$str_hook,
+                                   print=FALSE))
+            em$on("print",private$handle_text)
+            em$on("cat",private$handle_text)
+            em$on("before_print",private$handle_graphics)
+            em$on("before_cat",private$handle_graphics)
+        }
+
     )
 
 )
