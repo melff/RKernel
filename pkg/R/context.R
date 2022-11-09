@@ -317,7 +317,8 @@ Context <- R6Class("Context",
            # log_out(sprintf("Context: Handling event type \"%s\"",type))
            if(length(private$handlers[[type]])){
                prh <- private$handlers[[type]]
-               prh$run(...)
+               if(inherits(prh,"CallbackDispatcher"))
+                   prh$run(...)
            }
        },
        

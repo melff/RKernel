@@ -26,12 +26,15 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         
         initialize = function(append_output = TRUE,
                               graphics_widget = NULL,
+                              #envir = parent.frame(n=7),
+                              envir = new.env(),
                               ...){
             super$initialize(...)
             if(inherits(graphics_widget,"ImageWidget")){
                 self$graphics_widget <- graphics_widget
             }
-            context <- Context$new(envir=new.env(),
+            self$envir <- envir
+            context <- Context$new(envir=self$envir,
                                    attachment=list(
                                        display=self$display
                                    ))
@@ -46,7 +49,6 @@ OutputWidgetClass <- R6Class_("OutputWidget",
 
             #self$on_displayed(self$set_display_msg_id)
             self$context <- context
-            self$envir <- context$envir
             self$append_output <- append_output
             private$kernel <- get_current_kernel()
         },

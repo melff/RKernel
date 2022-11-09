@@ -73,6 +73,7 @@ Collate:
     'widget-interaction.R'
     'widget-media.R'
     'widget-play.R'
+    'widget-plot.R'
     'widget-progress.R'
     'widget-selection.R'
     'widget-selectioncontainer.R'

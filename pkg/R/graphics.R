@@ -86,8 +86,11 @@ GraphicsDevice <- R6Class("GraphicsDevice",
                 private$plot_new_called <- FALSE
             return(result)
         },
+        empty = function(){
+            self$empty_plot
+        },
         clear = function(){
-            replayPlot(private$empty_plot)
+            replayPlot(self$empty_plot)
         },
         push = function(plt){
             n <- length(private$plot_stack)
@@ -160,3 +163,8 @@ GraphicsDevice <- R6Class("GraphicsDevice",
     )
 )
 
+
+empty20x20 <- local({
+    imf <- system.file("images/empty20x20.png",package="RKernel")
+    readBin(imf, raw(), file.info(imf)$size)
+})
