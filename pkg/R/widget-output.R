@@ -54,13 +54,21 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         enter = function(){
             parent <- private$kernel$get_parent("shell")
             self$msg_id <- parent$header$msg_id
-            graphics$current$push(self$context$current_plot )
+            graphics$current$push(self$context$current_plot)
+            em <- get_current_event_manager()
+            for(event in c("before_print","print","before_cat","cat")){
+                em$push_handlers(event)
+            }
             # log_out(sprintf("msg_id set to '%s'",self$msg_id))
         },
         exit = function(){
             self$msg_id <- ""
             # log_out(sprintf("msg_id set to '%s'",self$msg_id))
             self$context$current_plot <- graphics$current$pop()
+            em <- get_current_event_manager()
+            for(event in c("before_print","print","before_cat","cat")){
+                em$pop_handlers(event)
+            }
         },
         
         #' @description 
