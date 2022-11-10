@@ -284,7 +284,8 @@ Interactive <- function(FUN,...,continuous_update=TRUE,
                            graphics_widget=gw)
     io <- interactive_output(FUN=FUN,
                        out=output,
-                       controls=controls)
+                       controls=controls,
+                       continuous_update=continuous_update)
     VBox(c(controls,gw,output))
 }
 
