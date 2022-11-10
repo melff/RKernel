@@ -21,14 +21,14 @@ PlotWidgetClass <- R6Class_(
             context$on_exit(self$exit)
 
             context$on_eval(self$handle_graphics)
-            context$on_result(self$handle_graphics)
             self$context <- context
             self$value <- empty20x20
             private$kernel <- get_current_kernel()
         },
         handle_graphics = function(){
 
-            plt <- self$context$get_graphics()
+            # plt <- self$context$get_graphics()
+            plt <- recordPlot()
             if(!length(plt)) return(NULL)
             
             width      <- getOption("jupyter.plot.width",6)
@@ -115,52 +115,45 @@ SVGWidgetClass <- R6Class_(
             context$on_exit(self$exit)
 
             context$on_eval(self$handle_graphics)
-            context$on_result(self$handle_graphics)
             self$context <- context
             private$kernel <- get_current_kernel()
-        },
-        handle_graphics = function(){
-
-            plt <- self$context$get_graphics()
-            if(!length(plt)) return(NULL)
-            
+            private$dev_num_other <- dev.cur()
             width <- getOption("jupyter.plot.width",6)
             height <- getOption("jupyter.plot.height",6)
             pointsize <- getOption("jupyter.plot.pointsize",12)
             scale <- getOption("jupyter.plot.scale",0.5)
-
-            self$value <- private$get_svg(plt,
-                                          width=width,
-                                          height=height,
-                                          pointsize=pointsize)
+            private$svg_string <- svgstring(width=width,height=height,pointsize=pointsize,
+                                            standalone=FALSE)
+            private$dev_num <- dev.cur()
+            dev.set(private$dev_num_other)
+        },
+        handle_graphics = function(){
+            string <- private$svg_string()
+            if(length(string)>1){
+                string <- string[length(string)]
+            }
+            self$value <- string
         },
         enter = function(){
             parent <- private$kernel$get_parent("shell")
             self$msg_id <- parent$header$msg_id
             graphics$current$push(self$context$current_plot)
             em <- get_current_event_manager()
-            for(event in c("before_print","print","before_cat","cat")){
-                em$push_handlers(event)
-            }
+            private$dev_num_other <- dev.cur()
+            dev.set(private$dev_num)
         },
         exit = function(){
             self$msg_id <- ""
             self$context$current_plot <- graphics$current$pop()
             em <- get_current_event_manager()
-            for(event in c("before_print","print","before_cat","cat")){
-                em$pop_handlers(event)
-            }
+            dev.set(private$dev_num_other)
         }
     ),
     private = list(
         kernel = NULL,
-        get_svg = function(plt,width,height,pointsize){
-            svgstr <- svgstring(width=width,height=height,pointsize=pointsize,
-                                standalone=FALSE)
-            replayPlot(plt)
-            dev.off()
-            return(svgstr())
-        }
+        dev_num = 0,
+        dev_num_other = 0,
+        svg_string = NULL
     )
 )
 
