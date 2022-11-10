@@ -25,7 +25,6 @@ Context <- R6Class("Context",
            private$attachment <- attachment
            private$id <- UUIDgenerate()
            private$name <- paste0("RKernel-context:",private$id)
-           private$evaluator <- get_evaluator()
        },
 
        #' @description
@@ -289,30 +288,6 @@ Context <- R6Class("Context",
 
        last_plot = NULL,
 
-       enter_hooks = list(),
-       run_enter_hooks = function(){
-           if(inherits(private$enter_hooks,"CallbackDispatcher"))
-               private$enter_hooks$run()
-       },
-
-       exit_hooks = list(),
-       run_exit_hooks = function(){
-           if(inherits(private$exit_hooks,"CallbackDispatcher"))
-               private$exit_hooks$run()
-       },
-
-       eval_hooks = list(),
-       run_eval_hooks = function(){
-           if(inherits(private$eval_hooks,"CallbackDispatcher"))
-               private$eval_hooks$run()
-       },
-
-       result_hooks = list(),
-       run_result_hooks = function(...){
-           if(inherits(private$result_hooks,"CallbackDispatcher"))
-               private$result_hooks$run(...)
-       },
-
        handle_event = function(type,...){
            # log_out(sprintf("Context: Handling event type \"%s\"",type))
            if(length(private$handlers[[type]])){
@@ -322,8 +297,6 @@ Context <- R6Class("Context",
            }
        },
        
-       evaluator = NULL,
-
       
        mHandler = function(m) {
            # log_out(m,use.print=TRUE)
