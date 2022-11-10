@@ -219,16 +219,18 @@ interactive_output <- function(FUN,
                                mime_type="text/plain"
                               ){
     run <- function(...) {
+        if(clear) out$clear_output()
         with(out,{
-            if(clear) out$clear_output()
             res <- call_with_controls(FUN,controls)
             # For reasons I have not found out,
             # 'print()'ing does not work with 
             # Jupyter notebooks - but with JupyterLab and 
             # Voila it does work.
-            d <- display_data(res)
-            d$data <- d$data[mime_type]
-            d
+            if(length(res)){
+                d <- display_data(res)
+                d$data <- d$data[mime_type]
+                d
+            }
         })
     }
     if(autorun){
@@ -265,7 +267,7 @@ mkWidgets <- function(...){
 #' @param graphics Logical, whether graphics output is expected, in which case
 #'   an "ImageWidget" object is created to receive the graphics output.
 #' @export
-interact <- function(FUN,...,continuous_update=TRUE,
+Interactive <- function(FUN,...,continuous_update=TRUE,
                      graphics=FALSE){
     controls <- mkWidgets(...)
     if(graphics){
@@ -280,8 +282,20 @@ interact <- function(FUN,...,continuous_update=TRUE,
     else gw <- NULL
     output <- OutputWidget(append_output=FALSE,
                            graphics_widget=gw)
-    interactive_output(FUN=FUN,
+    io <- interactive_output(FUN=FUN,
                        out=output,
                        controls=controls)
-    display(VBox(c(controls,gw,output)))
+    VBox(c(controls,gw,output))
+}
+
+#' @rdname interaction
+#' @param graphics Logical, whether graphics output is expected, in which case
+#'   an "ImageWidget" object is created to receive the graphics output.
+#' @export
+interact <- function(FUN,...,continuous_update=TRUE,
+                     graphics=FALSE){
+    widget <- interactive(FUN,...,
+                          continuous_update=continuous_update,
+                          graphics=graphics)
+    display(widget)
 }
