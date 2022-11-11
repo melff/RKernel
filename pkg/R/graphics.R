@@ -102,10 +102,11 @@ GraphicsDevice <- R6Class("GraphicsDevice",
         },
         pop = function(){
             n <- length(private$plot_stack)
-            retval <- recordPlot()
+            current_plot <- recordPlot()
             plt <- private$plot_stack[[n]]
             replayPlot(plt)
             private$plot_stack[[n]] <- NULL
+            return(current_plot)
         }
     ),
     private = list(
