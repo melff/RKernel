@@ -105,6 +105,7 @@ SVGWidgetClass <- R6Class_(
     public = list(
         context = NULL,
         initialize = function(...,
+                              use.recording = FALSE,
                               envir = new.env()){
             super$initialize(...)
             context <- Context$new(envir=self$envir,
@@ -118,16 +119,21 @@ SVGWidgetClass <- R6Class_(
             self$context <- context
             private$kernel <- get_current_kernel()
             private$dev_num_other <- dev.cur()
-            width <- getOption("jupyter.plot.width",6)
-            height <- getOption("jupyter.plot.height",6)
-            pointsize <- getOption("jupyter.plot.pointsize",12)
-            scale <- getOption("jupyter.plot.scale",0.5)
-            private$svg_string <- svgstring(width=width,height=height,pointsize=pointsize,
-                                            standalone=FALSE)
-            private$dev_num <- dev.cur()
-            dev.set(private$dev_num_other)
+            private$use.recording <- use.recording
+            if(!private$use.recording){
+                private$new_device()
+                private$dev_num <- dev.cur()
+                dev.set(private$dev_num_other)
+            }
         },
         handle_graphics = function(){
+            if(private$use.recording){
+                plt <- recordPlot()
+                if(!length(plt)) return(NULL)
+                private$new_device()
+                replayPlot(plt)
+                dev.off()
+            }
             string <- private$svg_string()
             if(length(string)>1){
                 string <- string[length(string)]
@@ -135,25 +141,35 @@ SVGWidgetClass <- R6Class_(
             self$value <- string
         },
         enter = function(){
-            parent <- private$kernel$get_parent("shell")
-            self$msg_id <- parent$header$msg_id
-            graphics$current$push(self$context$current_plot)
-            em <- get_current_event_manager()
-            private$dev_num_other <- dev.cur()
-            dev.set(private$dev_num)
+            if(private$use.recording){
+                graphics$current$push(self$context$current_plot)
+            } else {
+                private$dev_num_other <- dev.cur()
+                dev.set(private$dev_num)
+            }
         },
         exit = function(){
-            self$msg_id <- ""
-            self$context$current_plot <- graphics$current$pop()
-            em <- get_current_event_manager()
-            dev.set(private$dev_num_other)
+            if(private$use.recording){
+                self$context$current_plot <- graphics$current$pop()
+            } else {
+                dev.set(private$dev_num_other)
+            }
         }
     ),
     private = list(
         kernel = NULL,
         dev_num = 0,
         dev_num_other = 0,
-        svg_string = NULL
+        svg_string = NULL,
+        new_device = function(){
+            width <- getOption("jupyter.plot.width",6)
+            height <- getOption("jupyter.plot.height",6)
+            pointsize <- getOption("jupyter.plot.pointsize",12)
+            scale <- getOption("jupyter.plot.scale",0.5)
+            private$svg_string <- svgstring(width=width,height=height,pointsize=pointsize,
+                                            standalone=FALSE)
+        },
+        use.recording = FALSE
     )
 )
 
