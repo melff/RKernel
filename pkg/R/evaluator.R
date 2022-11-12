@@ -543,6 +543,7 @@ Evaluator <- R6Class("Evaluator",
             private$status <- "error"
             private$kernel$stream(text = text,
                                   stream = "stderr")
+            private$kernel$log_error(text)
             stop_on_error <- getOption("rkernel_stop_on_error")
             if(stop_on_error){
                 calls <- sys.calls()

@@ -213,14 +213,12 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                 call <- deparse(call)[[1]]
                 text <- paste0("Error in ",call,":\n",text,"\n")
             }
-            # log_out(text)
+            log_error(text)
             self$stream(text = text,
                         stream = "stderr")
         },
 
         handle_result = function(x,visible) {
-            # log_out("handle_result")
-            # log_out(visible,use.print=TRUE)
             if(visible){
                 if(any(class(x) %in% getOption("rkernel_displayed_classes"))){
                     d <- display_data(x)

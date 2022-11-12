@@ -254,14 +254,18 @@ Kernel <- R6Class("Kernel",
     #' @param use.print Logical, whether the function 'print()' should applied
     #'        to the message.
     log_out = function(message,...,use.print=FALSE,use.str=FALSE){
-      #tstate <- tracingState(on=FALSE)
       if(use.print)
         message <- paste(capture.output(private$orig_print(message)),collapse="\n")
       else if(use.str)
         message <- paste(capture.output(private$orig_str(message)),collapse="\n")
       else message <- paste(message,...,collapse="")
       private$orig_cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),file=stderr())
-      #tracingState(on=tstate)
+    },
+    log_warning = function(message){
+      private$orig_cat(crayon::bgYellow(format(Sys.time()),"\t",message,"\n"),file=stderr())
+    },
+    log_error = function(message){
+      private$orig_cat(crayon::bgRed(format(Sys.time()),"\t",message,"\n"),file=stderr())
     },
     #' @description
     #' Add a service to the kernel, i.e. a function that is called in each
@@ -711,6 +715,8 @@ check_page_payload <- function(payload){
 get_current_kernel <- function() kernel$current
 
 log_out <- function(...) kernel$current$log_out(...)
+log_error <- function(...) kernel$current$log_error(...)
+log_warning <- function(...) kernel$current$log_warning(...)
 
 
 # Local Variables:

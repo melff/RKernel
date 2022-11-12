@@ -305,6 +305,9 @@ Context <- R6Class("Context",
            invokeRestart("muffleMessage")
        },
        wHandler = function(w){
+           warning_text <- conditionMessage(e)
+           warning_text <- paste(warning_text,collapse="\n")
+           log_warning(warning_text)
            # log_out(w,use.print=TRUE)
            # textio_hooks$warning$run()
            private$handle_event("warning",w)
@@ -313,9 +316,9 @@ Context <- R6Class("Context",
        },
        eHandler = function(e) {
            # textio_hooks$error$run()
-           # error_text <- conditionMessage(e)
-           # error_text <- paste(c("ERROR",error_text),collapse="\n")
-           # log_out(error_text)
+           error_text <- conditionMessage(e)
+           error_text <- paste(error_text,collapse="\n")
+           log_error(error_text)
            private$handle_event("error",e)
        }
    )
