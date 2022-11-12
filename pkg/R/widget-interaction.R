@@ -222,10 +222,6 @@ interactive_output <- function(FUN,
         if(clear) out$clear_output()
         with(out,{
             res <- call_with_controls(FUN,controls)
-            # For reasons I have not found out,
-            # 'print()'ing does not work with 
-            # Jupyter notebooks - but with JupyterLab and 
-            # Voila it does work.
             if(length(res)){
                 d <- display_data(res)
                 d$data <- d$data[mime_type]

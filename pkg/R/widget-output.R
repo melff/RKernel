@@ -199,6 +199,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                 call <- deparse(call)[[1]]
                 text <- paste0("Warning in ",call,":\n",text,"\n")
             }
+            log_warning(text)
             self$stream(text = text,
                         stream = "stderr")
         },
@@ -230,12 +231,20 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                 else if(inherits(x,"update_display_data")){
                     self$display_send(x)
                 }
+                # 'print()'ing does not work well with 
+                # classic Jupyter notebooks - but with JupyterLab and 
+                # Voila seems to work well.
                 else {
-                    text <- capture.output(print(x))
-                    text <- paste(c("",text),collapse="\n")
-                    self$stream(text = text,
-                                stream = "stdout")
+                    d <- display_data(x)
+                    d$data <- d$data["text/plain"]
+                    self$display_send(d)
                 }
+                # else {
+                #     text <- capture.output(print(x))
+                #     text <- paste(c("",text),collapse="\n")
+                #     self$stream(text = text,
+                #                 stream = "stdout")
+                # }
             }
         },
         #' @description 
