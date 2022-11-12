@@ -105,6 +105,8 @@ SVGWidgetClass <- R6Class_(
     public = list(
         context = NULL,
         initialize = function(...,
+                              width=NULL,
+                              height=NULL,
                               use.recording = FALSE,
                               envir = new.env()){
             super$initialize(...)
@@ -125,6 +127,17 @@ SVGWidgetClass <- R6Class_(
                 private$dev_num <- dev.cur()
                 dev.set(private$dev_num_other)
             }
+            style <- character(0)
+            if(length(width)){
+                style <- c(style,paste0("width:",width))
+            }
+            if(length(height)){
+                style <- c(style,paste0("height:",height))
+            }
+            if(length(style)){
+                style <- paste0(style,collapse=";")
+                self$style <- style
+            }
         },
         handle_graphics = function(){
             if(private$use.recording){
@@ -138,6 +151,7 @@ SVGWidgetClass <- R6Class_(
             if(length(string)>1){
                 string <- string[length(string)]
             }
+            string <- private$set_dims(string)
             self$value <- string
         },
         enter = function(){
@@ -154,7 +168,8 @@ SVGWidgetClass <- R6Class_(
             } else {
                 dev.set(private$dev_num_other)
             }
-        }
+        },
+        style = NULL
     ),
     private = list(
         kernel = NULL,
@@ -169,7 +184,17 @@ SVGWidgetClass <- R6Class_(
             private$svg_string <- svgstring(width=width,height=height,pointsize=pointsize,
                                             standalone=FALSE)
         },
-        use.recording = FALSE
+        use.recording = FALSE,
+        widht = NULL,
+        height = NULL,
+        set_dims = function(string){
+            if(length(self$style)){
+                pattern <- "(<svg.*?)(>)"
+                replacement <- paste0("\\1 style=",self$style,"\\2")
+                string <- sub(pattern,replacement,string)
+            }
+            return(string)
+        }
     )
 )
 
