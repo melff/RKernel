@@ -34,21 +34,6 @@ is_base_graphics <- function(plt){
     get_name_el(plt1) == "C_plot_new"
 }
 
-compare_plots <- function(plt1,plt2){
-    if((length(plt1) > 0) != (length(plt2) > 0)) return(FALSE)
-    if(is_base_graphics(plt1) != is_base_graphics(plt2)) return(FALSE)
-    if(!is_base_graphics(plt1)) return(identical(plt1[[3]],plt2[[3]]))
-    else {
-        ne1 <- non_empty_plot_calls(plt1)
-        ne2 <- non_empty_plot_calls(plt2)
-        if(!identical(ne1,ne2)) return(FALSE)
-        else {
-            # log_out(ne1)
-            return(identical(plt1[[2]],plt2[[2]]))
-        }
-    }
-}
-
 plot_is_empty <- function(plt){
     if(!length(plt) || !length(plt)[[1]]) {
         return(TRUE)
