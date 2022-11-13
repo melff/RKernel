@@ -83,17 +83,20 @@ plot_has_changed <- function(current,last){
             else {
                 # log_out(digest::sha1(last[[2]]))
                 # log_out(digest::sha1(current[[2]]))
-                return(!identical(current[[2]],last[[2]]))
-                # return(!identical(current[1:2],last[1:2]))
-                # return(!identical(current[2],last[2]))
-                # return(!identical(current,last))
+                unchanged <- identical(current[[2]],last[[2]])
+                # if(unchanged)
+                #     log_out("Plot has not changed")
+                return(!unchanged)
             }
         }
     }
     else {
         if(is_base_graphics(last)) return(TRUE)
         else if(!length(last)) return(TRUE)
-        else return(identical(current[[3]],last[[3]])) 
+        else {
+            unchanged <- identical(current[[3]],last[[3]])
+            return(!unchanged)
+        }
     }
 }
 
