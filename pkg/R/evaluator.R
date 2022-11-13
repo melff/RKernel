@@ -608,11 +608,14 @@ Evaluator <- R6Class("Evaluator",
                 else {
                     text <- capture.output(print(x))
                     text <- paste(text,collapse="\n")
-                    #private$kernel$stream(text = text,
-                    #               stream = "stdout")
-                    data <- list("text/plain"=text)
-                    private$kernel$execute_result(data=data)
+                    if(nzchar(text)){
+                        #private$kernel$stream(text = text,
+                        #               stream = "stdout")
+                        data <- list("text/plain"=text)
+                        private$kernel$execute_result(data=data)
+                    }
                 }
+                private$handle_graphics()
             }
         },
 
