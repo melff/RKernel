@@ -305,7 +305,7 @@ Context <- R6Class("Context",
            invokeRestart("muffleMessage")
        },
        wHandler = function(w){
-           warning_text <- conditionMessage(e)
+           warning_text <- conditionMessage(w)
            warning_text <- paste(warning_text,collapse="\n")
            log_warning(warning_text)
            # log_out(w,use.print=TRUE)
