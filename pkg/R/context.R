@@ -230,7 +230,7 @@ Context <- R6Class("Context",
                plt <- recordPlot()
                new_page <- graphics$current$new_page(reset=TRUE)
                private$last_plot <- self$current_plot
-               if(always || plot_has_changed(current=plt,last=private$last_plot)) {
+               if(always || new_page || plot_has_changed(current=plt,last=private$last_plot)) {
                # if(!plot_is_empty(plt)){
                    self$current_plot <- plt
                    return(structure(plt,new_page=new_page))
