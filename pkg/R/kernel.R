@@ -259,13 +259,16 @@ Kernel <- R6Class("Kernel",
       else if(use.str)
         message <- paste(capture.output(private$orig_str(message)),collapse="\n")
       else message <- paste(message,...,collapse="")
-      private$orig_cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),file=stderr())
+      private$orig_cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
+                       file=stderr())
     },
     log_warning = function(message){
-      private$orig_cat(crayon::bgYellow(format(Sys.time()),"\t",message,"\n"),file=stderr())
+      private$orig_cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
+                       file=stderr())
     },
     log_error = function(message){
-      private$orig_cat(crayon::bgRed(format(Sys.time()),"\t",message,"\n"),file=stderr())
+      private$orig_cat(crayon::bgRed(format(Sys.time()),"\t",message,"\n"),
+                       file=stderr())
     },
     #' @description
     #' Add a service to the kernel, i.e. a function that is called in each
