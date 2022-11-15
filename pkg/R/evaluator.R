@@ -550,8 +550,8 @@ Evaluator <- R6Class("Evaluator",
                 private$aborted <- TRUE
                 #drop_prev <- private$nframes - 2
                 #calls <- tail(calls,-drop_prev)
-                calls <- tail(calls,-15-7)
-                calls <- head(calls,-3)
+                calls <- head(calls,-6)
+                calls <- tail(calls,-22)
                 calls <- limitedLabels(calls)
                 if(length(calls))
                     calls <- paste0(format(seq_along(calls),justify="right"),
