@@ -25,6 +25,12 @@ Context <- R6Class("Context",
            private$attachment <- attachment
            private$id <- UUIDgenerate()
            private$name <- paste0("RKernel-context:",private$id)
+           em <- EventManager(type="conditions")
+           private$condition_manager <- em
+           em$activate()
+           em <- EventManager(type="output")
+           private$output_manager <- em
+           em$activate()
        },
 
        #' @description
@@ -86,7 +92,6 @@ Context <- R6Class("Context",
            self$exit()
        },
        last.value = NULL,
-       current_plot = NULL,
        #' @description A function that is called before a set of expressions
        #'     is evaluated (e.g. in a notebook cell).
        #' @param enclos An enclosing environment.
@@ -101,7 +106,12 @@ Context <- R6Class("Context",
                   warn.conflicts=FALSE)
            # log_out(sprintf("Attached %s",private$name))
            
-
+           if(private$output_manager$has(c("print","cat"))){
+               private$output_manager$activate()
+           }
+           if(private$condition_manager$has("error")){
+               private$condition_manager$activate()
+           }
            private$handle_event("enter")
            sink(private$connection,split=FALSE)
 
@@ -111,6 +121,12 @@ Context <- R6Class("Context",
        #'     is evaluated (e.g. in a notebook cell).
        exit = function(){
            
+           if(private$output_manager$has(c("print","cat"))){
+               private$output_manager$suspend()
+           }
+           if(private$condition_manager$has("error")){
+               private$condition_manager$suspend()
+           }
            # log_out("context$exit")
            private$handle_event("exit")
            # log_out(search(),use.print=TRUE)
@@ -160,51 +176,52 @@ Context <- R6Class("Context",
            }
        },
 
+       on_error = function(handler=NULL,remove=FALSE){
+           private$condition_manager$on("error",handler=handler,remove=remove)
+       },
+
+       on_warning = function(handler=NULL,remove=FALSE){
+           private$condition_manager$on("warning",handler=handler,remove=remove)
+       },
+
+       on_message = function(handler=NULL,remove=FALSE){
+           private$condition_manager$on("message",handler=handler,remove=remove)
+       },
+
        on_print = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
-               private$on_event("print",handler=handler,remove=remove)
+               private$output_manager$on("before_print",handler=handler,remove=remove)
            }
            if(is.function(exit)){
-               private$on_event("print_exit",handler=exit,remove=remove)
+               private$output_manager$on("print",handler=exit,remove=remove)
            }
        },
 
        on_cat = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
-               private$on_event("cat",handler=handler,remove=remove)
+               private$output_manager$on("before_cat",handler=handler,remove=remove)
            }
            if(is.function(exit)){
-               private$on_event("cat_exit",handler=exit,remove=remove)
+               private$output_manager$on("cat",handler=exit,remove=remove)
            }
        },
 
        on_str = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
-               private$on_event("str",handler=handler,remove=remove)
+               private$output_manager$on("before_str",handler=handler,remove=remove)
            }
            if(is.function(exit)){
-               private$on_event("str_exit",handler=exit,remove=remove)
+               private$output_manager$on("str",handler=exit,remove=remove)
            }
-       },
-
-       on_error = function(handler=NULL,remove=FALSE){
-           private$on_event("error",handler=handler,remove=remove)
-       },
-
-       on_warning = function(handler=NULL,remove=FALSE){
-           private$on_event("warning",handler=handler,remove=remove)
-       },
-
-       on_message = function(handler=NULL,remove=FALSE){
-           private$on_event("message",handler=handler,remove=remove)
        },
        
        get_text = function(){
            # log_out("get_text")
            cat("\n",file=private$connection)
            private$prev_text_output <- private$text_output
+           # log_out(sprintf("prev_text_output = %s\n",paste(sQuote(private$prev_text_output),collapse=",")))
            private$text_output <- textConnectionValue(private$connection)
-           # log_out(sprintf("text_output = %s\n",paste(private$text_output,collapse="\n")))
+           # log_out(sprintf("text_output = %s\n",paste(sQuote(private$text_output),collapse=",")))
            nlines <- length(private$prev_text_output)
            if(nlines > 0)
                current_text_output <- tail(private$text_output,-nlines)
@@ -212,59 +229,20 @@ Context <- R6Class("Context",
                current_text_output <- private$text_output
            if(length(current_text_output)){
                current_text_output <- paste(current_text_output,collapse="\n")
-              # KLUDGE Ignore empty lines of output
+              # Ignore empty lines of output
                if(!identical(current_text_output,"\n"))
                    return(current_text_output)
                else return("")
            } else return("")
-       },
-
-       get_graphics = function(always = FALSE){
-           # log_out("get_graphics")
-           # log_out("dev.cur()==",dev.cur())
-           # dev.control(displaylist ="enable")
-           if(!graphics$current$is_active()) {
-               return(NULL)
-           }
-           else if(par("page")) {
-               plt <- recordPlot()
-               new_page <- graphics$current$new_page(reset=TRUE)
-               private$last_plot <- self$current_plot
-               if(always || new_page || plot_has_changed(current=plt,last=private$last_plot)) {
-               # if(!plot_is_empty(plt)){
-                   self$current_plot <- plt
-                   return(structure(plt,new_page=new_page))
-               } else return(NULL)
-           } else return(NULL)
        }
-
    ),
    private = list(
 
+       condition_manager = NULL,
+       output_manager = NULL,
+       
        handlers = list(),
        saved_handlers = list(),
-
-       init_hooks = function(){
-           nms <- ls(envir=textio_hooks)
-           for(nm in nms)
-               private$handlers[[nm]] <- CallbackDispatcher()
-       },
-       
-       install_hooks = function(){
-           nms <- ls(envir=textio_hooks)
-           for(nm in nms){
-               handlers <- private$handlers[[nm]]$copy_handlers()
-               private$saved_handlers[[nm]] <- textio_hooks[[nm]]$shift_handlers(handlers)
-           }
-       },
-
-       restore_hooks = function(){
-           nms <- ls(envir=textio_hooks)
-           for(nm in nms){
-               handlers <- private$saved_handlers[[nm]]
-               textio_hooks[[nm]]$shift_handlers(handlers)
-           }
-       },
 
        on_event = function(type,handler=NULL,remove=FALSE){
            if(is.function(handler)){
@@ -286,8 +264,6 @@ Context <- R6Class("Context",
        id = character(0),
        name = character(0),
 
-       last_plot = NULL,
-
        handle_event = function(type,...){
            # log_out(sprintf("Context: Handling event type \"%s\"",type))
            if(length(private$handlers[[type]])){
@@ -296,11 +272,13 @@ Context <- R6Class("Context",
                    prh$run(...)
            }
        },
-       
-      
+
        mHandler = function(m) {
+           message_text <- conditionMessage(m)
+           message_text <- paste(message_text,collapse="\n")
+           log_out(message_text)
            # log_out(m,use.print=TRUE)
-           private$handle_event("message",m)
+           private$condition_manager$send("message",m)
            # textio_hooks$message$run()
            invokeRestart("muffleMessage")
        },
@@ -310,7 +288,7 @@ Context <- R6Class("Context",
            log_warning(warning_text)
            # log_out(w,use.print=TRUE)
            # textio_hooks$warning$run()
-           private$handle_event("warning",w)
+           private$condition_manager$send("warning",w)
            if (getOption("warn") >= 2) return()
            invokeRestart("muffleWarning")
        },
@@ -319,7 +297,7 @@ Context <- R6Class("Context",
            error_text <- conditionMessage(e)
            error_text <- paste(error_text,collapse="\n")
            log_error(error_text)
-           private$handle_event("error",e)
+           private$condition_manager$send("error",e)
        }
    )
 )
@@ -339,5 +317,3 @@ with.Context <- function(data,expr,enclos=parent.frame(),...){
     # log_out(ls(enclos),use.print=TRUE)
     data$eval(substitute(expr),enclos=enclos)
 }
-
-

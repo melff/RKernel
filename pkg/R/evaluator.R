@@ -9,6 +9,7 @@ check_help_port <- function(port){
     return(FALSE)
 }
 
+
 evaluator <- new.env()
 
 #' The Evaluator Class
@@ -82,6 +83,10 @@ Evaluator <- R6Class("Evaluator",
             add_displayed_classes(c("htmlwidget","html_elem","shiny.tag"))
 
             private$comm_dispatcher <- private$kernel$comm_dispatcher
+            
+            if(!length(installed_hooks$textout)){
+                private$install_hooks()
+            }
 
             private$context <- Context$new(envir=.GlobalEnv,
                                            attachment=private$env)
@@ -92,7 +97,14 @@ Evaluator <- R6Class("Evaluator",
             private$context$on_warning(private$handle_warning)
             private$context$on_error(private$handle_error)
 
-            private$graphics <- GraphicsDevice$new(self)
+            private$context$on_print(private$handle_graphics,exit=private$handle_text)
+            private$context$on_cat(private$handle_graphics,exit=private$handle_text)
+            private$context$on_str(private$handle_str,
+                                   exit=private$handle_str_exit)
+
+            private$context$on_enter(private$handle_context_enter)
+            private$context$on_exit(private$handle_context_exit)
+            private$graphics <- GraphicsDevice$new()
 
             suppressMessages(trace(example,tracer=quote(if(missing(run.donttest)) run.donttest<-TRUE),
                                    print=FALSE))
@@ -100,8 +112,6 @@ Evaluator <- R6Class("Evaluator",
             jupyter_config <- file.path(home_dir,".jupyter","RKernel-config.R")
             if(file.exists(jupyter_config)) 
                 source(jupyter_config)
-            #if(file.exists("RKernel-startup.R"))
-            #    source("RKernel-startup.R")
 
             parents <- strsplit(getwd(),.Platform$file.sep)[[1]]
             parents <- Reduce(file.path,parents,accumulate=TRUE)
@@ -117,13 +127,13 @@ Evaluator <- R6Class("Evaluator",
             private$start_help_system()
             assign("help.start",help.start,envir=private$env)
 
-            private$init_hooks()
-
+            # log_out("evaluator$startup() complete")
         },
         #' @description
         #' Shut the session down
         shutdown = function(){
-            base::q()
+            private$remove_hooks()
+            base::q(save="no")
         },
         #' @description
         #' Evaluate R code
@@ -297,14 +307,6 @@ Evaluator <- R6Class("Evaluator",
             ))
         },
         #' @description
-        #' Set a handler to be called when an expression has been evaluated.
-        #' @param handler A function.
-        #' @param remove A logical value, whether the handler should be
-        #'    removed.
-        on_eval = function(handler,remove=FALSE){
-            private$callbacks$register(handler,remove=remove)
-        },
-        #' @description
         #' Set options locally for the current jupyter notebook cell
         #' @param ... Options, see \code{\link{options}}.
         cell.options = function(...){
@@ -333,6 +335,8 @@ Evaluator <- R6Class("Evaluator",
         kernel=list(),
         comm_dispatcher=list(),
         graphics = list(),
+        last_plot = NULL,
+        current_plot = NULL,
 
         nframes = -1,
         aborted = FALSE,
@@ -428,6 +432,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_eval = function() {
+            # log_out("handle_eval")
             private$handle_text()
             private$handle_graphics()
         },
@@ -449,13 +454,18 @@ Evaluator <- R6Class("Evaluator",
 
         handle_graphics = function() {
 
-            plt <- private$context$get_graphics()
-            if(!length(plt)) return(NULL)
+            if(!private$graphics$is_active()) return(NULL)
+            plt <- private$graphics$get_plot()
 
-            update <- !isTRUE(attr(plt,"new_page"))
+            if(!length(plt) || !private$graphics$complete_page()) return(NULL)
+            new_page <- private$graphics$new_page(reset=TRUE)
+            private$last_plot <- private$current_plot
+            if(new_page || plot_has_changed(current=plt,last=private$last_plot)) 
+                private$current_plot <- plt
+            else return(NULL)
             
             # log_out(sprintf("evaluator$handle_graphics(...,update=%s)",if(update)"TRUE"else"FALSE"))
-            new_display <- !update || private$new_cell && !getOption("jupyter.update.graphics",TRUE)
+            new_display <- new_page || private$new_cell && !getOption("jupyter.update.graphics",TRUE)
             
             width      <- getOption("jupyter.plot.width",6)
             height     <- getOption("jupyter.plot.height",6)
@@ -509,6 +519,7 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_message = function(m) {
+            # log_out("Evaluator: handle_message")
             text <- conditionMessage(m)
             text <- paste(text,collapse="\n")
             private$kernel$stream(text = text,
@@ -692,36 +703,20 @@ Evaluator <- R6Class("Evaluator",
         saved.options = list(),
         saved.parms = list(),
 
-        event_manager = NULL,
-        
-        before_print_hook = function(){
-            private$event_manager$send("before_print")
-        },
-        print_hook = function(){
-            # log_out("evaluator$print_hook")
-            private$event_manager$send("print")
-        },
-        before_cat_hook = function(){
-            private$event_manager$send("before_cat")
-        },
-        cat_hook = function(){
-            # log_out("evaluator$cat_hook")
-            private$event_manager$send("cat")
-        },
-        before_str_hook = function(){
+        handle_str = function(){
             private$str_depth <- private$str_depth + 1
             if(private$str_depth == 1){
-                em <- private$event_manager
+                em <- eventmanagers$output
                 em$suspend("before_print")
                 em$suspend("print")
                 em$suspend("before_cat")
                 em$suspend("cat")
             }
         },
-        str_hook = function(){
+        handle_str_exit = function(){
             if(private$str_depth == 1){
                 private$handle_text()
-                em <- private$event_manager
+                em <- eventmanagers$output
                 em$activate("before_print")
                 em$activate("print")
                 em$activate("before_cat")
@@ -730,16 +725,42 @@ Evaluator <- R6Class("Evaluator",
             private$str_depth <- private$str_depth - 1
         },
         str_depth = 0,
-        
-        init_hooks = function(){
-            em <- get_current_event_manager()
-            private$event_manager <- em
 
-            em$assure_handlers("before_print")
-            em$assure_handlers("print")
-            em$assure_handlers("before_cat")
-            em$assure_handlers("cat")
+        handle_context_enter = function(){
+            private$graphics$activate()
+        },
+        handle_context_exit = function(){
+            private$graphics$suspend()
+        },
 
+        print_hook = function(...){
+            # log_out("print_hook")
+            eventmanagers$output$send("print",...)
+        },
+        before_print_hook = function(...){
+            # log_out("before_print_hook")
+            eventmanagers$output$send("before_print",...)
+        },
+        cat_hook = function(...){
+            # log_out("cat_hook")
+            eventmanagers$output$send("cat",...)
+        },
+        before_cat_hook = function(...){
+            # log_out("before_cat_hook")
+            eventmanagers$output$send("before_cat",...)
+        },
+        str_hook = function(...){
+            # log_out("str_hook")
+            eventmanagers$output$send("str",...)
+        },
+        before_str_hook = function(...){
+            # log_out("before_str_hook")
+            eventmanagers$output$send("before_str",...)
+        },
+
+
+        install_hooks = function(){
+            # log_out("install_hooks")
             suppressMessages(trace(print,
                                    private$before_print_hook,
                                    exit=private$print_hook,
@@ -752,12 +773,14 @@ Evaluator <- R6Class("Evaluator",
                                    private$before_str_hook,
                                    exit=private$str_hook,
                                    print=FALSE))
-            em$on("print",private$handle_text)
-            em$on("cat",private$handle_text)
-            em$on("before_print",private$handle_graphics)
-            em$on("before_cat",private$handle_graphics)
+            installed_hooks$textout <- TRUE
+        },
+        remove_hooks = function(){
+            # log_out("remove_hooks")
+            suppressMessages(untrace(print))
+            suppressMessages(untrace(cat))
+            suppressMessages(untrace(str))
         }
-
     )
 
 )

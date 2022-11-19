@@ -20,19 +20,15 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         display_msg_id = "",
         #' @field context An object from class "Context" -- see \code{\link{Context}}
         context = NULL,
+        graphics = NULL,
         envir = NULL,
         append_output = TRUE,
-        graphics_widget = NULL,
         
         initialize = function(append_output = TRUE,
-                              graphics_widget = NULL,
                               #envir = parent.frame(n=7),
                               envir = new.env(),
                               ...){
             super$initialize(...)
-            if(inherits(graphics_widget,"ImageWidget")){
-                self$graphics_widget <- graphics_widget
-            }
             self$envir <- envir
             context <- Context$new(envir=self$envir,
                                    attachment=list(
@@ -47,6 +43,11 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             context$on_warning(self$handle_warning)
             context$on_error(self$handle_error)
 
+            context$on_print(private$handle_graphics,exit=private$handle_text)
+            context$on_cat(private$handle_graphics,exit=private$handle_text)
+            
+            self$graphics <- GraphicsDevice$new()
+
             #self$on_displayed(self$set_display_msg_id)
             self$context <- context
             self$append_output <- append_output
@@ -56,21 +57,13 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         enter = function(){
             parent <- private$kernel$get_parent("shell")
             self$msg_id <- parent$header$msg_id
-            graphics$current$push(self$context$current_plot)
-            em <- get_current_event_manager()
-            for(event in c("before_print","print","before_cat","cat")){
-                em$push_handlers(event)
-            }
+            self$graphics$activate()
             # log_out(sprintf("msg_id set to '%s'",self$msg_id))
         },
         exit = function(){
             self$msg_id <- ""
+            self$graphics$suspend()
             # log_out(sprintf("msg_id set to '%s'",self$msg_id))
-            self$context$current_plot <- graphics$current$pop()
-            em <- get_current_event_manager()
-            for(event in c("before_print","print","before_cat","cat")){
-                em$pop_handlers(event)
-            }
         },
         
         #' @description 
@@ -94,59 +87,32 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         },
         
         handle_text = function() {
+            # log_out("Widget-context: handle_text")
             text <- self$context$get_text()
             text <- paste(text,collapse="\n")
             self$stream(text = text,
                         stream = "stdout")
         },
-        handle_graphics = function(){
-            if(inherits(self$graphics_widget,"ImageWidget")){
-                self$handle_graphics_widget()
-            } else self$handle_graphics_display()
-        },
-
-        handle_graphics_widget = function(){
-            # log_out("Widget-context: handle_graphics_widget")
-            graphics_widget <- self$graphics_widget
-            if(!inherits(graphics_widget,"ImageWidget")) return(NULL)
-
-            plt <- self$context$get_graphics()
-            if(!length(plt)) return(NULL)
-            
-            width      <- getOption("jupyter.plot.width",6)
-            height     <- getOption("jupyter.plot.height",6)
-            pointsize  <- getOption("jupyter.plot.pointsize",12)
-            res        <- getOption("jupyter.plot.res",150)
-            scale      <- getOption("jupyter.plot.scale",0.5)
-            units      <- getOption("jupyter.plot.units","units")
-            
-            # Cairo(type="raster",
-            #       width=width,
-            #       height=height,
-            #       units=units,
-            #       dpi=resolution/scale)
-            # replayPlot(plt)
-            # raster <- Cairo.capture()
-            # dev.off()
-            # graphics_widget$value <- writePNG(raster)
-            graphics_widget$value <- mime_graphics(plt,
-                                                   mime="image/png",
-                                                   width=width,
-                                                   height=height,
-                                                   pointsize=pointsize,
-                                                   scale=scale,
-                                                   res=res,
-                                                   units=units)
-        },
         
         last_plot_id = character(0),
-        handle_graphics_display = function() {
-            # log_out("Widget-context: handle_graphics_display")
+        current_plot = NULL,
+        last_plot = NULL,
 
-            plt <- self$context$get_graphics()
-            if(!length(plt)) return(NULL)
+        handle_graphics = function() {
+            # log_out("Widget-context: handle_graphics")
 
-            update <-  (length(self$last_plot_id)>0)
+            if(!self$graphics$is_active()) return(NULL)
+            plt <- self$graphics$get_plot()
+
+            if(!length(plt) || !self$graphics$complete_page()) return(NULL)
+            new_page <- self$graphics$new_page(reset=TRUE)
+            private$last_plot <- private$current_plot
+            if(new_page || plot_has_changed(current=plt,last=private$last_plot)) 
+                private$current_plot <- plt
+            else return(NULL)
+
+            update <- !new_page
+
             if(update){
                 id <- self$last_plot_id
             } 
@@ -166,7 +132,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             # log_out("OutputWidget$graphics_send")
             # log_out("  -- update = ",if(update)"TRUE"else"FALSE")
             # log_out("  -- id = ",self$last_plot_id)
-
+            # 
             # log_out("  -- update = ",if(update)"TRUE"else"FALSE")
             # log_out("  -- id = ",id)
 
@@ -266,8 +232,10 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         current_output = NULL,
         stream = function(text,stream_name) {
             if(!nzchar(text)) return()
+            # log_out("Widget-context: stream")
             #self$sync_suspended <- TRUE
             if(self$append_output){
+                log_out(self$outputs,use.str=TRUE)
                 l <- length(self$outputs)
                 if(!is.null(self$current_output) &&
                    identical(self$current_output$output_type, "stream") &&
@@ -323,6 +291,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             out_data <- list(output_type = "display_data",
                              data = d$data,
                              metadata = d$metadata)
+            # log_out("Widget-context: display_send")
             if(self$append_output){
                 id <- d$transient$display_id
                 update <- inherits(d,"update_display_data")
@@ -371,7 +340,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         }
     ),
     private = list(
-        kernel=list()
+        kernel=NULL
     )
 )
 
@@ -382,9 +351,8 @@ OutputWidgetClass <- R6Class_("OutputWidget",
 #'    "ImageWidget" object or NULL.
 #' @param ... Other arguments, ignored.
 #' @export
-OutputWidget <- function(append_output=FALSE,graphics_widget=NULL,...) 
+OutputWidget <- function(append_output=FALSE,...) 
                    OutputWidgetClass$new(append_output=append_output,
-                                         graphics_widget=graphics_widget,
                                          ...)
 
 

@@ -1,99 +1,86 @@
 EventManagerClass <- R6Class("EventManager",
  public = list(
+     initialize = function(type){
+         private$type = type
+     },
      send = function(event,...){
          # log_out(sprintf("eventmanager$send(\"%s\",...)",event))
-         if(event %in% names(private$dispatchers)){
-             edlist <- private$dispatchers[[event]]
-             n <- length(edlist)
-             if(n > 0){
-                 ed <- edlist[[n]]
-                 if(inherits(ed,"CallbackDispatcher"))
-                     ed$run(...)
-             }
+         # log_out(private$dispatchers,use.str=TRUE)
+         if(private$active && event %in% names(private$dispatchers)){
+             ed <- private$dispatchers[[event]]
+             # log_out(ed,use.print=TRUE)
+             if(inherits(ed,"CallbackDispatcher"))
+                 ed$run(...)
          }
       },
      on = function(event,handler,remove=FALSE){
          # log_out(sprintf("eventmanager$on(\"%s\",...)",event))
-         self$assure_handlers(event)
-         edlist <- private$dispatchers[[event]]
-         n <- length(edlist)
-         ed <- edlist[[n]]
+         ed <- private$dispatchers[[event]]
          if(!inherits(ed,"CallbackDispatcher")){
              # log_out(sprintf("Creating dispatcher for %s",event))
              ed <- CallbackDispatcher()
-             edlist[[n]] <- ed
-             private$dispatchers[[event]] <- edlist
+             private$dispatchers[[event]] <- ed
          }
          #if(!remove)
              # log_out(sprintf("Adding handler for %s",event))
          ed$register(handler=handler,remove=remove)
      },
-     suspend = function(event){
-         if(event %in% names(private$dispatchers)){
-             edlist <- private$dispatchers[[event]]
-             n <- length(edlist)
-             if(n > 0){
-                 ed <- edlist[[n]]
-                 if(inherits(ed,"CallbackDispatcher"))
-                     ed$suspend_handlers()
+     activate = function(event=NULL,all=TRUE){
+         if(all){
+             if(!private$active){
+                 # log_out(sprintf("Activating event manager of type '%s",private$type))
+                 private$active <- TRUE
+                 if(length(eventmanagers[[private$type]]) &&
+                    !identical(eventmanagers[[private$type]],self)){
+                     eventmanagers[[private$type]]$suspend()
+                     private$saved <- eventmanagers[[private$type]]
+                 }
+                 eventmanagers[[private$type]] <- self
              }
          }
-     },
-     activate = function(event){
-         if(event %in% names(private$dispatchers)){
-             edlist <- private$dispatchers[[event]]
-             n <- length(edlist)
-             if(n > 0){
-                 ed <- edlist[[n]]
+         else if(length(event) && private$active){
+             if(event %in% names(private$dispatchers)) {
+                 ed <- private$dispatchers[[event]]
                  if(inherits(ed,"CallbackDispatcher"))
                      ed$activate_handlers()
              }
          }
      },
-     init_handlers = function(event){
-         private$dispatchers[[event]] <- list(list())
-     },
-     assure_handlers = function(event){
-         if(!(event %in% names(private$dispatchers))){
-             self$init_handlers(event)
-         }
-     },
-     push_handlers = function(event){
-         if(!(event %in% names(private$dispatchers))){
-             self$init_handlers(event)
-         }
-         else {
-             edlist <- private$dispatchers[[event]]
-             n <- length(edlist)
-             edlist[[n + 1]] <- list()
-             private$dispatchers[[event]] <- edlist
-         }
-     },
-     pop_handlers = function(event){
-         ed <- NULL
-         if(event %in% names(private$dispatchers)){
-             edlist <- private$dispatchers[[event]]
-             n <- length(edlist)
-             if(n > 0) {
-                 ed <- edlist[[n]]
-                 edlist[[n]] <- NULL
+     suspend = function(event=NULL,all=TRUE){
+         if(all && private$active){
+             # log_out(sprintf("Activating event manager of type '%s",private$type))
+             private$active <- FALSE
+             if(length(private$saved)){
+                 eventmanagers[[private$type]] <- private$saved
+                 private$saved <- NULL
+                 eventmanagers[[private$type]]$resume()
              }
-             private$dispatchers[[event]] <- edlist
          }
-         return(ed)
+         else if(private$active && length(event) && event %in% names(private$dispatchers)){
+             ed <- private$dispatchers[[event]]
+             if(inherits(ed,"CallbackDispatcher"))
+                 ed$suspend_handlers()
+         }
+     },
+     resume = function(){
+         private$active <- TRUE
+     },
+     has = function(events){
+         if(length(private$dispatchers))
+             all(events %in% names(private$dispatchers))
+         else FALSE
      }
    ),
    private = list(
-       dispatchers = list()
+       dispatchers = list(),
+       active = FALSE,
+       saved = NULL,
+       type = NULL
  )
 )
 
 EventManager <- function(...) EventManagerClass$new(...)
 
-eventmanager <- new.env()
+eventmanagers <- new.env()
 
-get_current_event_manager <- function(){
-    if(!inherits(eventmanager$current,"EventManager"))
-        eventmanager$current <- EventManager()
-    return(eventmanager$current)
-}
+installed_hooks <- new.env()

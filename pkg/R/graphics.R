@@ -44,14 +44,19 @@ mime_graphics <- function(plt,mime,width,height,pointsize,scale,res,units="in"){
     return(graphics_data)
 }
 
-graphics <- new.env()
+plot_new_hook <- function(...){
+    if(inherits(eventmanagers$graphics,"EventManager"))
+        eventmanagers$graphics$send("plot_new",...)
+}
+before_plot_new_hook <- function(...){
+    if(inherits(eventmanagers$graphics,"EventManager"))
+        eventmanagers$graphics$send("before_plot_new",...)
+}
+
 
 GraphicsDevice <- R6Class("GraphicsDevice",
     public = list(
-        initialize = function(evaluator){
-            private$evaluator <- evaluator
-            em <- get_current_event_manager()
-            private$event_manager <- em
+        initialize = function(){
             os <- .Platform$OS.type
             sysname <- Sys.info()[["sysname"]]
             if(os == "unix" && sysname=="Darwin")
@@ -64,21 +69,44 @@ GraphicsDevice <- R6Class("GraphicsDevice",
                                        windows="png",
                                        osx="pdf",
                                        unix="png")
-            setHook('plot.new',private$plot_new_hook)
-            setHook('grid.newpage',private$plot_new_hook)
-            setHook('before.plot.new',private$before_plot_new_hook)
-            setHook('before.grid.newpage',private$before_plot_new_hook)
-            em$init_handlers("plot_new")
-            em$init_handlers("before_plot_new")
-            graphics$current <- self
+            if(!length(installed_hooks$graphics)){
+                setHook('plot.new',plot_new_hook)
+                setHook('grid.newpage',plot_new_hook)
+                setHook('before.plot.new',before_plot_new_hook)
+                setHook('before.grid.newpage',before_plot_new_hook)
+                installed_hooks$graphics <- TRUE
+            }
+            em <- EventManager(type="graphics")
+            em$activate()
+            private$event_manager <- em
+            em$on("plot_new",private$plot_new_hook)
             private$device()
             private$empty_plot <- recordPlot()
         },
         is_active = function(){
             private$dev_num == dev.cur()
         },
-        activate = function(){
+        create = function(){
             private$device()
+        },
+        activate = function(){
+            if(private$dev_num != dev.cur()){
+                private$other_dev = dev.cur()
+                dev.set(private$dev_num)
+                private$event_manager$activate()
+            }
+            
+        },
+        suspend = function(){
+            private$event_manager$suspend()
+            if(private$other_dev > 0)
+                dev.set(private$other_dev)
+            else
+                dev.set(1)
+        },
+        get_plot = function(){
+            plt <- recordPlot()
+            return(plt)
         },
         new_page = function(reset=FALSE){
             result <- isTRUE(private$plot_new_called)
@@ -86,27 +114,23 @@ GraphicsDevice <- R6Class("GraphicsDevice",
                 private$plot_new_called <- FALSE
             return(result)
         },
+        complete_page = function(){
+            self$is_active() && par("page")
+        },
         empty = function(){
             self$empty_plot
         },
         clear = function(){
             replayPlot(self$empty_plot)
         },
-        push = function(plt){
-            n <- length(private$plot_stack)
-            private$plot_stack[[n+1]] <- recordPlot()
-            if(inherits(plt,"recordedplot"))
-                replayPlot(plt)
-            else
-                replayPlot(private$empty_plot)
-        },
-        pop = function(){
-            n <- length(private$plot_stack)
-            current_plot <- recordPlot()
-            plt <- private$plot_stack[[n]]
-            replayPlot(plt)
-            private$plot_stack[[n]] <- NULL
-            return(current_plot)
+        on_new_page = function(handler,replace=FALSE,before=FALSE){
+            em <- private$event_manager
+            if(before){
+                em$on("before_plot_new",handler,replace)
+            }
+            else {
+                em$on("plot_new",handler,replace)
+            }
         }
     ),
     private = list(
@@ -116,13 +140,6 @@ GraphicsDevice <- R6Class("GraphicsDevice",
         plot_new_called = FALSE,
         graphics_par_usr = numeric(0),
 
-        before_plot_new_hook = function(...){
-            if(self$is_active()){
-                private$event_manager$send("before_plot_new",...)
-                # dev.control(displaylist="enable")
-            }
-        },
-
         plot_new_hook = function(...){
             # log_out("plot_new_hook")
             # log_out("private$dev_num==",private$dev_num)
@@ -130,13 +147,13 @@ GraphicsDevice <- R6Class("GraphicsDevice",
             if(self$is_active()){
                 private$plot_new_called <- TRUE
                 private$graphics_par_usr <- par("usr")
-                private$event_manager$send("plot_new",...)
             } #else log_out("graphics not active ...")
         },
 
         dev_filename = character(0),
         dev_name = character(),
         dev_num = 0,
+        other_dev = 0,
         device = function(filename = NULL,
                           width = getOption("jupyter.plot.width",6),
                           height = getOption("jupyter.plot.height",6),
@@ -159,8 +176,7 @@ GraphicsDevice <- R6Class("GraphicsDevice",
             # log_out("private$dev_num==",private$dev_num)
 
         },
-        empty_plot = NULL,
-        plot_stack = NULL
+        empty_plot = NULL
     )
 )
 

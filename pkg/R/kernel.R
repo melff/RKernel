@@ -62,13 +62,16 @@ Kernel <- R6Class("Kernel",
       self$evaluator$startup()
       continue <- TRUE
       while(continue) {
+        # log_out("kernel loop")
         private$run_services()
         rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
         if(length(private$services) > 0) 
           poll_timeout <- rkernel_poll_timeout 
         else 
           poll_timeout <- -1L
+        # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
+        # log_out("kernel$poll_request")
         if(!length(req)) next
         #Sys.sleep(1)
         ## if(req$abort) break
@@ -81,6 +84,7 @@ Kernel <- R6Class("Kernel",
                hb=private$respond_hb(req),
                control=private$respond_control(req),
                shell=private$respond_shell(req))
+        # log_out(continue)
       }
       self$evaluator$shutdown()
     },
@@ -344,7 +348,7 @@ Kernel <- R6Class("Kernel",
       #cat("Sent a execute_reply ...\n")
       # message("Code:", msg$content$code)
       #message("Store history:", msg$content$store_history)
-      #message("Execution count:", private$execution_count)
+      # message("Kernel execution count:", private$execution_count)
       if(msg$content$store_history)
         private$execution_count <- private$execution_count + 1
       if(aborted) private$clear_shell_queue()
@@ -495,6 +499,7 @@ Kernel <- R6Class("Kernel",
     },
 
     respond_shell = function(req,debug=FALSE){
+      # log_out("respond_shell")
       msg <- private$get_message("shell")
       private$parent$shell <- msg
       if(!length(msg)) return(TRUE)

@@ -68,10 +68,13 @@ plot_has_changed <- function(current,last){
             else {
                 # log_out(digest::sha1(last[[2]]))
                 # log_out(digest::sha1(current[[2]]))
-                unchanged <- identical(current[1:2],last[1:2])
+                # unchanged12 <- identical(current[1:2],last[1:2])
+                unchanged2 <- identical(current[[2]],last[[2]])
+                # log_out("unchanged12 ",format(unchanged12))
+                # log_out("unchanged2 ",format(unchanged2))
                 # if(unchanged)
                 #     log_out("Plot has not changed")
-                return(!unchanged)
+                return(!unchanged2)
             }
         }
     }
