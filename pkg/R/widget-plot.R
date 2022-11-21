@@ -10,6 +10,7 @@ PlotWidgetClass <- R6Class_(
     inherit = ImageWidgetClass,
     public = list(
         context = NULL,
+        graphics = NULL,
         initialize = function(...,
                               envir = new.env()){
             super$initialize(...)
@@ -24,11 +25,12 @@ PlotWidgetClass <- R6Class_(
             self$context <- context
             self$value <- empty20x20
             private$kernel <- get_current_kernel()
+            self$graphics <- GraphicsDevice$new()
         },
         handle_graphics = function(){
 
-            # plt <- self$context$get_graphics()
-            plt <- recordPlot()
+            if(!self$graphics$is_active()) return(NULL)
+            plt <- self$graphics$get_plot()
             if(!length(plt)) return(NULL)
             
             width      <- getOption("jupyter.plot.width",6)
@@ -53,19 +55,11 @@ PlotWidgetClass <- R6Class_(
         enter = function(){
             parent <- private$kernel$get_parent("shell")
             self$msg_id <- parent$header$msg_id
-            graphics$current$push(self$context$current_plot)
-            em <- get_current_event_manager()
-            for(event in c("before_print","print","before_cat","cat")){
-                em$push_handlers(event)
-            }
+            self$graphics$activate()
         },
         exit = function(){
             self$msg_id <- ""
-            self$context$current_plot <- graphics$current$pop()
-            em <- get_current_event_manager()
-            for(event in c("before_print","print","before_cat","cat")){
-                em$pop_handlers(event)
-            }
+            self$graphics$suspend()
         }
     ),
     private = list(
@@ -107,7 +101,6 @@ SVGWidgetClass <- R6Class_(
         initialize = function(...,
                               width=NULL,
                               height=NULL,
-                              use.recording = FALSE,
                               envir = new.env()){
             super$initialize(...)
             context <- Context$new(envir=self$envir,
@@ -121,12 +114,9 @@ SVGWidgetClass <- R6Class_(
             self$context <- context
             private$kernel <- get_current_kernel()
             private$dev_num_other <- dev.cur()
-            private$use.recording <- use.recording
-            if(!private$use.recording){
-                private$new_device()
-                private$dev_num <- dev.cur()
-                dev.set(private$dev_num_other)
-            }
+            private$new_device()
+            private$dev_num <- dev.cur()
+            dev.set(private$dev_num_other)
             style <- character(0)
             if(length(width)){
                 style <- c(style,paste0("width:",width))
@@ -155,19 +145,11 @@ SVGWidgetClass <- R6Class_(
             self$value <- string
         },
         enter = function(){
-            if(private$use.recording){
-                graphics$current$push(self$context$current_plot)
-            } else {
-                private$dev_num_other <- dev.cur()
-                dev.set(private$dev_num)
-            }
+            private$dev_num_other <- dev.cur()
+            dev.set(private$dev_num)
         },
         exit = function(){
-            if(private$use.recording){
-                self$context$current_plot <- graphics$current$pop()
-            } else {
-                dev.set(private$dev_num_other)
-            }
+            dev.set(private$dev_num_other)
         },
         style = NULL
     ),

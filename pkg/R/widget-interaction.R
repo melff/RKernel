@@ -263,36 +263,22 @@ mkWidgets <- function(...){
 #' @param graphics Logical, whether graphics output is expected, in which case
 #'   an "ImageWidget" object is created to receive the graphics output.
 #' @export
-Interactive <- function(FUN,...,continuous_update=TRUE,
-                     graphics=FALSE){
+Interactive <- function(FUN,...,continuous_update=TRUE){
     controls <- mkWidgets(...)
-    if(graphics){
-        gw_res <- (getOption("jupyter.plot.res") *
-                   getOption("jupyter.plot.scale"))
-        gw_h <- getOption("jupyter.plot.height") * gw_res
-        gw_w <- getOption("jupyter.plot.width") * gw_res
-        gw_h <- paste0(gw_h,"px")
-        gw_w <- paste0(gw_w,"px")
-        gw <- ImageWidget(width=gw_w,height=gw_h)
-    }
-    else gw <- NULL
-    output <- OutputWidget(append_output=FALSE,
-                           graphics_widget=gw)
+    output <- OutputWidget(append_output=FALSE)
     io <- interactive_output(FUN=FUN,
                        out=output,
                        controls=controls,
                        continuous_update=continuous_update)
-    VBox(c(controls,gw,output))
+    VBox(c(controls,output))
 }
 
 #' @rdname interaction
 #' @param graphics Logical, whether graphics output is expected, in which case
 #'   an "ImageWidget" object is created to receive the graphics output.
 #' @export
-interact <- function(FUN,...,continuous_update=TRUE,
-                     graphics=FALSE){
+interact <- function(FUN,...,continuous_update=TRUE){
     widget <- interactive(FUN,...,
-                          continuous_update=continuous_update,
-                          graphics=graphics)
+                          continuous_update=continuous_update)
     display(widget)
 }
