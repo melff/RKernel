@@ -130,13 +130,6 @@ SVGWidgetClass <- R6Class_(
             }
         },
         handle_graphics = function(){
-            if(private$use.recording){
-                plt <- recordPlot()
-                if(!length(plt)) return(NULL)
-                private$new_device()
-                replayPlot(plt)
-                dev.off()
-            }
             string <- private$svg_string()
             if(length(string)>1){
                 string <- string[length(string)]
@@ -166,9 +159,6 @@ SVGWidgetClass <- R6Class_(
             private$svg_string <- svgstring(width=width,height=height,pointsize=pointsize,
                                             standalone=FALSE)
         },
-        use.recording = FALSE,
-        widht = NULL,
-        height = NULL,
         set_dims = function(string){
             if(length(self$style)){
                 pattern <- "(<svg.*?)(>)"
