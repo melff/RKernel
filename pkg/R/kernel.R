@@ -50,6 +50,9 @@ Kernel <- R6Class("Kernel",
       self$evaluator <- evaluator
       kernel$current <- self
       private$save_textout()
+      replace_in_package("base","print",evaluator$print)
+      replace_in_package("base","cat",evaluator$cat)
+      replace_in_package("utils","str",evaluator$str)
     },
 
     #' @field evaluator See \code{\link{Evaluator}}.
@@ -259,19 +262,19 @@ Kernel <- R6Class("Kernel",
     #'        to the message.
     log_out = function(message,...,use.print=FALSE,use.str=FALSE){
       if(use.print)
-        message <- paste(capture.output(private$orig_print(message)),collapse="\n")
+        message <- paste(capture.output(self$print(message)),collapse="\n")
       else if(use.str)
-        message <- paste(capture.output(private$orig_str(message)),collapse="\n")
+        message <- paste(capture.output(self$str(message)),collapse="\n")
       else message <- paste(message,...,collapse="")
-      private$orig_cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
+      self$cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
                        file=stderr())
     },
     log_warning = function(message){
-      private$orig_cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
+      self$cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
                        file=stderr())
     },
     log_error = function(message){
-      private$orig_cat(crayon::bgRed(format(Sys.time()),"\t",message,"\n"),
+      self$cat(crayon::bgRed(format(Sys.time()),"\t",message,"\n"),
                        file=stderr())
     },
     #' @description
@@ -309,7 +312,11 @@ Kernel <- R6Class("Kernel",
     is_child = function(){
       # Check if the current process is a fork from the original kernel process
       return(Sys.getpid()!=private$pid)
-    }
+    },
+
+    print = NULL,
+    cat = NULL,
+    str = NULL
   ),
 
   private = list(
@@ -677,14 +684,10 @@ Kernel <- R6Class("Kernel",
       }
     },
 
-    orig_print = NULL,
-    orig_cat = NULL,
-    orig_str = NULL,
-
     save_textout = function(){
-      private$orig_print <- print
-      private$orig_cat <- cat
-      private$orig_str <- str
+      self$print <- .BaseNamespaceEnv$print
+      self$cat <- .BaseNamespaceEnv$cat
+      self$str <- utils::str
     }
 
   )
@@ -725,6 +728,17 @@ get_current_kernel <- function() kernel$current
 log_out <- function(...) kernel$current$log_out(...)
 log_error <- function(...) kernel$current$log_error(...)
 log_warning <- function(...) kernel$current$log_warning(...)
+
+replace_in_package <- function(pkg_name,name,value){
+  env_name <- paste0("package:",pkg_name)
+  if(env_name %in% search())
+    env <- as.environment(env_name)
+  else
+    env <- getNamespace(pkg_name)
+  .BaseNamespaceEnv$unlockBinding(name, env)
+  assign(name, value, env)
+  .BaseNamespaceEnv$lockBinding(name, env)
+}
 
 
 # Local Variables:

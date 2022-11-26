@@ -84,10 +84,6 @@ Evaluator <- R6Class("Evaluator",
 
             private$comm_dispatcher <- private$kernel$comm_dispatcher
             
-            if(!length(installed_hooks$textout)){
-                private$install_hooks()
-            }
-
             private$context <- Context$new(envir=.GlobalEnv,
                                            attachment=private$env)
             
@@ -99,8 +95,6 @@ Evaluator <- R6Class("Evaluator",
 
             private$context$on_print(private$handle_graphics,exit=private$handle_text)
             private$context$on_cat(private$handle_graphics,exit=private$handle_text)
-            private$context$on_str(private$handle_str,
-                                   exit=private$handle_str_exit)
 
             private$context$on_enter(private$handle_context_enter)
             private$context$on_exit(private$handle_context_exit)
@@ -132,7 +126,6 @@ Evaluator <- R6Class("Evaluator",
         #' @description
         #' Shut the session down
         shutdown = function(){
-            private$remove_hooks()
             base::q(save="no")
         },
         #' @description
@@ -327,8 +320,35 @@ Evaluator <- R6Class("Evaluator",
             nms <- names(args)
             op[nms] <- args
             do.call("par",op)
-        }
+        },
 
+        print = function(x,...){
+            eventmanagers$output$send("before_print",x,...)
+            private$kernel$print(x,...)
+            eventmanagers$output$send("print",x,...)
+        },
+        cat = function(..., file = "", sep = " ", fill = FALSE, labels = NULL, 
+                       append = FALSE){
+            do_send <- !nzchar(file)
+            if(do_send) eventmanagers$output$send("before_cat",...,
+                                                  sep=sep,
+                                                  fill=fill,
+                                                  labels=labels,
+                                                  append=append)
+            private$kernel$cat(...,file=file,sep=sep,
+                               fill=fill,labels=labels,
+                               append=append)
+            if(do_send) eventmanagers$output$send("cat",...,
+                                                  sep=sep,
+                                                  fill=fill,
+                                                  labels=lables,
+                                                  append=append)
+        },
+        str = function(object, ...){
+            private$handle_str()
+            private$kernel$str(object,...)
+            private$handle_str_exit()
+        }
     ),
     
     private = list(
@@ -431,13 +451,13 @@ Evaluator <- R6Class("Evaluator",
             private$add_payload(unclass(p))
         },
 
-        handle_eval = function() {
+        handle_eval = function(...) {
             # log_out("handle_eval")
             private$handle_text()
             private$handle_graphics()
         },
 
-        handle_text = function() {
+        handle_text = function(...) {
             text <- private$context$get_text()
             # log_out(sprintf("handle_text(%s)",text))
             # log_out("handle_text")
@@ -452,7 +472,7 @@ Evaluator <- R6Class("Evaluator",
         last_plot_id = character(),
 
 
-        handle_graphics = function() {
+        handle_graphics = function(...) {
 
             if(!private$graphics$is_active()) return(NULL)
             plt <- private$graphics$get_plot()
@@ -731,55 +751,6 @@ Evaluator <- R6Class("Evaluator",
         },
         handle_context_exit = function(){
             private$graphics$suspend()
-        },
-
-        print_hook = function(...){
-            # log_out("print_hook")
-            eventmanagers$output$send("print",...)
-        },
-        before_print_hook = function(...){
-            # log_out("before_print_hook")
-            eventmanagers$output$send("before_print",...)
-        },
-        cat_hook = function(...){
-            # log_out("cat_hook")
-            eventmanagers$output$send("cat",...)
-        },
-        before_cat_hook = function(...){
-            # log_out("before_cat_hook")
-            eventmanagers$output$send("before_cat",...)
-        },
-        str_hook = function(...){
-            # log_out("str_hook")
-            eventmanagers$output$send("str",...)
-        },
-        before_str_hook = function(...){
-            # log_out("before_str_hook")
-            eventmanagers$output$send("before_str",...)
-        },
-
-
-        install_hooks = function(){
-            # log_out("install_hooks")
-            suppressMessages(trace(print,
-                                   private$before_print_hook,
-                                   exit=private$print_hook,
-                                   print=FALSE))
-            suppressMessages(trace(cat,
-                                   private$before_cat_hook,
-                                   exit=private$cat_hook,
-                                   print=FALSE))
-            suppressMessages(trace(str,
-                                   private$before_str_hook,
-                                   exit=private$str_hook,
-                                   print=FALSE))
-            installed_hooks$textout <- TRUE
-        },
-        remove_hooks = function(){
-            # log_out("remove_hooks")
-            suppressMessages(untrace(print))
-            suppressMessages(untrace(cat))
-            suppressMessages(untrace(str))
         }
     )
 
