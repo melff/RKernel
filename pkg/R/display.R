@@ -79,46 +79,72 @@ display_data.htmlwidget <- function(x,...,
                             id=UUIDgenerate(),
                             update=FALSE){
 
-    hash <- digest::digest(as.character(x))
-    url <- paste0(hash,".html")
+    path <- getOption("htmlwidgets_path","htmlwidgets")
+    use_tmpdir <- getOption("htmlwidgets_tmpdir",FALSE)
+    embed <- getOption("htmlwidgets_embed",FALSE)
+    iframe <- getOption("htmlwidgets_iframe",TRUE) && length(path) || embed
+    selfcontained <- getOption("htmlwidgets_selfcontained",TRUE) || embed
+    assets <- getOption("htmlwigets_assets",NULL)
+    show_button <- getOption("htmlwidgets_showbutton",FALSE)
 
-    embed <- getOption("htmlwidgets_embed",FALSE) 
-    assets <- getOption("htmlwigets_assetsdir","assets")
-    path <- getOption("htmlwidget_path","htmlwidgets")
-    if(length(path)){
-        url <- paste(path,url,sep="/")
-        path <- file.path(getwd(),path)
+    if(use_tmpdir) {
+        htmlfile <- tempfile(pattern = "widget",fileext = ".html")
+        url <- htmlfile
+        file_url <- paste0("file://",htmlfile)
+        iframe <- FALSE
+        show_button <- FALSE
+    }
+    else { 
+        url <- path
+        hash <- digest(as.character(x))
+        htmlfile <- paste0(hash,".html")
+        url <- paste(url,htmlfile,sep="/")
+        htmlfile <- file.path(path,htmlfile)
+        if(length(assets))
+            assets <- file.path(path,assets)
+        # path <- file.path(getwd(),path)
         if(!file_test("-d",path))
             dir.create(path)
+        file_url <- paste0("file://",getwd(),"/",htmlfile)
     }
-    else
-        path <- getwd()
-    htmlfile <- file.path(path,paste0(hash,".html"))
-    assets <- file.path(path,assets)
 
     htmlwidgets::saveWidget(x,
                             file=htmlfile,
-                            selfcontained=embed,
-                            libdir=assets,
+                            selfcontained=selfcontained,
+                            libdir=assets
                             )
-
-    res <- "<div>"
-    if_tmpl <- "
-            <iframe src=\"%s\" width=\"%s\" height=\"%s\" seamless  style=\"border-style:none\">
+    if(iframe){
+        res <- "<div>"
+        if_tmpl <- "
+            <iframe src=\"%s\" width=\"%s\" height=\"%s\" class='html-widget-iframe'  style=\"border-style:none\">
             </iframe>
             "
-    width <- getOption("embed_htmlwidget_width","100%")
-    height <- getOption("embed_htmlwidget_height",600L)
-
-    if(embed)
-        url <- dataURI(mime="text/html",file=htmlfile)
-    iframe <- sprintf(if_tmpl,url,width,height)
-    res <- paste0(res,iframe)
-    res <- paste0(res,"</div>")
-    text <- paste(res,collapse="\n")
+        width <- getOption("htmlwidget_iframe_width","100%")
+        height <- getOption("htmlwidget_iframe_height",600L)
+        if(embed)
+            url <- dataURI(mime="text/html",file=htmlfile)
+        iframe <- sprintf(if_tmpl,url,width,height)
+        res <- paste0(res,iframe)
+        res <- paste0(res,"</div>")
+    }
+    else {
+        if(!show_button)
+            browseURL(file_url)
+        res <- ""
+    }
+    if(show_button){
+        button_tmpl <- '
+        <form class="help-popout-button" action="%s" method="get" target="_blank">
+                                                                      <button type="submit">Open in new tab</button>
+                                                                                                                 </form>'
+        button <- sprintf(button_tmpl,url)
+        res <- c(res,button)
+    }
+    text_html <- paste(res,collapse="\n")
+    
     mime_data <- list(
         "text/plain"="",
-        "text/html"=text
+        "text/html"=text_html
     )
 
     d <- list(data=mime_data)
@@ -587,16 +613,22 @@ format_item <- function(x){
 #' @param file Path of a file with Javascript code
 #' @return An S3 object of class "display_data" with mime data of type "application/javascript"
 #' @export
-Javascript <- function(text,file){
+Javascript <- function(text,file,as_tag=FALSE){
     if(missing(text)){
         if(!missing(file))
             text <- readLines(file)
     }
     text <- paste(text,collapse="\n")
     # text_plain <- paste("Javascript: ",text,sep="\n")
-    #text_html <- paste("<script>",text,"</script>",sep="\n")
-    display_data(#"text/plain"="",
+    if(as_tag){
+        text_html <- paste("<script>",text,"</script>",sep="\n")
+        display_data(#"text/plain"="",
+            "text/html"=text_html)
+    }
+    else {
+        display_data(#"text/plain"="",
             "application/javascript"=text)
+    }
 }
 
 #' Send CSS code to the frontend

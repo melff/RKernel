@@ -27,7 +27,7 @@ It differs from the already existing [*IRKernel*](http://irkernel.github.io) by:
     instead of S4 reference classes.
   - Links in help pages work. To this purpose, help pages are not paged, but included
     into the notebook. This also allows to show several help pages in the notebook.
-    Also `help.start() now works. HTML help is shown using [jupyter-server-proxy](https://pypi.org/project/jupyter-server-proxy/)
+    Also `help.start()` now works. HTML help is shown using [jupyter-server-proxy](https://pypi.org/project/jupyter-server-proxy/)
   - The polling loop allows for providing services e.g. with the "htmluv"
     package.
   - It is possible to make use of the Widgets infrastructure provided by
@@ -35,10 +35,12 @@ It differs from the already existing [*IRKernel*](http://irkernel.github.io) by:
     user interfaces. These can be used with jupyter notebooks, JupyterLab and
     [*voilà*](https://voila.readthedocs.io). However, only widgets provided 
     by version 7.5 of the *ipywidgets* are supported. Supported for 8.0 is planned.
-  - [HTML widgets](https://cran.r-project.org/package=htmlwidgets) (partially) work. At the time of 
-    writing, "rbokeh" widgets work flawless when included into a Jupyter notebook. 
-    "plotly" and "d3plus" widgets only work with Firefox, but not with Google Chrome. 
-    This appears to be a Javascript issue.
+  - [HTML widgets](https://cran.r-project.org/package=htmlwidgets) generally
+    work. However, *some* htmlwidgets (notably those created with
+    [*plotly*](https://plotly.com/r/)) displayed with the setting
+    `options(htmlwidgets_embed=TRUE)` however to not appear if the notebook is 
+    opened in Google Chrome. 
+    
   - There is also a support for virtual table display (based on the ipywidget
     infrastructure).
     
@@ -51,4 +53,4 @@ TODO:
   - [ ] Add documentation
   - [x] Make HTML help work on servers
   - [ ] Add example notebooks
-  - [ ] Make HTML widgets work more generally
+  - [x] Make HTML widgets work more generally
