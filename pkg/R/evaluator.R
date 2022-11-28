@@ -117,10 +117,11 @@ Evaluator <- R6Class("Evaluator",
                 if(file.exists(startup_file))
                     source(startup_file)
             }
-            
+            # Sleep briefly to allow HTTP service etc.
+            private$kernel$add_service(function()Sys.sleep(getOption("rkernel_service_interval",.001)))
             private$start_help_system()
             assign("help.start",help.start,envir=private$env)
-
+            
             # log_out("evaluator$startup() complete")
         },
         #' @description
