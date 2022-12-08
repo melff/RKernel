@@ -49,10 +49,11 @@ Kernel <- R6Class("Kernel",
       self$comm_manager <- comm_manager
       self$evaluator <- evaluator
       kernel$current <- self
-      private$save_textout()
+      private$save_io_handlers()
       replace_in_package("base","print",evaluator$print)
       replace_in_package("base","cat",evaluator$cat)
       replace_in_package("utils","str",evaluator$str)
+      replace_in_package("tools","httpd",evaluator$httpd)
     },
 
     #' @field evaluator See \code{\link{Evaluator}}.
@@ -262,7 +263,7 @@ Kernel <- R6Class("Kernel",
     #'        to the message.
     log_out = function(message,...,use.print=FALSE,use.str=FALSE){
       if(use.print)
-        message <- paste(capture.output(self$print(message)),collapse="\n")
+        message <- paste0("\n",paste0(capture.output(self$print(message)),collapse="\n"))
       else if(use.str)
         message <- paste(capture.output(self$str(message)),collapse="\n")
       else message <- paste(message,...,collapse="")
@@ -316,7 +317,8 @@ Kernel <- R6Class("Kernel",
 
     print = NULL,
     cat = NULL,
-    str = NULL
+    str = NULL,
+    httpd = NULL
   ),
 
   private = list(
@@ -684,10 +686,11 @@ Kernel <- R6Class("Kernel",
       }
     },
 
-    save_textout = function(){
+    save_io_handlers = function(){
       self$print <- .BaseNamespaceEnv$print
       self$cat <- .BaseNamespaceEnv$cat
       self$str <- utils::str
+      self$httpd <- tools:::httpd
     }
 
   )

@@ -9,8 +9,11 @@ EventManagerClass <- R6Class("EventManager",
          if(private$active && event %in% names(private$dispatchers)){
              ed <- private$dispatchers[[event]]
              # log_out(ed,use.print=TRUE)
-             if(inherits(ed,"CallbackDispatcher"))
-                 ed$run(...)
+             if(inherits(ed,"CallbackDispatcher")){
+                 res <- ed$run(...)
+                 if(length(res))
+                     return(res)
+             }
          }
       },
      on = function(event,handler,remove=FALSE){
@@ -60,6 +63,13 @@ EventManagerClass <- R6Class("EventManager",
              ed <- private$dispatchers[[event]]
              if(inherits(ed,"CallbackDispatcher"))
                  ed$suspend_handlers()
+         }
+     },
+     clear = function(event){
+         if(private$active && length(event) && event %in% names(private$dispatchers)){
+             ed <- private$dispatchers[[event]]
+             if(inherits(ed,"CallbackDispatcher"))
+                 ed$clear()
          }
      },
      resume = function(){

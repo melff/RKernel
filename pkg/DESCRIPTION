@@ -38,6 +38,7 @@ Collate:
     'comms.R'
     'compare-plots.R'
     'context.R'
+    'dataTable.R'
     'dictionary.R'
     'display.R'
     'env-browser.R'

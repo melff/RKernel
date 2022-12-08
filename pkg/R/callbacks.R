@@ -24,14 +24,8 @@ CallbackDispatcherClass <- R6Class("CallbackDispatcher",
         }
         private$callbacks <- new
       },
-      shift_handlers = function(new=list()){
-          old <- private$callbacks
-          private$callbacks <- new
-          return(old)
-      },
-      copy_handlers = function(){
-          old <- private$callbacks
-          return(old)
+      clear = function(){
+          private$callbacks <- list()
       },
       suspend_handlers = function(){
           private$suspended <- TRUE
@@ -44,11 +38,14 @@ CallbackDispatcherClass <- R6Class("CallbackDispatcher",
       #' @param ... Aruments passed on to the handler functions
       run = function(...){
         # log_out(private$callbacks,use.print=TRUE)
+          res <- NULL
           if(!private$suspended){
               for(cbkfun in private$callbacks){
-                  if(is.function(cbkfun))cbkfun(...)
+                  if(is.function(cbkfun))
+                      res <- cbkfun(...)
               }
           }
+          invisible(res)
       }
     ),
     private = list(

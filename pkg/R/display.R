@@ -114,7 +114,6 @@ display_data.htmlwidget <- function(x,...,
                             libdir=assets
                             )
     if(iframe){
-        res <- "<div>"
         if_tmpl <- "
             <iframe src=\"%s\" width=\"%s\" height=\"%s\" class='html-widget-iframe'  style=\"border-style:none\">
             </iframe>
@@ -124,13 +123,14 @@ display_data.htmlwidget <- function(x,...,
         if(embed)
             url <- dataURI(mime="text/html",file=htmlfile)
         iframe <- sprintf(if_tmpl,url,width,height)
-        res <- paste0(res,iframe)
-        res <- paste0(res,"</div>")
+        res <- iframe
     }
     else {
+        log_out(url)
         if(!show_button)
-            browseURL(file_url)
-        res <- ""
+            res <- sprintf("Use <a href=\"%s\" target=\"_blank\">this link</a> to view widget",url)
+        else 
+            res <- ""
     }
     if(show_button){
         button_tmpl <- '
@@ -663,6 +663,19 @@ LaTeXMath <- function(text){
             "text/latex"=text_latex)
 }
 
+#' @export
+IFrame <- function(url,width="100%",height="70ex",class=NULL){
+    tmpl <- paste(
+        "<iframe src='%s'",
+        "style='width:%s;height:%s;'",
+        if(length(class)) class,
+        "</iframe>",
+        sep="\n")
+    text_html <- sprintf(tmpl,url,width,height)
+    display_data("text/plain"="",
+                 "text/html"=text_html)
+}
+
 #' Send a graphics file to the frontend
 #'
 #' @description Send embed the contents of an png, jpeg, pdf, or svg file in
@@ -786,6 +799,20 @@ display_data.shiny.tag <- function(x,...,
             update=update)
 }
 
+#' @describeIn display_data S3 methods for "iframe" objects
+#' @export
+display_data.iframe <- function(x,...,
+                                metadata=emptyNamedList,
+                                id=attr(x,"id"),
+                                update=FALSE){
+    display_data("text/plain"="",
+            "text/html"=unclass(x),
+            metadata=metadata,
+            id=id,
+            update=update)
+}
+
+
 #' Create an alert in the frontend
 #'
 #' @description Creates Javascript code and sends it to the frontend that opens
@@ -806,3 +833,4 @@ print_ <- function (x, ...) {
     }
     else UseMethod("print")
 }
+

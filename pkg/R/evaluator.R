@@ -64,8 +64,7 @@ Evaluator <- R6Class("Evaluator",
             assign("In",self$cells,envir=private$env)
             assign("Out",self$cell_results,envir=private$env)
 
-            options(pager=self$pager,
-                    crayon.enabled=TRUE,crayon.colors=256L,
+            options(crayon.enabled=TRUE,crayon.colors=256L,
                     jupyter.graphics.types=c("image/png","application/pdf"),
                     jupyter.plot.width=6,
                     jupyter.plot.height=6,
@@ -80,7 +79,7 @@ Evaluator <- R6Class("Evaluator",
 
 
             add_displayed_classes(c("help_files_with_topic","packageIQR","hsearch"))
-            add_displayed_classes(c("htmlwidget","html_elem","shiny.tag"))
+            add_displayed_classes(c("htmlwidget","html_elem","shiny.tag","iframe","dataTable"))
 
             private$comm_dispatcher <- private$kernel$comm_dispatcher
             
@@ -118,10 +117,16 @@ Evaluator <- R6Class("Evaluator",
                     source(startup_file)
             }
             # Sleep briefly to allow HTTP service etc.
-            private$kernel$add_service(function()Sys.sleep(getOption("rkernel_service_interval",.001)))
+            if(getOption("rkernel_service_enable",TRUE)){
+                private$kernel$add_service(function()Sys.sleep(getOption("rkernel_service_interval",.001)))
+            }
             private$start_help_system()
             assign("help.start",help.start,envir=private$env)
-            
+            assign("get_help_url",private$get_help_url,envir=private$env)
+            assign("get_url",self$get_url,envir=private$env)
+            assign("get_port",self$get_port,envir=private$env)
+            assign("set_port",self$set_port,envir=private$env)
+            assign("str2iframe",self$str2iframe,envir=private$env)
             # log_out("evaluator$startup() complete")
         },
         #' @description
@@ -140,7 +145,7 @@ Evaluator <- R6Class("Evaluator",
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
                 # message(sprintf("Found magic '%s'",magic))
-                code <- gsub("^%%.+?\n","",code)
+                #code <- gsub("^%%.+?\n","",code)
                 private$handle_magic(magic,code)
                 return()
             }
@@ -349,7 +354,79 @@ Evaluator <- R6Class("Evaluator",
             private$handle_str()
             private$kernel$str(object,...)
             private$handle_str_exit()
+        },
+
+        httpd = function(path,query,...){
+            log_out("http path: ",path)
+            log_out("http query: ",query,use.str=TRUE)
+            split_path <- strsplit(path,"/")[[1]]
+            response <- NULL
+            if(length(split_path) > 1){
+                event <- split_path[2]
+                response <- eventmanagers$http$send(event,path,query,...)
+            }
+            if(!length(response))
+                response <- private$kernel$httpd(path=path,query=query,...)
+            return(response)
+        },
+
+        get_url = function(){
+            port <- self$get_port()
+            return(paste0("/proxy/",port))
+        },
+
+        get_port = function(){
+            if(private$http_port == 0){
+                self$start_http()
+            }
+            return(private$http_port)
+        },
+
+        set_port = function(port){
+            if(private$http_port > 0)
+                suppressMessages(tools::startDynamicHelp(FALSE))
+            self$start_http(port=port)
+        },
+
+        start_http = function(port=NULL){
+            if(length(port) > 0)
+                options(help.ports=port[1])
+            if(private$http_port == 0){
+                suppressMessages(port <- tools::startDynamicHelp(TRUE))
+                private$http_port <- port
+                em <- EventManager(type="http")
+                em$activate()
+            }
+        },
+
+        str2iframe = function(code,
+                              width = "100%",
+                              height = 400L,
+                              class = "rkernel-iframe",
+                              style = "border-style:none"){
+            id <- UUIDgenerate()
+            path <- paste0("/iframe/",id,"/")
+            url <- paste0(self$get_url(),path)
+            if(!eventmanagers$http$has("iframe"))
+                eventmanagers$http$on("iframe",private$handle_iframe)
+            private$iframes[[id]] <- code
+            if_tmpl <- "
+                   <iframe src=\"%s\" width=\"%s\" height=\"%s\" class=\"%s\" style=\"%s\">
+                   </iframe>
+                   "
+            iframe <- sprintf(if_tmpl,url,width,height,class,style)
+            # mime_data <- list(
+            #     "text/plain" = "",
+            #     "text/html"  = iframe
+            # )
+            # metadata <- emptyNamedList
+            # transient <- list(display_id=id)
+            # display_data(data=mime_data,
+            #              metadata=metadata,
+            #              transient=transient)
+            structure(iframe,class="iframe",id=id)
         }
+
     ),
     
     private = list(
@@ -373,7 +450,9 @@ Evaluator <- R6Class("Evaluator",
         help_proc = integer(),
         help_url = character(),
 
-        start_local_help_system = function(help_port=getOption("help.port",10001)){
+        http_port = 0,
+
+        start_shared_help_server = function(help_port=getOption("help.port",10001)){
             help_port <- as.integer(help_port)
             if(!check_help_port(help_port)){
                 help_proc  <- callr::r_bg(function(port){
@@ -386,29 +465,38 @@ Evaluator <- R6Class("Evaluator",
                 }
                 private$help_proc <- help_proc
             }
-            #private$help_port <- help_port
-            private$help_url <- paste0("http://127.0.0.1:",help_port)
-            #assign("help_proc",private$help_proc,envir=private$env)
-            #assign("help_port",private$help_port,envir=private$env)
-
-            assign("get_help_url",function()private$help_url,envir=private$env)
-        },
-        start_proxied_help_system = function(help_url=paste0(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"),
-                                                           "/RHelp")){
-            help_url <- gsub("//","/",help_url,fixed=TRUE)
+            if(getOption("help_use_proxy",FALSE)){
+                if(nzchar(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"))){
+                    help_url <- paste0(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"),
+                                       "/RHelp")
+                    help_url <- gsub("//","/",help_url,fixed=TRUE)
+                } else
+                help_url <- sprintf("/proxy/%d",help_port)
+            } else
+                help_url <- paste0("http://127.0.0.1:",help_port)
+            private$help_port <- help_port
             private$help_url <- help_url
-            assign("get_help_url",function()private$help_url,envir=private$env)
+        },
+
+        start_private_help_server = function(){
+            help_port <- tools::startDynamicHelp(TRUE)
+            if(getOption("help_use_proxy",TRUE))
+                help_url <- sprintf("/proxy/%d",help_port)
+            else
+                help_url <- paste0("http://127.0.0.1:",help_port)
+            private$help_port <- help_port
+            private$help_url <- help_url
+            private$http_port <- help_port
         },
         start_help_system = function(){
-            if(nzchar(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")) &&
-               !length(getOption("rkernel_help_system")))
-                options(rkernel_help_system="proxy")
-            if(isTRUE(getOption("rkernel_help_system")=="proxy"))
-                private$start_proxied_help_system()
+            if(getOption("shared_help_system",TRUE))
+                private$start_shared_help_server()
             else
-                private$start_local_help_system()
+                private$start_private_help_server()
+            assign("get_help_url",private$get_help_url)
+            assign("get_help_port",private$get_help_port)
         },
-        
+
         # help_start = function(update = FALSE, 
         #                       gui = "irrelevant", 
         #                       browser = getOption("browser"), 
@@ -420,6 +508,13 @@ Evaluator <- R6Class("Evaluator",
         #                       browser=browser,
         #                       remote=remote)
         # },
+
+        get_help_url = function(){
+            return(private$help_url)
+        },
+        get_help_port = function(){
+            return(private$help_port)
+        },
 
         new_cell = TRUE,
 
@@ -653,31 +748,56 @@ Evaluator <- R6Class("Evaluator",
 
         handle_magic = function(magic,code){
             if(tolower(magic) == "math"){
+                code <- gsub("^%%.+?\n","",code)
                 d <- LaTeXMath(code)
                 private$kernel$display_data(data=d$data,
                                             metadata=d$metadata,
                                             transient=d$transient)
             } 
             else if (tolower(magic) == "css"){
+                code <- gsub("^%%.+?\n","",code)
                 d <- CSS(code)
                 private$kernel$display_data(data=d$data,
                                             metadata=d$metadata,
                                             transient=d$transient)
             }
             else if (tolower(magic) == "javascript"){
+                code <- gsub("^%%.+?\n","",code)
                 d <- Javascript(code)
                 private$kernel$display_data(data=d$data,
                                             metadata=d$metadata,
                                             transient=d$transient)
             }
             else if (tolower(magic) == "html"){
+                code <- gsub("^%%.+?\n","",code)
                 d <- raw_html(code)
                 private$kernel$display_data(data=d$data,
                                             metadata=d$metadata,
                                             transient=d$transient)
             }
+            else if (tolower(magic) == "iframe"){
+                code <- gsub("^%%.+?\n","",code)
+                log_out(code)
+                text_html <- self$str2iframe(code,class="rkernel-iframe-magic")
+                d <- raw_html(text_html)
+                log_out(d,use.str=TRUE)
+                private$kernel$display_data(data=d$data,
+                                            metadata=d$metadata,
+                                            transient=d$transient)
+            }
         },
-
+        iframes = list(),
+        handle_iframe = function(path,query,...){
+            log_out("handle_iframe: %s",path)
+            path <- strsplit(path,"/")[[1]]
+            log_out(path,use.print=TRUE)
+            id <- path[3]
+            body <- private$iframes[[id]]
+            list(payload=body,
+                 `content-type`="text/html",
+                 headers=NULL,
+                 `status code`=200)
+        },
 
         handle_interrupt = function(i){
             private$kernel$stream(text = "<interrupted>",
@@ -811,3 +931,5 @@ cell.par <- function(...){
     e <- get_evaluator()
     e$cell.par(...)
 }
+
+str2iframe <- function(x,...) evaluator$current$str2iframe(x,...)

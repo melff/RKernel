@@ -1,0 +1,366 @@
+asset_fetcher <- function(path,...){
+    # log_out('asset_fetcher:',path)
+    split_path <- strsplit(path,"/",fixed=TRUE)[[1]]
+    pkgname <- split_path[3]
+    basename <- tail(split_path,1)
+    file_path <- as.list(tail(split_path,-3))
+    args <- c(file_path,list(package=pkgname))
+    filename <- do.call("system.file",args)
+    if(file_test("-f",filename)){
+      split_basename <- strsplit(basename,".",fixed=TRUE)[[1]]
+      filext <- tail(split_basename,1)
+      mime_type <- switch(filext,
+        "html"="text/html",
+        "css"="text/css",
+        "js"="text/js",
+        "text/plain"
+        )
+      payload <- readLines(filename)
+      # log_out(sprintf('"%s" successfully loaded',filename))
+      payload <- paste0(payload,collapse="\n")
+      list(payload=payload,
+         `content-type`=mime_type,
+          headers=NULL,
+          `status code`=200)
+    }
+    else {
+        # log_error(sprintf('"%s" not found',filename))
+        list(payload=sprintf('"%s" not found',filename),
+         `content-type`="text/plain",
+          headers=NULL,
+          `status code`=404)
+    }
+}
+
+dt_data <- new.env()
+
+dt_data_fetcher <- function(path,query,postBody,headers){
+    log_out('data_fetcher:',path)
+    log_out('query:')
+    log_out(query,use.print=TRUE)
+    log_out('post body:')
+    log_out(postBody,use.print=TRUE)
+    log_out('headers:')
+    log_out(headers,use.str=TRUE)
+    draw <- as.integer(postBody["draw"])
+    start <- as.integer(postBody["start"])
+    len <- as.integer(postBody["length"])
+    split_path <- strsplit(path,"/",fixed=TRUE)[[1]]
+    name <- split_path[3]
+    obj <- get(name,envir=dt_data)
+    if(len < 0) len <- nrow(obj)
+    from <- start + 1
+    to <- min(nrow(obj),start + len)
+    ii <- seq(from=from,to=to)
+    data <- obj[ii,,drop=FALSE]
+    data <- cbind("row.names"=rownames(data),as.matrix(format(data)))
+    # log_out(data,use.str=TRUE)
+    payload <- to_json(list(
+                     draw=draw,
+                     recordsTotal=nrow(obj),
+                     recordsFiltered=nrow(obj),
+                     data=data
+                     ),
+                     pretty=TRUE)
+    list(payload=payload,
+         `content-type`="application/json",
+          headers=NULL,
+          `status code`=200)
+}
+
+fill_tmpl <- function(tmpl,...){
+    substitutions <- c(...)
+    res <- tmpl
+    for(nm in names(substitutions)){
+        pattern <- paste0("(( ",nm," ))")
+        replacement <- substitutions[nm]
+        res <- gsub(pattern,replacement,res,fixed=TRUE)
+    }
+    res
+}
+
+dt_head_tmpl <- '<link rel="stylesheet" type="text/css" href="/proxy/(( port ))/assets/RKernel/css/datatables.min.css">
+<style>
+table.dataTable tbody td {
+    text-align: right;
+}
+table.dataTable thead th {
+    text-align: center;
+}
+.datatable-wrapper {
+    font-size: 12px;
+}
+.rownames {
+    font-weight: bold;
+    border-style-left: none;
+}
+div.dts div.dataTables_scrollBody {
+    background: unset;
+    background-color: rgba(250,250,250);
+}
+/* table.dataTable thead tr th:first-child,
+table.dataTable thead tr td:first-child {
+   border-left: 1px solid rgb(0,0,0,.15);
+}*/
+table.dataTable.cell-border tbody tr th:first-child,
+table.dataTable.cell-border tbody tr td:first-child {
+   border-left: none;
+}
+table.dataTable thead tr th,
+table.dataTable thead tr td {
+   /*border-top: 1px solid rgba(0,0,0,.15);*/
+   border-right: 1px solid rgba(0,0,0,.15);
+   border-bottom: 1px solid rgba(0,0,0,.15);
+   background-color: rgba(250,250,250);
+}
+.dataTables_scroll {
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  border-left: 1px solid rgba(0, 0, 0, 0.15);
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+}
+.dataTables_scrollHead {
+  background-color: rgb(250,250,250);
+}
+table.dataTable thead tr > .dtfc-fixed-left,
+table.dataTable.cell-border tbody tr th:first-child,
+table.dataTable.cell-border tbody tr td:first-child,
+table.dataTable.cell-border tbody tr th:first-child,
+table.dataTable.cell-border tbody tr td:first-child {
+   background-color: rgb(250,250,250);
+}
+</style>
+<script type="text/javascript" charset="utf8" 
+        src="/proxy/(( port ))/assets/RKernel/js/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" charset="utf8" 
+        src="/proxy/(( port ))/assets/RKernel/js/datatables.min.js"></script>'
+
+
+dt_tmpl <- '<script type="text/javascript" charset="utf8">
+    $(document).ready(function () {
+        $("#(( id ))").DataTable({
+            serverSide: true,
+            processing: true,
+            ordering: false,
+            searching: false,
+            scrollY: (( scrollY )),
+            scrollCollapse: true,
+            scrollX: true,
+            fixedColumns: true,
+            scroller: true,
+            deferRender: true,
+            ajax: {
+              url: "/proxy/(( port ))/dt-data/(( name ))",
+              type: "POST"
+            },
+            "columnDefs": [
+                { className: "rownames", "targets": [ 0 ] }
+             ],
+        });
+    });
+</script>'
+
+dt_table_tmpl <- '<div class="datatable-wrapper">
+<table id="(( id ))" class="cell-border hover compact" style="width:auto;"><thead>
+    <tr>
+(( header ))
+    </tr>
+  </thead><tbody><tr><td>Loading... </td></tr></tbody></table>
+</div>'
+
+html_page_tmpl <- '<!DOCTYPE html>
+<html>
+<head>
+(( head ))
+</head>
+<body>
+(( table ))
+(( script ))
+</body>
+</html>'
+
+mk_tab_hdr <- function(obj){
+    hdr <- c("",colnames(obj))
+    hdr <- paste0("      <th>",hdr,"</th>")
+    paste(hdr,collapse="\n")
+}
+
+datatable_page <- function(obj,
+                         id=UUIDgenerate(),
+                         scrollY=400,
+                         size=50,
+                         page_num=1){
+    port <- evaluator$current$get_port()
+    if(!eventmanagers$http$has("assets"))
+    eventmanagers$http$on("assets",asset_fetcher)
+    if(!eventmanagers$http$has("dt-data"))
+        eventmanagers$http$on("dt-data",dt_data_fetcher)
+    n <- ncol(obj)
+    m <- n%/%size
+    r <- n%%size
+    p0 <- page_num - 1
+    from <- p0*size + 1
+    to <- if(page_num > m) from - 1 + r else page_num*size
+    ii <- seq(from=from,to=to)
+    obj <- obj[ii]
+    dt_data[[id]] <- obj
+    code <- fill_tmpl(html_page_tmpl,
+                        head=fill_tmpl(dt_head_tmpl,port=port),
+                        table=fill_tmpl(dt_table_tmpl,id=id,header=mk_tab_hdr(obj)),
+                        script=fill_tmpl(dt_tmpl,port=port,name=id,id=id,scrollY=scrollY)
+                   )    
+    code
+}
+
+#' @export
+dataTable <- function(x,...) UseMethod("dataTable")
+#' @export
+dataTable.default <- function(x) dataTable.data.frame(as.data.frame(x),...)
+#' @export
+dataTable.data.frame <- function(x,...) 
+    dataTableClass$new(x,...)
+
+#' @export
+dataTableClass <- R6Class("dataTable",{
+    public = list(
+        w = NULL,
+        page = 1,
+        m = 0,
+        r = 0,
+        size = 50,
+        iframe = NULL,
+        b_left = NULL,
+        b_right = NULL,
+        b_first = NULL,
+        b_last = NULL,
+        dt = NULL,
+        obj = NULL,
+        label = NULL,
+        style = NULL,
+        navigator = NULL,
+        scrollY = NULL,
+        height = NULL,
+        initialize = function(obj,size=50,nlines=min(nrow(obj),15),...){
+            self$size <- size
+            self$m <- ncol(obj)%/%size
+            self$r <- ncol(obj)%%size
+            self$b_left <- Button(description="<")
+            self$b_right <- Button(description=">")
+            self$b_first <- Button(description="<<")
+            self$b_last <- Button(description=">>")
+            self$iframe <- HTML()
+            if(ncol(obj) > size){
+                self$label <- HTML()
+                self$style <- HTML()
+                self$style$value <- "<style>
+div.datatable-navigation {
+  align-self: center;
+}
+button.datatable-navigation-button {
+  width: auto;
+  height: auto;
+  background: unset;
+  padding: 0;
+  line-height: 15px;
+}
+div.datatable-navigation div.widget-html-content {
+  line-height: 15px;
+}
+</style>"
+                self$b_left$add_class("datatable-navigation-button")
+                self$b_right$add_class("datatable-navigation-button")
+                self$b_first$add_class("datatable-navigation-button")
+                self$b_last$add_class("datatable-navigation-button")
+
+                self$b_left$on_click(self$page_left)
+                self$b_right$on_click(self$page_right)
+                self$b_first$on_click(self$page_first)
+                self$b_last$on_click(self$page_last)
+
+                self$navigator <- HBox(self$b_first,
+                                       self$b_left,
+                                       self$label,
+                                       self$b_right,
+                                       self$b_last)
+                self$navigator$add_class("datatable-navigation")
+                self$w <- VBox(self$style,
+                               self$navigator,
+                               self$iframe)
+            }
+            else {
+                self$w <- self$iframe
+            }
+            self$scrollY <- nlines*23
+            self$height <- self$scrollY + 64
+            self$dt <- datatable_page(obj,size=size,scrollY=self$scrollY,...)
+            self$iframe$value <- str2iframe(self$dt,height=self$height)
+            self$obj <- obj
+            self$show_columns()
+        },
+        show_columns = function(){
+            from <- (self$page - 1)*self$size + 1
+            if(self$page > self$m)
+                to <- from + self$r
+            else
+                to <- self$page*self$size
+            self$label$value <- sprintf("Columns %d-%d of %d",from,to,ncol(self$obj))
+            invisible(NULL)
+        },
+        page_left = function(){
+            page <- max(1,self$page - 1)
+            if(page < self$page){
+                self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
+                self$iframe$value <- str2iframe(self$dt,height=self$height)
+                self$page <- page
+                self$show_columns()
+            }
+            invisible(NULL)
+        },
+        page_right = function(){
+            page <- self$page + 1
+            if(page > self$m){
+                if(self$r > 0) page <- self$m + 1
+                else page <- self$m
+            }
+            if(page > self$page){
+                self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
+                self$iframe$value <- str2iframe(self$dt,height=self$height)
+                self$page <- page
+                self$show_columns()
+            }
+            invisible(NULL)
+        },
+        page_first = function(){
+            page <- 1
+            if(page < self$page){
+                self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
+                self$iframe$value <- str2iframe(self$dt,height=self$height)
+                self$page <- page
+                self$show_columns()
+            }
+            invisible(NULL)
+        },
+        page_last = function(){
+            if(self$r > 0) page <- self$m + 1
+            else page <- self$m
+            if(page > self$page){
+                self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
+                self$iframe$value <- str2iframe(self$dt,height=self$height)
+                self$page <- page
+                self$show_columns()
+            }
+            invisible(NULL)
+        }
+    )
+    
+})
+
+#' @export
+display_data.dataTable <- function(x,...,
+                                metadata=emptyNamedList,
+                                id=attr(x,"id"),
+                                update=FALSE){
+    display_data(x$w,
+            metadata=metadata,
+            id=id,
+            update=update)
+}
