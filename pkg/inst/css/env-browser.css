@@ -1,6 +1,7 @@
 .output_area .env-browser-wrapper {
     overflow: auto;
     max-height: 300px;
+    line-height: 1;
 }
 
 .ui-dialog .env-browser-wrapper {

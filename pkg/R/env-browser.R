@@ -9,6 +9,8 @@ str_ <- function(nm,envir){
 
 #' A HTML version of 'ls.str()'
 #'
+#' This function is deprecated. Use \code{\link{env_browser}} instead.
+#'
 #' @param pos integer indicating \code{\link[base]{search}} path position, or -1 for the current environment.
 #' @param name an optional name indicating search path position, see \code{\link[base]{ls}}.
 #' @param envir the environment to look into
@@ -60,14 +62,14 @@ env_browser_table <- function(pos = -1, name, envir, all.names = FALSE, pattern,
     nms <- nms[r]
     n <- length(nms)
     m <- matrix("",ncol=3,nrow=n)
-    str_nms <- sapply(nms,str_,envir=envir)
-    str_nms1 <- sapply(str_nms,"[[",1)
-    str_nms2 <- sapply(str_nms,"[",-1)
-    str_nms2 <- sapply(str_nms2,paste0,collapse="\n")
+    str_nms <- lapply(nms,str_,envir=envir)
+    str_nms1 <- lapply(str_nms,"[[",1)
+    str_nms2 <- lapply(str_nms,"[",-1)
+    str_nms2 <- lapply(str_nms2,paste0,collapse="\n")
     m[,1] <- nms
-    m[,2] <- str_nms1
-    m[,3] <- str_nms2
-    result <- c()
+    m[,2] <- unlist(str_nms1)
+    m[,3] <- unlist(str_nms2)
+    result <- NULL
     thead <- c("Name","Value")
     thead <- c(paste0("<th class='object-name border-left border-top'>",thead[1],"</th>"),
                paste0("<th class='object-summary border-left border-right border-top'>",thead[2],"</th>"))
@@ -90,7 +92,7 @@ env_browser_table <- function(pos = -1, name, envir, all.names = FALSE, pattern,
             summary <- c("<table class='env-browser'>",summary,"</table>")
             summary <- paste(summary,collapse="\n")    
             if(nzchar(row[3])){  
-                details <- unlist(strsplit(row[3],"\n"))
+                details <- unlist(strsplit(row[3],"\n",fixed=TRUE))
                 details <- paste0("<td class='object-details border-left border-right'><code>",
                                   details,
                                   "</code></td>")
@@ -130,5 +132,4 @@ env_browser_table <- function(pos = -1, name, envir, all.names = FALSE, pattern,
     }
     html
 }
-
 

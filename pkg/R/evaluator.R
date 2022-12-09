@@ -127,7 +127,11 @@ Evaluator <- R6Class("Evaluator",
             assign("get_port",self$get_port,envir=private$env)
             assign("set_port",self$set_port,envir=private$env)
             assign("str2iframe",self$str2iframe,envir=private$env)
+            assign("envBrowser",envBrowser,envir=private$env)
             # log_out("evaluator$startup() complete")
+            em <- EventManager(type="eval")
+            em$activate()
+
         },
         #' @description
         #' Shut the session down
@@ -147,6 +151,7 @@ Evaluator <- R6Class("Evaluator",
                 # message(sprintf("Found magic '%s'",magic))
                 #code <- gsub("^%%.+?\n","",code)
                 private$handle_magic(magic,code)
+                eventmanagers$eval$send("cell_completed")
                 return()
             }
 
@@ -194,6 +199,7 @@ Evaluator <- R6Class("Evaluator",
                     private$saved.parms <- list()
                     do.call("par",op)
                 }
+                eventmanagers$eval$send("cell_completed")
                 # log_out(sprintf("== END CELL [%d] ==",self$cell_no))
             }
         },
@@ -357,8 +363,8 @@ Evaluator <- R6Class("Evaluator",
         },
 
         httpd = function(path,query,...){
-            log_out("http path: ",path)
-            log_out("http query: ",query,use.str=TRUE)
+            # log_out("http path: ",path)
+            # log_out("http query: ",query,use.str=TRUE)
             split_path <- strsplit(path,"/")[[1]]
             response <- NULL
             if(length(split_path) > 1){
