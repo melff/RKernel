@@ -374,8 +374,15 @@ Evaluator <- R6Class("Evaluator",
                 event <- split_path[2]
                 response <- eventmanagers$http$send(event,path,query,...)
             }
-            if(!length(response))
+            if(!length(response)){
                 response <- private$kernel$httpd(path=path,query=query,...)
+                log_out(private$help_url)
+                if(getOption("help_use_proxy",TRUE)){
+                    payload <- response$payload
+                    payload <- gsub("/doc/html/",paste0(private$help_url,"/doc/html/"),payload,fixed=TRUE)
+                    response$payload <- payload
+                }
+            }
             return(response)
         },
 
@@ -510,7 +517,7 @@ Evaluator <- R6Class("Evaluator",
             em$activate()
         },
         start_help_system = function(){
-            if(getOption("shared_help_system",TRUE))
+            if(getOption("shared_help_system",FALSE))
                 private$start_shared_help_server()
             else
                 private$start_private_help_server()
