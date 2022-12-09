@@ -9,13 +9,29 @@
 #' @export
 View <- function(x,
                  title=deparse(substitute(x)),
-                 ...)
+                 ...) UseMethod("View")
+
+#' @export
+View.default <- function(x,title=deparse(substitute(x)),...)
 {
 
     # cls <- class(x)
     # title <- paste0(cls,": ",title)
+    title <- paste0(title,collapse="")
+    x <- as.data.frame(x)
+    if(ncol(x) == 1)
+        colnames(x) <- title
+    dataTable(x)
+    
+}
 
-    virtable_widget(x)
+#' @export
+View.data.frame <- function(x,title=deparse(substitute(x)),...)
+{
+
+    # cls <- class(x)
+    # title <- paste0(cls,": ",title)
+    dataTable(x)
     
 }
 

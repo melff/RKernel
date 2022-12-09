@@ -214,7 +214,7 @@ datatable_page <- function(obj,
 #' @export
 dataTable <- function(x,...) UseMethod("dataTable")
 #' @export
-dataTable.default <- function(x) dataTable.data.frame(as.data.frame(x),...)
+dataTable.default <- function(x,...) dataTable.data.frame(as.data.frame(x),...)
 #' @export
 dataTable.data.frame <- function(x,...) 
     dataTableClass$new(x,...)

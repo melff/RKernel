@@ -3,6 +3,8 @@
 S3method("[",dictionary)
 S3method("[<-",dictionary)
 S3method(Page,default)
+S3method(View,data.frame)
+S3method(View,default)
 S3method(as.character,Unicode)
 S3method(as.integer,Float)
 S3method(as.integer,Integer)
