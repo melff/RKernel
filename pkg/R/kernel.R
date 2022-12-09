@@ -318,7 +318,39 @@ Kernel <- R6Class("Kernel",
     print = NULL,
     cat = NULL,
     str = NULL,
-    httpd = NULL
+    httpd = NULL,
+    input_request = function(prompt="",password=FALSE){
+      private$send_message(type="input_request",
+                           parent=private$parent$shell,
+                           socket_name="stdin",
+                           content=list(
+                             prompt=prompt,
+                             password=password))
+    },
+    read_stdin = function(){
+      continue <- TRUE
+      input <- ""
+      while(continue){
+        private$run_services()
+        rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
+        if(length(private$services) > 0) 
+          poll_timeout <- rkernel_poll_timeout 
+        else 
+          poll_timeout <- -1L
+        # log_out(sprintf("poll_timeout = %d",poll_timeout))
+        req <- private$poll_request("stdin",timeout=poll_timeout)
+        # log_out("req")
+        # log_out(req,use.str=TRUE)
+        # Setting poll_timeout to anything other than -1 seems to be
+        # futile right now as get_message("stdin") is blocking ...
+        msg <- private$get_message("stdin")
+        if(msg$header$msg_type != "input_reply")
+          next
+        input <- msg$content$value
+        continue <- FALSE
+      }
+      return(input)
+    }
   ),
 
   private = list(
@@ -334,7 +366,9 @@ Kernel <- R6Class("Kernel",
                            content=list(
                              code=msg$content$code,
                              execution_count=private$execution_count))
-      r <- tryCatch(self$evaluator$eval_cell(msg$content$code),
+      # self$log_out(msg,use.print=TRUE)
+      r <- tryCatch(self$evaluator$eval_cell(msg$content$code,
+                                             msg$content$allow_stdin),
                     error=function(e)"errored",
                     interrupt=function(e)"interrupted"
                     )
@@ -554,9 +588,10 @@ Kernel <- R6Class("Kernel",
         get_more <- zmq.getsockopt(socket,private$.pbd_env$ZMQ.SO$RCVMORE,0L)
         if(get_more != 1) break
         i <- i + 1
+        # self$cat("i = %d", i)
       }
       msg <- private$wire_unpack(wire_in)
-      #cat("Got message from socket", socket_name)
+      # self$cat("Got message from socket", socket_name)
       if(!length(private$session)){
         header <- msg$header
         private$session <- header$session

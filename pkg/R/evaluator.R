@@ -127,6 +127,7 @@ Evaluator <- R6Class("Evaluator",
             assign("get_port",self$get_port,envir=private$env)
             assign("set_port",self$set_port,envir=private$env)
             assign("str2iframe",self$str2iframe,envir=private$env)
+            assign("readline",self$readline,envir=private$env)
             assign("envBrowser",envBrowser,envir=private$env)
             # log_out("evaluator$startup() complete")
             em <- EventManager(type="eval")
@@ -142,8 +143,9 @@ Evaluator <- R6Class("Evaluator",
         #' Evaluate R code
         #' @param code A string with R code
         #' @param ... Other arguments, currently ignored
-        eval_cell = function(code,...){
+        eval_cell = function(code,allow_stdin,...){
             
+            private$allow_stdin <- allow_stdin
             # log_out("eval_cell")
             perc_match <- getMatch(code,regexec("^%%([a-zA-Z0-9]+)\n",code))
             if(length(perc_match) > 1){
@@ -365,6 +367,7 @@ Evaluator <- R6Class("Evaluator",
         httpd = function(path,query,...){
             # log_out("http path: ",path)
             # log_out("http query: ",query,use.str=TRUE)
+            # log_out(eventmanagers$http,use.str=TRUE)
             split_path <- strsplit(path,"/")[[1]]
             response <- NULL
             if(length(split_path) > 1){
@@ -431,6 +434,14 @@ Evaluator <- R6Class("Evaluator",
             #              metadata=metadata,
             #              transient=transient)
             structure(iframe,class="iframe",id=id)
+        },
+
+        readline = function(prompt=""){
+            if(!private$allow_stdin) return()
+            private$kernel$input_request(prompt=prompt,
+                                         password=FALSE)
+            result <- private$kernel$read_stdin()
+            return(result)
         }
 
     ),
@@ -449,6 +460,8 @@ Evaluator <- R6Class("Evaluator",
         results = list(),
         env = list(),
         comm_manager = list(),
+
+        allow_stdin = TRUE,
 
         context = list(),
 
@@ -493,6 +506,8 @@ Evaluator <- R6Class("Evaluator",
             private$help_port <- help_port
             private$help_url <- help_url
             private$http_port <- help_port
+            em <- EventManager(type="http")
+            em$activate()
         },
         start_help_system = function(){
             if(getOption("shared_help_system",TRUE))
