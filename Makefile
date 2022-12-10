@@ -63,11 +63,6 @@ install:
 installspec:
 	Rscript --vanilla -e 'RKernel::installspec()'
 
-.PHONY: install-RHelp-server
-install-RHelp-server:
-	Rscript --vanilla -e 'RKernel::install_RHelp_server()'
-
-
 .PHONY: build-and-install
 build-and-install: build install
 

@@ -50,7 +50,6 @@ Collate:
     'kernel.R'
     'main.R'
     'scrolling-table.R'
-    'sharedHelp.R'
     'traitlets.R'
     'traitlets-R6instance.R'
     'traitlets-boolean.R'

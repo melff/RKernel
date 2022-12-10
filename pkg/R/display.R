@@ -410,12 +410,12 @@ display_data.help_files_with_topic <- function(x,...,
             # text_latex <- c(text_latex,text_latex1)
             help_label1 <- paste0(pkgname,"::",topic)
             help_labels <- c(help_labels,help_label1)
-            help_url1 <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(file),".html")
+            help_url1 <- paste0(get_url(),"/library/",pkgname,"/html/",basename(file),".html")
             help_urls <- c(help_urls,help_url1)
         }
 
         if(length(paths) == 1){
-            help_url <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(paths),".html")
+            help_url <- paste0(get_url(),"/library/",pkgname,"/html/",basename(paths),".html")
             text_html <- paste(paste0(
                 "<iframe src='",help_url,"'"),
                 "style='width:100%;height:",help_page_height,";'",
@@ -425,7 +425,7 @@ display_data.help_files_with_topic <- function(x,...,
                 sep="\n")
         } 
         else {
-            help_url <- paste0(get_help_url(),"/library/NULL/help/",URLencode(topic,reserved=TRUE))
+            help_url <- paste0(get_url(),"/library/NULL/help/",URLencode(topic,reserved=TRUE))
             text_html <- paste(paste0("<iframe src='",help_url,"'"),
                 "style='width:100%;height:",help_page_height,"'",
                 "class='manpage'>",
@@ -479,7 +479,7 @@ help.start <- function(update = FALSE,
                        gui = "irrelevant", 
                        browser = getOption("browser"), 
                        remote = NULL){
-    help_url <- paste0(get_help_url(),"/doc/html/index.html")
+    help_url <- paste0(get_url(),"/doc/html/index.html")
     text_html <- paste(paste0("<iframe src='",help_url,"'"),
         "style='width:100%;height:70ex;'",
         "class='manpage'>",
@@ -535,7 +535,7 @@ display_data.hsearch <- function(x,...,
     # http://127.0.0.1:10006/doc/html/Search?pattern=regression&
     #fields.alias=1&fields.title=1&fields.concept=1&ignore.case=1&types.help=1&types.vignette=1&types.demo=1
 
-    help_search_url <- paste0(get_help_url(),
+    help_search_url <- paste0(get_url(),
                   "/doc/html/Search?pattern=",
                   gsub(" ","+",x$pattern,fixed=TRUE))
     for(field in x$fields){
