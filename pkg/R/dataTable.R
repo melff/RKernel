@@ -35,13 +35,13 @@ asset_fetcher <- function(path,...){
 dt_data <- new.env()
 
 dt_data_fetcher <- function(path,query,postBody,headers){
-    log_out('data_fetcher:',path)
-    log_out('query:')
-    log_out(query,use.print=TRUE)
-    log_out('post body:')
-    log_out(postBody,use.print=TRUE)
-    log_out('headers:')
-    log_out(headers,use.str=TRUE)
+    # log_out('data_fetcher:',path)
+    # log_out('query:')
+    # log_out(query,use.print=TRUE)
+    # log_out('post body:')
+    # log_out(postBody,use.print=TRUE)
+    # log_out('headers:')
+    # log_out(headers,use.str=TRUE)
     draw <- as.integer(postBody["draw"])
     start <- as.integer(postBody["start"])
     len <- as.integer(postBody["length"])
@@ -149,7 +149,7 @@ dt_tmpl <- '<script type="text/javascript" charset="utf8">
             scroller: true,
             deferRender: true,
             ajax: {
-              url: "/proxy/(( port ))/dt-data/(( name ))",
+              url: "(( url ))/dt-data/(( name ))",
               type: "POST"
             },
             "columnDefs": [
@@ -189,7 +189,7 @@ datatable_page <- function(obj,
                          scrollY=400,
                          size=50,
                          page_num=1){
-    port <- evaluator$current$get_port()
+    url <- evaluator$current$get_url()
     if(!eventmanagers$http$has("assets"))
     eventmanagers$http$on("assets",asset_fetcher)
     if(!eventmanagers$http$has("dt-data"))
