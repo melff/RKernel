@@ -492,9 +492,14 @@ Evaluator <- R6Class("Evaluator",
             help_port <- as.integer(help_port)
             if(!check_help_port(help_port)){
                 help_proc  <- callr::r_bg(function(port){
-                    options(help.ports=port)
-                    tools::startDynamicHelp(TRUE)
-                    repeat Sys.sleep(60)
+                    url <- sprintf("/proxy/%d",port)
+                    if(nzchar(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"))){
+                        url <- paste0(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"),
+                                           url)
+                        url <- gsub("//","/",url,fixed=TRUE)
+                    }
+                    server <- RKernel::sharedHelpServer$new(port,url)
+                    server$run()
                 },args=list(port=help_port))
                 repeat{
                     if(help_proc$is_alive()) break
