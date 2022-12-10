@@ -396,7 +396,7 @@ Evaluator <- R6Class("Evaluator",
 
         get_port = function(){
             if(private$http_port == 0){
-                self$start_http()
+                self$start_httpd()
             }
             return(private$http_port)
         },
@@ -404,10 +404,10 @@ Evaluator <- R6Class("Evaluator",
         set_port = function(port){
             if(private$http_port > 0)
                 suppressMessages(tools::startDynamicHelp(FALSE))
-            self$start_http(port=port)
+            self$start_httpd(port=port)
         },
 
-        start_http = function(port=NULL){
+        start_httpd = function(port=NULL){
             if(length(port) > 0)
                 options(help.ports=port[1])
             if(private$http_port == 0){
