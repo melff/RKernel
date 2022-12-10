@@ -376,10 +376,11 @@ Evaluator <- R6Class("Evaluator",
             }
             if(!length(response)){
                 response <- private$kernel$httpd(path=path,query=query,...)
-                log_out(private$help_url)
+                # log_out(private$help_url)
                 if(getOption("help_use_proxy",TRUE)){
                     payload <- response$payload
-                    payload <- gsub("/doc/html/",paste0(private$help_url,"/doc/html/"),payload,fixed=TRUE)
+                    payload <- gsub("/doc/html/",paste0(private$help_url,
+                                                        "/doc/html/"),payload,fixed=TRUE)
                     response$payload <- payload
                 }
             }
@@ -387,8 +388,10 @@ Evaluator <- R6Class("Evaluator",
         },
 
         get_url = function(){
-            port <- self$get_port()
-            return(paste0("/proxy/",port))
+            if(private$http_port == 0){
+                self$start_httpd()
+            }
+            return(private$http_url)
         },
 
         get_port = function(){
@@ -410,6 +413,12 @@ Evaluator <- R6Class("Evaluator",
             if(private$http_port == 0){
                 suppressMessages(port <- tools::startDynamicHelp(TRUE))
                 private$http_port <- port
+                http_url <- sprintf("/proxy/%d",port)
+                if(nzchar(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"))){
+                    http_url <- paste0(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"),
+                                       http_url)
+                }
+                private$http_url <- http_url
                 em <- EventManager(type="http")
                 em$activate()
             }
@@ -477,6 +486,7 @@ Evaluator <- R6Class("Evaluator",
         help_url = character(),
 
         http_port = 0,
+        http_url = character(),
 
         start_shared_help_server = function(help_port=getOption("help.port",10001)){
             help_port <- as.integer(help_port)
@@ -492,12 +502,12 @@ Evaluator <- R6Class("Evaluator",
                 private$help_proc <- help_proc
             }
             if(getOption("help_use_proxy",FALSE)){
+                help_url <- sprintf("/proxy/%d",help_port)
                 if(nzchar(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"))){
                     help_url <- paste0(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"),
-                                       "/RHelp")
+                                       help_url)
                     help_url <- gsub("//","/",help_url,fixed=TRUE)
-                } else
-                help_url <- sprintf("/proxy/%d",help_port)
+                }
             } else
                 help_url <- paste0("http://127.0.0.1:",help_port)
             private$help_port <- help_port
@@ -505,14 +515,23 @@ Evaluator <- R6Class("Evaluator",
         },
 
         start_private_help_server = function(){
-            help_port <- tools::startDynamicHelp(TRUE)
-            if(getOption("help_use_proxy",TRUE))
+            suppressMessages(help_port <- tools::startDynamicHelp(TRUE))
+            if(getOption("help_use_proxy",TRUE)){
                 help_url <- sprintf("/proxy/%d",help_port)
+                if(nzchar(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"))){
+                    help_url <- paste0(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"),
+                                       help_url)
+                    help_url <- gsub("//","/",help_url,fixed=TRUE)
+                }
+            }
             else
                 help_url <- paste0("http://127.0.0.1:",help_port)
             private$help_port <- help_port
             private$help_url <- help_url
             private$http_port <- help_port
+            private$http_url <- help_url
+            # log_out(sprintf("help_url: %s",help_url))
+            # log_out(sprintf("http_url: %s",private$http_url))
             em <- EventManager(type="http")
             em$activate()
         },
