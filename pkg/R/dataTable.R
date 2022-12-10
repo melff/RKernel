@@ -79,7 +79,7 @@ fill_tmpl <- function(tmpl,...){
     res
 }
 
-dt_head_tmpl <- '<link rel="stylesheet" type="text/css" href="/proxy/(( port ))/assets/RKernel/css/datatables.min.css">
+dt_head_tmpl <- '<link rel="stylesheet" type="text/css" href="(( url ))/assets/RKernel/css/datatables.min.css">
 <style>
 table.dataTable tbody td {
     text-align: right;
@@ -130,9 +130,9 @@ table.dataTable.cell-border tbody tr td:first-child {
 }
 </style>
 <script type="text/javascript" charset="utf8" 
-        src="/proxy/(( port ))/assets/RKernel/js/jquery-3.6.0.min.js"></script>
+        src="(( url ))/assets/RKernel/js/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" charset="utf8" 
-        src="/proxy/(( port ))/assets/RKernel/js/datatables.min.js"></script>'
+        src="(( url ))/assets/RKernel/js/datatables.min.js"></script>'
 
 
 dt_tmpl <- '<script type="text/javascript" charset="utf8">
@@ -204,9 +204,9 @@ datatable_page <- function(obj,
     obj <- obj[ii]
     dt_data[[id]] <- obj
     code <- fill_tmpl(html_page_tmpl,
-                        head=fill_tmpl(dt_head_tmpl,port=port),
+                        head=fill_tmpl(dt_head_tmpl,url=url),
                         table=fill_tmpl(dt_table_tmpl,id=id,header=mk_tab_hdr(obj)),
-                        script=fill_tmpl(dt_tmpl,port=port,name=id,id=id,scrollY=scrollY)
+                        script=fill_tmpl(dt_tmpl,url=url,name=id,id=id,scrollY=scrollY)
                    )    
     code
 }
