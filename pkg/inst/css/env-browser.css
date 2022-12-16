@@ -25,18 +25,10 @@ table.env-browser-head {
     top: 0;
 }
 
-.output_area table.env-browser {
-    width: 976px;
-}
-
-#pager-container table.env-browser {
-    width: 100%;
-}
-
-#pager #pager-container table.env-browser {
-    width: 1132px;
-}
-
+table.env-browser,
+.output_area table.env-browser,
+#pager-container table.env-browser,
+#pager #pager-container table.env-browser,
 .ui-resizable table.env-browser {
     width: 100%;
 }

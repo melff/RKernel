@@ -298,6 +298,12 @@ Context <- R6Class("Context",
            error_text <- paste(error_text,collapse="\n")
            log_error(error_text)
            private$condition_manager$send("error",e)
+           errOpt <- getOption("error",NULL)
+           # log_out(errOpt,use.print=TRUE)
+           # log_out(errOpt,use.str=TRUE)
+           # log_out(mode(errOpt))
+           if(is.call(errOpt))
+               eval(errOpt)
        }
    )
 )

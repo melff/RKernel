@@ -164,6 +164,10 @@ Evaluator <- R6Class("Evaluator",
                 tryCatch(evalq(stop()),
                     error = getnframes)
             }
+            # log_out(private$nframes)
+            # log_out(sys.calls(),use.print=TRUE)
+            # log_out(sys.frames(),use.print=TRUE)
+            # log_out(sys.parents(),use.print=TRUE)
 
             private$results <- list()
             if(private$aborted) return(private$results)
@@ -896,3 +900,4 @@ cell.par <- function(...){
 }
 
 str2iframe <- function(x,...) evaluator$current$str2iframe(x,...)
+
