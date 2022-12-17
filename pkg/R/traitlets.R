@@ -153,15 +153,17 @@ HasTraits <- R6Class_("HasTraits",
               makeActiveBinding(tn, property, self)
           }
       },
+      suspended = FALSE,
       #' @description
       #' Notify observers about a trait being set to a value.
       #' @param tn A string, the name of the trait.
       #' @param value The value to which the trait is set.
       notify = function(tn,value){
           # log_out(sprintf("notify %s = %s",tn,value))
-          if(length(self$observers) && tn %in% names(self$observers)){
+          if(!self$suspended && length(self$observers) && tn %in% names(self$observers)){
               observers <- self$observers[[tn]]
               for(cb in observers){
+                  # log_out(cb,use.print=TRUE)
                   if(is.function(cb))
                       cb(tn,self,value)
               }
