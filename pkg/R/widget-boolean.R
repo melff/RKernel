@@ -15,6 +15,10 @@ CheckboxClass <- R6Class_("Checkbox",
     `_model_name` = structure(Unicode("CheckboxModel"),sync=TRUE),
     #' @field _view_name Name of the Javascript model view in the frontend
     `_view_name` = structure(Unicode("CheckboxView"),sync=TRUE),
+    #' @field description A button description
+    description = structure(Unicode(""),sync=TRUE),
+    #' @field disabled Boolean, whether the button is disabled
+    disabled = structure(Boolean(FALSE),sync=TRUE),
     #' @field indent Boolean, whether to indent the checkbox
     indent = structure(Boolean(TRUE),sync=TRUE),
     #' @field value Boolean, whether the box is checked
@@ -48,6 +52,10 @@ ToggleButtonClass <- R6Class_("ToggleButton",
     value = structure(Boolean(FALSE),sync=TRUE),
     #' @field tooltip A tooltip
     tooltip = structure(Unicode(),sync=TRUE),
+    #' @field description A button description
+    description = structure(Unicode(""),sync=TRUE),
+    #' @field disabled Boolean, whether the button is disabled
+    disabled = structure(Boolean(FALSE),sync=TRUE),
     #' @field icon An icon (a fontawesome icon name)
     icon = structure(Unicode(""),sync=TRUE),
     #' @field button_style The string that describes the button style
