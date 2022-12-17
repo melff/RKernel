@@ -60,7 +60,7 @@ Context <- R6Class("Context",
        #' @param expressions A list of expressions.
        #' @param envir A list or an environment
        #' @param enclos An enclosing an environment (see \code{\link{eval}}).
-       evaluate = function(expressions,envir=list(),enclos=parent.frame()){
+       evaluate = function(expressions,envir=NULL,enclos=parent.frame()){
            if(is.null(envir))
                envir <- private$envir
            self$enter()
