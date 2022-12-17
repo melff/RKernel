@@ -76,7 +76,13 @@ TextWidgetClass <- R6Class_("TextWidget",
     `_model_name` = structure(Unicode("TextModel"),sync=TRUE),
     `_view_name` = structure(Unicode("TextView"),sync=TRUE),
     disabled = structure(Boolean(FALSE),sync=TRUE),
-    continuous_update = structure(Boolean(FALSE),sync=TRUE)
+    continuous_update = structure(Boolean(FALSE),sync=TRUE),
+    clear = function(){
+        self$suspended <- TRUE
+        self$value <- character(0)
+        self$suspended <- FALSE
+        self$send_state()
+    }
    )
 )
 
