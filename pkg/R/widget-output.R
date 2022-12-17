@@ -23,10 +23,11 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         graphics = NULL,
         envir = NULL,
         append_output = TRUE,
+        use_display = FALSE,
         
         initialize = function(append_output = TRUE,
-                              #envir = parent.frame(n=7),
                               envir = new.env(),
+                              use_display = FALSE,
                               ...){
             super$initialize(...)
             self$envir <- envir
@@ -51,6 +52,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             #self$on_displayed(self$set_display_msg_id)
             self$context <- context
             self$append_output <- append_output
+            self$use_display <- use_display
             private$kernel <- get_current_kernel()
         },
 
@@ -222,7 +224,8 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         #' @description 
         #' Show printed output in the widget area, see \code{\link{print}}
         print = function(x,...){
-            text <- capture.output(print(x,...))
+            k <- get_current_kernel()
+            text <- capture.output(k$print(x,...))
             self$stream(text,"stdout")
         },
         stdout = function(text) self$stream(text,"stdout"),
@@ -232,17 +235,46 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         current_output = NULL,
         stream = function(text,stream_name) {
             if(!nzchar(text)) return()
+            self$sync_suspended <- TRUE
+            if(self$use_display && stream_name=="stdout"){
+                d <- display_data(`text/plain`=text)
+                self$current_output <- list(
+                    output_type = "display_data",
+                    data = d$data,
+                    metadata = d$metadata
+                )
+                if(self$append_output){
+                    l <- length(self$outputs)
+                    self$outputs[[l+1]] <- self$current_output
+                }
+                else {
+                    self$outputs[[1]] <- self$current_output
+                }
+            }
+            else {
             # log_out("Widget-context: stream")
-            #self$sync_suspended <- TRUE
-            if(self$append_output){
-                log_out(self$outputs,use.str=TRUE)
-                l <- length(self$outputs)
-                if(!is.null(self$current_output) &&
-                   identical(self$current_output$output_type, "stream") &&
-                   identical(self$current_output$name, stream_name) && l > 0){
-                    self$current_output$text <- paste0(self$current_output$text,
-                                                       text)
-                    self$outputs[[l]] <- self$current_output
+                if(self$append_output){
+                    # log_out(self$outputs,use.str=TRUE)
+                    l <- length(self$outputs)
+                    if(!is.null(self$current_output) &&
+                       identical(self$current_output$output_type, "stream") &&
+                       identical(self$current_output$name, stream_name) && l > 0){
+                        self$current_output$text <- paste0(self$current_output$text,
+                                                           text)
+                        self$outputs[[l]] <- self$current_output
+                    }
+                    else {
+                        self$current_output <- list(
+                            output_type = "stream",
+                            name = stream_name,
+                            text = text
+                        )
+                        outputs <- self$outputs
+                        outputs[[l+1]] <- self$current_output
+                        self$outputs <- outputs
+                    }
+                # kernel <- get_current_kernel()
+                # kernel$stream(text,stream_name)
                 }
                 else {
                     self$current_output <- list(
@@ -250,26 +282,14 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                         name = stream_name,
                         text = text
                     )
-                    outputs <- self$outputs
-                    outputs[[l+1]] <- self$current_output
-                    self$outputs <- outputs
-                }
-                # kernel <- get_current_kernel()
-                # kernel$stream(text,stream_name)
-            }
-            else {
-                self$current_output <- list(
-                    output_type = "stream",
-                    name = stream_name,
-                    text = text
-                )
                 # log_out("\n\n================================================================\n")
                 #self$traits$outputs$set(list(self$current_output),notify=FALSE)
                 #self$send_state()
-                self$outputs[[1]] <- self$current_output
+                    self$outputs[[1]] <- self$current_output
+                }
             }
-            #self$sync_suspended <- FALSE
-            #self$send_state("outputs")
+            self$sync_suspended <- FALSE
+            self$send_state("outputs")
         },
         #' @description A variant of \code{\link{display}} for output within a display widget.
         display = function(...){
