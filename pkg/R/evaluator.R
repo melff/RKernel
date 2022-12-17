@@ -127,6 +127,7 @@ Evaluator <- R6Class("Evaluator",
             assign("readline",self$readline,envir=private$env)
             assign("envBrowser",envBrowser,envir=private$env)
             assign("str",self$str,envir=private$env)
+            assign("dump.frames",dump.frames,envir=private$env)
             # log_out("evaluator$startup() complete")
             em <- EventManager(type="eval")
             em$activate()

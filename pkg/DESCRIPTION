@@ -39,6 +39,7 @@ Collate:
     'compare-plots.R'
     'context.R'
     'dataTable.R'
+    'debugging.R'
     'dictionary.R'
     'display.R'
     'env-browser.R'
