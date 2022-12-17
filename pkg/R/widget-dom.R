@@ -37,6 +37,9 @@ DOMWidgetClass <- R6Class_("DOMWidget",
           dom_classes <- setdiff(dom_classes,className)
           self$`_dom_classes` <- dom_classes
       }
+    },
+    has_class = function(className){
+      className %in% self[["_dom_classes"]]
     }
   )
 )
