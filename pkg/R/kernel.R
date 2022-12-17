@@ -52,7 +52,6 @@ Kernel <- R6Class("Kernel",
       private$save_io_handlers()
       replace_in_package("base","print",evaluator$print)
       replace_in_package("base","cat",evaluator$cat)
-      replace_in_package("utils","str",evaluator$str)
       replace_in_package("tools","httpd",evaluator$httpd)
     },
 
