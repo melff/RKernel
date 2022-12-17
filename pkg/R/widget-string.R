@@ -58,7 +58,10 @@ TextareaClass <- R6Class_("Textarea",
    inherit = StringWidgetClass,
    public = list(
     `_model_name` = structure(Unicode("TextareaModel"),sync=TRUE),
-    `_view_name` = structure(Unicode("TextareaView"),sync=TRUE)
+    `_view_name` = structure(Unicode("TextareaView"),sync=TRUE),
+    disabled = structure(Boolean(FALSE),sync=TRUE),
+    continuous_update = structure(Boolean(FALSE),sync=TRUE),
+    rows = structure(Integer(),sync=TRUE)
    )
 )
 
