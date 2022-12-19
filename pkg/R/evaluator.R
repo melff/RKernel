@@ -41,7 +41,7 @@ Evaluator <- R6Class("Evaluator",
             # 
             # assign("display",self$display,envir=private$env)
             # assign("display",display,envir=private$env)
-            # assign("stream",self$stream,pos=pos)
+            assign("stream",self$stream,envir=private$env)
             # #assign("cat",private$cat,pos=pos)
             # 
             # assign("Javascript",Javascript,pos=pos)
