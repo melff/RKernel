@@ -2,7 +2,11 @@
 #' @importFrom uuid UUIDgenerate
 
 str_ <- function(nm,envir){
-    res <- capture.output(str(get(nm,envir)))
+    res <- tryCatch(capture.output(str(get(nm,envir))),
+                    error=function(e)e)
+    if(inherits(res,"error")){
+        res <- "<missing>"
+    }
     res <- gsub("\\t","",res)
     htmlEscape(trimws(res))
 }
