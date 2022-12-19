@@ -73,13 +73,17 @@ Context <- R6Class("Context",
                # ev <- list(value = NULL, visible = FALSE)
                ### See 'evaluate_call' in package "evaluate" (Yihui Xie et al.)
                # dev.control(displaylist ="enable")
-               ev <- withVisible(try(withCallingHandlers(
+               ev <- withVisible(
+                       try(withRestarts(
+                           withCallingHandlers(
                                eval(expr,
                                     envir=envir,
                                     enclos=enclos),
                                error=private$eHandler,
                                warning=private$wHandler,
-                               message=private$mHandler),silent=TRUE))
+                               message=private$mHandler),
+                           exit=noop),
+                          silent=TRUE))
                self$last.value <- ev
                cat("\n",file=private$connection)
                private$handle_event("eval")
@@ -322,4 +326,8 @@ with.Context <- function(data,expr,enclos=parent.frame(),...){
     # log_out(enclos,use.print=TRUE)
     # log_out(ls(enclos),use.print=TRUE)
     data$eval(substitute(expr),enclos=enclos)
+}
+
+noop <- function(...) {
+    return(invisible(NULL))
 }
