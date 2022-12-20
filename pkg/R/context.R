@@ -18,8 +18,8 @@ Context <- R6Class("Context",
        #' @param envir An optional environment within which expressions are evaluated
        #' @param attachment An optional environment that is attached while an expression is evaluated within 
        #'   the context.
-       initialize = function(envir=new.env(),
-                             attachment=new.env()){
+       initialize = function(envir=list(),
+                             attachment=list()){
            private$connection <- textConnection(NULL,"w",local=TRUE)
            private$envir <- envir
            private$attachment <- attachment
@@ -54,13 +54,15 @@ Context <- R6Class("Context",
        #' @param envir A list or an environment
        #' @param enclos An enclosing an environment (see \code{\link{eval}}).
        eval = function(expr,envir=list(),enclos=parent.frame())
-           self$evaluate(list(expr),enclos=enclos),
+           self$evaluate(list(expr),envir=envir,enclos=enclos),
        #' @description
        #' Evaluate a single expression
        #' @param expressions A list of expressions.
        #' @param envir A list or an environment
        #' @param enclos An enclosing an environment (see \code{\link{eval}}).
-       evaluate = function(expressions,envir=NULL,enclos=parent.frame()){
+       # So envir=list() makes interactive widgets work while
+       # envir=private$envir does not. Need to figure out why ...
+       evaluate = function(expressions,envir=list(),enclos=parent.frame()){
            if(is.null(envir))
                envir <- private$envir
            self$enter()
