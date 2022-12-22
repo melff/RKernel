@@ -300,39 +300,8 @@ clone_env <- function(old_env){
 
 #' @export
 BreakPoint <- function(){
-    envir <- parent.frame()
-    eb <- envBrowser(envir=envir)
-    display(eb)
-    next_step <- TRUE
-    repeat{
-        input <- rkernel_readline()
-        if(input == "c") {
-            stream("Continuing ...")
-            break
-        }
-        else if(input == "Q"){
-            stream("Leaving ...")
-            invokeRestart("exit")
-        }
-        else if(nzchar(trimws(input))) {
-            expr <- parse(text=input)
-            do_echo <- TRUE
-            res <- withVisible(tryCatch(eval(expr,envir=envir),
-                                        error=function(e){
-                                            stream(conditionMessage(e),"stderr")
-                                            return(invisible(NULL))
-                                        }))
-            if(do_echo && res$visible)
-                print(res$value)
-        }
-        eb$refresh()
-    }
-}
-
-
-# Unfortunately tracing does not work as I intended as long as there is no way to jump out of a function and 
-BreakPoint_with_tracing <- function(){
-    envir <- parent()
+    parent <- parent.frame()
+    envir <- new.env(parent=parent)
     the_call <- sys.call(-1)
     the_function <- sys.function(-1)
     expressions <- NULL
@@ -370,7 +339,7 @@ BreakPoint_with_tracing <- function(){
     else stop("Breakpoint not found")
     deparsed <- lapply(expressions,deparse)       
     #print(deparsed)
-    eb <- envBrowser(envir=envir)
+    eb <- envBrowser(envir=envir,parent=parent)
     n_expressions <- length(expressions)
     n_to_eval <- length(to_eval)
     if(n_expressions > 0){
@@ -439,55 +408,56 @@ BreakPoint_with_tracing <- function(){
     else 
         w <- eb
     display(w)
-    i <- 1
-    j <- bp_position
     message(the_message)
-    next_step <- TRUE
-    repeat{
-        do_echo <- FALSE
-        do_step <- FALSE
-        if(next_step && n_to_eval > 0 && j <= n_expressions){
-            dep_j <- deparsed[[j]]
-            prompt <- sprintf("%0d:",j)
-            if((nn <- length(dep_j)) > 1){
-                prompt[2:nn] <- paste(rep(" ",nchar(prompt)),collapse="")
-            }
-            dep_j <- paste(prompt,dep_j)
-            stream(paste(dep_j,collapse="\n"))
-            next_step <- FALSE
-            do_step <- TRUE
+    exit_for <- FALSE
+    stream("\n")
+    for(j in bp_position:n_expressions){
+        dep_j <- deparsed[[j]]
+        prompt <- sprintf("%0d:",j)
+        if((nn <- length(dep_j)) > 1){
+            prompt[2:nn] <- paste(rep(" ",nchar(prompt)),collapse="")
         }
-        input <- rkernel_readline()
-        if(input == "c") {
-            stream("Continuing ...")
-            break
-        }
-        else if(input == "Q"){
-            stream("Leaving ...")
-            invokeRestart("exit")
-        }
-        else if(do_step && (input == "n" || trimws(input) == "")){
-            expr <- expressions[[j]]
-            j <- j + 1
-            next_step <- TRUE
-        }
-        else if(nzchar(trimws(input))) {
-            expr <- parse(text=input)
-            do_echo <- TRUE
-        }
-        else {
-            stream("Completed ...")
-            break
-        }
-        res <- withVisible(tryCatch(eval(expr,envir=envir),
-                            error=function(e){
-                                stream(conditionMessage(e),"stderr")
-                                return(invisible(NULL))
-                            }))
-        if(do_echo && res$visible)
-            print(res$value)
+        dep_j <- paste(prompt,dep_j)
+        stream(paste(dep_j,collapse="\n"))
+        expr_j <- expressions[[j]]
+        res <- withVisible(tryCatch(eval(expr_j,envir=envir,enclos=parent),
+                                    error=function(e){
+                                        stream(conditionMessage(e),"stderr")
+                                        return(invisible(NULL))
+                                    }))
         eb$refresh()
+        if(res$visible){
+            stream("\n")
+            stream(capture.output(print(res$value)))
+        }
+        while(TRUE){
+            stream("\n")
+            input <- rkernel_readline()
+            if(input == "c") {
+                stream("Continuing ...")
+                exit_for <- TRUE
+                break
+            }
+            else if(input == "Q"){
+                stream("Leaving ...")
+                invokeRestart("exit")
+            }
+            else if(input == "n" || trimws(input) == "")
+                break
+            expr <- parse(text=input)
+            res <- withVisible(tryCatch(eval(expr,envir=envir,enclos=parent),
+                                        error=function(e){
+                                        stream(conditionMessage(e),"stderr")
+                                        return(invisible(NULL))
+                                        }))
+            eb$refresh()
+            if(res$visible)
+                stream(capture.output(print(res$value)))
+        }
+        if(exit_for) break
     }
+    if(!exit_for)
+        stream("Completed ...")
 }
 
 Debug <- function(FUN){

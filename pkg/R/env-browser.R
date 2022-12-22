@@ -1,8 +1,13 @@
 #' @importFrom htmltools htmlEscape
 #' @importFrom uuid UUIDgenerate
 
-str_ <- function(nm,envir){
-    res <- tryCatch(capture.output(str(get(nm,envir))),
+get2 <- function(nm,env,parent=NULL){
+    if(exists(nm,envir=env)) get(nm,envir=env)
+    else if(is.environment(parent) && exists(nm,envir=parent)) get(nm,envir=parent)
+}
+
+str_ <- function(nm,envir,parent=NULL){
+    res <- tryCatch(capture.output(str(get2(nm,envir,parent))),
                     error=function(e)e)
     if(inherits(res,"error")){
         res <- "<missing>"
@@ -56,17 +61,31 @@ init_env_browser <- function(){
 .env_browser_table$inited <- FALSE
 
 
-env_browser_table <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
+env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FALSE, pattern = NULL, 
     mode = "any", id=NULL, include_css = FALSE){
     if (missing(envir)) 
         envir <- as.environment(pos)
-    nms <- ls(name, envir = envir, all.names = all.names, pattern = pattern)
+    if(length(pattern))
+        nms <- ls(name, envir = envir, all.names = all.names, pattern = pattern)
+    else
+        nms <- ls(name, envir = envir, all.names = all.names)
     r <- vapply(nms, exists, NA, envir = envir, mode = mode, 
         inherits = FALSE)
     nms <- nms[r]
+    if(is.environment(parent)){
+        # stream("Yes parent is an environment")
+        if(length(pattern))
+            nms_p <- ls(envir = parent, all.names = all.names, pattern = pattern)
+        else
+            nms_p <- ls(envir = parent, all.names = all.names)
+        r_p <- vapply(nms_p, exists, NA, envir = parent, mode = mode, 
+                    inherits = FALSE)
+        nms_p <- nms_p[r_p]
+        nms <- union(nms,nms_p)
+    }
     n <- length(nms)
     m <- matrix("",ncol=3,nrow=n)
-    str_nms <- lapply(nms,str_,envir=envir)
+    str_nms <- lapply(nms,str_,envir=envir,parent=parent)
     str_nms1 <- lapply(str_nms,"[[",1)
     str_nms2 <- lapply(str_nms,"[",-1)
     str_nms2 <- lapply(str_nms2,paste0,collapse="\n")
