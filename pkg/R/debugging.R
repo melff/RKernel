@@ -359,11 +359,17 @@ BreakPoint <- function(){
     border: 1px solid #cfcfcf;
 }
 
+.dbg-srcbox pre,
 .output_area .dbg-srcbox pre {
     padding: 6px;
     line-height: 1.3;
 }
 
+.dbg-srcbox details summary {
+    display: block;
+}
+
+.dbg-srcbox summary,
 .output_area .dbg-srcbox summary {
     padding: 6px;
     font-weight: bold;
