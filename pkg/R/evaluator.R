@@ -506,6 +506,8 @@ Evaluator <- R6Class("Evaluator",
                 # while(!check_help_port(help_port))
                 #     Sys.sleep(.2)
                 help_port <- private$get_shared_help_port()
+            } else {
+                private$publish_shared_help_port(help_port)
             }
             private$update_help_url(help_port)
         },
@@ -520,16 +522,22 @@ Evaluator <- R6Class("Evaluator",
         },
         start_help_system = function(){
             shared_help_system <- getOption("shared_help_system",NA)
+            help_use_proxy <- getOption("help_use_proxy",NA)
             jupyterhub_prefix <- Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")
             if(nzchar(jupyterhub_prefix)) {
                 # We are likely in a multi-user environment
                 if(is.na(shared_help_system))
                     shared_help_system <- FALSE
+                if(is.na(help_use_proxy))
+                    help_use_proxy <- TRUE
             } else {
                 if(is.na(shared_help_system))
                     shared_help_system <- TRUE
+                if(is.na(help_use_proxy))
+                    help_use_proxy <- FALSE
             }
             private$shared_help_system <- shared_help_system
+            private$help_use_proxy <- help_use_proxy
             
             if(shared_help_system)
                 private$start_shared_help_system()
@@ -542,6 +550,7 @@ Evaluator <- R6Class("Evaluator",
         },
         shared_help_system = FALSE,
         jupyterhub_prefix = "",
+        help_use_proxy = FALSE,
 
         get_help_url = function(){
             return(private$help_url)
@@ -932,11 +941,19 @@ Evaluator <- R6Class("Evaluator",
                                               error=function(e) 0))
             as.integer(port)
         },
+
+        publish_shared_help_port = function(port){
+            user <- Sys.info()["user"]
+            filename <- file.path(dirname(tempdir()),
+                                  paste("RHelp",user,sep="-"))
+            writeLines(as.character(port),filename)
+        },
         
         start_shared_help_server = function(port){
             prefix <- private$jupyterhub_prefix
-            arg_template <- "server <- RKernel::sharedHelpServer$new(%s,\"%s\"); server$run()"
-            R_arg <- paste("-e",shQuote(sprintf(arg_template,port,prefix)))
+            use_proxy <- private$help_use_proxy
+            arg_template <- "server <- RKernel::sharedHelpServer$new(%s,\"%s\",\"%s\"); server$run()"
+            R_arg <- paste("-e",shQuote(sprintf(arg_template,port,prefix,use_proxy)))
             if(.Platform$OS.type == "windows") {
                 R_binary <- file.path(R.home("bin"), "Rscript.exe")
 
@@ -947,14 +964,21 @@ Evaluator <- R6Class("Evaluator",
         },
 
         update_help_url = function(help_port){
-            help_url <- sprintf("/proxy/%d",help_port)
-            prefix <- private$jupyterhub_prefix
-            if(nzchar(prefix)){
-                help_url <- paste0(prefix,help_url)
-                help_url <- gsub("//","/",help_url,fixed=TRUE)
+            help_use_proxy <- private$help_use_proxy
+            if(help_use_proxy){
+                help_url <- sprintf("/proxy/%d",help_port)
+                prefix <- private$jupyterhub_prefix
+                if(nzchar(prefix)){
+                    help_url <- paste0(prefix,help_url)
+                    help_url <- gsub("//","/",help_url,fixed=TRUE)
+                }
+                private$help_port <- help_port
+                private$help_url <- help_url
+            } else {
+                help_url <- sprintf("http://127.0.0.1:%d",help_port)
+                private$help_port <- help_port
+                private$help_url <- help_url
             }
-            private$help_port <- help_port
-            private$help_url <- help_url
         }
     )
 
