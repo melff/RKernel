@@ -3,7 +3,8 @@
 
 check_help_port <- function(port){
     url <- sprintf("http://127.0.0.1:%d/doc/html/index.html",port)
-    res <- try(curlGetHeaders(url))
+    log_out(sprintf("Trying %s",url))
+    res <- try(curlGetHeaders(url),silent=TRUE)
     if(inherits(res,"try-error")) return(FALSE)
     if(attr(res,"status") == 200) return(TRUE)
     return(FALSE)
@@ -119,18 +120,22 @@ Evaluator <- R6Class("Evaluator",
             # Sleep briefly to allow HTTP service etc.
             private$kernel$add_service(function()Sys.sleep(getOption("rkernel_service_interval",.001)))
             self$start_httpd()
+            private$start_help_system()
             assign("help.start",help.start,envir=private$env)
+            assign("get_help_url",private$get_help_url,envir=private$env)
             assign("get_url",self$get_url,envir=private$env)
             assign("get_port",self$get_port,envir=private$env)
+            assign("get_shared_help_port",private$get_shared_help_port,envir=private$env)
             assign("set_port",self$set_port,envir=private$env)
             assign("str2iframe",self$str2iframe,envir=private$env)
             assign("readline",self$readline,envir=private$env)
             assign("envBrowser",envBrowser,envir=private$env)
             assign("str",self$str,envir=private$env)
             assign("dump.frames",dump.frames,envir=private$env)
-            # log_out("evaluator$startup() complete")
             em <- EventManager(type="eval")
             em$activate()
+            log_out("evaluator$startup() complete")
+            private$jupyterhub_prefix <- Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")
 
         },
         #' @description
@@ -145,7 +150,7 @@ Evaluator <- R6Class("Evaluator",
         eval_cell = function(code,allow_stdin,...){
             
             private$allow_stdin <- allow_stdin
-            # log_out("eval_cell")
+            # log_out("++ eval_cell ++++++++++++++++++++++++++++++++++++")
             perc_match <- getMatch(code,regexec("^%%([a-zA-Z0-9]+)\n",code))
             if(length(perc_match) > 1){
                 magic <- perc_match[2]
@@ -156,8 +161,8 @@ Evaluator <- R6Class("Evaluator",
                 return()
             }
 
-            if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
-                rm(var_dic_list,envir=.GlobalEnv)
+            # if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
+            #     rm(var_dic_list,envir=.GlobalEnv)
             #pos <- match("RKernel",search())
             #assign("var_dic_list",private$var_dic_list,pos=pos)
 
@@ -482,8 +487,68 @@ Evaluator <- R6Class("Evaluator",
 
         context = list(),
 
+        help_port = integer(),
+        help_proc = integer(),
+        help_url = character(),
+
         http_port = 0,
         http_url = character(),
+
+        start_shared_help_system = function(help_port=getOption("help.port",NA)){
+            if(is.finite(help_port))
+                help_port <- as.integer(help_port)
+            else
+                help_port <- private$get_shared_help_port()
+            if(!check_help_port(help_port)){
+                log_out("help port not serviced, attempting to start new server")
+                private$start_shared_help_server(help_port)
+                # check_help_port(help_port)
+                # while(!check_help_port(help_port))
+                #     Sys.sleep(.2)
+                help_port <- private$get_shared_help_port()
+            }
+            private$update_help_url(help_port)
+        },
+
+        start_private_help_system = function(port=NULL){
+            if(private$http_port == 0)
+                self$start_httpd(port=port)
+            private$help_port <- private$http_port
+            private$help_url <- private$http_url
+            em <- EventManager(type="http")
+            em$activate()
+        },
+        start_help_system = function(){
+            shared_help_system <- getOption("shared_help_system",NA)
+            jupyterhub_prefix <- Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")
+            if(nzchar(jupyterhub_prefix)) {
+                # We are likely in a multi-user environment
+                if(is.na(shared_help_system))
+                    shared_help_system <- FALSE
+            } else {
+                if(is.na(shared_help_system))
+                    shared_help_system <- TRUE
+            }
+            private$shared_help_system <- shared_help_system
+            
+            if(shared_help_system)
+                private$start_shared_help_system()
+            else
+                private$start_private_help_system()
+            assign("get_help_url",private$get_help_url)
+            assign("get_help_port",private$get_help_port)
+            log_out("start_help_system completed")
+            log_out(sprintf("help url: %s",private$get_help_url()))
+        },
+        shared_help_system = FALSE,
+        jupyterhub_prefix = "",
+
+        get_help_url = function(){
+            return(private$help_url)
+        },
+        get_help_port = function(){
+            return(private$help_port)
+        },
 
         new_cell = TRUE,
 
@@ -841,6 +906,55 @@ Evaluator <- R6Class("Evaluator",
         },
         handle_context_exit = function(){
             private$graphics$suspend()
+        },
+
+        get_shared_help_port = function(){
+            port <- private$read_help_port_file()
+            prefix <- private$jupyterhub_prefix
+            if(port == 0){
+                log_out("Port is 0 starting new help server")
+                private$start_shared_help_server(port)
+                while(port == 0){
+                    port <- private$read_help_port_file()
+                    Sys.sleep(0.01)
+                }
+                log_out(sprintf("New port number is %d",port))
+                private$update_help_url(port)
+            }
+            return(port)
+        },
+
+        read_help_port_file = function(){
+            user <- Sys.info()["user"]
+            filename <- file.path(dirname(tempdir()),
+                                  paste("RHelp",user,sep="-"))
+            suppressWarnings(port <- tryCatch(readLines(filename),
+                                              error=function(e) 0))
+            as.integer(port)
+        },
+        
+        start_shared_help_server = function(port){
+            prefix <- private$jupyterhub_prefix
+            arg_template <- "server <- RKernel::sharedHelpServer$new(%s,\"%s\"); server$run()"
+            R_arg <- paste("-e",shQuote(sprintf(arg_template,port,prefix)))
+            if(.Platform$OS.type == "windows") {
+                R_binary <- file.path(R.home("bin"), "Rscript.exe")
+
+            } else {
+                R_binary <- file.path(R.home("bin"), "Rscript")
+            }
+            system2(R_binary,R_arg,wait=FALSE)
+        },
+
+        update_help_url = function(help_port){
+            help_url <- sprintf("/proxy/%d",help_port)
+            prefix <- private$jupyterhub_prefix
+            if(nzchar(prefix)){
+                help_url <- paste0(prefix,help_url)
+                help_url <- gsub("//","/",help_url,fixed=TRUE)
+            }
+            private$help_port <- help_port
+            private$help_url <- help_url
         }
     )
 
