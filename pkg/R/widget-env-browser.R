@@ -33,6 +33,7 @@ envBrowserClass <- R6Class_("envBrowser",
             self$value <- text_html
             self$name <- name
             self$envir <- envir
+            self$parent <- parent
             self$all.names <- all.names
             self$pattern <- pattern
             self$mode <- mode

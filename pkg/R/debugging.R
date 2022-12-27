@@ -310,9 +310,6 @@ BreakPoint <- function(){
         the_calls <- get.call.stack(drop.last=2)
         source_calls_idx <- find_calls(the_calls$calls,"source")
         trace_calls_idx <- find_calls(the_calls$calls,".doTrace")
-        if(length(trace_calls_idx)>0) {
-            warning("Step-wise debugging with 'trace' not (yet?) supported")
-        }
         if(length(source_calls_idx)){
             i <- max(source_calls_idx)
             source_call <- the_calls$calls[[i]]
@@ -331,20 +328,51 @@ BreakPoint <- function(){
         in_function <- TRUE
     }
     bp_position <- find_call(expressions,"BreakPoint")
-    if(length(bp_position) > 0) {
-        if(length(bp_position) > 1) stop("Multiple breakpoints not supported")
-        to_eval <- tail(expressions,-bp_position)
-        expressions <- expressions[-bp_position]
-    }
-    else stop("Breakpoint not found")
-    deparsed <- lapply(expressions,deparse)       
     #print(deparsed)
     eb <- envBrowser(envir=envir,parent=parent)
-    n_expressions <- length(expressions)
-    n_to_eval <- length(to_eval)
-    if(n_expressions > 0){
-        w <- VBox()
-        style <- HTML("<style>
+    display(eb)
+    message(the_message)
+    while(TRUE){
+        stream("\n")
+        input <- rkernel_readline()
+        input <- trimws(input)
+        if(input == "c" || !nzchar(input)) {
+            stream("Continuing ...")
+            break
+        }
+        else if(input == "Q"){
+            stream("Leaving ...")
+            invokeRestart("exit")
+        }
+        else if(nzchar(trimws(input))){
+            expr <- parse(text=input)
+            res <- withVisible(tryCatch(eval(expr,envir=envir,enclos=parent),
+                                        error=function(e){
+                                            stream(conditionMessage(e),"stderr")
+                                            return(invisible(NULL))
+                                        }))
+            eb$refresh()
+            if(res$visible)
+                stream(capture.output(print(res$value)))
+        }
+    }
+}
+
+tracers <- new.env()
+
+Tracer <- R6Class("Tracer",
+    public = list(
+        envir = NULL,
+        expressions = NULL,
+        label = NULL,
+        w = NULL,
+        eb = NULL,
+        i = 1,
+        n = 0,
+        complete = FALSE,
+        use_sandbox = TRUE,
+        sandbox = NULL,
+        style = "
 .R-source.compact > .widget-html-content > pre {
    padding-top: 0px;
    padding-bottom: 0px;
@@ -353,24 +381,24 @@ BreakPoint <- function(){
 .R-source.active-code > .widget-html-content > pre {
    background-color: #f7f7f7;
 }
-.dbg-srcbox {
+.tracer-srcbox {
     padding: 0;
     margin: 2px;
     border: 1px solid #cfcfcf;
 }
 
-.dbg-srcbox pre,
-.output_area .dbg-srcbox pre {
+.tracer-srcbox pre,
+.output_area .tracer-srcbox pre {
     padding: 6px;
     line-height: 1.3;
 }
 
-.dbg-srcbox details summary {
+.tracer-srcbox details summary {
     display: block;
 }
 
-.dbg-srcbox summary,
-.output_area .dbg-srcbox summary {
+.tracer-srcbox summary,
+.output_area .tracer-srcbox summary {
     padding: 6px;
     font-weight: bold;
     background-color: #f7f7f7;
@@ -378,122 +406,148 @@ BreakPoint <- function(){
     line-height: 1.3;
 }
 
-.dbg-srcbox details summary::before {
+.tracer-srcbox details summary::before {
     content: \"\\2BC8\";
 }
 
-.dbg-srcbox details[open] summary::before {
+.tracer-srcbox details[open] summary::before {
     content: \"\\2BC6\";
 }
-
-</style>")
-        
-
-        # for(i in 1:n_expressions){
-        #     dep_i <- deparsed[[i]]
-        #     dep_i <- paste(c("<pre>",dep_i,"</pre>"),collapse="\n")
-        #     html_i <- HTML(dep_i)
-        #     html_i$add_class("R-source")
-        #     html_i$add_class("compact")
-        #     if(i == bp_position) html_i$add_class("active-code")
-        #     srcbox$children[[i]] <- html_i
-        # }
-        # #cat("bp_pos",bp_position)
-        src_text <- c("<details>","<summary>"," Source code","</summary>","<pre>")
-        for(i in 1:n_expressions){
-             dep_i <- deparsed[[i]]
-             dep_i <- paste(dep_i,collapse="\n")
-             src_text <- c(src_text,dep_i)
-        }
-        src_text <- c(src_text,"</pre>","</details>")
-        src_text <- paste(src_text,collapse="\n")
-        srcbox <- HTML(src_text)
-        w$children <- list(style,eb,srcbox)
-        srcbox$add_class("dbg-srcbox")
-    }
-    else 
-        w <- eb
-    display(w)
-    message(the_message)
-    exit_for <- FALSE
-    stream("\n")
-    for(j in bp_position:n_expressions){
-        dep_j <- deparsed[[j]]
-        prompt <- sprintf("%0d:",j)
-        if((nn <- length(dep_j)) > 1){
-            prompt[2:nn] <- paste(rep(" ",nchar(prompt)),collapse="")
-        }
-        dep_j <- paste(prompt,dep_j)
-        stream(paste(dep_j,collapse="\n"))
-        expr_j <- expressions[[j]]
-        res <- withVisible(tryCatch(eval(expr_j,envir=envir,enclos=parent),
-                                    error=function(e){
-                                        stream(conditionMessage(e),"stderr")
-                                        return(invisible(NULL))
-                                    }))
-        eb$refresh()
-        if(res$visible){
-            stream("\n")
-            stream(capture.output(print(res$value)))
-        }
-        while(TRUE){
-            stream("\n")
-            input <- rkernel_readline()
-            if(input == "c") {
-                stream("Continuing ...")
-                exit_for <- TRUE
-                break
+",
+    initialize = function(envir,label,expressions,
+                      src,use_sandbox=getOption("trace_use_sandbox",TRUE)){
+            eb <- envBrowser(envir=envir)
+            self$eb <- eb
+            self$label <- label
+            self$expressions <- expressions
+            self$n <- length(expressions)
+            self$envir <- envir
+            self$use_sandbox <- use_sandbox
+            if(use_sandbox){
+                self$sandbox <- new.env(parent=envir) 
             }
-            else if(input == "Q"){
-                stream("Leaving ...")
-                invokeRestart("exit")
+            if(self$n > 1){
+                w <- VBox()
+                style <- HTML(paste0("<style>",self$style,"</style>"))
+                src_text <- c("<details>",
+                              "<summary>",
+                              " Source code",
+                              "</summary>",
+                              "<pre>",
+                              src)
+                src_text <- c(src_text,"</pre>","</details>")
+                src_text <- paste(src_text,collapse="\n")
+                srcbox <- HTML(src_text)
+                w$children <- list(style,eb,srcbox)
+                srcbox$add_class("tracer-srcbox")
+                self$w <- w
             }
-            else if(input == "n" || trimws(input) == "")
-                break
-            expr <- parse(text=input)
-            res <- withVisible(tryCatch(eval(expr,envir=envir,enclos=parent),
-                                        error=function(e){
-                                        stream(conditionMessage(e),"stderr")
-                                        return(invisible(NULL))
-                                        }))
-            eb$refresh()
-            if(res$visible)
-                stream(capture.output(print(res$value)))
+            else {
+                self$w <- self$eb
+            }
+            
+        },
+        display = function(){
+            display(self$w)
+        },
+        step = function(){
+            if(!self$complete) {
+                self$i <- self$i + 1
+                if(self$i <= self$n){
+                    expr <- self$expressions[[self$i]]
+                    dep_expr <- deparse(expr)
+                    dep_expr <- paste(dep_expr,collapse="\n")
+                    dep_expr <- paste0(dep_expr,"\t")
+                    stream(dep_expr)
+                }
+                self$eb$refresh()
+                while(TRUE){
+                    input <- rkernel_readline()
+                    if(input == "c") {
+                        self$complete <- TRUE
+                        break
+                    }
+                    else if(input == "Q"){
+                        invokeRestart("exit")
+                    } else if(input == "n" || trimws(input) == ""){
+                        break
+                    }
+                    else {
+                        expr <- parse(text=input)
+                        if(self$use_sandbox)
+                            envir <- self$sandbox
+                        else
+                            envir <- self$envir
+                        res <- withVisible(tryCatch(eval(expr,
+                                                         envir=envir),
+                                                    error=function(e){
+                                                        stream(conditionMessage(e),"stderr")
+                                                        return(invisible(NULL))
+                                                    }))
+                        self$eb$refresh()
+                        if(res$visible)
+                            stream(paste0(capture.output(print(res$value)),
+                                          "\t"))
+                    }
+                }
+            }
+        },
+        finalize = function(){
+            self$envir <- NULL
+            self$eb <- NULL
         }
-        if(exit_for) break
+    )
+)
+
+tracer <- function(...) {
+    e <- parent.frame()
+    cl <- deparse(sys.call(sys.parent()))
+    #cat(cl)
+    if(!(cl %in% names(tracers))){
+        #cat("not found")
+        fun <- sys.function(sys.parent())
+        fun_orig <- fun@original
+        fun_src <- deparse(fun_orig)
+        expressions <- as.list(body(fun_orig))
+        trc <- Tracer$new(envir=e,
+                          label=cl,
+                          expressions=expressions,
+                          src=fun_src)
+        tracers[[cl]] <- trc
+        trc$display()
     }
-    if(!exit_for)
-        stream("Completed ...")
+    else{
+        #cat("found")
+        trc <- tracers[[cl]]
+        trc$step()
+    }
+    
+}
+exit_tracer <- function(...) {
+    cl <- deparse(sys.call(sys.parent()))
+    #cat(cl)
+    if(cl %in% names(tracers)){
+        trc <- tracers[[cl]]
+        trc$finalize()
+        rm(list=cl,envir=tracers)
+    }    
 }
 
-Debug <- function(FUN){
-    FUN <- substitute(FUN)
-    if(!exists(FUN,mode="function")){
-        stop(sprintf("Function '%s' not found",FUN))
-    }
-    FUNname <- deparse(FUN)
-    FUN <- get(FUN)
-    body(FUN) <- as.call(c(as.name("{"),c(call("BreakPoint"),as.list(body(FUN)[-1]))))
-    assign(FUNname,FUN,DebugEnv())
-}
-
-DebugEnv <- function(){
-    if(!("RKernel-helper:debug" %in% search())){
-        e <- attach(NULL,name="RKernel-helper:debug")
-        return(e)
-    } else as.environment("RKernel-helper:debug")
-}
-
-Undebug <- function(FUN){
-    FUN <- substitute(FUN)
-    if(!exists(FUN,mode="function")){
-        stop(sprintf("Function '%s' not found",FUN))
-    }
-    FUNname <- deparse(FUN)
-    denv <- DebugEnv()
-    msg <- sprintf("Function '%s' is not being debugged",FUNname)
-    tryCatch(rm(list=FUNname,envir=denv),
-             warning=function(w) warning(msg,call.=FALSE,immediate.=TRUE),
-             error=function(e) warning(msg,call.=FALSE,immediate.=TRUE))
-        
+#' @export
+Trace <- function(FUN){
+     cls <- class(FUN)
+     print(cls)
+     if("functionWithTrace" %in%cls){
+         warning("Function is already being traced")
+         return(invisible(NULL))
+     }
+         
+     bd <- as.list(body(FUN))
+     trace_at <- seq_along(bd)
+     FUN <- substitute(FUN)
+     tryCatch(trace(FUN,
+                    tracer=tracer,
+                    exit=exit_tracer,
+                    at=trace_at,print=FALSE),
+              error=function(e)stop("Is the function already being traced?"))
 }
