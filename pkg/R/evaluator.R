@@ -44,7 +44,7 @@ Evaluator <- R6Class("Evaluator",
             # assign("display",display,envir=private$env)
             assign("stream",self$stream,envir=private$env)
             # #assign("cat",private$cat,pos=pos)
-            # 
+            assign("poll_and_respond",private$kernel$poll_and_respond,envir=private$env)
             # assign("Javascript",Javascript,pos=pos)
             # assign("Math",LaTeXMath,pos=pos)
             # assign("raw_html",raw_html,pos=pos)
@@ -723,7 +723,7 @@ Evaluator <- R6Class("Evaluator",
                 #drop_prev <- private$nframes - 2
                 #calls <- tail(calls,-drop_prev)
                 calls <- head(calls,-6)
-                calls <- tail(calls,-22)
+                calls <- tail(calls,-26)
                 calls <- limitedLabels(calls)
                 if(length(calls))
                     calls <- paste0(format(seq_along(calls),justify="right"),

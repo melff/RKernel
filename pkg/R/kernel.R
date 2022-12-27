@@ -66,6 +66,13 @@ Kernel <- R6Class("Kernel",
       continue <- TRUE
       while(continue) {
         # log_out("kernel loop")
+        continue <- self$poll_and_respond()
+      }
+      self$evaluator$shutdown()
+    },
+    #' @description
+    #' A single iteration of the kernel loop
+    poll_and_respond = function(){
         private$run_services()
         rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
         if(length(private$services) > 0) 
@@ -75,21 +82,18 @@ Kernel <- R6Class("Kernel",
         # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
         # log_out("kernel$poll_request")
-        if(!length(req)) next
+        if(!length(req)) return(TRUE)
         #Sys.sleep(1)
         ## if(req$abort) break
         if(req$interrupt) {
-          next
+          return(TRUE)
         }
         # print(req$socket_name)
-        if(!length(req$socket_name)) next
-        continue <- switch(req$socket_name,
+        if(!length(req$socket_name)) return(TRUE)
+        switch(req$socket_name,
                hb=private$respond_hb(req),
                control=private$respond_control(req),
                shell=private$respond_shell(req))
-        # log_out(continue)
-      }
-      self$evaluator$shutdown()
     },
     #' @description
     #' Clear the current output cell in the frontend.
