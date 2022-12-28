@@ -454,9 +454,12 @@ Tracer <- R6Class("Tracer",
         display = function(){
             display(self$w)
         },
-        step = function(){
+        step = function(i){
             if(!self$complete) {
-                self$i <- self$i + 1
+                if(missing(i))
+                    self$i <- self$i + 1
+                else
+                    self$i <- i + 1
                 if(self$i <= self$n){
                     expr <- self$expressions[[self$i]]
                     dep_expr <- deparse(expr)
@@ -557,4 +560,59 @@ Trace <- function(FUN){
                     exit=exit_tracer,
                     at=trace_at,print=FALSE),
               error=function(e)stop("Is the function already being traced?"))
+}
+
+
+src_tracer_init <- function(filename,expressions){
+    src <- readLines(filename)
+    parent <- parent.frame()
+    trc <- Tracer$new(envir=parent,
+                      label=filename,
+                      expressions=expressions,
+                      src=src)
+    tracers[[filename]] <- trc
+    trc$display()
+}
+register_export(src_tracer_init)
+
+src_tracer_step <- function(filename,i){
+    trc <- tracers[[filename]]
+    trc$step()
+}
+register_export(src_tracer_step)
+
+src_tracer_exit <- function(filename){
+    trc <- tracers[[filename]]
+    trc$finalize()
+    rm(list=filename,envir=tracers)
+}
+register_export(src_tracer_exit)
+
+#' @export
+tracing_source <- function(filename){
+    parsed <- parse(filename)
+    parsed <- c(quote(invisible()),parsed)
+    n <- length(parsed)
+    expr <- expression()
+    for(i in 1:n){
+        parsed_i <- parsed[[i]]
+        if(i==1)
+        expr_i <- call("src_tracer_init",filename,parsed)
+        else
+            expr_i <- call("src_tracer_step",filename,i)
+        expr_i <- call(".doTrace",expr_i)
+        expr_i <- call("{",expr_i,parsed_i)
+        expr[[i]] <- expr_i
+    }
+    expr_i <- call("src_tracer_exit",filename)
+    expr_i <- call(".doTrace",expr_i)
+    expr_i <- call("{",expr_i,quote(invisible()))
+    expr[[n+1]] <- expr_i
+    for(i in seq_along(expr)){
+        expr_i <- expr[[i]]
+        res <- withVisible(eval.parent(expr_i))
+        if(res$visible)
+            stream(paste0(capture.output(print(res$value)),
+                          "\t"))
+    }
 }
