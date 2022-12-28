@@ -1,3 +1,5 @@
+#' @include dictionary.R
+
 #' @importFrom utils capture.output
 #' @importFrom grDevices png
 
@@ -12,6 +14,11 @@ check_help_port <- function(port){
 
 
 evaluator <- new.env()
+
+exports <- new.env()
+register_export <- function(obj,name=deparse(substitute(obj))){
+    assign(name,obj,envir=exports)
+}
 
 #' The Evaluator Class
 #'
@@ -129,11 +136,12 @@ Evaluator <- R6Class("Evaluator",
             assign("set_port",self$set_port,envir=private$env)
             assign("str2iframe",self$str2iframe,envir=private$env)
             assign("readline",self$readline,envir=private$env)
-            assign("envBrowser",envBrowser,envir=private$env)
-            assign("tracer",tracer,envir=private$env)
-            assign("exit_tracer",exit_tracer,envir=private$env)
             assign("str",self$str,envir=private$env)
-            assign("dump.frames",dump.frames,envir=private$env)
+            # assign("envBrowser",envBrowser,envir=private$env)
+            # assign("dump.frames",dump.frames,envir=private$env)
+            # assign("tracer",tracer,envir=private$env)
+            # assign("exit_tracer",exit_tracer,envir=private$env)
+            private$assign_exports()
             em <- EventManager(type="eval")
             em$activate()
             log_out("evaluator$startup() complete")
@@ -980,6 +988,13 @@ Evaluator <- R6Class("Evaluator",
                 help_url <- sprintf("http://127.0.0.1:%d",help_port)
                 private$help_port <- help_port
                 private$help_url <- help_url
+            }
+        },
+
+        assign_exports = function(){
+            for(n in ls(exports)){
+                obj <- get(n,envir=exports)
+                assign(n,obj,envir=private$env)
             }
         }
     )

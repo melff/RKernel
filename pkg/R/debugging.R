@@ -1,3 +1,5 @@
+#' @include evaluator.R
+
 #' @export
 # Adapted from the utils package
 dump.frames <- function(dumpto = "last.dump", 
@@ -32,6 +34,8 @@ dump.frames <- function(dumpto = "last.dump",
     else assign(dumpto, last.dump, envir = .GlobalEnv)
     invisible()
 }
+register_export(dump.frames)
+
 
 return.frames <- function(drop.kernel.frames = TRUE,drop.last=0){
     calls <- sys.calls()
@@ -521,8 +525,9 @@ tracer <- function(...) {
         trc <- tracers[[cl]]
         trc$step()
     }
-    
 }
+register_export(tracer)
+
 exit_tracer <- function(...) {
     cl <- deparse(sys.call(sys.parent()))
     #cat(cl)
@@ -532,6 +537,8 @@ exit_tracer <- function(...) {
         rm(list=cl,envir=tracers)
     }    
 }
+register_export(exit_tracer)
+
 
 #' @export
 Trace <- function(FUN){

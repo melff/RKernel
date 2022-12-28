@@ -70,3 +70,4 @@ envBrowser <- function(pos = -1,
                         if(!missing(pattern))pattern=pattern,
                         mode=mode)
 }
+register_export(envBrowser)
