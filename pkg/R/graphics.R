@@ -93,16 +93,14 @@ GraphicsDevice <- R6Class("GraphicsDevice",
             if(private$dev_num != dev.cur()){
                 private$other_dev = dev.cur()
                 dev.set(private$dev_num)
-                private$event_manager$activate()
             }
+            private$event_manager$activate()
             
         },
         suspend = function(){
             private$event_manager$suspend()
             if(private$other_dev > 0)
                 dev.set(private$other_dev)
-            else
-                dev.set(1)
         },
         get_plot = function(){
             plt <- recordPlot()
