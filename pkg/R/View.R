@@ -11,6 +11,9 @@ View <- function(x,
                  title=deparse(substitute(x)),
                  ...) UseMethod("View")
 
+#' @include evaluator.R
+register_export(View)
+
 #' @export
 View.default <- function(x,title=deparse(substitute(x)),...)
 {

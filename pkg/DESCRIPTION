@@ -32,6 +32,8 @@ SystemRequirements:
     jupyter
 RoxygenNote: 7.1.2
 Collate: 
+    'dictionary.R'
+    'evaluator.R'
     'View.R'
     'aa-versions.R'
     'callbacks.R'
@@ -39,8 +41,6 @@ Collate:
     'compare-plots.R'
     'context.R'
     'dataTable.R'
-    'dictionary.R'
-    'evaluator.R'
     'debugging.R'
     'display.R'
     'env-browser.R'

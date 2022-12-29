@@ -461,6 +461,8 @@ display_data.help_files_with_topic <- function(x,...,
     structure(d,class=cl)
 }
 
+#' @include evaluator.R
+
 #' Start interactive help system
 #'
 #' @description A variant of \code{\link[utils]{help.start}} that works when called from inside a
@@ -501,6 +503,7 @@ help.start <- function(update = FALSE,
     else cl <- "display_data"
     structure(d,class=cl)
 }
+register_export(help.start)
 
 help_start <- help.start
 
