@@ -2,25 +2,26 @@
 
 magic_handlers <- new.env()
 
-dispatch_magic_handler <- function(magic,code) {
+dispatch_magic_handler <- function(magic,code,args) {
     if(exists(magic,magic_handlers))
         handler <- get(magic,envir=magic_handlers)
     else stop("Unsupported cell magic")
-    handler(code)
+    handler(code,args)
 }
 
 register_magic_handler <- function(magic,handler){
     assign(magic,handler,envir=magic_handlers)
 }
 
-iframe_cell_handler <- function(code){
-    e <- get_evaluator()
-    text_html <- e$str2iframe(code,class="rkernel-iframe-magic")
+iframe_cell_handler <- function(code,args){
+    args$code <- code
+    args$class <- "rkernel-iframe-magic"
+    text_html <- do.call(str2iframe,args)
     raw_html(text_html)
 }
 
-register_magic_handler("math",LaTeXMath)
-register_magic_handler("css",CSS)
-register_magic_handler("javascript",Javascript)
-register_magic_handler("html",raw_html)
-register_magic_handler("iframe",iframe_cell_handler)
+register_magic_handler("math",function(code,...)LaTeXMath(code))
+register_magic_handler("css",function(code,...)CSS(text=code))
+register_magic_handler("javascript",function(code,...)Javascript(text=code))
+register_magic_handler("html",function(code,...)raw_html(text=code))
+register_magic_handler("iframe",function(code,args,...)iframe_cell_handler(code,args))

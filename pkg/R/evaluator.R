@@ -156,12 +156,12 @@ Evaluator <- R6Class("Evaluator",
             
             private$allow_stdin <- allow_stdin
             # log_out("++ eval_cell ++++++++++++++++++++++++++++++++++++")
-            perc_match <- getMatch(code,regexec("^%%([a-zA-Z0-9]+)\n",code))
-            if(length(perc_match) > 1){
-                magic <- perc_match[2]
-                # message(sprintf("Found magic '%s'",magic))
-                #code <- gsub("^%%.+?\n","",code)
-                private$handle_magic(magic,code)
+            mparsed <- parse_magic(code)
+            if(length(mparsed) > 0){
+                magic <- mparsed$magic
+                args <- mparsed$args
+                code <- mparsed$code
+                private$handle_magic(magic,code,args)
                 eventmanagers$eval$send("cell_completed")
                 return()
             }
@@ -439,7 +439,9 @@ Evaluator <- R6Class("Evaluator",
                               width = "100%",
                               height = 400L,
                               class = "rkernel-iframe",
-                              style = "border-style:none"){
+                              style = "border-style:none",...){
+            cl <- match.call()
+            log_out(deparse1(cl))
             id <- UUIDgenerate()
             path <- paste0("/iframe/",id,"/")
             url <- paste0(self$get_url(),path)
@@ -794,9 +796,8 @@ Evaluator <- R6Class("Evaluator",
             }
         },
 
-        handle_magic = function(magic,code){
-            code <- gsub("^%%.+?\n","",code)
-            res <- dispatch_magic_handler(magic,code)
+        handle_magic = function(magic,code,args){
+            res <- dispatch_magic_handler(magic,code,args)
             if(length(res))
                 private$handle_result(res,TRUE)
         },
@@ -1017,5 +1018,29 @@ cell.par <- function(...){
     e$cell.par(...)
 }
 
-str2iframe <- function(x,...) evaluator$current$str2iframe(x,...)
+str2iframe <- function(...) evaluator$current$str2iframe(...)
 
+parse_magic_args <- function(perc_line){
+   line_match <- getMatch(perc_line,regexec("^%%[a-zA-Z0-9]+\\s*(.*?)\n",perc_line))
+   if(length(line_match)>1){
+     tryCatch({
+       magic_args <- line_match[2]
+       magic_args <- unlist(strsplit(magic_args,",\\s*"))
+       magic_args <- strsplit(magic_args,"\\s*=\\s*")
+       magic_arg_names <- unlist(lapply(magic_args,"[",1))
+       magic_arg_values <- lapply(magic_args,"[",2)
+       structure(magic_arg_values,names=magic_arg_names)   
+     },error=function(e)stop("Error in parsing arguments"))
+   } else NULL
+}
+
+parse_magic <- function(code){
+    perc_match <- getMatch(code,regexec("^%%([a-zA-Z0-9]+).*?\n",code))
+    if(length(perc_match) > 1){
+        magic <- perc_match[2]
+        perc_line <- perc_match[1]
+        args <- parse_magic_args(perc_line)
+        code <- gsub("^%%.+?\n","",code)
+        list(magic=magic,args=args,code=code)
+    } else NULL
+}
