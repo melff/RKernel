@@ -107,8 +107,6 @@ Evaluator <- R6Class("Evaluator",
             private$context$on_exit(private$handle_context_exit)
             private$graphics <- GraphicsDevice$new()
 
-            suppressMessages(trace(example,tracer=quote(if(missing(run.donttest)) run.donttest<-TRUE),
-                                   print=FALSE))
             home_dir <- Sys.getenv("HOME")
             jupyter_config <- file.path(home_dir,".jupyter","RKernel-config.R")
             if(file.exists(jupyter_config)) 
