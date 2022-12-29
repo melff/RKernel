@@ -5,7 +5,7 @@
 
 check_help_port <- function(port){
     url <- sprintf("http://127.0.0.1:%d/doc/html/index.html",port)
-    log_out(sprintf("Trying %s",url))
+    # log_out(sprintf("Trying %s",url))
     res <- try(curlGetHeaders(url),silent=TRUE)
     if(inherits(res,"try-error")) return(FALSE)
     if(attr(res,"status") == 200) return(TRUE)
@@ -142,7 +142,7 @@ Evaluator <- R6Class("Evaluator",
             private$assign_exports()
             em <- EventManager(type="eval")
             em$activate()
-            log_out("evaluator$startup() complete")
+            # log_out("evaluator$startup() complete")
             private$jupyterhub_prefix <- Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")
 
         },
@@ -508,7 +508,7 @@ Evaluator <- R6Class("Evaluator",
             else
                 help_port <- private$get_shared_help_port()
             if(!check_help_port(help_port)){
-                log_out("help port not serviced, attempting to start new server")
+                # log_out("help port not serviced, attempting to start new server")
                 private$start_shared_help_server(help_port)
                 # check_help_port(help_port)
                 # while(!check_help_port(help_port))
@@ -553,8 +553,8 @@ Evaluator <- R6Class("Evaluator",
                 private$start_private_help_system()
             assign("get_help_url",private$get_help_url)
             assign("get_help_port",private$get_help_port)
-            log_out("start_help_system completed")
-            log_out(sprintf("help url: %s",private$get_help_url()))
+            # log_out("start_help_system completed")
+            # log_out(sprintf("help url: %s",private$get_help_url()))
         },
         shared_help_system = FALSE,
         jupyterhub_prefix = "",
