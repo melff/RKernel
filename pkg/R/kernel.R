@@ -265,13 +265,18 @@ Kernel <- R6Class("Kernel",
     #' @param use.print Logical, whether the function 'print()' should applied
     #'        to the message.
     log_out = function(message,...,use.print=FALSE,use.str=FALSE){
-      if(use.print)
-        message <- paste0("\n",paste0(capture.output(self$print(message)),collapse="\n"))
-      else if(use.str)
-        message <- paste(capture.output(self$str(message)),collapse="\n")
-      else message <- paste(message,...,collapse="")
-      self$cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
-                       file=stderr())
+      dcl <- deparse1(match.call())
+      tryCatch({
+        if(use.print)
+          message <- paste0("\n",paste0(capture.output(self$print(message)),collapse="\n"))
+        else if(use.str)
+          message <- paste(capture.output(self$str(message)),collapse="\n")
+        else message <- paste(message,...,collapse="")
+        self$cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
+                 file=stderr())
+      },error=function(e){
+        log_error(sprintf("Error in %s",dcl))
+      })
     },
     log_warning = function(message){
       self$cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
