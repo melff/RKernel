@@ -282,7 +282,7 @@ Context <- R6Class("Context",
        mHandler = function(m) {
            message_text <- conditionMessage(m)
            message_text <- paste(message_text,collapse="\n")
-           log_out(message_text)
+           # log_out(message_text)
            # log_out(m,use.print=TRUE)
            private$condition_manager$send("message",m)
            # textio_hooks$message$run()
@@ -291,7 +291,7 @@ Context <- R6Class("Context",
        wHandler = function(w){
            warning_text <- conditionMessage(w)
            warning_text <- paste(warning_text,collapse="\n")
-           log_warning(warning_text)
+           # log_warning(warning_text)
            # log_out(w,use.print=TRUE)
            # textio_hooks$warning$run()
            private$condition_manager$send("warning",w)
@@ -302,7 +302,7 @@ Context <- R6Class("Context",
            # textio_hooks$error$run()
            error_text <- conditionMessage(e)
            error_text <- paste(error_text,collapse="\n")
-           log_error(error_text)
+           # log_error(error_text)
            private$condition_manager$send("error",e)
            errOpt <- getOption("error",NULL)
            # log_out(errOpt,use.print=TRUE)

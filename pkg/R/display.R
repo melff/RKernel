@@ -126,7 +126,6 @@ display_data.htmlwidget <- function(x,...,
         res <- iframe
     }
     else {
-        log_out(url)
         if(!show_button)
             res <- sprintf("Use <a href=\"%s\" target=\"_blank\">this link</a> to view widget",url)
         else 

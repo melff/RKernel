@@ -72,7 +72,7 @@ env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FA
     r <- vapply(nms, exists, NA, envir = envir, mode = mode, 
         inherits = FALSE)
     nms <- nms[r]
-    log_out(nms,use.print=TRUE)
+    # log_out(nms,use.print=TRUE)
     if(is.environment(parent)){
         # log_out("Yes, parent is an environment")
         if(length(pattern))
@@ -82,7 +82,7 @@ env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FA
         r_p <- vapply(nms_p, exists, NA, envir = parent, mode = mode, 
                     inherits = FALSE)
         nms_p <- nms_p[r_p]
-        log_out(nms_p,use.print=TRUE)
+        # log_out(nms_p,use.print=TRUE)
         nms <- union(nms,nms_p)
     } # else log_out("No, parent isn't an environment")
         
