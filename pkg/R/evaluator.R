@@ -795,44 +795,10 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_magic = function(magic,code){
-            if(tolower(magic) == "math"){
-                code <- gsub("^%%.+?\n","",code)
-                d <- LaTeXMath(code)
-                private$kernel$display_data(data=d$data,
-                                            metadata=d$metadata,
-                                            transient=d$transient)
-            } 
-            else if (tolower(magic) == "css"){
-                code <- gsub("^%%.+?\n","",code)
-                d <- CSS(code)
-                private$kernel$display_data(data=d$data,
-                                            metadata=d$metadata,
-                                            transient=d$transient)
-            }
-            else if (tolower(magic) == "javascript"){
-                code <- gsub("^%%.+?\n","",code)
-                d <- Javascript(code)
-                private$kernel$display_data(data=d$data,
-                                            metadata=d$metadata,
-                                            transient=d$transient)
-            }
-            else if (tolower(magic) == "html"){
-                code <- gsub("^%%.+?\n","",code)
-                d <- raw_html(code)
-                private$kernel$display_data(data=d$data,
-                                            metadata=d$metadata,
-                                            transient=d$transient)
-            }
-            else if (tolower(magic) == "iframe"){
-                code <- gsub("^%%.+?\n","",code)
-                # log_out(code)
-                text_html <- self$str2iframe(code,class="rkernel-iframe-magic")
-                d <- raw_html(text_html)
-                log_out(d,use.str=TRUE)
-                private$kernel$display_data(data=d$data,
-                                            metadata=d$metadata,
-                                            transient=d$transient)
-            }
+            code <- gsub("^%%.+?\n","",code)
+            res <- dispatch_magic_handler(magic,code)
+            if(length(res))
+                private$handle_result(res,TRUE)
         },
         iframes = list(),
         handle_iframe = function(path,query,...){
