@@ -218,8 +218,13 @@ Evaluator <- R6Class("Evaluator",
                 # log_out(sprintf("== END CELL [%d] ==",self$cell_no))
             }
         },
+        #' @field cell_no The number of the cell currently executed
         cell_no = 0,
+        #' @field cells A 'dictionary' traitlet with the code of the 
+        #'   cells so far encountered
         cells = dictionary(),
+        #' @field cells A 'dictionary' traitlet with the output of the 
+        #'   code cells so far executed
         cell_results = dictionary(),
         #' @description
         #' Get the payload associated with the result returned from running a Jupyter cell
@@ -348,12 +353,25 @@ Evaluator <- R6Class("Evaluator",
             op[nms] <- args
             do.call("par",op)
         },
-
+        #' @description
+        #' A variant of the 'print' function that allows to run hooks before and after
+        #' after printing. Sends the events "before_print" and "print", see \code{\link{EventManager}}
+        #' @param x The object to be printed
+        #' @param ... Any additional arguments, see \code{\link{print}}
         print = function(x,...){
             eventmanagers$output$send("before_print",x,...)
             private$kernel$print(x,...)
             eventmanagers$output$send("print",x,...)
         },
+        #' @description
+        #' A variant of the 'cat' function that allows to run hooks before and after
+        #' after creating output. Sends the events "before_print" and "print", see \code{\link{EventManager}}
+        #' @param ... Any strings to be output, see \code{\link{cat}}
+        #' @param file A file name, see \code{\link{cat}}
+        #' @param sep A separtor string, see \code{\link{cat}}
+        #' @param fill A logical value, see \code{\link{cat}}
+        #' @param labels See \code{\link{cat}}
+        #' @param append A logical value, see \code{\link{cat}}
         cat = function(..., file = "", sep = " ", fill = FALSE, labels = NULL, 
                        append = FALSE){
             do_send <- !nzchar(file)
@@ -371,12 +389,23 @@ Evaluator <- R6Class("Evaluator",
                                                   labels=lables,
                                                   append=append)
         },
+        #' @description
+        #' A variant of the 'str' function that allows to run hooks before and after
+        #' after creating output.
+        #' @param object Any object
+        #' @param ... Any additional arguments, see \code{\link{str}}
         str = function(object, ...){
             private$handle_str()
             private$kernel$str(object,...)
             private$handle_str_exit()
         },
-
+        #' @description
+        #' A variant of 'tools:::httpd' that adapts the paths used in HTML-pages if 
+        #' the help system is proxied. Also allows to implement handlers
+        #' for specific URL patterns via the event mechanism (see \code{\link{EventManager}})
+        #' @param path The \emph{relative} url, e.g. "/doc/html/something/index.html"
+        #' @param query The query string (that appeared after '?' in the http request)
+        #' @param ... Any further arguments, passed on to specific handlers
         httpd = function(path,query,...){
             # log_out("http path: ",path)
             # log_out("http query: ",query,use.str=TRUE)
@@ -396,27 +425,33 @@ Evaluator <- R6Class("Evaluator",
             }
             return(response)
         },
-
+        #' @description
+        #' Get the URL served by the current R kernel
         get_url = function(){
             if(private$http_port == 0){
                 self$start_httpd()
             }
             return(private$http_url)
         },
-
+        #' @description
+        #' Get the ip port served by the current R kernel
         get_port = function(){
             if(private$http_port == 0){
                 self$start_httpd()
             }
             return(private$http_port)
         },
-
+        #' @description
+        #' Set the ip port served by the current R kernel
+        #' @param port The port number, an integer
         set_port = function(port){
             if(private$http_port > 0)
                 suppressMessages(tools::startDynamicHelp(FALSE))
             self$start_httpd(port=port)
         },
-
+        #' @description
+        #' Start the help server of the R kernel
+        #' @param port The port number, an integer; or NULL
         start_httpd = function(port=NULL){
             if(length(port) > 0)
                 options(help.ports=port[1])
@@ -434,7 +469,13 @@ Evaluator <- R6Class("Evaluator",
                 em$activate()
             }
         },
-
+        #' @description
+        #' Create an HTML iframe tag that refers to some (usually HTML) code
+        #' @param code The code to be shown in the iframe
+        #' @param width The intended width of the iframe, a string or a number
+        #' @param height The intended height of the iframe, a string or a number
+        #' @param class The DOM class attribute the iframe, a string
+        #' @param style The CSS style attribte of the iframe, a string
         str2iframe = function(code,
                               width = "100%",
                               height = 400L,
@@ -464,7 +505,9 @@ Evaluator <- R6Class("Evaluator",
             #              transient=transient)
             structure(iframe,class="iframe",id=id)
         },
-
+        #' @description
+        #' Ask the kernel object to send an input request to the frontend
+        #' @param prompt A character string
         readline = function(prompt=""){
             if(!private$allow_stdin) return()
             private$kernel$input_request(prompt=prompt,
