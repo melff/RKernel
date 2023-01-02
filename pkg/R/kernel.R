@@ -24,7 +24,7 @@ Kernel <- R6Class("Kernel",
   public = list(
     #' @description
     #' Initialize the kernel
-    #' @param conn_info A listh with the connection info from the front-end
+    #' @param conn_info A list with the connection info from the front-end
     initialize = function(conn_info){
       .zmqopt_init(envir = private)
       private$zmqctx <- zmq.ctx.new()
@@ -278,10 +278,16 @@ Kernel <- R6Class("Kernel",
         log_error(sprintf("Error in %s",dcl))
       })
     },
+    #' @description
+    #' Show a warning in the Jupyter server log
+    #' @param message A string to be shown in the log
     log_warning = function(message){
       self$cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
                        file=stderr())
     },
+    #' @description
+    #' Show an error message in the Jupyter server log
+    #' @param message A string to be shown in the log
     log_error = function(message){
       self$cat(crayon::bgRed(format(Sys.time()),"\t",message,"\n"),
                        file=stderr())
@@ -318,15 +324,28 @@ Kernel <- R6Class("Kernel",
     get_conn_info = function(){
       return(private$conn_info)
     },
+    #' @description
+    #' Check if the current process is a fork from the original kernel process
     is_child = function(){
-      # Check if the current process is a fork from the original kernel process
       return(Sys.getpid()!=private$pid)
     },
-
+    #' @field print This field is intended to hold the original \'print\' function from
+    #'  package "base"
     print = NULL,
+    #' @field cat This field is intended to hold the original \'cat\' function from
+    #'  package "base"
     cat = NULL,
+    #' @field str This field is intended to hold the original \'str\' function from
+    #'  package "utils"
     str = NULL,
+    #' @field httpd This field is intended to hold the original \'httpd\' function from
+    #'  package "tools"
     httpd = NULL,
+    #' @description
+    #' Send an input request to the frontend
+    #' @param prompt A prompt string
+    #' @param password Logical value; whether the input should be hidden like in a
+    #'    password dialog
     input_request = function(prompt="",password=FALSE){
       private$send_message(type="input_request",
                            parent=private$parent$shell,
@@ -335,6 +354,8 @@ Kernel <- R6Class("Kernel",
                              prompt=prompt,
                              password=password))
     },
+    #' @description
+    #' Read a line from the frontend
     read_stdin = function(){
       continue <- TRUE
       input <- ""
