@@ -37,13 +37,13 @@ Context <- R6Class("Context",
        #' Evaluate one or several expressions
        #' @param ... A single expression or several expressions
        #'   included in curly braces.
-       #' @param envir A list or an environment
+       #' @param envir A list or an environment or NULL
        #' @param enclos An enclosing an environment (see \code{\link{eval}}).
-       do = function(...,envir=list(),enclos=parent.frame()){
+       do = function(...,envir=NULL,enclos=parent.frame()){
            expr <- substitute(...)
            if(class(expr)=="{"){
                expressions <- as.list(expr[-1])
-               self$evaluate(expressions,enclos=enclos)
+               self$evaluate(expressions,envir=envir,enclos=enclos)
            }
            else
                self$eval(expr,envir=envir,enclos=enclos)
@@ -51,18 +51,16 @@ Context <- R6Class("Context",
        #' @description
        #' Evaluate a single expression
        #' @param expr A single expression.
-       #' @param envir A list or an environment
+       #' @param envir A list or an environment or NULL
        #' @param enclos An enclosing an environment (see \code{\link{eval}}).
-       eval = function(expr,envir=list(),enclos=parent.frame())
+       eval = function(expr,envir=NULL,enclos=parent.frame())
            self$evaluate(list(expr),envir=envir,enclos=enclos),
        #' @description
        #' Evaluate a single expression
        #' @param expressions A list of expressions.
-       #' @param envir A list or an environment
+       #' @param envir A list or an environment or NULL
        #' @param enclos An enclosing an environment (see \code{\link{eval}}).
-       # So envir=list() makes interactive widgets work while
-       # envir=private$envir does not. Need to figure out why ...
-       evaluate = function(expressions,envir=list(),enclos=parent.frame()){
+       evaluate = function(expressions,envir=NULL,enclos=parent.frame()){
            if(is.null(envir))
                envir <- private$envir
            self$enter()

@@ -76,11 +76,11 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         #' @description
         #' Evaluate a single expression
         #' @param expr A single expression.
-        eval = function(expr) self$context$eval(expr),
+        eval = function(expr,...) self$context$eval(expr,...),
         #' @description
         #' Evaluate a single expression
         #' @param expressions A list of expressions.
-        evaluate = function(expressions) self$context$evaluate(expressions),
+        evaluate = function(expressions,...) self$context$evaluate(expressions,...),
 
         handle_eval = function() {
             # log_out("Widget-context: handle_eval")
@@ -382,5 +382,5 @@ OutputWidget <- function(append_output=FALSE,...)
 #'    encapsulated by curly braces.
 #' @param enclos An enclosing environment.
 #' @export
-with.OutputWidget <- function(data,expr,enclos=parent.frame(),...)
-    data$context$eval(substitute(expr),enclos=enclos)
+with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),...)
+    data$context$eval(substitute(expr),envir=envir,enclos=enclos)
