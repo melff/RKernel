@@ -8,7 +8,7 @@
 CallbackDispatcherClass <- R6Class("CallbackDispatcher",
     public = list(
       #' @description
-      #' Register a function as call back
+      #' Register a function as a callback
       #' @param handler A function
       #' @param remove A logical value; whether the function
       #'   is added or removed from the list of callbacks
@@ -24,12 +24,18 @@ CallbackDispatcherClass <- R6Class("CallbackDispatcher",
         }
         private$callbacks <- new
       },
+      #' @description
+      #' Remove all callback functions
       clear = function(){
           private$callbacks <- list()
       },
+      #' @description
+      #' Suspend registered callback functions
       suspend_handlers = function(){
           private$suspended <- TRUE
       },
+      #' @description
+      #' (Re-)activate registered callback functions
       activate_handlers = function(){
           private$suspended <- FALSE
       },
