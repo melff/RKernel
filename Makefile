@@ -50,7 +50,7 @@ install-dir:
 
 install-quick:
 	echo "Installing package ${PACKAGE} version ${VERSION} from ${SRCDIR}"
-	R CMD INSTALL --no-byte-compile --with-keep.source --data-compress=none --no-test-load --no-help $(SRCDIR)
+	R CMD INSTALL --no-byte-compile --with-keep.source --data-compress=none --no-test-load $(SRCDIR)
 
 .PHONY: install-dir-clean
 install-dir-clean:
