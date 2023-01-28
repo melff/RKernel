@@ -136,6 +136,7 @@ Evaluator <- R6Class("Evaluator",
             register_export(self$str2iframe,"str2iframe")
             register_export(self$readline,"readline")
             register_export(self$str,"str")
+            register_export(self$restart_graphics,"restart_graphics")
             private$assign_exports()
             em <- EventManager(type="eval")
             em$activate()
@@ -514,8 +515,16 @@ Evaluator <- R6Class("Evaluator",
                                          password=FALSE)
             result <- private$kernel$read_stdin()
             return(result)
+        },
+        #' Restart/recreate the graphics device if for whatever reason 
+        #' it was closed needs to be reinitialized
+        restart_graphics = function(){
+            dev_cur <- dev.cur()
+            if(dev_cur > 1)
+                dev.off(dev_cur)
+            private$graphics$create()
+            private$graphics$activate()
         }
-
     ),
     
     private = list(
@@ -724,6 +733,9 @@ Evaluator <- R6Class("Evaluator",
             private$kernel$display_send(d)
 
             private$new_cell <- FALSE
+            sleep_after_graphics <- getOption("sleep_after_graphics",0)
+            if(sleep_after_graphics > 0)
+                Sys.sleep(sleep_after_graphics)
 
         },
 
