@@ -95,6 +95,8 @@ Context <- R6Class("Context",
            }
            self$exit()
        },
+       #' @field last.value
+       #' Value of last evaluated expression.
        last.value = NULL,
        #' @description A function that is called before a set of expressions
        #'     is evaluated (e.g. in a notebook cell).
