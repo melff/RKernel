@@ -1,5 +1,15 @@
 #' @include evaluator.R
 
+#' @describeIn Debugger An adaptation of the function with the same name from
+#'   the 'utils' package
+#'
+#' @param dumpto Character string; name of the object or file that contains the dumped frames
+#' @param to.file Logical; whether to dump to a file.
+#' @param include.GlobalEnv Logical; see \code{\link[utils]{dump.frames}}
+#' @param drop.kernel.frames Logical; whether frames belonging to the R Kernel should be dropped
+#' @param drop.last Integer; how many of the last frames should be dropped (which are specific to the
+#'            RKernel evaluator)
+#' 
 #' @export
 # Adapted from the utils package
 dump.frames <- function(dumpto = "last.dump", 
@@ -77,6 +87,11 @@ get.call.stack <- function(drop.kernel.frames = TRUE,drop.last=0){
     return(list(calls=calls,frames=frames))
 }
 
+#' @title Interactive Debugger
+#'
+#' @description Provides a Jupyter notebook compatible variant of
+#'     \code{\link[utils]{debugger}}
+#' @param dump An R dump object created by \code{dump.frames}
 #' @export
 Debugger <- function(dump=last.dump){
     widgets <- Map(dbgWidget,names(dump),dump,seq_along(dump))
@@ -302,6 +317,12 @@ clone_env <- function(old_env){
     new_env
 }
 
+
+#' @title Breakpoints
+#'
+#' @description The function \code{BreakPoint} can be used to set a breakpoint in
+#'   a function or a script. Instead of a terminal input and output, the thus
+#'   created breakpoint can be interacted with using a Widget.
 #' @export
 BreakPoint <- function(){
     parent <- parent.frame()
@@ -543,10 +564,22 @@ exit_tracer <- function(...) {
 register_export(exit_tracer)
 
 
+#' @title Step through a function
+#'
+#' @description The function \code{Trace} markes a function to be traced
+#'   so that it will be evaluated step-by-step when called.
+#'
+#' @details \code{Trace} differs
+#'   in semantics from the function \code{\link[utils]{trace}} which
+#'   allows to insert expressions at given positions within a function.
+#'   Nevertheless, it uses the function \code{\link[utils]{trace}} internally.
+#'   Therefore the effect of \code{Trace(FUN)} can be undone by the call
+#'   \code{unrace(FUN)}
+#'
+#' @param FUN the function to be traced.
 #' @export
 Trace <- function(FUN){
      cls <- class(FUN)
-     print(cls)
      if("functionWithTrace" %in%cls){
          warning("Function is already being traced")
          return(invisible(NULL))
@@ -588,6 +621,12 @@ src_tracer_exit <- function(filename){
 }
 register_export(src_tracer_exit)
 
+#' @title Step through a scripted being sourced
+#'
+#' @description The function parses the contents of a script
+#'   and evaluates each expression within it step-by-step.
+#'
+#' @param filename A string; the name of the script file.
 #' @export
 tracing_source <- function(filename){
     parsed <- parse(filename)
