@@ -8,7 +8,7 @@ ARCHIVE := $(PACKAGE)_$(VERSION).tar.gz
 RCHKIMG := kalibera-rchk-master-def.simg
 
 .PHONY: default
-default: install-quick
+default: roxygenize install-quick
 
 .PHONY: all
 all: roxygenize build install installspec
