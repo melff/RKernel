@@ -169,31 +169,59 @@ Context <- R6Class("Context",
                private$on_event("exit",handler=handler,remove=remove)
            }
        },
-
+       #' @description
+       #' Add or remove a handler function to be called after every time an expression 
+       #' has been evaluated.
+       #' @param handler A handler function
+       #' @param remove A logical value, whether the handler should be removed or added
        on_eval = function(handler,remove=FALSE){
            if(is.function(handler)){
                private$on_event("eval",handler=handler,remove=remove)
            }
        },
-
+       #' @description
+       #' Add or remove a handler function to the results of each evaluated 
+       #' expression.
+       #' @param handler A handler function. This function must take two arguments,
+       #'   the value resulting from the evalualition of the expression
+       #'   and a logical value, which indicates whether the value is visible.
+       #'   See also \code{\link[base]{withVisible}}.
+       #' @param remove A logical value, whether the handler should be removed or added
        on_result = function(handler,remove=FALSE){
            if(is.function(handler)){
                private$on_event("result",handler=handler,remove=remove)
            }
        },
-
+       #' @description
+       #' Add or remove a handler function to be called if an error condition is 
+       #' raised, e.g. by \code{stop()}.
+       #' @param handler A handler function
+       #' @param remove A logical value, whether the handler should be removed or added
        on_error = function(handler=NULL,remove=FALSE){
            private$condition_manager$on("error",handler=handler,remove=remove)
        },
-
+       #' @description
+       #' Add or remove a handler function to be called if an warning is 
+       #' raised, e.g. by \code{stop()}.
+       #' @param handler A handler function
+       #' @param remove A logical value, whether the handler should be removed or added
        on_warning = function(handler=NULL,remove=FALSE){
            private$condition_manager$on("warning",handler=handler,remove=remove)
        },
-
+       #' @description
+       #' Add or remove a handler function to be called if a message is 
+       #' shown.
+       #' @param handler A handler function
+       #' @param remove A logical value, whether the handler should be removed or added
        on_message = function(handler=NULL,remove=FALSE){
            private$condition_manager$on("message",handler=handler,remove=remove)
        },
-
+       #' @description
+       #' Add or remove a handler function to be called if an object is
+       #' output \code{print()}.
+       #' @param handler A handler function to called *before* \code{print()}
+       #' @param handler A handler function to called *after* \code{print()}
+       #' @param remove A logical value, whether the handler should be removed or added
        on_print = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
                private$output_manager$on("before_print",handler=handler,remove=remove)
@@ -202,7 +230,12 @@ Context <- R6Class("Context",
                private$output_manager$on("print",handler=exit,remove=remove)
            }
        },
-
+       #' @description
+       #' Add or remove a handler function to be called if text is output using
+       #' \code{cat()}.
+       #' @param handler A handler function to called *before* \code{cat()}
+       #' @param handler A handler function to called *after* \code{cat()}
+       #' @param remove A logical value, whether the handler should be removed or added
        on_cat = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
                private$output_manager$on("before_cat",handler=handler,remove=remove)
@@ -211,7 +244,12 @@ Context <- R6Class("Context",
                private$output_manager$on("cat",handler=exit,remove=remove)
            }
        },
-
+       #' @description
+       #' Add or remove a handler function to be called if the structure of an object
+       #' is shown using \code{str()}.
+       #' @param handler A handler function to called *before* \code{str()}
+       #' @param handler A handler function to called *after* \code{str()}
+       #' @param remove A logical value, whether the handler should be removed or added
        on_str = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
                private$output_manager$on("before_str",handler=handler,remove=remove)
@@ -220,7 +258,8 @@ Context <- R6Class("Context",
                private$output_manager$on("str",handler=exit,remove=remove)
            }
        },
-       
+       #' @description
+       #' Get text output produced by the expressions last evaluated.
        get_text = function(){
            # log_out("get_text")
            cat("\n",file=private$connection)
