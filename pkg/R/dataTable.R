@@ -211,34 +211,72 @@ datatable_page <- function(obj,
     code
 }
 
+#' @title HTML Tables with Interactive Controls
+#'
+#' @description Objects of class "dataTable" provide HTML tables with interactive
+#'    controls powered by the DataTable Javascript library.
+#' @name dataTable
+
+#' @describeIn dataTable A dataTable constructor
+#' @param x An object to be shown as a data table.
+#' @param ... Other arguments passed to the initialization method of
+#'   'dataTableClass' R6 objects
 #' @export
 dataTable <- function(x,...) UseMethod("dataTable")
+
+#' @describeIn dataTable Default method
 #' @export
 dataTable.default <- function(x,...) dataTable.data.frame(as.data.frame(x),...)
+
+#' @describeIn dataTable data.frame method 
 #' @export
 dataTable.data.frame <- function(x,...) 
     dataTableClass$new(x,...)
 
+#' @rdname dataTable
 #' @export
 dataTableClass <- R6Class("dataTable",{
     public = list(
+        #' @field w A container widget or NULL
         w = NULL,
+        #' @field page Number of the current page
         page = 1,
+        #' @field m Width of the object divided by 'size'
         m = 0,
+        #' @field r Remainder of the widht of the object divided by 'size'
         r = 0,
+        #' @field size Number of columns in each group for horizontal paging 
         size = 50,
+        #' @field iframe An <iframe> container or NULL
         iframe = NULL,
+        #' @field b_left Button to scroll left
         b_left = NULL,
+        #' @field b_right Button to scroll right
         b_right = NULL,
+        #' @field b_first Button to scroll to the first group of columns
         b_first = NULL,
+        #' @field b_last Button to scroll to the last group of columns
         b_last = NULL,
+        #' @field dt HTML code for the visible table
         dt = NULL,
+        #' @field obj The tabular object being dispayed
         obj = NULL,
+        #' @field label A string label that shows the columns being displayed
         label = NULL,
+        #' @field style A string with CSS styling
         style = NULL,
+        #' @field navigator A container widgets that contains the navigator buttons
         navigator = NULL,
+        #' @field scrollY The vertical scroll amount
         scrollY = NULL,
+        #' @field height The height of the iframe
         height = NULL,
+        #' @description
+        #' Initialize the DataTable
+        #' @param obj The object to be displayed
+        #' @param size An integer, the number of columns pre-formatted on each page.
+        #' @param nlines An integer, the number of rows of each page
+        #' @param ... Other arguments, ignored
         initialize = function(obj,size=50,nlines=min(nrow(obj),15),...){
             self$size <- size
             self$m <- ncol(obj)%/%size
@@ -296,6 +334,8 @@ div.datatable-navigation div.widget-html-content {
             self$obj <- obj
             self$show_columns()
         },
+        #' @description
+        #' Show which columns are displayed
         show_columns = function(){
             from <- (self$page - 1)*self$size + 1
             if(self$page > self$m)
@@ -305,6 +345,8 @@ div.datatable-navigation div.widget-html-content {
             self$label$value <- sprintf("Columns %d-%d of %d",from,to,ncol(self$obj))
             invisible(NULL)
         },
+        #' @description
+        #' Go one page to the left
         page_left = function(){
             page <- max(1,self$page - 1)
             if(page < self$page){
@@ -315,6 +357,8 @@ div.datatable-navigation div.widget-html-content {
             }
             invisible(NULL)
         },
+        #' @description
+        #' Go one page to the right
         page_right = function(){
             page <- self$page + 1
             if(page > self$m){
@@ -329,6 +373,8 @@ div.datatable-navigation div.widget-html-content {
             }
             invisible(NULL)
         },
+        #' @description
+        #' Go to the first page (to the left)
         page_first = function(){
             page <- 1
             if(page < self$page){
@@ -339,6 +385,8 @@ div.datatable-navigation div.widget-html-content {
             }
             invisible(NULL)
         },
+        #' @description
+        #' Go to the last page (to the right)
         page_last = function(){
             if(self$r > 0) page <- self$m + 1
             else page <- self$m
@@ -354,6 +402,11 @@ div.datatable-navigation div.widget-html-content {
     
 })
 
+#' @describeIn dataTable dataTable method for display_data
+#' @param x A "dataTable" object
+#' @param metadata A list of metadata strings
+#' @param id An ID string
+#' @param update A logical value; whether an existing display item will be updated
 #' @export
 display_data.dataTable <- function(x,...,
                                 metadata=emptyNamedList,
