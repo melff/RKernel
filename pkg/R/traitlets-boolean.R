@@ -1,6 +1,6 @@
 #' Boolean Traitlets
 #'
-#' @description A class and a constructor function to create boolean train(let)s.
+#' @description A class and a constructor function to create boolean trait(let)s.
 #'
 #' @include traitlets.R
 #' @name Boolean
