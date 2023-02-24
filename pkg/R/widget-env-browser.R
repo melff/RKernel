@@ -53,6 +53,23 @@ envBrowserClass <- R6Class_("envBrowser",
         }
     )                   
 )
+
+#' Environment Browser Widgets
+#'
+#' @description This function returns a widget that allows to browse within an environment
+#'
+#' @param pos integer indicating the \code{\link[base]{search}} position, or -1
+#'     for the current environment.
+#' @param name optional name indicating a position in the search path, see
+#'     \code{\link[base]{ls}}.
+#' @param envir environment to use, see \code{\link[base]{ls}}.
+#' @param parent an optional parent environment.
+#' @param all.names logical; if true names starting with '.' are not omitted,
+#'     see \code{\link[base]{ls}}.
+#' @param pattern an optional pattern of names to restrict browsing to, see
+#'     \code{\link[base]{ls}}.
+#' @param mode an optional string indicating the mode of objects to which
+#'     browsing is restricted, see \code{\link[base]{ls}}.
 #' @export
 envBrowser <- function(pos = -1,
                        name = NULL,
