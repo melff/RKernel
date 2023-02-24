@@ -14,6 +14,7 @@ View <- function(x,
 #' @include evaluator.R
 register_export(View)
 
+#' @rdname View
 #' @export
 View.default <- function(x,title=deparse(substitute(x)),...)
 {
@@ -28,6 +29,7 @@ View.default <- function(x,title=deparse(substitute(x)),...)
     
 }
 
+#' @rdname View
 #' @export
 View.data.frame <- function(x,title=deparse(substitute(x)),...)
 {
