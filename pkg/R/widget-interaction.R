@@ -10,10 +10,12 @@
 #'     as fixed, so that \code{mkWidget} returns it as is.
 #' 
 #' @include widget-output.R widget-value.R
+#' @param x an object
 #' @export
 mkWidget <- function(x,...) UseMethod("mkWidget")
 
-#' @describeIn mkWidget S3 method for integer numbers
+#' @rdname mkWidget
+#' @param description NULL or a character string that contains a description.
 #' @export
 mkWidget.integer <- function(x,description=NULL,...){
    if(length(x) == 1L){
@@ -77,7 +79,7 @@ mkWidget.integer <- function(x,description=NULL,...){
    w
 }
 
-#' @describeIn mkWidget S3 method for floating point numbers
+#' @rdname mkWidget 
 #' @export
 mkWidget.numeric <- function(x,description=NULL,...){
    if(length(x) == 1L){
@@ -141,7 +143,7 @@ mkWidget.numeric <- function(x,description=NULL,...){
    w
 }
 
-#' @describeIn mkWidget S3 method for logical numbers
+#' @rdname mkWidget
 #' @export
 mkWidget.logical <- function(x,description=NULL,...){
     w <- Checkbox()
@@ -154,7 +156,7 @@ mkWidget.logical <- function(x,description=NULL,...){
     w
 }
 
-#' @describeIn mkWidget S3 method for character strings
+#' @rdname mkWidget
 #' @export
 mkWidget.character <- function(x,description=NULL,...){
     if(length(x) == 1){
@@ -172,15 +174,19 @@ mkWidget.character <- function(x,description=NULL,...){
     w
 }
 
-#' @describeIn mkWidget S3 method for objects 
+#' @rdname mkWidget
 #' @export
 mkWidget.Fixed <- function(x,...) list(value=x)
 
-#' @describeIn mkWidget S3 method for objects 
+#' @rdname mkWidget
 #' @export
 mkWidget.ValueWidget <- function(x,...) x
 
-#' @rdname mkWidget
+#' @title Fixed Arguements in Interactive Widgets
+#' @description The function 'Fixed' returns ist argument 
+#'   marked with a class attribute "Fixed", so that it
+#'   is not made into a widget when passed to \code{\link{Interactive}} 
+#' @param x An object.
 #' @export
 Fixed <- function(x) structure(x,class="Fixed")
 
@@ -206,6 +212,11 @@ call_with_controls <- function(FUN,controls){
 #' @param continous_update A logical value, if \code{TRUE} the function
 #'     \code{FUN} is called whenever one of the controlling widgets changes a
 #'     value
+#' @param autorun Logical, whether the function \code{FUN} will be automatically
+#'     called when any of the controlling widget values is changed or
+#'     only when \code{button} is clicked.
+#' @param clear Logical, whether \code{out} is cleared before each
+#'     call of \code{FUN}.
 #' @param mime_type A character string that specifies the mime type as which the
 #'     return value of \code{FUN} is displayed.
 #' @export
@@ -260,8 +271,6 @@ mkWidgets <- function(...){
 
 
 #' @rdname interaction
-#' @param graphics Logical, whether graphics output is expected, in which case
-#'   an "ImageWidget" object is created to receive the graphics output.
 #' @export
 Interactive <- function(FUN,...,continuous_update=TRUE){
     controls <- mkWidgets(...)
@@ -274,11 +283,9 @@ Interactive <- function(FUN,...,continuous_update=TRUE){
 }
 
 #' @rdname interaction
-#' @param graphics Logical, whether graphics output is expected, in which case
-#'   an "ImageWidget" object is created to receive the graphics output.
 #' @export
 interact <- function(FUN,...,continuous_update=TRUE){
-    widget <- interactive(FUN,...,
+    widget <- Interactive(FUN,...,
                           continuous_update=continuous_update)
     display(widget)
 }
