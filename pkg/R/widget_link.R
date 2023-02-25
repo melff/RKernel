@@ -13,9 +13,17 @@ NULL
 WidgetLinkClass <- R6Class_("WidgetLink",
   inherit = CoreWidgetClass,
   public = list(
+      #' @field _model_name Name of the Javascript model in the frontend.
       `_model_name` = structure(Unicode("LinkModel"),sync=TRUE),
+      #' @field source A pair of Unicode strings, the first is the JSON representation 
+      #'    of a widget, the second is the name of a trait(let) of the widget.
       source = structure(Unicode(length=2),sync=TRUE),
+      #' @field target A pair of Unicode strings, the first is the JSON representation 
+      #'    of a widget, the second is the name of a trait(let) of the widget.
       target = structure(Unicode(length=2),sync=TRUE),
+      #' @description An initializer method
+      #' @param source A list with two elements, a widget and the name of a trait(let).
+      #' @param target A list with two elements, a widget and the name of a trait(let).
       initialize = function(source,target,...){
           super$initialize(...)
           source_widget <- source[[1]]
