@@ -13,10 +13,14 @@ NULL
 LayoutClass <- R6Class_("Layout",
    inherit = WidgetClass,
    public = list(
-     `_view_name` = structure(Unicode("LayoutView"),sync=TRUE),
+    #' @field _view_name Name of the Javascript view in the frontend.
+    `_view_name` = structure(Unicode("LayoutView"),sync=TRUE),
+    #' @field _view_module Name of the Javascript view module in the frontend.
     `_view_module` = structure(Unicode("@jupyter-widgets/base"),sync=TRUE),
+    #' @field _view_module_version Version of the Javascript view module in the frontend.
     `_view_module_version` = structure(Unicode(jupyter_widgets_base_version),sync=TRUE),
-     `_model_name` = structure(Unicode("LayoutModel"),sync=TRUE),
+    #' @field _model_name Name of the Javascript model in the frontend.
+    `_model_name` = structure(Unicode("LayoutModel"),sync=TRUE),
     #' @field align_content An optional string, if non-empty, one of "flex-start", "flex-end",
     #'                      "center", "space-between", "space-around", "space-evenly", "stretch"
     align_content = structure(StrEnum(c("flex-start","flex-end","center","space-between",
