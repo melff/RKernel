@@ -271,10 +271,13 @@ mkWidgets <- function(...){
 
 
 #' @rdname interaction
+#' @param append_output Logical, whether existing output should be appended to or overwritten.
+#' @param use_display Logical, whether the display mechanism is used internally for 
+#'    output streams.
 #' @export
-Interactive <- function(FUN,...,continuous_update=TRUE){
+Interactive <- function(FUN,...,continuous_update=TRUE,append_output=FALSE,use_display=TRUE){
     controls <- mkWidgets(...)
-    output <- OutputWidget(append_output=FALSE)
+    output <- OutputWidget(append_output=append_output,use_display=use_display)
     io <- interactive_output(FUN=FUN,
                        out=output,
                        controls=controls,
@@ -284,8 +287,9 @@ Interactive <- function(FUN,...,continuous_update=TRUE){
 
 #' @rdname interaction
 #' @export
-interact <- function(FUN,...,continuous_update=TRUE){
+interact <- function(FUN,...,continuous_update=TRUE,append_output=FALSE,use_display=TRUE){
     widget <- Interactive(FUN,...,
-                          continuous_update=continuous_update)
+                          continuous_update=continuous_update,
+                          append_output=append_output,use_display=use_display)
     display(widget)
 }

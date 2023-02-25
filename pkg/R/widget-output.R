@@ -26,7 +26,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         #' @description Initializing function
         #' @param append_output Logical, whether existing output should be appended to or overwritten.
         #' @param envir An environment, where expressions are evaluated.
-        #' @param use_display Logical, whether the display objects are used internally for 
+        #' @param use_display Logical, whether the display mechanism is used internally for 
         #'    output streams.
         #' @param ... Any other arguments, passed to the superclass initializer.
         initialize = function(append_output = TRUE,
