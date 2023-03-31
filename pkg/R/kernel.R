@@ -276,6 +276,8 @@ Kernel <- R6Class("Kernel",
                  file=stderr())
       },error=function(e){
         log_error(sprintf("Error in %s",dcl))
+        msg <- conditionMessage(e)
+        log_error(msg)
       })
     },
     #' @description
