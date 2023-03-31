@@ -21,10 +21,10 @@ SVGWidgetClass <- R6Class_(
                                    attachment=list(
                                        display=self$display
                                    ))
-            context$on_enter(self$enter)
-            context$on_exit(self$exit)
+            context$on_enter(private$enter)
+            context$on_exit(private$exit)
 
-            context$on_eval(self$handle_graphics)
+            context$on_eval(private$handle_graphics)
             self$context <- context
             private$kernel <- get_current_kernel()
             private$dev_num_other <- dev.cur()
@@ -40,9 +40,12 @@ SVGWidgetClass <- R6Class_(
             }
             if(length(style)){
                 style <- paste0(style,collapse=";")
-                self$style <- style
+                private$style <- style
             }
-        },
+        }
+    ),
+    private = list(
+        style = NULL,
         handle_graphics = function(){
             string <- private$svg_string()
             if(length(string)>1){
@@ -58,9 +61,6 @@ SVGWidgetClass <- R6Class_(
         exit = function(){
             dev.set(private$dev_num_other)
         },
-        style = NULL
-    ),
-    private = list(
         kernel = NULL,
         dev_num = 0,
         dev_num_other = 0,
@@ -74,9 +74,9 @@ SVGWidgetClass <- R6Class_(
                                             standalone=FALSE)
         },
         set_dims = function(string){
-            if(length(self$style)){
+            if(length(private$style)){
                 pattern <- "(<svg.*?)(>)"
-                replacement <- paste0("\\1 style=",self$style,"\\2")
+                replacement <- paste0("\\1 style=",private$style,"\\2")
                 string <- sub(pattern,replacement,string)
             }
             return(string)
