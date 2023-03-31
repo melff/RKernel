@@ -23,6 +23,8 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         `_model_module_version` = structure(Unicode(jupyter_widgets_output_version),sync=TRUE),
         #' @field msg_id Unicode string with the id of the last message sent to the frontend.
         msg_id = structure(Unicode(""),sync=TRUE),
+        #' @field outputs A list with output strings
+        outputs = structure(List(),sync=TRUE),
         #' @description Initializing function
         #' @param append_output Logical, whether existing output should be appended to or overwritten.
         #' @param envir An environment, where expressions are evaluated.
@@ -94,11 +96,11 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         #'   the output.
         clear_output = function(wait=FALSE){
             private$sync_suspended <- TRUE
-            private$outputs <- list()
+            self$outputs <- list()
             # kernel <- get_current_kernel()
             # kernel$clear_output(wait=wait)
             private$sync_suspended <- FALSE
-            private$send_state("outputs")
+            self$send_state("outputs")
         },
         #' @field context NULL or (after initialization) an object inclass
         #'    "Context" -- see \code{\link{Context}}.
@@ -127,14 +129,14 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             # log_out(sprintf("msg_id set to '%s'",private$msg_id))
         },
 
-        handle_eval = function() {
+        handle_eval = function(...) {
             # log_out("Widget-context: handle_eval")
             private$handle_text()
             private$handle_graphics()
         },
         
-        handle_text = function() {
-            # log_out("Widget-context: handle_text")
+        handle_text = function(...) {
+            log_out("Widget-context: handle_text")
             text <- self$context$get_text()
             text <- paste(text,collapse="\n")
             private$stream(text = text,
@@ -145,7 +147,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         current_plot = NULL,
         last_plot = NULL,
 
-        handle_graphics = function() {
+        handle_graphics = function(...) {
             # log_out("Widget-context: handle_graphics")
 
             if(!private$graphics$is_active()) return(NULL)
@@ -263,10 +265,10 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         stdout = function(text) private$stream(text,"stdout"),
         stderr = function(text) private$stream(text,"stderr"),
 
-        outputs = structure(List(),sync=TRUE),
         current_output = NULL,
         stream = function(text,stream_name) {
             if(!nzchar(text)) return()
+            log_out("Widget-context: stream")
             private$sync_suspended <- TRUE
             if(private$use_display && stream_name=="stdout"){
                 d <- display_data(`text/plain`=text)
@@ -276,24 +278,23 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                     metadata = d$metadata
                 )
                 if(private$append_output){
-                    l <- length(private$outputs)
-                    private$outputs[[l+1]] <- private$current_output
+                    l <- length(self$outputs)
+                    self$outputs[[l+1]] <- private$current_output
                 }
                 else {
-                    private$outputs[[1]] <- private$current_output
+                    self$outputs[[1]] <- private$current_output
                 }
             }
             else {
-            # log_out("Widget-context: stream")
                 if(private$append_output){
-                    # log_out(private$outputs,use.str=TRUE)
-                    l <- length(private$outputs)
+                    # log_out(self$outputs,use.str=TRUE)
+                    l <- length(self$outputs)
                     if(!is.null(private$current_output) &&
                        identical(private$current_output$output_type, "stream") &&
                        identical(private$current_output$name, stream_name) && l > 0){
                         private$current_output$text <- paste0(private$current_output$text,
                                                            text)
-                        private$outputs[[l]] <- private$current_output
+                        self$outputs[[l]] <- private$current_output
                     }
                     else {
                         private$current_output <- list(
@@ -301,9 +302,9 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                             name = stream_name,
                             text = text
                         )
-                        outputs <- private$outputs
+                        outputs <- self$outputs
                         outputs[[l+1]] <- private$current_output
-                        private$outputs <- outputs
+                        self$outputs <- outputs
                     }
                 # kernel <- get_current_kernel()
                 # kernel$stream(text,stream_name)
@@ -316,12 +317,12 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                     )
                 # log_out("\n\n================================================================\n")
                 #private$traits$outputs$set(list(private$current_output),notify=FALSE)
-                #private$send_state()
-                    private$outputs[[1]] <- private$current_output
+                #self$send_state()
+                    self$outputs[[1]] <- private$current_output
                 }
             }
             private$sync_suspended <- FALSE
-            private$send_state("outputs")
+            self$send_state("outputs")
         },
         display_index = integer(0),
         display_send = function(d){
@@ -342,27 +343,27 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                 if(update){
                     if(id == "last" && l > 0){
                         i <- private$display_index[l]
-                        private$outputs[[i]] <- out_data
+                        self$outputs[[i]] <- out_data
                     }
                     if(id %in% names(private$display_index)){
                         i <- private$display_index[id]
-                        private$outputs[[i]] <- out_data
+                        self$outputs[[i]] <- out_data
                     }
                 } else {
                     if(l < 1 || !(id %in% names(private$display_index))){
-                        i <- length(private$outputs) + 1L
+                        i <- length(self$outputs) + 1L
                         ii <- l + 1L
                         private$display_index[ii] <- i
                         names(private$display_index)[ii] <- id
-                        private$outputs[[i]] <- out_data
+                        self$outputs[[i]] <- out_data
                         private$current_output <- out_data
                     }
                 }
             }
             else {
-                private$outputs <- list(out_data)
+                self$outputs <- list(out_data)
                 private$current_output <- out_data
-                #private$send_state()
+                #self$send_state()
             }
         },
         last_display = function(){
@@ -375,7 +376,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         },
         clear = function(){
             private$display_index <- integer(0)
-            private$outputs <- list()
+            self$outputs <- list()
         },
         kernel=NULL
     )
