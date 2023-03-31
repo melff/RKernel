@@ -136,7 +136,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         },
         
         handle_text = function(...) {
-            log_out("Widget-context: handle_text")
+            # log_out("Widget-context: handle_text")
             text <- self$context$get_text()
             text <- paste(text,collapse="\n")
             private$stream(text = text,
@@ -268,7 +268,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         current_output = NULL,
         stream = function(text,stream_name) {
             if(!nzchar(text)) return()
-            log_out("Widget-context: stream")
+            # log_out("Widget-context: stream")
             private$sync_suspended <- TRUE
             if(private$use_display && stream_name=="stdout"){
                 d <- display_data(`text/plain`=text)
