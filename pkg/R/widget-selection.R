@@ -122,83 +122,130 @@ SelectionWidgetClass <- R6Class_("SelectionWidget",
   )
 )
 
-#' @describeIn SelectionWidget A 
+#' @describeIn SelectionWidget A constructor function for selection widgets.
 #' @export
 SelectionWidget <- function(options,value,...) SelectionWidgetClass$new(options=options,value=value,...)
 
+#' @rdname SelectionWidget
 #' @export
 DropdownClass <- R6Class_("Dropdown",
   inherit = SelectionWidgetClass,
   public = list(
+      #' @field _model_name Name of the Javascript model in the frontend.
       `_model_name` = structure(Unicode("DropdownModel"),sync=TRUE),
+      #' @field _view_name Name of the Javascript view in the frontend.
       `_view_name` = structure(Unicode("DropdownView"),sync=TRUE)
   )
 )
+
+#' @describeIn SelectionWidget The construction function for dropdown widgets.
+#' 
+#' @param options A named vector or a vector coerceable into a character vector.
+#' @param value A trait.
 #' @export
 Dropdown <- function(options,value,...) DropdownClass$new(options=options,value=value,...)
 
+#' @rdname SelectionWidget
 #' @export
 RadioButtonsClass <- R6Class_("RadioButtons",
   inherit = SelectionWidgetClass,
   public = list(
+      #' @field _model_name Name of the Javascript model in the frontend.
       `_model_name` = structure(Unicode("RadioButtonsModel"),sync=TRUE),
+      #' @field _view_name Name of the Javascript view in the frontend.
       `_view_name` = structure(Unicode("RadioButtonsView"),sync=TRUE)
   )
 )
+
+#' @describeIn SelectionWidget The construction function for radiobuttons widgets.
+#' 
 #' @export
 RadioButtons <- function(options,value,...) RadioButtonsClass$new(options=options,value=value,...)
 
+#' @rdname SelectionWidget
 #' @export
 ListboxSelectClass <- R6Class_("ListboxSelect",
   inherit = SelectionWidgetClass,
   public = list(
+      #' @field _model_name Name of the Javascript model in the frontend.
       `_model_name` = structure(Unicode("SelectModel"),sync=TRUE),
+      #' @field _view_name Name of the Javascript view in the frontend.
       `_view_name` = structure(Unicode("SelectView"),sync=TRUE),
+      #' @field rows An integer, the number of rows.
       rows = structure(Integer(5L),sync=TRUE)
   )
 )
+
+#' @describeIn SelectionWidget The construction function for listbox-selection widgets.
+#' 
+#' @param options A named vector or a vector coerceable into a character vector.
+#' @param value A trait.
 #' @export
 ListboxSelect <- function(options,value,...) ListboxSelectClass$new(options=options,value=value,...)
 
 
+#' @rdname SelectionWidget
 #' @export
 ToggleButtonsStyleClass <- R6Class_("ToggleButtonsStyle",
   inherit = DescriptionStyleClass,
   public = list(
-    `_model_name` = structure(Unicode("ToggleButtonsStyleModel"),sync=TRUE),
-    button_width = structure(Unicode(character(0)),sync=TRUE),
-    font_weight = structure(Unicode(character(0)),sync=TRUE)
+      #' @field _model_name Name of the Javascript model in the frontend.
+      `_model_name` = structure(Unicode("ToggleButtonsStyleModel"),sync=TRUE),
+      #' @field button_width A unicode string, the width in CSS language
+      button_width = structure(Unicode(character(0)),sync=TRUE),
+      #' @field font_weight A unicode string, the font weight in CSS language
+      font_weight = structure(Unicode(character(0)),sync=TRUE)
   )
 )
 
 
+#' @rdname SelectionWidget
 #' @export
 ToggleButtonsClass <- R6Class_("ToggleButtons",
   inherit = SelectionWidgetClass,
   public = list(
+      #' @field _model_name Name of the Javascript model in the frontend.
       `_model_name` = structure(Unicode("ToggleButtonsModel"),sync=TRUE),
+      #' @field _view_name Name of the Javascript view in the frontend.
       `_view_name` = structure(Unicode("ToggleButtonsView"),sync=TRUE),
+      #' @field tooltips A unicode vector with tooltips.
       tooltips = structure(Unicode(length=NA),sync=TRUE),
+      #' @field icons A unicode vector with icon specs.
       icons = structure(Unicode(length=NA),sync=TRUE),
+      #' @field style A TobbleButtonStyle widget
       style = structure(R6Instance(ToggleButtonsStyleClass),sync=TRUE),
+      #' @field button_style A character string, one of "primary", "success", "info",
+      #'        "warning", "danger", or the empty string.
       button_style = structure(StrEnum(
         c("primary","success","info","warning","danger",""),
         default=""))
   )
 )
+
+#' @describeIn SelectionWidget The construction function for togglebuttons widgets.
+#' 
+#' @param options A named vector or a vector coerceable into a character vector.
+#' @param value A trait.
 #' @export
 ToggleButtons <- function(options,value,...) ToggleButtonsClass$new(options=options,value=value,...)
 
 
 
+#' @rdname SelectionWidget
 #' @export
 MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
   inherit = DescriptionWidgetClass,
   public = list(
+      #' @field _options_labels A unicode string vector with labels
       `_options_labels` = structure(Unicode(length=NA),sync=TRUE),
+      #' @field _options_values A list of labelled values
       `_options_values` = list(),
+      #' @field index An integer vector of indices of currenlty selected elements.
       index = structure(Integer(integer(0),optional=TRUE,length=NA),sync=TRUE),
+      #' @field value A traitlet vector.
       value = Trait(),
+      #' @description Validate an index.
+      #' @param An index, the index to be checked.
       validate_index = function(index){
           # cat("validate_index")
           options_values <- self[["_options_values"]]
@@ -210,6 +257,10 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
           } 
           index
       },
+      #' @description Standard observer function for indices
+      #' @param name Name of the traitlet
+      #' @param self The traitlet container
+      #' @param index The index
       observe_index = function(name,self,index){
           # cat("observe_index")
           options_values <- self[["_options_values"]]
@@ -222,6 +273,8 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
           # cat(value)
           self$send_state()
       },
+      #' @description Validate a value
+      #' @param value The value to be validated
       validate_value = function(value){
           # cat("validate_value")
           options_labels <- self[["_options_labels"]]
@@ -239,6 +292,10 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
           }
           value
       },
+      #' @description Standard observer function for values
+      #' @param name Name of the traitlet
+      #' @param self The traitlet container
+      #' @param index A value
       observe_value = function(name,self,value){
           # cat("observe_value\n")
           # print(name)
@@ -260,6 +317,9 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
           # str(self)
           self$send_state()
       },
+      #' @description Initialiser
+      #' @param options A named vector or a vector coerceable into a character vector.
+      #' @param value A trait.
       initialize = function(options,value,...){
           # print(options)
           # args <- list(...)
@@ -287,17 +347,30 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
   )
 )
 
+#' @describeIn SelectionWidget The construction function for multiple-selection widgets.
+#' 
+#' @param options A named vector or a vector coerceable into a character vector.
+#' @param value A trait.
 #' @export
 MultipleSelectionWidget <- function(options,value,...) MultipleSelectionWidgetClass$new(options=options,value=value,...)
 
+#' @rdname SelectionWidget
 #' @export
 ListboxSelectMultipleClass <- R6Class_("ListboxSelectMultiple",
   inherit = MultipleSelectionWidgetClass,
   public = list(
+      #' @field _model_name Name of the Javascript model in the frontend.
       `_model_name` = structure(Unicode("SelectMultipleModel"),sync=TRUE),
+      #' @field _view_name Name of the Javascript view in the frontend.
       `_view_name` = structure(Unicode("SelectMultipleView"),sync=TRUE),
+      #' @field rows An integer, the number of rows.
       rows = structure(Integer(5L),sync=TRUE)
   )
 )
+
+#' @describeIn SelectionWidget The construction function for listbox widgets with multiple selections.
+#' 
+#' @param options A named vector or a vector coerceable into a character vector.
+#' @param value A trait.
 #' @export
 ListboxSelectMultiple <- function(options,value,...) ListboxSelectMultipleClass$new(options=options,value=value,...)
