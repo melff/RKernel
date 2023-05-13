@@ -1,13 +1,23 @@
+#' Selection widgets
+#' @description Classes and constructors for selection widgets, i.e. dropdowns, listboxes etc.
 #' @include widget.R widget-description.R
+#' @name SelectionWidget
 
+#' @rdname SelectionWidget
 #' @export
 SelectionWidgetClass <- R6Class_("SelectionWidget",
   inherit = ValueWidgetClass,
   public = list(
+      #' @field _options_labels A unicode vector of option labels.
       `_options_labels` = structure(Unicode(length=NA),sync=TRUE),
+      #' @field _options_values A list of values - the options.
       `_options_values` = list(),
+      #' @field index An integer that refers to currently selected item.
       index = structure(Integer(0L,optional=TRUE,length=1L),sync=TRUE),
+      #' @field value Any kind of trait(let).
       value = Trait(),
+      #' @description Validate an index argument.
+      #' @param index The index to be checked.
       validate_index = function(index){
           # cat("validate_index")
           options_values <- self[["_options_values"]]
@@ -20,6 +30,10 @@ SelectionWidgetClass <- R6Class_("SelectionWidget",
           } 
           index
       },
+      #' @description Standard observer function for indices
+      #' @param name Name of the traitlet
+      #' @param self The traitlet container
+      #' @param index The index
       observe_index = function(name,self,index){
           #cat("observe_index")
           options_values <- self[["_options_values"]]
@@ -33,6 +47,8 @@ SelectionWidgetClass <- R6Class_("SelectionWidget",
           # cat(value)
           self$send_state()
       },
+      #' @description Validate a value
+      #' @param value The value to be validated
       validate_value = function(value){
           # cat("validate_value")
           options_labels <- self[["_options_labels"]]
@@ -51,6 +67,10 @@ SelectionWidgetClass <- R6Class_("SelectionWidget",
           }
           value
       },
+      #' @description Standard observer function for values
+      #' @param name Name of the traitlet
+      #' @param self The traitlet container
+      #' @param index A value
       observe_value = function(name,self,value){
           # cat("observe_value\n")
           # print(name)
@@ -72,6 +92,9 @@ SelectionWidgetClass <- R6Class_("SelectionWidget",
           # str(self)
           self$send_state()
       },
+      #' @description Initialiser
+      #' @param options A named vector or a vector coerceable into a character vector.
+      #' @param value A trait.
       initialize = function(options,value,...){
           # print(options)
           # args <- list(...)
@@ -99,6 +122,7 @@ SelectionWidgetClass <- R6Class_("SelectionWidget",
   )
 )
 
+#' @describeIn SelectionWidget A 
 #' @export
 SelectionWidget <- function(options,value,...) SelectionWidgetClass$new(options=options,value=value,...)
 
