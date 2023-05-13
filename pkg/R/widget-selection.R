@@ -95,6 +95,7 @@ SelectionWidgetClass <- R6Class_("SelectionWidget",
       #' @description Initialiser
       #' @param options A named vector or a vector coerceable into a character vector.
       #' @param value A trait.
+      #' @param ... Any other arguments, ignored.
       initialize = function(options,value,...){
           # print(options)
           # args <- list(...)
@@ -123,6 +124,10 @@ SelectionWidgetClass <- R6Class_("SelectionWidget",
 )
 
 #' @describeIn SelectionWidget A constructor function for selection widgets.
+#' 
+#' @param options A named vector or a vector coerceable into a character vector.
+#' @param value A trait.
+#' @param ... Any other arguments, ignored.
 #' @export
 SelectionWidget <- function(options,value,...) SelectionWidgetClass$new(options=options,value=value,...)
 
@@ -142,6 +147,7 @@ DropdownClass <- R6Class_("Dropdown",
 #' 
 #' @param options A named vector or a vector coerceable into a character vector.
 #' @param value A trait.
+#' @param ... Any other arguments, ignored.
 #' @export
 Dropdown <- function(options,value,...) DropdownClass$new(options=options,value=value,...)
 
@@ -159,6 +165,9 @@ RadioButtonsClass <- R6Class_("RadioButtons",
 
 #' @describeIn SelectionWidget The construction function for radiobuttons widgets.
 #' 
+#' @param options A named vector or a vector coerceable into a character vector.
+#' @param value A trait.
+#' @param ... Any other arguments, ignored.
 #' @export
 RadioButtons <- function(options,value,...) RadioButtonsClass$new(options=options,value=value,...)
 
@@ -180,6 +189,7 @@ ListboxSelectClass <- R6Class_("ListboxSelect",
 #' 
 #' @param options A named vector or a vector coerceable into a character vector.
 #' @param value A trait.
+#' @param ... Any other arguments, ignored.
 #' @export
 ListboxSelect <- function(options,value,...) ListboxSelectClass$new(options=options,value=value,...)
 
@@ -226,6 +236,7 @@ ToggleButtonsClass <- R6Class_("ToggleButtons",
 #' 
 #' @param options A named vector or a vector coerceable into a character vector.
 #' @param value A trait.
+#' @param ... Any other arguments, ignored.
 #' @export
 ToggleButtons <- function(options,value,...) ToggleButtonsClass$new(options=options,value=value,...)
 
@@ -245,7 +256,7 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
       #' @field value A traitlet vector.
       value = Trait(),
       #' @description Validate an index.
-      #' @param An index, the index to be checked.
+      #' @param index An index, the index to be checked.
       validate_index = function(index){
           # cat("validate_index")
           options_values <- self[["_options_values"]]
@@ -320,6 +331,7 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
       #' @description Initialiser
       #' @param options A named vector or a vector coerceable into a character vector.
       #' @param value A trait.
+      #' @param ... Any other arguments, ignored.
       initialize = function(options,value,...){
           # print(options)
           # args <- list(...)
@@ -351,6 +363,7 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
 #' 
 #' @param options A named vector or a vector coerceable into a character vector.
 #' @param value A trait.
+#' @param ... Any other arguments, ignored.
 #' @export
 MultipleSelectionWidget <- function(options,value,...) MultipleSelectionWidgetClass$new(options=options,value=value,...)
 
@@ -372,5 +385,6 @@ ListboxSelectMultipleClass <- R6Class_("ListboxSelectMultiple",
 #' 
 #' @param options A named vector or a vector coerceable into a character vector.
 #' @param value A trait.
+#' @param ... Any other arguments, ignored.
 #' @export
 ListboxSelectMultiple <- function(options,value,...) ListboxSelectMultipleClass$new(options=options,value=value,...)
