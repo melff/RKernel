@@ -33,7 +33,7 @@ MediaWidgetClass <- R6Class_("MediaWidget",
 ImageWidgetClass <- R6Class_("ImageWidget",
     inherit = MediaWidgetClass,
     public =list(
-        #' @field _model_name Name of the Javascript view in the frontend.
+        #' @field _view_name Name of the Javascript view in the frontend.
         `_view_name` = structure(Unicode("ImageView"),sync=TRUE),
         #' @field _model_name Name of the Javascript model in the frontend.
         `_model_name` = structure(Unicode("ImageModel"),sync=TRUE),
