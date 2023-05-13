@@ -85,5 +85,4 @@ Collate:
     'widget-sidecar.R'
     'widget-slider.R'
     'widget-string.R'
-    'widget-virtual-table.R'
     'widget_link.R'
