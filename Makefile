@@ -119,3 +119,6 @@ check-reverse:
 
 clean-reverse:
 	rm -rfv depends/*
+
+install-deps:
+	Rscript --vanilla -e 'devtools::install_deps(pkg="${SRCDIR}")'
