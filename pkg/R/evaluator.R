@@ -1075,27 +1075,4 @@ cell.par <- function(...){
 
 str2iframe <- function(...) evaluator$current$str2iframe(...)
 
-parse_magic_args <- function(perc_line){
-   line_match <- getMatch(perc_line,regexec("^%%[a-zA-Z0-9]+\\s*(.*?)\n",perc_line))
-   if(length(line_match)>1){
-     tryCatch({
-       magic_args <- line_match[2]
-       magic_args <- unlist(strsplit(magic_args,",\\s*"))
-       magic_args <- strsplit(magic_args,"\\s*=\\s*")
-       magic_arg_names <- unlist(lapply(magic_args,"[",1))
-       magic_arg_values <- lapply(magic_args,"[",2)
-       structure(magic_arg_values,names=magic_arg_names)   
-     },error=function(e)stop("Error in parsing arguments"))
-   } else NULL
-}
 
-parse_magic <- function(code){
-    perc_match <- getMatch(code,regexec("^%%([a-zA-Z0-9]+).*?\n",code))
-    if(length(perc_match) > 1){
-        magic <- perc_match[2]
-        perc_line <- perc_match[1]
-        args <- parse_magic_args(perc_line)
-        code <- gsub("^%%.+?\n","",code)
-        list(magic=magic,args=args,code=code)
-    } else NULL
-}

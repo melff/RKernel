@@ -207,21 +207,6 @@ display_data.recordedplot <- function(x,
     structure(d,class=cl)
 }
 
-getMatch <- function(x,match){
-    if(length(match) < 0) return(character(0))
-    if(is.list(match))
-        match <- match[[1]]
-    lens <- attr(match,"match.length")
-    n <- length(match)
-    res <- character(n)
-    for(i in 1:n){
-        start <- match[i]
-        end <- start + lens[i] - 1
-        res[i] <- substr(x,start=start,stop=end)
-    }
-    res
-}
-
 #' @describeIn display_data S3 method for "display_data" objects
 #' @export
 display_data.display_data <- function(x,...) x
