@@ -308,8 +308,9 @@ rkernel_readline <- function(){
     evaluator$current$readline()
 }
 
-rkernel_stream <- function(text){
-    evaluator$current$stream(text)
+rkernel_stream <- function(text,
+                           stream=c("stdout","stderr")){
+    evaluator$current$stream(text,stream=stream)
 }
 
 add_prompts <- function(text){
