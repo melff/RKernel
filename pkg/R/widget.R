@@ -265,6 +265,7 @@ WidgetClass <- R6Class_("Widget",
 )
 
 #' @describeIn Widgets A Widget Constructor Function
+#' @param ... Arguments passed to the inializer
 #' @export
 Widget <- function(...) WidgetClass$new(...)
 

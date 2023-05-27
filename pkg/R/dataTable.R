@@ -1,3 +1,5 @@
+#' @importFrom utils tail file_test
+
 asset_fetcher <- function(path,...){
     # log_out('asset_fetcher:',path)
     split_path <- strsplit(path,"/",fixed=TRUE)[[1]]
@@ -216,6 +218,7 @@ datatable_page <- function(obj,
 #' @description Objects of class "dataTable" provide HTML tables with interactive
 #'    controls powered by the DataTable Javascript library.
 #' @name dataTable
+NULL
 
 #' @describeIn dataTable A dataTable constructor
 #' @param x An object to be shown as a data table.

@@ -22,6 +22,7 @@ StringWidgetClass <- R6Class_("StringWidget",
 
 #' @describeIn StringWidget A constructor for string widgets
 #' @param value A character vector
+#' @param ... Arguments passed to the inializer
 #' @export
 StringWidget <- function(value=character(0),...) StringWidgetClass$new(value=value,...)
 
@@ -40,6 +41,7 @@ HTMLClass <- R6Class_("HTML",
 
 #' @describeIn StringWidget A constructor for HTML widgets
 #' @param value A character vector
+#' @param ... Arguments passed to the inializer
 #' @export
 HTML <- function(value=character(0),...) HTMLClass$new(value=value,...)
 
@@ -57,6 +59,7 @@ HTMLMathClass <- R6Class_("HTMLMath",
 
 #' @describeIn StringWidget A constructor for HTML widgets with math
 #' @param value A character vector
+#' @param ... Arguments passed to the inializer
 #' @export
 HTMLMath <- function(value=character(0),...) HTMLMathClass$new(value=value,...)
 
@@ -75,6 +78,7 @@ LabelClass <- R6Class_("Label",
 
 #' @describeIn StringWidget A constructor for label widgets
 #' @param value A character vector
+#' @param ... Arguments passed to the inializer
 #' @export
 Label <- function(value=character(0),...) LabelClass$new(value=value,...)
 
@@ -99,6 +103,7 @@ TextareaClass <- R6Class_("Textarea",
 
 #' @describeIn StringWidget A constructor for text area widgets
 #' @param value A character vector
+#' @param ... Arguments passed to the inializer
 #' @export
 Textarea <- function(value=character(0),...) TextareaClass$new(value=value,...)
 
@@ -128,6 +133,7 @@ TextWidgetClass <- R6Class_("TextWidget",
 
 #' @describeIn StringWidget A constructor for text field widgets
 #' @param value A character vector
+#' @param ... Arguments passed to the inializer
 #' @export
 TextWidget <- function(value=character(0),...) TextWidgetClass$new(value=value,...)
 
@@ -146,6 +152,7 @@ PasswordWidgetClass <- R6Class_("PasswordWidget",
 
 #' @describeIn StringWidget A constructor for password entry widgets
 #' @param value A character vector
+#' @param ... Arguments passed to the inializer
 #' @export
 PasswordWidget <- function(value=character(0),...) PasswordWidgetClass$new(value=value,...)
 
@@ -169,5 +176,6 @@ ComboboxClass <- R6Class_("Combobox",
 
 #' @describeIn StringWidget A constructor for combo boxes
 #' @param value A character vector
+#' @param ... Arguments passed to the inializer
 #' @export
 Combobox <- function(value=character(0),...) ComboboxClass$new(value=value,...)

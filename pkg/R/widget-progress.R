@@ -19,6 +19,7 @@ ProgressStyleClass <- R6Class_("ProgrssStyle",
 
 
 #' @describeIn Progress A constructor for a progress bar style
+#' @param ... Arguments passed to the inializer
 #' @export
 ProgressStyle <- function(...) ProgressStyleClass$new(...)
 
@@ -43,6 +44,7 @@ IntProgressClass <- R6Class_("IntProgress",
 #' @param value An integer, the initial position of the progress bar
 #' @param min An integer, the minumum value
 #' @param max An integer, the maximum value
+#' @param ... Other arguments.
 #' @export
 IntProgress <- function(value=0L,min=0L,max=100L,...) 
     IntProgressClass$new(value=value,
@@ -71,6 +73,7 @@ FloatProgressClass <- R6Class_("FloatProgress",
 #' @param value A floating point number, the initial position of the progress bar
 #' @param min An floating point number, the minumum value
 #' @param max An floating point number, the maximum value
+#' @param ... Other arguments.
 #' @export
 FloatProgress <- function(value=0L,min=0L,max=100L,...) 
     FloatProgressClass$new(value=value,

@@ -39,6 +39,21 @@ register_magic_handler("javascript",function(code,...)Javascript(text=code))
 register_magic_handler("html",function(code,...)raw_html(text=code))
 register_magic_handler("iframe",function(code,args,...)iframe_cell_handler(code,args))
 
+getMatch <- function(x,match){
+    if(length(match) < 0) return(character(0))
+    if(is.list(match))
+        match <- match[[1]]
+    lens <- attr(match,"match.length")
+    n <- length(match)
+    res <- character(n)
+    for(i in 1:n){
+        start <- match[i]
+        end <- start + lens[i] - 1
+        res[i] <- substr(x,start=start,stop=end)
+    }
+    res
+}
+
 parse_magic_args <- function(perc_line){
    line_match <- getMatch(perc_line,regexec("^%%[a-zA-Z0-9]+\\s*(.*?)\n",perc_line))
    if(length(line_match)>1){

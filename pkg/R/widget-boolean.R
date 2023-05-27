@@ -27,6 +27,7 @@ CheckboxClass <- R6Class_("Checkbox",
 )
 
 #' @describeIn Checkboxes A checkbox constructor
+#' @param ... Arguments passed to the inializer
 #' @export
 Checkbox <- function(...) CheckboxClass$new(...)
 
@@ -66,6 +67,7 @@ ToggleButtonClass <- R6Class_("ToggleButton",
 )
 
 #' @describeIn Togglebuttons A toggle-button constructor
+#' @param ... Arguments passed to the inializer
 #' @export
 ToggleButton <- function(...) ToggleButtonClass$new(...)
 
@@ -96,5 +98,6 @@ ValidClass <- R6Class_("Valid",
 )
 
 #' @describeIn Valid A constructor for validity indicator widgets
+#' @param ... Arguments passed to the inializer
 #' @export
 Valid <- function(...) ValidClass$new(...)

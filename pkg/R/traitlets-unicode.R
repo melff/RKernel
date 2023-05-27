@@ -52,9 +52,13 @@ UnicodeClass <- R6Class_("Unicode",
         }
    )
 )
-#' An Unicode String Trait Constructor
+#' A Unicode String Trait Constructor
+#' @param ... Arguments passed to the trait instance initializer
 #' @export
 Unicode <- function(...)TraitInstance(Class=UnicodeClass,...)
+
 #' @describeIn UnicodeClass Coerce a unicode string trait to a (one-element) character vector
+#' @param x A Unicode traitlet
+#' @param ... Other arguments, ignored.
 #' @export
 as.character.Unicode <- function(x,...) x$value

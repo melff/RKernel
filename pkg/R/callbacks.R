@@ -62,5 +62,6 @@ CallbackDispatcherClass <- R6Class("CallbackDispatcher",
 )
 
 #' @describeIn CallbackDispatcherClass The constructor function, returns an Object of Class "CallbackDispatcherClass" 
+#' @param ... Arguments passed to the inializer
 #' @export
 CallbackDispatcher <- function(...) CallbackDispatcherClass$new(...)

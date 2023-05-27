@@ -152,6 +152,7 @@ Evaluator <- R6Class("Evaluator",
         #' @description
         #' Evaluate R code
         #' @param code A string with R code
+        #' @param allow_stdin Logical value, whether reading from stdin is allowed.
         #' @param ... Other arguments, currently ignored
         eval_cell = function(code,allow_stdin,...){
             
@@ -224,7 +225,7 @@ Evaluator <- R6Class("Evaluator",
         #' @field cells A 'dictionary' traitlet with the code of the 
         #'   cells so far encountered
         cells = dictionary(),
-        #' @field cells A 'dictionary' traitlet with the output of the 
+        #' @field cell_results A 'dictionary' traitlet with the output of the 
         #'   code cells so far executed
         cell_results = dictionary(),
         #' @description
@@ -477,6 +478,7 @@ Evaluator <- R6Class("Evaluator",
         #' @param height The intended height of the iframe, a string or a number
         #' @param class The DOM class attribute the iframe, a string
         #' @param style The CSS style attribte of the iframe, a string
+        #' @param ... Other arguments, ignored.
         str2iframe = function(code,
                               width = "100%",
                               height = 400L,
@@ -516,6 +518,7 @@ Evaluator <- R6Class("Evaluator",
             result <- private$kernel$read_stdin()
             return(result)
         },
+        #' @description
         #' Restart/recreate the graphics device if for whatever reason 
         #' it was closed needs to be reinitialized
         restart_graphics = function(){
@@ -524,6 +527,16 @@ Evaluator <- R6Class("Evaluator",
                 dev.off(dev_cur)
             private$graphics$create()
             private$graphics$activate()
+        },
+        #' @description
+        #' Get URL of the help system
+        get_help_url = function(){
+            return(private$help_url)
+        },
+        #' @description
+        #' Get port of the help system
+        get_help_port = function(){
+            return(private$help_port)
         }
     ),
     
@@ -610,13 +623,6 @@ Evaluator <- R6Class("Evaluator",
         shared_help_system = FALSE,
         jupyterhub_prefix = "",
         help_use_proxy = FALSE,
-
-        get_help_url = function(){
-            return(private$help_url)
-        },
-        get_help_port = function(){
-            return(private$help_port)
-        },
 
         new_cell = TRUE,
 

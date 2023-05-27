@@ -4,6 +4,7 @@
 #' 
 #' @include widget.R widget-box.R
 #' @name SelectionContainer
+NULL
 
 #' @rdname SelectionContainer 
 #' @export
@@ -51,7 +52,8 @@ AccordionClass <- R6Class_("Accordion",
     )
 )
 
-#' @describeIn Accordion The constructor function for accordion widgets.
+#' @describeIn SelectionContainer The constructor function for accordion widgets.
+#' @param ... Arguments passed to the superclass constructor
 #' @export
 Accordion <- function(...) ContainerClass_new(Class=AccordionClass,...)
 
@@ -67,6 +69,7 @@ TabClass <- R6Class_("Tab",
     )
 )
 
-#' @describeIn Tab The construction function for accordion widgets.
+#' @describeIn SelectionContainer The construction function for accordion widgets.
+#' @param ... Arguments passed to the superclass constructor
 #' @export
 Tab <- function(...) ContainerClass_new(Class=TabClass,...)

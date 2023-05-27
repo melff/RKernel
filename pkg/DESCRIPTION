@@ -21,8 +21,7 @@ Imports:
     svglite,
     repr,
     htmltools,
-    callr,
-    png,
+    htmlwidgets,
     base64enc
 Depends:
     R (>= 3.0.1)

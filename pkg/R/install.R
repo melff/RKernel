@@ -3,14 +3,14 @@
 #' @export
 install <- function(){
     installspec()
-    install_RHelp_server()
 }
 
 
-#' @rdname install
-#' Install the R Kernel spec
+#' @describeIn install Install the R Kernel spec
 #'
 #' @importFrom jsonlite fromJSON toJSON
+#' @param user Logical, whether to install the kernel in the user's home directory
+#' @param prefix NULL or a character string with a path prefix
 #' @export
 # The following is adapted from IRKernel/R/installspec.r
 installspec <- function(user=TRUE,prefix=NULL){

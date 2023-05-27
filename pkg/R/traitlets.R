@@ -3,6 +3,7 @@
 #' @description This function calls the R6 class constructor in such a way that
 #'   new members can be added to the created objects.
 #'
+#' @param ... Arguments passed to the superclass constructor
 #' @param lock_objects A logical value, indicates whether objects should be
 #'     locked. See \code{\link[R6]{R6Class}}.
 #' 
@@ -21,6 +22,7 @@ R6Class_ <- function(...,lock_objects=FALSE)
 #'     based to \emph{R}.
 #'
 #' @name Traitlets
+NULL
 
 #' @rdname Traitlets
 #' @export
@@ -73,7 +75,7 @@ TraitClass <- R6Class_("Trait",
 
 
 #' @describeIn Traitlets A Baseline Trait Constructor
-#'
+#' @param ... Arguments passed to the inializer
 #' @export
 Trait <- function(...)TraitInstance(...,Class=TraitClass)
 
@@ -84,6 +86,7 @@ Trait <- function(...)TraitInstance(...,Class=TraitClass)
 #'     \code{\link{HasTraits}} object to construct a \code{\link{TraitClass}}
 #'     object.
 #' @param Class An R6 Class that inherits from "TraitClass"
+#' @param ... Arguments passed to the inializer
 #' @export
 TraitInstance <- function(Class,...){
     structure(
@@ -153,6 +156,7 @@ HasTraits <- R6Class_("HasTraits",
               makeActiveBinding(tn, property, self)
           }
       },
+      #' @field suspended Logical value; whether notifying observers is suspended.
       suspended = FALSE,
       #' @description
       #' Notify observers about a trait being set to a value.
@@ -210,6 +214,10 @@ HasTraits <- R6Class_("HasTraits",
 )
 
 #' @describeIn to_json S3 method for 'TraitClass' objects, i.e. traitlets.
+#' @param x An object to be converted as JSON
+#' @param auto_unbox A logical value, whether one-element a JSON list should be
+#'     changed into JSON scalar.
+#' @param ... Other arguments, passed on to  \code{\link[jsonlite]{toJSON}}.
 #' @export
 to_json.Trait <- function(x,auto_unbox=TRUE,...){
     value <- x$get()

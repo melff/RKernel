@@ -1,5 +1,7 @@
 #' @include evaluator.R
 
+#' @importFrom utils head tail limitedLabels
+
 #' @describeIn Debugger An adaptation of the function with the same name from
 #'   the 'utils' package
 #'
@@ -46,6 +48,7 @@ dump.frames <- function(dumpto = "last.dump",
 }
 register_export(dump.frames)
 
+#' @importFrom utils head tail limitedLabels
 
 return.frames <- function(drop.kernel.frames = TRUE,drop.last=0){
     calls <- sys.calls()
@@ -65,6 +68,8 @@ return.frames <- function(drop.kernel.frames = TRUE,drop.last=0){
     class(dump) <- "dump.frames"
     return(dump)
 }
+
+#' @importFrom utils head tail
 
 get.call.stack <- function(drop.kernel.frames = TRUE,drop.last=0){
     status <- sys.status()
@@ -246,7 +251,7 @@ dbgConsole <- function(envir,callback=NULL,
         input$add_class("monospace")
         run_btn <- Button(description="Run")
 
-        run <- function(){
+        run_on_click <- function(){
             expr <- parse(text=input$value)
             output$clear_output()
             output$context$eval(expr)
@@ -254,7 +259,7 @@ dbgConsole <- function(envir,callback=NULL,
                 callback()
             invisible()
         }
-        run_btn$on_click(run)
+        run_btn$on_click(run_on_click)
 
         input_hbox <- HBox(input,run_btn)
         input_hbox$add_class("debug-box")
@@ -263,7 +268,7 @@ dbgConsole <- function(envir,callback=NULL,
         input <- TextWidget()
         input$add_class("monospace")
         input$add_class("width-auto")
-        run <- function(tn,tlt,value){
+        run_on_value <- function(tn,tlt,value){
             expr <- parse(text=input$value)
             output$clear_output()
             output$context$eval(expr)
@@ -271,7 +276,7 @@ dbgConsole <- function(envir,callback=NULL,
                 callback()
             invisible()
         }
-        input$observe("value",run)
+        input$observe("value",run_on_value)
         VBox(input,output)
     }
 }
@@ -301,6 +306,10 @@ find_call <- function(expressions,name){
 
 rkernel_readline <- function(){
     evaluator$current$readline()
+}
+
+rkernel_stream <- function(text){
+    evaluator$current$stream(text)
 }
 
 add_prompts <- function(text){
@@ -358,27 +367,27 @@ BreakPoint <- function(){
     display(eb)
     message(the_message)
     while(TRUE){
-        stream("\n")
+        rkernel_stream("\n")
         input <- rkernel_readline()
         input <- trimws(input)
         if(input == "c" || !nzchar(input)) {
-            stream("Continuing ...")
+            rkernel_stream("Continuing ...")
             break
         }
         else if(input == "Q"){
-            stream("Leaving ...")
+            rkernel_stream("Leaving ...")
             invokeRestart("exit")
         }
         else if(nzchar(trimws(input))){
             expr <- parse(text=input)
             res <- withVisible(tryCatch(eval(expr,envir=envir,enclos=parent),
                                         error=function(e){
-                                            stream(conditionMessage(e),"stderr")
+                                            rkernel_stream(conditionMessage(e),"stderr")
                                             return(invisible(NULL))
                                         }))
             eb$refresh()
             if(res$visible)
-                stream(capture.output(print(res$value)))
+                rkernel_stream(capture.output(print(res$value)))
         }
     }
 }
@@ -486,7 +495,7 @@ Tracer <- R6Class("Tracer",
                     dep_expr <- deparse(expr)
                     dep_expr <- paste(dep_expr,collapse="\n")
                     dep_expr <- paste0(dep_expr,"\t")
-                    stream(dep_expr)
+                    rkernel_stream(dep_expr)
                 }
                 self$eb$refresh()
                 while(TRUE){
@@ -509,12 +518,12 @@ Tracer <- R6Class("Tracer",
                         res <- withVisible(tryCatch(eval(expr,
                                                          envir=envir),
                                                     error=function(e){
-                                                        stream(conditionMessage(e),"stderr")
+                                                        rkernel_stream(conditionMessage(e),"stderr")
                                                         return(invisible(NULL))
                                                     }))
                         self$eb$refresh()
                         if(res$visible)
-                            stream(paste0(capture.output(print(res$value)),
+                            rkernel_stream(paste0(capture.output(print(res$value)),
                                           "\t"))
                     }
                 }
@@ -570,9 +579,9 @@ register_export(exit_tracer)
 #'   so that it will be evaluated step-by-step when called.
 #'
 #' @details \code{Trace} differs
-#'   in semantics from the function \code{\link[utils]{trace}} which
+#'   in semantics from the function \code{\link[base]{trace}} which
 #'   allows to insert expressions at given positions within a function.
-#'   Nevertheless, it uses the function \code{\link[utils]{trace}} internally.
+#'   Nevertheless, it uses the function \code{\link[base]{trace}} internally.
 #'   Therefore the effect of \code{Trace(FUN)} can be undone by the call
 #'   \code{unrace(FUN)}
 #'
@@ -651,7 +660,7 @@ tracing_source <- function(filename){
         expr_i <- expr[[i]]
         res <- withVisible(eval.parent(expr_i))
         if(res$visible)
-            stream(paste0(capture.output(print(res$value)),
+            rkernel_stream(paste0(capture.output(print(res$value)),
                           "\t"))
     }
 }

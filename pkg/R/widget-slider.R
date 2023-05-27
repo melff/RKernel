@@ -26,7 +26,7 @@ IntSliderClass <- R6Class_("IntSlider",
        `_model_name` = structure(Unicode("IntSliderModel"),sync=TRUE),
        #' @field _view_name Name of the Javascript view in the frontend
        `_view_name` = structure(Unicode("IntSliderView"),sync=TRUE),
-       #' @field step An integer, the step size
+       #' @field step An \code{\link{Integer}} traitlet, the minimal step size per slider movement
        step = structure(Integer(1L),sync=TRUE),
        #' @field orientation A Unicode string, either "horizontal" or "vertical"
        orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
@@ -46,6 +46,7 @@ IntSliderClass <- R6Class_("IntSlider",
 #' @param value An integer, the current value of the slider
 #' @param min An integer, the minimum value
 #' @param max An integer, the maximum value
+#' @param ... Other arguments.
 #' @export
 IntSlider <- function(value=0L,min=0L,max=100L,...) 
     IntSliderClass$new(value=value,
@@ -64,7 +65,7 @@ IntRangeSliderClass <- R6Class_("IntRangeSlider",
        `_model_name` = structure(Unicode("IntRangeSliderModel"),sync=TRUE),
        #' @field _view_name Name of the Javascript view in the frontend
        `_view_name` = structure(Unicode("IntRangeSliderView"),sync=TRUE),
-       #' @field step An integer, the step size
+       #' @field step An \code{\link{Integer}} traitlet, the minimal step size per slider movement
        step = structure(Integer(1L),sync=TRUE),
        #' @field orientation A Unicode string, either "horizontal" or "vertical"
        orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
@@ -84,6 +85,7 @@ IntRangeSliderClass <- R6Class_("IntRangeSlider",
 #' @param value A pair integers, the current value of the range slider
 #' @param min An integer, the minimum value
 #' @param max An integer, the maximum value
+#' @param ... Other arguments.
 #' @export
 IntRangeSlider <- function(value=c(0L,50L),min=0L,max=100L,...) 
     IntRangeSliderClass$new(value=value,
@@ -103,7 +105,7 @@ FloatSliderClass <- R6Class_("FloatSlider",
     `_model_name` = structure(Unicode("FloatSliderModel"),sync=TRUE),
     #' @field _view_name Name of the Javascript view in the frontend
     `_view_name` = structure(Unicode("FloatSliderView"),sync=TRUE),
-    #' @field step 
+    #' @field step A \code{\link{Float}} traitlet, the minimal step size per slider movement
     step = structure(Float(0.01),sync=TRUE),
     #' @field orientation A Unicode string, either "horizontal" or "vertical"
     orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
@@ -123,6 +125,7 @@ FloatSliderClass <- R6Class_("FloatSlider",
 #' @param value A floating point number, the current value of the slider
 #' @param min A floating point number, the minimum value
 #' @param max A floating point number, the maximum value
+#' @param ... Other arguments.
 #' @export
 FloatSlider <- function(value=0,min=0,max=100,...) 
     FloatSliderClass$new(value=value,
@@ -139,7 +142,7 @@ FloatRangeSliderClass <- R6Class_("FloatRangeSlider",
        `_model_name` = structure(Unicode("FloatRangeSliderModel"),sync=TRUE),
        #' @field _view_name Name of the Javascript view in the frontend
        `_view_name` = structure(Unicode("FloatRangeSliderView"),sync=TRUE),
-       #' @field
+       #' @field step A \code{\link{Float}} traitlet, the minimal step size per slider movement
        step = structure(Float(0.01),sync=TRUE),
        #' @field orientation A Unicode string, either "horizontal" or "vertical"
        orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
@@ -159,6 +162,7 @@ FloatRangeSliderClass <- R6Class_("FloatRangeSlider",
 #' @param value A pair of floating point numbers, the current value of the range slider
 #' @param min A floating point number, the minimum value
 #' @param max A floating point number, the maximum value
+#' @param ... Other arguments.
 #' @export
 FloatRangeSlider <- function(value=c(0,50),min=0,max=100,...) 
     FloatRangeSliderClass$new(value=value,
@@ -176,7 +180,7 @@ FloatLogSliderClass <- R6Class_("FloatLogSlider",
     `_model_name` = structure(Unicode("FloatLogSliderModel"),sync=TRUE),
     #' @field _view_name Name of the Javascript view in the frontend
     `_view_name` = structure(Unicode("FloatLogSliderView"),sync=TRUE),
-    #' @field
+    #' @field step A \code{\link{Float}} traitlet, the minimal step size per slider movement
     step = structure(Float(0.01),sync=TRUE),
     #' @field orientation A Unicode string, either "horizontal" or "vertical"
     orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
@@ -186,9 +190,9 @@ FloatLogSliderClass <- R6Class_("FloatLogSlider",
     readout_format = structure(Unicode(".3g"),sync=TRUE),
     #' @field continuous_update A logical value, whether values should be updated as the slider is moved by the user
     continuous_update = structure(Boolean(TRUE),sync=TRUE),
-    #' @field disabled A logical value, whether the slider is disabled
+    #' @field disabled A \code{\link{Boolean}} traitlet, whether the slider is disabled
     disabled = structure(Boolean(FALSE),sync=TRUE),
-    #' @field A floating point number, the base of the logarithm
+    #' @field base A \code{\link{Float}} traitlet, the base of the logarithm
     base = structure(Float(10.0),sync=TRUE),
     #' @field style A SliderStyle widget
     style = structure(R6Instance(SliderStyleClass),sync=TRUE)
@@ -199,6 +203,7 @@ FloatLogSliderClass <- R6Class_("FloatLogSlider",
 #' @param min A floating point number, the minimum value
 #' @param max A floating point number, the maximum value
 #' @param base A floating point number, the base of the logarithm
+#' @param ... Other arguments.
 #' @export
 FloatLogSlider <- function(value=1,min=0,max=40,base=10,...) 
     FloatLogSliderClass$new(value=value,

@@ -1,4 +1,4 @@
-#' @importFrom grDevices png jpeg svg pdf
+#' @importFrom grDevices png jpeg svg pdf replayPlot dev.off
 mime_graphics <- function(plt,mime,width,height,pointsize,scale,res,units="in"){
     grapics_data <- NULL
     if(mime=="image/png"){

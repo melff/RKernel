@@ -26,7 +26,7 @@ PlayClass <- R6Class_("Play",
        #' @field _repeat A Boolean traitlet, indicates wether the the repeat toggle
        #'    is on.
        `_repeat` = structure(Boolean(FALSE),sync=TRUE),
-       #' @field show_repeast A Boolean traitlet, determines whether
+       #' @field show_repeat A Boolean traitlet, determines whether
        #'    to show a repeat toggle button.
        show_repeat = structure(Boolean(TRUE),sync=TRUE)
    ))

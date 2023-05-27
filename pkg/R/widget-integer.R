@@ -5,6 +5,7 @@
 #'     "IntWidgetClass", which in turn have the S3 class attribute "IntWidget".
 #' @include widget-value.R
 #' @name IntWidget
+NULL
 
 #' @rdname IntWidget
 #' @export
@@ -27,7 +28,7 @@ IntWidget <- function(value,...) IntWidgetClass$new(value=value,...)
 #'     widgets that can be used to manipulate integer numbers that are bounded within an interval.
 #' @details The function \code{BoundedIntWidget} creates objects of the R6 Class
 #'     "BoundedIntWidgetClass", which in turn have the S3 class attribute "BoundedIntWidget".
-#' @name BounedIntWidget
+#' @name BoundedIntWidget
 NULL
 
 #' @rdname BoundedIntWidget
@@ -87,7 +88,7 @@ BoundedIntWidget <- function(value,min,max,...)
                                   max=max,
                                   ...)
 
-#' @rdname BoundedIntRangeWidget
+#' @rdname BoundedIntWidget
 #' @export
 BoundedIntRangeWidgetClass <- R6Class_("BoundedIntRangeWidget",
   inherit = ValueWidgetClass,
@@ -141,7 +142,7 @@ BoundedIntRangeWidgetClass <- R6Class_("BoundedIntRangeWidget",
       })
   )
 
-#' @rdname BoundedIntRangeWidget
+#' @rdname BoundedIntWidget
 #' @param value A pair of integer values
 #' @param min The lower bound of the enclosing interval
 #' @param max The upper bound of the enclosing interval
@@ -169,12 +170,12 @@ IntTextClass <- R6Class_("IntText",
        `_model_name` = structure(Unicode("IntTextModel"),sync=TRUE),
        #' @field _view_name Name of the Javascript view in the frontend.
        `_view_name` = structure(Unicode("IntTextView"),sync=TRUE),
-       #' @field A \link{Boolean} traitlet, whether the text widget is disabled.
+       #' @field disabled A \link{Boolean} traitlet, whether the text widget is disabled.
        disabled = structure(Boolean(FALSE),sync=TRUE),
-       #' @field A \link{Boolean} traitlet, whether the text widget is
+       #' @field continuous_update A \link{Boolean} traitlet, whether the text widget is
        #'    continuously updated upon change in the frontend.
        continuous_update = structure(Boolean(FALSE),sync=TRUE),
-       #' @field An \link{Integer} traitlet, a step size by which the 
+       #' @field step An \link{Integer} traitlet, a step size by which the 
        #'   value is incremented or decremented if the arrows are clicked.
        step = structure(Integer(1L),sync=TRUE)
    ))
@@ -183,6 +184,7 @@ IntTextClass <- R6Class_("IntText",
 #' @param value Initial value of the integer number
 #' @param step Increment by which the number is increased or decreased by the
 #'     text field controls
+#' @param ... Arguments passed to the superclass constructor
 #' @export
 IntText <- function(value=0,step=1,...) IntTextClass$new(value=value,step=step,...)
 
@@ -202,12 +204,12 @@ BoundedIntTextClass <- R6Class_("BoundedIntText",
        `_model_name` = structure(Unicode("BoundedIntTextModel"),sync=TRUE),
        #' @field _view_name Name of the Javascript view in the frontend.
        `_view_name` = structure(Unicode("IntTextView"),sync=TRUE),
-       #' @field A \link{Boolean} traitlet, whether the text widget is disabled.
+       #' @field disabled A \link{Boolean} traitlet, whether the text widget is disabled.
        disabled = structure(Boolean(FALSE),sync=TRUE),
-       #' @field A \link{Boolean} traitlet, whether the text widget is
+       #' @field continuous_update A \link{Boolean} traitlet, whether the text widget is
        #'    continuously updated upon change in the frontend.
        continuous_update = structure(Boolean(FALSE),sync=TRUE),
-       #' @field A \link{Integer} traitlet, a step size by which the 
+       #' @field step A \link{Integer} traitlet, a step size by which the 
        #'   value is incremented or decremented if the arrows are clicked.
        step = structure(Integer(1L),sync=TRUE)
    ))
@@ -218,6 +220,7 @@ BoundedIntTextClass <- R6Class_("BoundedIntText",
 #' @param max Upper limit of the enclosing interval
 #' @param step Increment by which the number is increased or decreased by the
 #'     text field controls
+#' @param ... Arguments passed to the superclass constructor
 #' @export
 BoundedIntText <- function(value=0,min=0,max=100,step=1,...) 
     IntTextClass$new(value=value,min=min,max=max,step=step,...)

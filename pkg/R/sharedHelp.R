@@ -47,6 +47,7 @@ sharedHelpServer <- R6Class("sharedHelpServer",
        #' The function that serves paths and queries
        #' @param path A character string, the path part of an URL
        #' @param query An optional HTTP query string
+       #' @param ... Any other arguments, passed on to the original 'httpd' function.
        httpd = function(path,query,...){
            response <- self$orig_httpd(path=path,query=query,...)
            payload <- response$payload

@@ -1,5 +1,13 @@
+get_help_url <- function(){
+    evaluator$current$get_help_url()
+}
+get_help_port <- function(){
+    evaluator$current$get_help_port()
+}
+
 #' Display an R Object
 #'
+#' @param ... Arguments passed to 'display_data' methods
 #' @export
 display <- function(...){
     # log_out("display")
@@ -14,6 +22,7 @@ display <- function(...){
 #' @description A generic function that prepares R objects for display using \code{display()}
 #'
 #' @param x An object to be prepared for display.
+#' @param ... Optional arguments tagged by mime types with mime data
 #' @return An object of class "display_data"
 #' 
 #' @export
@@ -73,6 +82,8 @@ display_data.default <- function(x,...,
 #' @importFrom htmltools htmlEscape
 #' @importFrom digest digest
 #' @importFrom base64enc dataURI
+#' @importFrom htmlwidgets saveWidget
+#' @importFrom utils file_test
 #' @export
 display_data.htmlwidget <- function(x,...,
                             metadata=emptyNamedList,
@@ -108,11 +119,11 @@ display_data.htmlwidget <- function(x,...,
         file_url <- paste0("file://",getwd(),"/",htmlfile)
     }
 
-    htmlwidgets::saveWidget(x,
-                            file=htmlfile,
-                            selfcontained=selfcontained,
-                            libdir=assets
-                            )
+    saveWidget(x,
+               file=htmlfile,
+               selfcontained=selfcontained,
+               libdir=assets
+               )
     if(iframe){
         if_tmpl <- "
             <iframe src=\"%s\" width=\"%s\" height=\"%s\" class='html-widget-iframe'  style=\"border-style:none\">
@@ -158,7 +169,7 @@ display_data.htmlwidget <- function(x,...,
 #'
 #' @param width Width of the diplayed plot 
 #' @param height Height of the displayed plot
-#' @param pointssize Point size, see \code{\link[grDevices]{png}}
+#' @param pointsize Point size, see \code{\link[grDevices]{png}}
 #' @param resolution Resolution in ppi, see \code{\link[grDevices]{png}}
 #' @param scale The amount by which the plots are scaled in the frontend
 #' @param units Units of width and height, see \code{\link[grDevices]{png}}
@@ -236,6 +247,7 @@ display_id.display_data <- function(x) x$transient$display_id
 display_id.update_display_data <- function(x) x$transient$display_id
 
 #' @describeIn display_data "update" method for "display_data" objects
+#' @param object An object of class "display_data"
 #' @export
 update.display_data <- function(object,...){
     id <- display_id(object)
@@ -247,11 +259,14 @@ update.display_data <- function(object,...){
 #' @description This function allows to display an \emph{R} object in the pager
 #'     of a Jupyter notebook. Note that acts like \code{display()} when Jupyter
 #'     Lab is used.
-#' 
+#'
+#' @param x An object to be displayed in the Notebook pager
+#' @param ... Other arguments, ignored or passed to specific methods.
 #' @export
 Page <- function(x,...) UseMethod("Page")
 
 #' @describeIn Page S3 default method -- calls \code{display_data} and marks it as pager payload
+#' @param start Integer, where to start the output.
 #' @export
 Page.default <- function(x,start=1,...){
     if(missing(x)){
@@ -365,6 +380,7 @@ popout_button <- '<form class="help-popout-button" action="%s" method="get" targ
 
 #' @describeIn display_data S3 method for help pages
 #' @importFrom uuid UUIDgenerate
+#' @importFrom utils URLencode
 #' @importFrom tools Rd2HTML Rd2txt Rd2latex
 #' @export 
 display_data.help_files_with_topic <- function(x,...,
@@ -445,7 +461,6 @@ display_data.help_files_with_topic <- function(x,...,
     structure(d,class=cl)
 }
 
-#' @include evaluator.R
 
 #' Start interactive help system
 #'
@@ -460,6 +475,7 @@ display_data.help_files_with_topic <- function(x,...,
 #'     reasons only.
 #' @param remote A character string. This formal argument exists for compatibility
 #'     reasons only.
+#' @include evaluator.R
 #' @export
 help.start <- function(update = FALSE, 
                        gui = "irrelevant", 
@@ -503,8 +519,7 @@ display_data.hsearch <- function(x,...,
     
     matches <- x$matches
     matches <- unique(matches[c("Topic","Title","Package","Type")])
-    matches <- within(matches,
-                      Name <- paste0(Package,"::",Topic))
+    matches$Name <- paste0(matches$Package,"::",matches$Topic)
     
     matches <- split(matches,matches$Type)
     text_out_grp <- lapply(matches,tformat_mgroup)
@@ -598,6 +613,7 @@ format_item <- function(x){
 #'
 #' @param text A character string with Javascript code
 #' @param file Path of a file with Javascript code
+#' @param as_tag Logical, whether to return a '<script>' tag
 #' @return An S3 object of class "display_data" with mime data of type "application/javascript"
 #' @export
 Javascript <- function(text,file,as_tag=FALSE){

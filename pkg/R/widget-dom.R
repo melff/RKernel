@@ -38,6 +38,8 @@ DOMWidgetClass <- R6Class_("DOMWidget",
           self$`_dom_classes` <- dom_classes
       }
     },
+    #' @description Check whether the DOM element has a class attribute
+    #' @param className Name of the class attribute
     has_class = function(className){
       className %in% self[["_dom_classes"]]
     }
@@ -45,6 +47,7 @@ DOMWidgetClass <- R6Class_("DOMWidget",
 )
 
 #' @describeIn DOMWidgetClass The DOM widget constructor function
+#' @param ... Arguments passed to the inializer
 #' @export
 DOMWidget <- function(...) DOMWidgetClass$new(...)
 

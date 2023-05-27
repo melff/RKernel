@@ -201,6 +201,7 @@ CommManagerClass <- R6Class("CommManager",
 )
 
 #' A constructor for objects in the 'CommManagerClass'
+#' @param ... Arguments passed to the inializer
 #' @export
 CommManager <- function(...) CommManagerClass$new(...)
 
@@ -281,6 +282,7 @@ CommClass <- R6Class("Comm",
 )
 
 #' A constructor function for objects of class "CommClass"
+#' @param ... Arguments passed to the inializer
 #' @export
 Comm <- function(...) CommClass$new(...)
 

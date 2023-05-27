@@ -67,25 +67,35 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         do = function(...) self$context$do(...),
         #' @description
         #' Evaluate a single expression
-        #' @param expr A single expression.
+        #' @param expr The expression to be evaluated
+        #' @param ... Any arguments, passed on to the 'evaluate' method of the \code{\link{Context}}
+        #'            class,
         eval = function(expr,...) self$context$eval(expr,...),
         #' @description
         #' Evaluate a single expression
         #' @param expressions A list of expressions.
+        #' @param ... Further arguments, passed on to the 'eval' method of the \code{\link{Context}}
+        #'            class,
         evaluate = function(expressions,...) self$context$evaluate(expressions,...),
         #' @description A variant of \code{\link{display}} for output within a display widget.
+        #' @param ... Further arguments, passed on to the 'evaluate' method of the \code{\link{Context}}
+        #'            class,
         display = function(...){
             d <- display_data(...)
             private$display_send(d)
         },
         #' @description 
         #' Show textual output in the widget area, see \code{\link{cat}}.
+        #' @param ... One or more character arguments
+        #' @param sep A character string used as separator
         cat = function(...,sep=" "){
             text <- paste(...,sep=sep)
             private$stream(text,"stdout")
         },
         #' @description 
         #' Show printed output in the widget area, see \code{\link{print}}
+        #' @param x Any argument to be 'print'ed
+        #' @param ... Further arguments to be passed to \code{\link{print}}
         print = function(x,...){
             k <- get_current_kernel()
             text <- capture.output(k$print(x,...))
@@ -108,13 +118,9 @@ OutputWidgetClass <- R6Class_("OutputWidget",
 
     ),
     private = list(
-        #' @field graphics A graphics object, used to control graphical output.
         graphics = NULL,
-        #' @field envir An environment, within whicht expressions are evaluated.
         envir = NULL,
-        #' @append_output A logiccal value, whether output is appended to or overwritten.
         append_output = TRUE,
-        #' @use_display A logiccal value, whether .
         use_display = FALSE,
 
         enter = function(){
@@ -396,7 +402,9 @@ OutputWidget <- function(append_output=FALSE,...)
 #' @param data An "OutputWidget" object
 #' @param expr An expression to evaluate, or a sequence of expression, 
 #'    encapsulated by curly braces.
+#' @param envir A list or environment within which the evaluation takes place
 #' @param enclos An enclosing environment.
+#' @param ... Other arguments, ignored.
 #' @export
 with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),...)
     data$context$eval(substitute(expr),envir=envir,enclos=enclos)

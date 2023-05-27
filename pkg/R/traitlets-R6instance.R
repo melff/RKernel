@@ -28,5 +28,6 @@ R6TraitClass <- R6Class_("R6Trait",
 )
 
 #' A Generic Constructor for R6 Object Traits 
+#' @param ... Arguments passed to the trait instance initializer
 #' @export
 R6Instance <- function(...)TraitInstance(Class=R6TraitClass,...)

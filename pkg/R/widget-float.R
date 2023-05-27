@@ -27,7 +27,7 @@ FloatWidget <- function(value,...) FloatWidgetClass$new(value=value,...)
 #'     widgets that can be used to manipulate floating point numbers that are bounded within an interval
 #' @details The function \code{BoundedFloatWidget} creates objects of the R6 Class
 #'     "BoundedFloatWidgetClass", which in turn have the S3 class attribute "BoundedFloatWidget"
-#' @name BounedFloatWidget
+#' @name BoundedFloatWidget
 NULL
 
 #' @rdname BoundedFloatWidget
@@ -98,7 +98,7 @@ BoundedFloatWidget <- function(value,min,max,...)
 #' @details The function \code{BoundedLogFloatWidget} creates objects of the R6
 #'     Class "BoundedLogFloatWidgetClass", which in turn have the S3 class
 #'     attribute "BoundedLogFloatWidget"
-#' @name BounedLogFloatWidget
+#' @name BoundedLogFloatWidget
 NULL
 
 #' @rdname BoundedLogFloatWidget
@@ -258,12 +258,12 @@ FloatTextClass <- R6Class_("FloatText",
        `_model_name` = structure(Unicode("FloatTextModel"),sync=TRUE),
        #' @field _view_name Name of the Javascript view in the frontend.
        `_view_name` = structure(Unicode("FloatTextView"),sync=TRUE),
-       #' @field A \link{Boolean} traitlet, whether the text widget is disabled.
+       #' @field disabled A \link{Boolean} traitlet, whether the text widget is disabled.
        disabled = structure(Boolean(FALSE),sync=TRUE),
-       #' @field A \link{Boolean} traitlet, whether the text widget is
+       #' @field continuous_update A \link{Boolean} traitlet, whether the text widget is
        #'    continuously updated upon change in the frontend.
        continuous_update = structure(Boolean(FALSE),sync=TRUE),
-       #' @field A \link{Float} traitlet, a step size by which the 
+       #' @field step A \link{Float} traitlet, a step size by which the 
        #'   value is incremented or decremented if the arrows are clicked.
        step = structure(Float(1.0),sync=TRUE)
    ))
@@ -292,12 +292,12 @@ BoundedFloatTextClass <- R6Class_("BoundedFloatText",
        `_model_name` = structure(Unicode("BoundedFloatTextModel"),sync=TRUE),
        #' @field _view_name Name of the Javascript view in the frontend.
        `_view_name` = structure(Unicode("FloatTextView"),sync=TRUE),
-       #' @field A \link{Boolean} traitlet, whether the text widget is disabled.
+       #' @field disabled A \link{Boolean} traitlet, whether the text widget is disabled.
        disabled = structure(Boolean(FALSE),sync=TRUE),
-       #' @field A \link{Boolean} traitlet, whether the text widget is
+       #' @field continuous_update A \link{Boolean} traitlet, whether the text widget is
        #'    continuously updated upon change in the frontend.
        continuous_update = structure(Boolean(FALSE),sync=TRUE),
-       #' @field A \link{Float} traitlet, a step size by which the 
+       #' @field step A \link{Float} traitlet, a step size by which the 
        #'   value is incremented or decremented if the arrows are clicked.
        step = structure(Float(1.0),sync=TRUE)
    ))
@@ -308,6 +308,7 @@ BoundedFloatTextClass <- R6Class_("BoundedFloatText",
 #' @param max Upper limit of the enclosing interval.
 #' @param step Increment by which the number is increased or decreased by the
 #'     text field controls.
+#' @param ... Other arguments.
 #' @export
 BoundedFloatText <- function(value=0,min=0,max=100,step=.1,...) 
     BoundedFloatTextClass$new(value=value,min=min,max=max,step=step,...)

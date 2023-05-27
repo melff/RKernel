@@ -35,6 +35,7 @@ ButtonStyleClass <- R6Class_("ButtonStyle",
 
 #' @describeIn Buttons A constructor for a button style
 #' @order 3
+#' @param ... Arguments passed to the inializer
 #' @export
 ButtonStyle <- function(...) ButtonStyleClass$new(...)
 
@@ -85,6 +86,7 @@ ButtonClass <- R6Class_("Button",
 )
 
 #' @describeIn Buttons A button constructor
+#' @param ... Arguments passed to the inializer
 #' @order 1
 #' @export
 Button <- function(...) ButtonClass$new(...)

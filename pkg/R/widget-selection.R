@@ -70,7 +70,7 @@ SelectionWidgetClass <- R6Class_("SelectionWidget",
       #' @description Standard observer function for values
       #' @param name Name of the traitlet
       #' @param self The traitlet container
-      #' @param index A value
+      #' @param value A value
       observe_value = function(name,self,value){
           # cat("observe_value\n")
           # print(name)
@@ -306,7 +306,7 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
       #' @description Standard observer function for values
       #' @param name Name of the traitlet
       #' @param self The traitlet container
-      #' @param index A value
+      #' @param value A value
       observe_value = function(name,self,value){
           # cat("observe_value\n")
           # print(name)

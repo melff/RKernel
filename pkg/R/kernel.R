@@ -262,8 +262,10 @@ Kernel <- R6Class("Kernel",
     #' Show a message in the Jupyter server log
     #' @param message A string or object to be shown in the log.
     #' @param ... More character strings, pasted to the message.
-    #' @param use.print Logical, whether the function 'print()' should applied
+    #' @param use.print Logical value, whether the function 'print()' should applied
     #'        to the message.
+    #' @param use.str Logical value, whether 'str()' should be called and its output
+    #'        shown
     log_out = function(message,...,use.print=FALSE,use.str=FALSE){
       dcl <- deparse1(match.call())
       tryCatch({

@@ -6,11 +6,12 @@
 #' @details The function \code{mkWidget} is a generic function that creates a
 #'     widget that allows to manipulate the arguments of a function that is
 #'     called in an interactive widget. This generic function is called by the
-#'     function \code{\link{mWidgets}}. The function \code{Fixed} marks a value
+#'     function \code{\link{mkWidgets}}. The function \code{Fixed} marks a value
 #'     as fixed, so that \code{mkWidget} returns it as is.
 #' 
 #' @include widget-output.R widget-value.R
 #' @param x an object
+#' @param ... Other arguments, passed to more specific methods or ignored
 #' @export
 mkWidget <- function(x,...) UseMethod("mkWidget")
 
@@ -60,7 +61,7 @@ mkWidget.integer <- function(x,description=NULL,...){
            value <- x[1L]
            min <- x[2L]
            max <- x[3L]
-           step <- x[4,L]
+           step <- x[4L]
        } else if(all(names(x) %in% c("min","max","value","step"))){
            value <- x["value"]
            min <- x["min"]
@@ -124,7 +125,7 @@ mkWidget.numeric <- function(x,description=NULL,...){
            value <- x[1L]
            min <- x[2L]
            max <- x[3L]
-           step <- x[4,L]
+           step <- x[4L]
        } else if(all(names(x) %in% c("min","max","value","step"))){
            value <- x["value"]
            min <- x["min"]
@@ -209,7 +210,7 @@ call_with_controls <- function(FUN,controls){
 #' @param out An output widget, i.e. a widget in class "OutputWidget"
 #' @param button An (optional) button widget; when clicked, the function
 #'     \code{FUN} is called.
-#' @param continous_update A logical value, if \code{TRUE} the function
+#' @param continuous_update A logical value, if \code{TRUE} the function
 #'     \code{FUN} is called whenever one of the controlling widgets changes a
 #'     value
 #' @param autorun Logical, whether the function \code{FUN} will be automatically

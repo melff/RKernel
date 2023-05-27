@@ -29,12 +29,13 @@ BoxClass <- R6Class_("Box",
     `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
     #' @field children A generic vector with the widgets in the container
     children = structure(Vector(),sync=TRUE),
-    #' @field button_style The string that describes the button style
+    #' @field box_style The string that describes the button style
     box_style = structure(StrEnum(
         c("primary","success","info","warning","danger",""),
         default="")),
     #' @description An initializer function
     #' @param children A list of widgets
+    #' @param ... Other arguments, passed to the superclass method
     initialize = function(children=list(),...){
         super$initialize(...)
         if(length(children)==1 && is.list(children[[1]]))
@@ -73,6 +74,7 @@ ContainerClass_new <- function(Class,...){
 }
 
 #' @describeIn Boxes A baseline box constructor
+#' @param ... Arguments passed to the superclass constructor
 #' @export
 Box <- function(...) ContainerClass_new(Class=BoxClass,...)
 
@@ -89,6 +91,8 @@ HBoxClass <- R6Class_("HBox",
 )
 
 #' @describeIn Boxes A horizontal box constructor
+#' @param ... Arguments passed to the superclass constructor
+#' @param wrap Logical value, whether lines of widgets should be wrapped?
 #' @export
 HBox <- function(...,wrap=FALSE) {
     box <- ContainerClass_new(Class=HBoxClass,...)
@@ -110,6 +114,8 @@ VBoxClass <- R6Class_("VBox",
 )
 
 #' @describeIn Boxes A vertical box constructor
+#' @param ... Arguments passed to the superclass constructor
+#' @param wrap Logical value, whether lines of widgets should be wrapped?
 #' @export
 VBox <- function(...,wrap=FALSE) {
     box <- ContainerClass_new(Class=VBoxClass,...)
@@ -131,5 +137,6 @@ GridBoxClass <- R6Class_("GridBox",
 )
 
 #' @describeIn Boxes A grid box constructor
+#' @param ... Arguments passed to the superclass constructor
 #' @export
 GridBox <- function(...) ContainerClass_new(Class=GridBoxClass,...)

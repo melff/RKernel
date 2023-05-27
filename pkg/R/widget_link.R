@@ -24,6 +24,7 @@ WidgetLinkClass <- R6Class_("WidgetLink",
       #' @description An initializer method
       #' @param source A list with two elements, a widget and the name of a trait(let).
       #' @param target A list with two elements, a widget and the name of a trait(let).
+      #' @param ... Futher arguments, passed to the superclass initializer.
       initialize = function(source,target,...){
           super$initialize(...)
           source_widget <- source[[1]]
@@ -39,5 +40,6 @@ WidgetLinkClass <- R6Class_("WidgetLink",
 #' @describeIn WidgetLink The WidgetLink constructor function
 #' @param source A link with two elements, the first is a widget, the second is one of its traits.
 #' @param target A link with two elements, the first is a widget, the second is one of its traits.
+#' @param ... Other arguments passed to the inializer
 #' @export
 WidgetLink <- function(source,target,...) WidgetLinkClass$new(source=source,target=target,...)

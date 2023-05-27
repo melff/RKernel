@@ -9,12 +9,6 @@ Context <- R6Class("Context",
    public = list(
        #' @description 
        #' Initialize the object
-       #' @param text_callback An optional callback function to handle text output
-       #' @param message_callback An optional callback function to handle messages
-       #' @param warning_callback An optional callback function to handle warnings
-       #' @param error_callback An optional callback function to handle errors
-       #' @param value_callback An optional callback function to handle return values
-       #' @param graphics_callback An optional callback function to handle graphics
        #' @param envir An optional environment within which expressions are evaluated
        #' @param attachment An optional environment that is attached while an expression is evaluated within 
        #'   the context.
@@ -220,7 +214,7 @@ Context <- R6Class("Context",
        #' Add or remove a handler function to be called if an object is
        #' output \code{print()}.
        #' @param handler A handler function to called *before* \code{print()}
-       #' @param handler A handler function to called *after* \code{print()}
+       #' @param exit A handler function to called *after* \code{print()}
        #' @param remove A logical value, whether the handler should be removed or added
        on_print = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
@@ -234,7 +228,7 @@ Context <- R6Class("Context",
        #' Add or remove a handler function to be called if text is output using
        #' \code{cat()}.
        #' @param handler A handler function to called *before* \code{cat()}
-       #' @param handler A handler function to called *after* \code{cat()}
+       #' @param exit A handler function to called *after* \code{cat()}
        #' @param remove A logical value, whether the handler should be removed or added
        on_cat = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
@@ -248,7 +242,7 @@ Context <- R6Class("Context",
        #' Add or remove a handler function to be called if the structure of an object
        #' is shown using \code{str()}.
        #' @param handler A handler function to called *before* \code{str()}
-       #' @param handler A handler function to called *after* \code{str()}
+       #' @param exit A handler function to called *after* \code{str()}
        #' @param remove A logical value, whether the handler should be removed or added
        on_str = function(handler=NULL,exit=NULL,remove=FALSE){
            if(is.function(handler)){
@@ -361,6 +355,7 @@ Context <- R6Class("Context",
 #' @param data A Context object
 #' @param expr An expression (or a set of expression wrapped in curly braces).
 #' @param enclos An enclosing environment.
+#' @param ... Other arguments, ignored.
 #' @export
 with.Context <- function(data,expr,enclos=parent.frame(),...){
     # log_out("with.Context")

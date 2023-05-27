@@ -3,6 +3,10 @@
 #' @description Objects of this class contain the CSS styling of description widgets
 #' 
 #' @include widget.R widget-dom.R
+#' @name DescriptionStyle
+NULL
+
+#' @rdname DescriptionStyle
 #' @export
 DescriptionStyleClass <- R6Class_("DescriptionStyle",
   inherit = WidgetClass,
@@ -25,6 +29,7 @@ DescriptionStyleClass <- R6Class_("DescriptionStyle",
 )
 
 #' @describeIn DescriptionStyle A Constructor Function for "DescriptionStyle" objects
+#' @param ... Arguments passed to the inializer
 #' @export
 DescriptionStyle <- function(...) DescriptionStyleClass$new(...)
 
@@ -33,6 +38,10 @@ DescriptionStyle <- function(...) DescriptionStyleClass$new(...)
 #' @description Objects of this class have an optional description and a description tooltip field
 #' 
 #' @include widget.R widget-dom.R
+#' @name DescriptionWidget
+NULL
+
+#' @rdname DescriptionWidget
 #' @export
 DescriptionWidgetClass <- R6Class_("DescriptionWidget",
   inherit = DOMWidgetClass,
@@ -57,5 +66,6 @@ DescriptionWidgetClass <- R6Class_("DescriptionWidget",
 )
 
 #' @describeIn DescriptionWidget A Constructor Function for "DescriptionWidget" objects
+#' @param ... Arguments passed to the inializer
 #' @export
 DescriptionWidget <- function(...) DescriptionWidgetClass$new(...)

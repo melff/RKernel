@@ -30,5 +30,6 @@ StrEnumClass <- R6Class_("StrEnum",
 )
 
 #' An Enumerated String Constructor
+#' @param ... Arguments passed to the trait instance initializer
 #' @export
 StrEnum <- function(...)TraitInstance(Class=StrEnumClass,...)

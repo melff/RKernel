@@ -38,5 +38,6 @@ SidecarClass <- R6Class_("Sidecar",
 )
 
 #' @describeIn Sidecar A constructor for sidebar widgets
+#' @param ... Arguments passed to the inializer
 #' @export
 Sidecar <- function(...) SidecarClass$new(...)

@@ -1,5 +1,12 @@
-#' @include traitlets.R
+#' Integer Traitlets
 #'
+#' @description A class and a constructor function to create integer vector trait(let)s.
+#'
+#' @include traitlets.R
+#' @name Integer
+NULL
+ 
+#' @rdname Integer
 #' @export
 IntegerClass <- R6Class_("Integer",
     inherit=TraitClass,
@@ -37,15 +44,27 @@ IntegerClass <- R6Class_("Integer",
             super$initialize(initial)
         }))
 
+#' @rdname Integer
+#' @param ... Arguments passed to the trait instance initializer
 #' @export
 Integer <- function(...)TraitInstance(...,Class=IntegerClass)
 
+#' @rdname Integer
+#' @param x An integer traitlet.
+#' @param ... Other arguments.
 #' @export
 as.integer.Integer <- function(x,...) x$value
+
+#' @rdname Integer
+#' @param x An integer traitlet.
+#' @param ... Other arguments.
 #' @export
 as.numeric.Integer <- function(x,...) as.numeric(x$value)
 
 
+#' @rdname Integer
+#' @param x An integer traitlet.
+#' @param ... Other arguments.
 #' @export
 to_json.Integer <- function(x,...) {
     len <- x$length
@@ -62,7 +81,15 @@ to_json.Integer <- function(x,...) {
     }
 }
 
+#' Floating Point Number Traitlets
+#'
+#' @description A class and a constructor function to create floating point vector trait(let)s.
+#'
+#' @include traitlets.R
+#' @name Float
+NULL
 
+#' @rdname Float
 #' @export
 FloatClass <- R6Class_("Float",
     inherit=TraitClass,
@@ -99,10 +126,18 @@ FloatClass <- R6Class_("Float",
             super$initialize(initial)
         }))
 
+#' @rdname Float
+#' @param ... Arguments passed to the trait instance initializer
 #' @export
 Float <- function(...)TraitInstance(...,Class=FloatClass)
 
+#' @rdname Float
+#' @param x A floating point traitlet.
+#' @param ... Other arguments.
 #' @export
 as.integer.Float <- function(x,...) as.integer(x$value)
+#' @param x A floating point traitlet.
+#' @param ... Other arguments.
+#' @rdname Float
 #' @export
 as.numeric.Float <- function(x,...) x$value

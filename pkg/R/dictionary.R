@@ -5,6 +5,7 @@
 #'    indices are allowed. Unlike with Python dictionaries, numeric indices can be used
 #'    well as character indices.
 #' @name dictionary
+NULL
 
 #' @describeIn dictionary A dictionary constructor
 #' @param ... Arbitrary objects. Should be tagged, yet currently name tags are

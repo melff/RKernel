@@ -49,7 +49,7 @@ LayoutClass <- R6Class_("Layout",
     display = structure(Unicode(character(0)),sync=TRUE),
     #' @field flex An optional string with a valid CSS flex property
     flex = structure(Unicode(character(0)),sync=TRUE),
-    #' @field flex_row An optional string with a valid CSS flex_row property
+    #' @field flex_flow An optional string with a valid CSS flex_flow property
     flex_flow = structure(Unicode(character(0)),sync=TRUE),
     #' @field height An optional string with a valid CSS height 
     height = structure(Unicode(character(0)),sync=TRUE),
@@ -149,6 +149,7 @@ LayoutClass <- R6Class_("Layout",
 )
 
 #' @describeIn Layout The Layout constructor function
+#' @param ... Arguments passed to the inializer
 #' @export
 Layout <- function(...) LayoutClass$new(...)
 

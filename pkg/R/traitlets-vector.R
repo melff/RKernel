@@ -4,6 +4,7 @@
 #'
 #' @include traitlets.R
 #' @name Vector
+NULL
 
 #' @rdname Vector
 #' @export
