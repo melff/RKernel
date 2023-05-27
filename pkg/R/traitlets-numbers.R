@@ -11,10 +11,17 @@ NULL
 IntegerClass <- R6Class_("Integer",
     inherit=TraitClass,
     public=list(
+        #' @field value An integer vector.
         value = integer(0),
+        #' @field optional Logical value, whether a length-zero value is allowed.
         optional = FALSE,
+        #' @field coerce Logical value, whether assignments to the value field should
+        #'    be coerced to the appropriate type.
         coerce = TRUE,
-        length = 1,
+        #' @field length Integer number, the length the value should have.
+        length = 1L,
+        #' @description Check the value assigned to the traitlet.
+        #' @param value The value assigned to the traitlet.
         validator=function(value){
             if(self$coerce){
                 value <- as.integer(value)
@@ -31,9 +38,15 @@ IntegerClass <- R6Class_("Integer",
             }
             value
         },
+        #' @description Initialize the traitlet.
+        #' @param initial An integer vector, the initial value for the traitlet.
+        #' @param coerce coerce Logical value, whether assignments to the value field should
+        #'    be coerced to the appropriate type.
+        #' @param optional Logical value, whether a length-zero value is allowed.
+        #' @param length Integer number, the length the value should have.
         initialize=function(initial=integer(0),coerce=TRUE,
                             optional=length(initial) == 0,
-                            length=1
+                            length=1L
                             ){
             self$optional <- optional
             self$coerce <- coerce
@@ -94,10 +107,17 @@ NULL
 FloatClass <- R6Class_("Float",
     inherit=TraitClass,
     public=list(
+        #' @field value A numeric vector.
         value = numeric(0),
+        #' @field optional Logical value, whether a length-zero value is allowed.
         optional = FALSE,
+        #' @field coerce Logical value, whether assignments to the value field should
+        #'    be coerced to the appropriate type.
         coerce = TRUE,
+        #' @field length Integer number, the length the value should have.
         length = 1,
+        #' @description Check the value assigned to the traitlet.
+        #' @param value The value assigned to the traitlet.
         validator=function(value){
             if(self$coerce){
                 value <- as.numeric(value)
@@ -114,9 +134,15 @@ FloatClass <- R6Class_("Float",
             }
             value
         },
+        #' @description Initialize the traitlet.
+        #' @param initial A numeric vector, the initial value for the traitlet.
+        #' @param coerce coerce Logical value, whether assignments to the value field should
+        #'    be coerced to the appropriate type.
+        #' @param optional Logical value, whether a length-zero value is allowed.
+        #' @param length Integer number, the length the value should have.
         initialize=function(initial,coerce=TRUE,
                             optional=length(initial) == 0,
-                            length=1){
+                            length=1L){
             self$optional <- optional
             self$coerce <- coerce
             if(missing(length))
