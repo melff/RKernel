@@ -1,9 +1,13 @@
 #' A Manager for Comms
 #'
 #' @description Objects of this class are used internally to manage comms, they
-#'     are not meant to be called by end-users.
+#'     are not meant to be used by end-users.
 #' @details  See the documentation 
 #'   of \href{https://jupyter-client.readthedocs.io/en/latest/messaging.html#custom-messages}{Jupyter custom messages}.
+#' @name CommManager 
+NULL
+
+#' @rdname CommManager
 #' @export
 CommManagerClass <- R6Class("CommManager",
     
@@ -200,7 +204,7 @@ CommManagerClass <- R6Class("CommManager",
     )
 )
 
-#' A constructor for objects in the 'CommManagerClass'
+#' @describeIn CommManager A constructor for objects in the 'CommManagerClass'
 #' @param ... Arguments passed to the inializer
 #' @export
 CommManager <- function(...) CommManagerClass$new(...)
@@ -212,6 +216,10 @@ CommManager <- function(...) CommManagerClass$new(...)
 #'    the Jupyter frontend, e.g. a Jupyter notebook
 #' @details Objects of this class are used to communicate to the frontend via
 #' \href{https://jupyter-client.readthedocs.io/en/latest/messaging.html#custom-messages}{custom messages}.
+#' @name Comm
+NULL
+
+#' @rdname Comm
 #' @export
 CommClass <- R6Class("Comm",
 
@@ -281,7 +289,7 @@ CommClass <- R6Class("Comm",
     )
 )
 
-#' A constructor function for objects of class "CommClass"
+#' @describeIn Comm A constructor function for objects of class "CommClass"
 #' @param ... Arguments passed to the inializer
 #' @export
 Comm <- function(...) CommClass$new(...)
