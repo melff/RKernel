@@ -14,7 +14,7 @@ asset_fetcher <- function(path,...){
       mime_type <- switch(filext,
         "html"="text/html",
         "css"="text/css",
-        "js"="text/js",
+        "js"="application/javascript",
         "text/plain"
         )
       payload <- readLines(filename)
