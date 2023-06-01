@@ -3,7 +3,10 @@
 #' @description Objects in this class are collections of callbacks functions
 #'     usually related to certain events. The function \code{CallbackDispachter} can be
 #'     used as an constructor
-#'
+#' @name CallbackDispatcher
+NULL
+
+#' @rdname CallbackDispatcher
 #' @export
 CallbackDispatcherClass <- R6Class("CallbackDispatcher",
     public = list(
@@ -61,7 +64,7 @@ CallbackDispatcherClass <- R6Class("CallbackDispatcher",
     )
 )
 
-#' @describeIn CallbackDispatcherClass The constructor function, returns an Object of Class "CallbackDispatcherClass" 
+#' @describeIn CallbackDispatcher The constructor function, returns an Object of Class "CallbackDispatcherClass" 
 #' @param ... Arguments passed to the inializer
 #' @export
 CallbackDispatcher <- function(...) CallbackDispatcherClass$new(...)
