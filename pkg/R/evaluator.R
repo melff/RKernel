@@ -137,6 +137,8 @@ Evaluator <- R6Class("Evaluator",
             register_export(self$readline,"readline")
             register_export(self$str,"str")
             register_export(self$restart_graphics,"restart_graphics")
+            private$orig_startDynamicHelp <- tools::startDynamicHelp
+            replace_in_package("tools","startDynamicHelp",private$startDynamicHelp)
             private$assign_exports()
             em <- EventManager(type="eval")
             em$activate()
@@ -409,6 +411,7 @@ Evaluator <- R6Class("Evaluator",
         #' @param query The query string (that appeared after '?' in the http request)
         #' @param ... Any further arguments, passed on to specific handlers
         httpd = function(path,query,...){
+            # log_out("evaluator$httpd")
             # log_out("http path: ",path)
             # log_out("http query: ",query,use.str=TRUE)
             # log_out(eventmanagers$http,use.str=TRUE)
@@ -623,6 +626,13 @@ Evaluator <- R6Class("Evaluator",
         shared_help_system = FALSE,
         jupyterhub_prefix = "",
         help_use_proxy = FALSE,
+
+        # Dummy variant to prevent 'Server already running' errors with Rook et al.
+        startDynamicHelp = function(start=TRUE){
+            if(!start) error("Stopping dynamic help is not supported.")
+            return(self$get_port())
+        },
+        orig_startDynamicHelp = NULL,
 
         new_cell = TRUE,
 
