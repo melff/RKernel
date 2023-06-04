@@ -11,7 +11,7 @@ RCHKIMG := kalibera-rchk-master-def.simg
 default: roxygenize install-quick
 
 .PHONY: all
-all: roxygenize build install installspec
+all: build install installspec
 
 .PHONY: describe
 describe:
@@ -21,12 +21,14 @@ describe:
 show:
 	echo "Package ${PACKAGE} version ${VERSION}"
 
-.PHONY: build
 build-wo-vignettes:
+	Rscript --vanilla -e 'roxygen2::roxygenize(package.dir="${SRCDIR}")'
 	echo "Building ${ARCHIVE}"
 	R CMD build --no-build-vignettes $(SRCDIR)
 
+.PHONY: build
 build:
+	Rscript --vanilla -e 'roxygen2::roxygenize(package.dir="${SRCDIR}")'
 	echo "Building ${ARCHIVE}"
 	R CMD build $(SRCDIR)
 
