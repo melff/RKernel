@@ -666,15 +666,28 @@ LaTeXMath <- function(text){
             "text/latex"=text_latex)
 }
 
+#' Include HTML content using in an iframe
+#'
+#' @description Display the contents of a webpage or other HTML content
+#'   by including output using an [iframe](https://html.spec.whatwg.org/multipage/iframe-embed-object.html).
+#' @param url A character string, the URL of the content to be included
+#' @param width A character string that specifies the width of the iframe
+#' @param height A character string that specifies the width of the iframe
+#' @param class An optional character string with DOM classes to be assigned to the iframe.
+#' @param srcdoc Logical, whether to use a 'src' (FALSE, the default)  or 'srcdoc' attribute.
 #' @export
-IFrame <- function(url,width="100%",height="70ex",class=NULL){
+IFrame <- function(url,width="100%",height="70ex",class=NULL,srcdoc=FALSE){
     tmpl <- paste(
-        "<iframe src='%s'",
+        "<iframe",
+        paste0(if(srcdoc) "srcdoc" else "src", "='%s'"),
         "style='width:%s;height:%s;'",
-        if(length(class)) class,
+        if(length(class)) "class='%s'",
         "</iframe>",
         sep="\n")
-    text_html <- sprintf(tmpl,url,width,height)
+    if(length(class))
+        text_html <- sprintf(tmpl,url,width,height,class)
+    else
+        text_html <- sprintf(tmpl,url,width,height)
     display_data("text/plain"="",
                  "text/html"=text_html)
 }
