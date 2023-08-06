@@ -812,6 +812,31 @@ replace_in_package <- function(pkg_name,name,value){
 }
 
 
+#' @title Add or remove services
+#' @description
+#' Add or a service to the kernel, i.e. a function that is called in each
+#' iteration of the kernel event loop.
+#' @param run A function to be run in each loop iteration.
+#' @param init A function to be run once in the first iteration.
+#' @name services
+NULL
+
+#' @rdname services
+#' @export
+add_service <- function(run,init=NULL){
+  k <- get_current_kernel()
+  k$add_service(run,init)
+}
+
+
+#' @rdname services
+#' @export
+remove_service <- function(run){
+  k <- get_current_kernel()
+  k$remove_service(run)
+}
+
+
 # Local Variables:
 # ess-indent-offset: 2
 # End:
