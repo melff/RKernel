@@ -1,7 +1,9 @@
 #' Invoke a Data Viewer
 #'
 #' This is a re-implementation of \code{\link[utils]{View}} that works within
-#' Jupyter notebooks by leveraging the \href{https://ipywidgets.readthedocs.io}{Jupyter widgets} infrastructure.
+#' Jupyter notebooks by leveraging the \href{https://ipywidgets.readthedocs.io}{Jupyter widgets} infrastructure
+#' or by using the DataTable Javascript library. The latter is the case if the system option "View.backend"
+#' is set to "dataTable" or if this option is not set. Otherwise a 'virtable_widget' is used.
 #'
 #' @param x an \R object which can be coerced to a data frame with non-zero numbers of rows and columns.
 #' @param title a string used as title. Currently unused.
@@ -26,7 +28,10 @@ View.default <- function(x,title=deparse(substitute(x)),...)
     x <- as.data.frame(x)
     if(ncol(x) == 1)
         colnames(x) <- title
-    dataTable(x)
+    if(getOption("View.backend","dataTable")=="dataTable")
+        dataTable(x)
+    else
+        virtable_widget(x)
     
 }
 
@@ -38,7 +43,9 @@ View.data.frame <- function(x,title=deparse(substitute(x)),...)
 
     # cls <- class(x)
     # title <- paste0(cls,": ",title)
-    dataTable(x)
-    
+    if(getOption("View.backend","dataTable")=="dataTable")
+        dataTable(x)
+    else
+        virtable_widget(x)
 }
 
