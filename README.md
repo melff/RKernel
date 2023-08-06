@@ -5,7 +5,15 @@ for [*Jupyter*](http://juypter.org).
 
 ![Interactive-distributions-demo.gif](gifs/Interactive-distributions-demo.gif)
 
-It differs from the already existing [*IRKernel*](http://irkernel.github.io) by:
+To install run the following lines in *R*:
+
+```{r}
+devtools::install_github("melff/RKernel/pkg")
+RKernel::installspec()
+```
+For dynamic help you also need to install the python package [jupyter-server-proxy](https://pypi.org/project/jupyter-server-proxy/).
+
+This kernel differs from the already existing [*IRKernel*](http://irkernel.github.io) by:
 
   - Users can decide whether objects of certain classes are output via the 
     "stdout" stream - which allows using any dedicated `print()`-methods
@@ -35,8 +43,8 @@ It differs from the already existing [*IRKernel*](http://irkernel.github.io) by:
   - It is possible to make use of the Widgets infrastructure provided by
     [*ipywidgets*](https://ipywidgets.readthedocs.io) to constructed interactive
     user interfaces. These can be used with jupyter notebooks, JupyterLab and
-    [*voilà*](https://voila.readthedocs.io). However, only widgets provided 
-    by version 7.5 of the *ipywidgets* are supported. Supported for 8.0 is planned.
+    [*voilà*](https://voila.readthedocs.io). However, only *ipywidgets*  
+    version 7.x is supported. Supported for 8.0 is planned.
   - [HTML widgets](https://cran.r-project.org/package=htmlwidgets) generally
     work. However, *some* htmlwidgets (notably those created with
     [*plotly*](https://plotly.com/r/)) displayed with the setting
@@ -55,7 +63,7 @@ A widget demonstration can be found [here](https://tmphub.elff.eu/user-redirect/
     
 TODO:
 
-  - [ ] Add documentation
+  - [x] Add documentation
   - [x] Make HTML help work on servers
   - [ ] Add example notebooks
   - [x] Make HTML widgets work more generally
