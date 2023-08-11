@@ -142,7 +142,7 @@ Evaluator <- R6Class("Evaluator",
             private$assign_exports()
             em <- EventManager(type="eval")
             em$activate()
-            # log_out("evaluator$startup() complete")
+            log_out("evaluator$startup() complete")
             private$jupyterhub_prefix <- Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")
 
         },
@@ -155,8 +155,10 @@ Evaluator <- R6Class("Evaluator",
         #' Evaluate R code
         #' @param code A string with R code
         #' @param allow_stdin Logical value, whether reading from stdin is allowed.
+        #' @param silent Logical value, whether output should be created.
+        #' @param store_history Logical value, whether code history should be recorded.
         #' @param ... Other arguments, currently ignored
-        eval_cell = function(code,allow_stdin,...){
+        eval_cell = function(code,allow_stdin,silent,store_history,...){
             
             private$allow_stdin <- allow_stdin
             # log_out("++ eval_cell ++++++++++++++++++++++++++++++++++++")
@@ -196,30 +198,36 @@ Evaluator <- R6Class("Evaluator",
                                       stream="stderr")
             }
             else {
-
-                private$new_cell <- TRUE
-                self$cell_no <- self$cell_no + 1
-                # log_out(sprintf("== BEGIN CELL [%d] ==",self$cell_no))
+                if(store_history){
+                    private$new_cell <- TRUE
+                    self$cell_no <- self$cell_no + 1
+                    # log_out(sprintf("== BEGIN CELL [%d] ==",self$cell_no))
+                }
+                # log_out(code)
                 private$context$evaluate(expressions,envir=.GlobalEnv)
-                current_value <- private$context$last.value
-                self$cells[[self$cell_no]] <- code
-                self$cell_results[[self$cell_no]] <- current_value$value
-                assign("In",self$cells,envir=private$env)
-                assign("Out",self$cell_results,envir=private$env)
-                assign(".Last.value",current_value$value,envir=private$env)
+                if(!silent)
+                    current_value <- private$context$last.value
+                if(store_history){
+                    self$cells[[self$cell_no]] <- code
+                    self$cell_results[[self$cell_no]] <- current_value$value
+                    assign("In",self$cells,envir=private$env)
+                    assign("Out",self$cell_results,envir=private$env)
+                    assign(".Last.value",current_value$value,envir=private$env)
 
-                if(length(private$saved.options)){
-                    op <- private$saved.options
-                    private$saved.options <- list()
-                    do.call("options",op)
+                    if(length(private$saved.options)){
+                        op <- private$saved.options
+                        private$saved.options <- list()
+                        do.call("options",op)
+                    }
+                    if(length(private$saved.parms)){
+                        op <- private$saved.parms
+                        private$saved.parms <- list()
+                        do.call("par",op)
+                    }
+                    # log_out(sprintf("== END CELL [%d] ==",self$cell_no))
                 }
-                if(length(private$saved.parms)){
-                    op <- private$saved.parms
-                    private$saved.parms <- list()
-                    do.call("par",op)
-                }
-                eventmanagers$eval$send("cell_completed")
-                # log_out(sprintf("== END CELL [%d] ==",self$cell_no))
+                if(!silent)
+                    eventmanagers$eval$send("cell_completed")
             }
         },
         #' @field cell_no The number of the cell currently executed

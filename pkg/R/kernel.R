@@ -121,6 +121,8 @@ Kernel <- R6Class("Kernel",
     #' @param data Execution result in rich format
     #' @param metadata A list with metadata
     execute_result = function(data,metadata=emptyNamedList){
+      log_out("kernel$execute_result")
+      # log_out(sprintf("msg_type = %s",msg_type))
       content <- list(data=data,
                       metadata=metadata,
                       execution_count=private$execution_count)
@@ -138,7 +140,7 @@ Kernel <- R6Class("Kernel",
         msg_type <- class(d)
       else stop("'display_data' or 'update_display_data' object required")
 
-      # log_out("kernel$display_send")
+      log_out("kernel$display_send")
       # log_out(sprintf("msg_type = %s",msg_type))
       
       private$send_message(type=msg_type,
@@ -274,19 +276,19 @@ Kernel <- R6Class("Kernel",
         else if(use.str)
           message <- paste(capture.output(self$str(message)),collapse="\n")
         else message <- paste(message,...,collapse="")
-        self$cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
+        self$cat(crayon::green(format(Sys.time()),"\t",message,"\n"),
                  file=stderr())
       },error=function(e){
-        log_error(sprintf("Error in %s",dcl))
+        self$log_error(sprintf("Error in %s",dcl))
         msg <- conditionMessage(e)
-        log_error(msg)
+        self$log_error(msg)
       })
     },
     #' @description
     #' Show a warning in the Jupyter server log
     #' @param message A string to be shown in the log
     log_warning = function(message){
-      self$cat(crayon::bgBlue(format(Sys.time()),"\t",message,"\n"),
+      self$cat(crayon::bgYellow(format(Sys.time()),"\t",message,"\n"),
                        file=stderr())
     },
     #' @description
@@ -392,16 +394,26 @@ Kernel <- R6Class("Kernel",
 
     execution_count = 1,
 
-    execute_reply = function(msg){
+    handle_execute_request = function(msg){
+      # self$log_out("handle_execute_request")
+      # self$log_out(msg,use.print=TRUE)
+      if(msg$content$silent){
+        if(msg$content$store_history){
+          self$log_warning("store_history forced to FALSE")
+          msg$content$store_history <- FALSE
+        }
+      }
+      execution_count <- private$execution_count
       private$send_message(type="execute_input",
                            parent=private$parent$shell,
                            socket_name="iopub",
                            content=list(
                              code=msg$content$code,
-                             execution_count=private$execution_count))
-      # self$log_out(msg,use.print=TRUE)
+                             execution_count=execution_count))
       r <- tryCatch(self$evaluator$eval_cell(msg$content$code,
-                                             msg$content$allow_stdin),
+                                             msg$content$allow_stdin,
+                                             msg$content$silent,
+                                             msg$content$store_history),
                     error=function(e)"errored",
                     interrupt=function(e)"interrupted"
                     )
@@ -413,14 +425,14 @@ Kernel <- R6Class("Kernel",
       if(is.character(r) && (identical(r[1],"errored") || identical(r[1],"interrupted")))
         aborted <- TRUE
       content <- list(status = status,
-                      execution_count = private$execution_count)
+                      execution_count = execution_count)
       if(length(payload))
         content$payload <- payload
-
-      private$send_message(type="execute_reply",
-                           parent=private$parent$shell,
-                           socket="shell",
-                           content=content)
+      if(!isTRUE(msg$content$silent))
+        private$send_message(type="execute_reply",
+                             parent=private$parent$shell,
+                             socket="shell",
+                             content=content)
       #cat("Sent a execute_reply ...\n")
       # message("Code:", msg$content$code)
       #message("Store history:", msg$content$store_history)
@@ -592,7 +604,7 @@ Kernel <- R6Class("Kernel",
              comm_open = private$handle_comm_open(msg),
              comm_msg = private$handle_comm_msg(msg),
              comm_close = private$handle_comm_close(msg),
-             execute_request = private$execute_reply(msg),
+             execute_request = private$handle_execute_request(msg),
              is_complete_request = private$is_complete_reply(msg),
              kernel_info_request = private$kernel_info_reply(msg),
              complete_request = private$complete_reply(msg),
