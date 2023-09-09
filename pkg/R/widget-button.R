@@ -49,13 +49,13 @@ ButtonClass <- R6Class_("Button",
     #' @field _model_module Name of the Javascript module with the model
     `_model_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
     #' @field _model_module_version Version of the module where the model is defined
-    `_model_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
+    `_model_module_version` = structure(Unicode(jupyter_widgets_controls_version()),sync=TRUE),
     #' @field _model_name Name of the Javascript model in the frontend
     `_model_name` = structure(Unicode("ButtonModel"),sync=TRUE),
     #' @field _view_module Name of the module where the view is defined
     `_view_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
     #' @field _view_module_version Version of the module where the view is defined
-    `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
+    `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version()),sync=TRUE),
     #' @field _view_name Name of the Javascript model view in the frontend
     `_view_name` = structure(Unicode("ButtonView"),sync=TRUE),
     #' @field description A button description

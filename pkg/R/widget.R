@@ -17,7 +17,7 @@ WidgetClass <- R6Class_("Widget",
     #' @field _model_module Name of the Javascript module with the model
     `_model_module` = structure(Unicode("@jupyter-widgets/base"),sync=TRUE),
     #' @field _model_module_version Version of the module where the model is defined
-    `_model_module_version` = structure(Unicode(jupyter_widgets_base_version),sync=TRUE),
+    `_model_module_version` = structure(Unicode(jupyter_widgets_base_version()),sync=TRUE),
     #' @field _view_name Name of the Javascript model view in the frontend
     `_view_name` = structure(Unicode(character(0)),sync=TRUE),
     #' @field _view_module Version of the module where the view is defined
@@ -34,6 +34,7 @@ WidgetClass <- R6Class_("Widget",
     #' @param ... Values used for initialization
     #' @param open Logical, whether a connection with the frontend should be opened
     initialize = function(...,open=TRUE){
+      self$check_version()
       super$initialize(...)
       handler <- function(tn,trait,value){
             # print(str(list(tn=tn,trait=trait,value=value)))
@@ -69,7 +70,7 @@ WidgetClass <- R6Class_("Widget",
         buffers <- attr(state,"buffers")
         data <- list(state=state,
                      buffer_paths=buffer_paths)
-        metadata <- list(version=jupyter_widgets_protocol_version)
+        metadata <- list(version=jupyter_widgets_protocol_version())
         self$comm$open(data=data,metadata=metadata,buffers=buffers)
         self$comm$handlers$open <- self$handle_comm_opened
         self$comm$handlers$msg <- self$handle_comm_msg
@@ -253,6 +254,17 @@ WidgetClass <- R6Class_("Widget",
         # log_out(buffers,use.print=TRUE)
         self$`_comm`$send(msg,buffers=buffers)
       }
+    },
+    # @field required_version Minimum required ipywidgets version in which the
+    #    current widget class is supported.
+    required_version = c(7,0,0),
+    #' @description Check whether current widget class is supported by ipywidgets
+    check_version = function(){
+      v <- get_jupyter_ipywidgets_version()
+      v <- v*c(100,10,1)
+      r <- self$required_version*c(100,10,1)
+      supported <- all(v >= r)
+      if(!supported) stop("Widget not supported by this version of ipywidgets")
     }
   ),
   active = list(

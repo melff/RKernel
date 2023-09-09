@@ -10,7 +10,7 @@ DOMWidgetClass <- R6Class_("DOMWidget",
     #' @field _model_module Name of the Javascript module with the model
     `_model_module` = structure(Unicode("@jupyter-widgets/base"),sync=TRUE),
     #' @field _model_module_version Version of the module where the model is defined
-    `_model_module_version` = structure(Unicode(jupyter_widgets_base_version),sync=TRUE),
+    `_model_module_version` = structure(Unicode(jupyter_widgets_base_version()),sync=TRUE),
     #' @field _model_name Name of the Javascript model in the frontend
     `_model_name` = structure(Unicode("DOMWidgetModel"),sync=TRUE),
     #' @field _dom_classes A set of character strings that indicate the DOM

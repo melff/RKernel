@@ -18,9 +18,9 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         #' @field _model_module Name of the Javascript module with the model
         `_model_module` = structure(Unicode("@jupyter-widgets/output"),sync=TRUE),
         #' @field _view_module_version Version of the module where the view is defined
-        `_view_module_version` = structure(Unicode(jupyter_widgets_output_version),sync=TRUE),
+        `_view_module_version` = structure(Unicode(jupyter_widgets_output_version()),sync=TRUE),
         #' @field _model_module_version Version of the module where the model is defined
-        `_model_module_version` = structure(Unicode(jupyter_widgets_output_version),sync=TRUE),
+        `_model_module_version` = structure(Unicode(jupyter_widgets_output_version()),sync=TRUE),
         #' @field msg_id Unicode string with the id of the last message sent to the frontend.
         msg_id = structure(Unicode(""),sync=TRUE),
         #' @field outputs A list with output strings

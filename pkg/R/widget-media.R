@@ -11,11 +11,11 @@ MediaWidgetClass <- R6Class_("MediaWidget",
       #' @field _model_module Name of the Javascript model in the frontend.
       `_model_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
       #' @field _model_module_version Version of the Javascript model module in the frontend.
-      `_model_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
+      `_model_module_version` = structure(Unicode(jupyter_widgets_controls_version()),sync=TRUE),
       #' @field _view_module Name of the Javascript view module in the frontend.
       `_view_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
       #' @field _view_module_version Version of the Javascript view module in the frontend.
-      `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
+      `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version()),sync=TRUE),
       #' @field value A \link{Bytes} traitlet.
       value = structure(Bytes(),sync=TRUE),
       #' @description Add or remove a handler to be called if value 

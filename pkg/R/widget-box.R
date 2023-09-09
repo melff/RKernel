@@ -18,7 +18,7 @@ BoxClass <- R6Class_("Box",
     #' @field _model_module Name of the Javascript module with the model
     `_model_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
     #' @field _model_module_version Version of the module where the model is defined
-    `_model_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
+    `_model_module_version` = structure(Unicode(jupyter_widgets_controls_version()),sync=TRUE),
     #' @field _model_name Name of the Javascript model in the frontend
     `_model_name` = structure(Unicode("BoxModel"),sync=TRUE),
     #' @field _view_name Name of the Javascript model view in the frontend
@@ -26,7 +26,7 @@ BoxClass <- R6Class_("Box",
     #' @field _view_module Name of the module where the view is defined
     `_view_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
     #' @field _view_module_version Version of the module where the view is defined
-    `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version),sync=TRUE),
+    `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version()),sync=TRUE),
     #' @field children A generic vector with the widgets in the container
     children = structure(Vector(),sync=TRUE),
     #' @field box_style The string that describes the button style
