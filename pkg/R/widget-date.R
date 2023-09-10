@@ -48,24 +48,41 @@ DatePickerClass <- R6Class_("DatePicker",
        #' @description Check wether "value" is within range.
        #' @param value A value
        validate_value = function(value){
-           log_out("DatePicker$validate_value")
-           log_out(value,use.str=TRUE)
+           if(!length(value)) return(value)
            min <- self$min
            max <- self$max
+           if(length(min) && value < min)
+               value <- min
+           if(length(max) && value > max)
+               value <- max
            value
        },
        #' @description Validate the "min" field after assignment.
        #' @param min A minimum value, should be an integer number.
        validate_min = function(min){
+           if(!length(min)) return(min)
            max <- self$max
            value <- self$value
+           if(length(max) && max < min)
+               stop("max >= min required")
+           if(length(value) && value < min){
+               self$value <- min
+               self$send_state()
+           }
            min
        },
        #' @description Validate the "max" field after assignment.
        #' @param max A maximum value, should be an integer number.
        validate_max = function(max){
+           if(!length(max)) return(max)
            min <- self$min
            value <- self$value
+           if(length(max) && max < min)
+               stop("max >= min required")
+           if(length(value) && value > max){
+               self$value <- max
+               self$send_state()
+           }
            max
        },
        #' @param ... Arguments passed to the superclass initializer
