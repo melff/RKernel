@@ -98,11 +98,14 @@ WidgetClass <- R6Class_("Widget",
       for(k in keys){
         if(k %in% self$traits_to_sync){
           auto_unbox <- !isFALSE(attr(self$traits[[k]],"auto_unbox"))
+          to_json_ <- attr(self$traits[[k]],"to_json")
           if(inherits(self$traits[[k]],"Bytes")){
             buffer_paths <- append(buffer_paths,list(list(k)))
             bytes <- self$traits$value$get()
             buffers <- append(buffers,list(bytes))
           }
+          if(is.function(to_json_))
+            state[[k]] <- to_json_(self$traits[[k]])
           else
             state[[k]] <- to_json(self$traits[[k]],auto_unbox=auto_unbox)
         }
@@ -118,8 +121,12 @@ WidgetClass <- R6Class_("Widget",
       keys <- names(state)
       for(k in keys){
         # cat("Updating",k)
-        if(k %in% self$traits_to_sync)
-          self[[k]] <- state[[k]]
+        if(k %in% self$traits_to_sync){
+          from_json_ <- attr(self$traits[[k]],"from_json")
+          if(!is.function(from_json_))
+            from_json_ <- I
+          self[[k]] <- from_json_(state[[k]])
+        }
       }
     },
     #' @description Send updated traits to the frontend
@@ -255,8 +262,8 @@ WidgetClass <- R6Class_("Widget",
         self$`_comm`$send(msg,buffers=buffers)
       }
     },
-    # @field required_version Minimum required ipywidgets version in which the
-    #    current widget class is supported.
+    #' @field required_version Minimum required ipywidgets version in which the
+    #'        current widget class is supported.
     required_version = c(7,0,0),
     #' @description Check whether current widget class is supported by ipywidgets
     check_version = function(){
@@ -264,7 +271,7 @@ WidgetClass <- R6Class_("Widget",
       v <- v*c(100,10,1)
       r <- self$required_version*c(100,10,1)
       supported <- all(v >= r)
-      if(!supported) stop("Widget not supported by this version of ipywidgets")
+      if(!supported) warning("Widget not supported by this version of ipywidgets - expect the unexpected.")
     }
   ),
   active = list(
