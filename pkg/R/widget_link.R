@@ -43,3 +43,20 @@ WidgetLinkClass <- R6Class_("WidgetLink",
 #' @param ... Other arguments passed to the inializer
 #' @export
 WidgetLink <- function(source,target,...) WidgetLinkClass$new(source=source,target=target,...)
+
+#' @rdname WidgetLink
+#' @export
+DirectionalLinkClass <- R6Class_("DirectionalLink",
+  inherit = WidgetLinkClass,
+  public = list(
+      #' @field _model_name Name of the Javascript model in the frontend.
+      `_model_name` = structure(Unicode("DirectionalLinkModel"),sync=TRUE)
+  )
+)
+
+#' @describeIn WidgetLink The WidgetLink constructor function
+#' @param source A link with two elements, the first is a widget, the second is one of its traits.
+#' @param target A link with two elements, the first is a widget, the second is one of its traits.
+#' @param ... Other arguments passed to the inializer
+#' @export
+DirectionalLink <- function(source,target,...) DirectionalLinkClass$new(source=source,target=target,...)
