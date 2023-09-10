@@ -61,7 +61,7 @@ TraitClass <- R6Class_("Trait",
        #' @param initial The initial value
        #' @param coerce Logical; whether to coerce the initial value
        #'    to the approriate mode.
-       initialize = function(initial,coerce=TRUE){
+       initialize = function(initial){
             validator <- self$validator
             if(is.function(validator) && !missing(initial)){
                 self$value <- validator(initial)
@@ -94,6 +94,19 @@ TraitInstance <- function(Class,...){
             args=list(...),
             Class=Class),
         class="TraitInstance")
+}
+
+Force <- function(delayed){
+    Class <- delayed$Class
+    args <- delayed$args
+    do.call(Class$new,args)
+}
+
+#' @export
+print.TraitInstance <- function(x,...){
+    x <- Force(x)
+    cat(sprintf("Delayed trait instance of class '%s'\n",class(x)[1]))
+    print(x$value)
 }
 
 as_property <- function(self) {
@@ -225,3 +238,4 @@ to_json.Trait <- function(x,auto_unbox=TRUE,...){
         character(0)
     else to_json(value,auto_unbox=auto_unbox,...)
 }
+
