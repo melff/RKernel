@@ -70,6 +70,7 @@ Collate:
     'widget-boolean.R'
     'widget-box.R'
     'widget-button.R'
+    'widget-color.R'
     'widget-env-browser.R'
     'widget-float.R'
     'widget-integer.R'
