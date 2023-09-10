@@ -8,6 +8,114 @@ NULL
 
 #' @rdname StringWidget
 #' @export
+StringStyleClass <- R6Class_("StringStyle",
+   inherit = DescriptionStyleClass,
+   public = list(
+    #' @field _model_name Name of the Javascript model in the frontend
+    `_model_name` = structure(Unicode("StringStyleModel"),sync=TRUE),
+    #' @field background The background color
+    background = structure(Unicode(""),sync=TRUE),
+    #' @field font_size The font size
+    font_size = structure(Unicode(""),sync=TRUE),
+    #' @field text_color The text color
+    text_color = structure(Unicode(""),sync=TRUE),
+    #' @field required_version Minimum required ipywidgets version in which the
+    #'        current widget class is supported.
+    required_version = c(8,0,0)
+   )
+)
+
+#' @rdname StringWidget
+#' @export
+LabelStyleClass <- R6Class_("LabelStyle",
+   inherit = StringStyleClass,
+   public = list(
+    #' @field _model_name Name of the Javascript model in the frontend
+    `_model_name` = structure(Unicode("LabelStyleModel"),sync=TRUE),
+    #' @field font_family The font family
+    font_family = structure(Unicode(""),sync=TRUE),
+    #' @field font_style The font style
+    font_style = structure(Unicode(""),sync=TRUE),
+    #' @field font_variant The font variant
+    font_variant = structure(Unicode(""),sync=TRUE),
+    #' @field font_weight The font weight
+    font_weight = structure(Unicode(""),sync=TRUE),
+    #' @field text_decoration The text decoration
+    text_decoration = structure(Unicode(""),sync=TRUE),
+    #' @field required_version Minimum required ipywidgets version in which the
+    #'        current widget class is supported.
+    required_version = c(8,0,0)
+   )
+)
+
+#' @describeIn StringWidget The constructor for Label styles
+#' @param ... Arguments passed to the inializer
+#' @export
+LabelStyle <- function(...) LabelStyleClass$new(...)
+
+
+
+#' @rdname StringWidget
+#' @export
+TextStyleClass <- R6Class_("TextStyle",
+   inherit = StringStyleClass,
+   public = list(
+    #' @field _model_name Name of the Javascript model in the frontend
+    `_model_name` = structure(Unicode("TextStyleModel"),sync=TRUE),
+    #' @field required_version Minimum required ipywidgets version in which the
+    #'        current widget class is supported.
+     required_version = c(8,0,0)
+   )
+)
+
+#' @describeIn StringWidget The constructor for Text styles
+#' @param ... Arguments passed to the inializer
+#' @export
+TextStyle <- function(...) TextStyleClass$new(...)
+
+
+#' @rdname StringWidget
+#' @export
+HTMLStyleClass <- R6Class_("HTMLStyle",
+   inherit = StringStyleClass,
+   public = list(
+    #' @field _model_name Name of the Javascript model in the frontend
+    `_model_name` = structure(Unicode("HTMLStyleModel"),sync=TRUE),
+    #' @field required_version Minimum required ipywidgets version in which the
+    #'        current widget class is supported.
+     required_version = c(8,0,0)
+   )
+)
+
+#' @describeIn StringWidget The constructor for HTML styles
+#' @param ... Arguments passed to the inializer
+#' @export
+HTMLStyle <- function(...) HTMLStyleClass$new(...)
+
+
+#' @rdname StringWidget
+#' @export
+HTMLMathStyleClass <- R6Class_("HTMLMathStyle",
+   inherit = StringStyleClass,
+   public = list(
+    #' @field _model_name Name of the Javascript model in the frontend
+    `_model_name` = structure(Unicode("HTMLMathStyleModel"),sync=TRUE),
+    #' @field required_version Minimum required ipywidgets version in which the
+    #'        current widget class is supported.
+    required_version = c(8,0,0)
+   )
+)
+
+#' @describeIn StringWidget The constructor for HTMLMath styles
+#' @param ... Arguments passed to the inializer
+#' @export
+HTMLMathStyle <- function(...) HTMLMathStyleClass$new(...)
+
+
+
+
+#' @rdname StringWidget
+#' @export
 StringWidgetClass <- R6Class_("StringWidget",
    inherit = ValueWidgetClass,
    public = list(
@@ -35,7 +143,9 @@ HTMLClass <- R6Class_("HTML",
        #' @field _model_name Name of the Javascript model in the frontend
        `_model_name` = structure(Unicode("HTMLModel"),sync=TRUE),
        #' @field _view_name Name of the Javascript view in the frontend
-       `_view_name` = structure(Unicode("HTMLView"),sync=TRUE)
+       `_view_name` = structure(Unicode("HTMLView"),sync=TRUE),
+       #' @field style The HTML style, an object of class "HTMLStyleClass"
+       style = structure(R6Instance(HTMLStyleClass),sync=TRUE)
    )
 )
 
@@ -53,7 +163,9 @@ HTMLMathClass <- R6Class_("HTMLMath",
        #' @field _model_name Name of the Javascript model in the frontend
        `_model_name` = structure(Unicode("HTMLMathModel"),sync=TRUE),
        #' @field _view_name Name of the Javascript view in the frontend
-       `_view_name` = structure(Unicode("HTMLMathView"),sync=TRUE)
+       `_view_name` = structure(Unicode("HTMLMathView"),sync=TRUE),
+       #' @field style The HTMLMath style, an object of class "HTMLMathStyleClass"
+       style = structure(R6Instance(HTMLMathStyleClass),sync=TRUE)
    )
 )
 
@@ -72,7 +184,9 @@ LabelClass <- R6Class_("Label",
        #' @field _model_name Name of the Javascript model in the frontend
        `_model_name` = structure(Unicode("LabelModel"),sync=TRUE),
        #' @field _view_name Name of the Javascript view in the frontend
-       `_view_name` = structure(Unicode("LabelView"),sync=TRUE)
+       `_view_name` = structure(Unicode("LabelView"),sync=TRUE),
+       #' @field style The Label style, an object of class "LabelStyleClass"
+       style = structure(R6Instance(LabelStyleClass),sync=TRUE)
    )
 )
 
@@ -97,7 +211,9 @@ TextareaClass <- R6Class_("Textarea",
        #' @field continuous_update A logical value, whether values should be updated as the slider is moved by the user
        continuous_update = structure(Boolean(FALSE),sync=TRUE),
        #' @field rows An integer, the number of rows
-       rows = structure(Integer(),sync=TRUE)
+       rows = structure(Integer(),sync=TRUE),
+       #' @field style The Text style, an object of class "TextStyleClass"
+       style = structure(R6Instance(TextStyleClass),sync=TRUE)
    )
 )
 
@@ -127,7 +243,9 @@ TextWidgetClass <- R6Class_("TextWidget",
            self$value <- character(0)
            self$suspended <- FALSE
            self$send_state()
-    }
+       },
+       #' @field style The Text style, an object of class "TextStyleClass"
+       style = structure(R6Instance(TextStyleClass),sync=TRUE)
    )
 )
 
