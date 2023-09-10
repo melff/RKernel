@@ -39,7 +39,9 @@ IntSliderClass <- R6Class_("IntSlider",
        #' @field disabled A logical value, whether the slider is disabled
        disabled = structure(Boolean(FALSE),sync=TRUE),
        #' @field style A SliderStyle widget
-       style = structure(R6Instance(SliderStyleClass),sync=TRUE)
+       style = structure(R6Instance(SliderStyleClass),sync=TRUE),
+       #' @field behavior A string that describes the ddragging behavior.
+       behavior = structure(StrEnum(c("drag-tap","drag-snap","tap","drag","snap")))
    ))
 
 #' @describeIn Slider An integer slider constructor
@@ -78,7 +80,9 @@ IntRangeSliderClass <- R6Class_("IntRangeSlider",
        #' @field disabled A logical value, whether the slider is disabled
        disabled = structure(Boolean(FALSE),sync=TRUE),
        #' @field style A SliderStyle widget
-       style = structure(R6Instance(SliderStyleClass),sync=TRUE)
+       style = structure(R6Instance(SliderStyleClass),sync=TRUE),
+       #' @field behavior A string that describes the ddragging behavior.
+       behavior = structure(StrEnum(c("drag-tap","drag-snap","tap","drag","snap")))
    ))
 
 #' @describeIn Slider An integer range slider constructor
@@ -118,8 +122,10 @@ FloatSliderClass <- R6Class_("FloatSlider",
     #' @field disabled A logical value, whether the slider is disabled
     disabled = structure(Boolean(FALSE),sync=TRUE),
     #' @field style A SliderStyle widget
-    style = structure(R6Instance(SliderStyleClass),sync=TRUE)
-   ))
+    style = structure(R6Instance(SliderStyleClass),sync=TRUE),
+    #' @field behavior A string that describes the ddragging behavior.
+    behavior = structure(StrEnum(c("drag-tap","drag-snap","tap","drag","snap")))
+))
 
 #' @describeIn Slider A floating point slider constructor
 #' @param value A floating point number, the current value of the slider
@@ -155,7 +161,9 @@ FloatRangeSliderClass <- R6Class_("FloatRangeSlider",
        #' @field disabled A logical value, whether the slider is disabled
        disabled = structure(Boolean(FALSE),sync=TRUE),
        #' @field style A SliderStyle widget
-       style = structure(R6Instance(SliderStyleClass),sync=TRUE)
+       style = structure(R6Instance(SliderStyleClass),sync=TRUE),
+       #' @field behavior A string that describes the ddragging behavior.
+       behavior = structure(StrEnum(c("drag-tap","drag-snap","tap","drag","snap")))
    ))
 
 #' @describeIn Slider A floating point slider range constructor
@@ -195,7 +203,9 @@ FloatLogSliderClass <- R6Class_("FloatLogSlider",
     #' @field base A \code{\link{Float}} traitlet, the base of the logarithm
     base = structure(Float(10.0),sync=TRUE),
     #' @field style A SliderStyle widget
-    style = structure(R6Instance(SliderStyleClass),sync=TRUE)
+    style = structure(R6Instance(SliderStyleClass),sync=TRUE),
+    #' @field behavior A string that describes the ddragging behavior.
+    behavior = structure(StrEnum(c("drag-tap","drag-snap","tap","drag","snap")))
    ))
 
 #' @describeIn Slider A floating point log-slider constructor
