@@ -82,12 +82,12 @@ to_json.List <- function(x,auto_unbox=TRUE,...){
 
 #' Dictionary Traitlets
 #'
-#' @description A class and a constructor function to dictionary trait(let)s.
+#' @description A class and a constructor of dictionary trait(let)s.
 #'    These are lists with unique element names.
 #'
 #' @include traitlets.R
 #' @name Dict
-
+NULL
 
 #' @rdname Dict
 #' @export
