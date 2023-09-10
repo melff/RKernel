@@ -62,6 +62,38 @@ Checkbox <- function(...) CheckboxClass$new(...)
 #' @name Togglebuttons
 NULL
 
+#' @rdname Togglebuttons
+#' @export
+ToggleButtonStyleClass <- R6Class_("ToggleButtonStyle",
+   inherit = DescriptionStyleClass,
+   public = list(
+    #' @field _model_name Name of the Javascript model in the frontend
+    `_model_name` = structure(Unicode("ToggleButtonStyleModel"),sync=TRUE),
+    #' @field font_family The font family
+    font_family = structure(Unicode(""),sync=TRUE),
+    #' @field font_size The font size
+    font_size = structure(Unicode(""),sync=TRUE),
+    #' @field font_style The font style
+    font_style = structure(Unicode(""),sync=TRUE),
+    #' @field font_variant The font variant
+    font_variant = structure(Unicode(""),sync=TRUE),
+    #' @field font_weight The font weight
+    font_weight = structure(Unicode(""),sync=TRUE),
+    #' @field text_color The text color
+    text_color = structure(Unicode(""),sync=TRUE),
+    #' @field text_decoration The text decoration
+    text_decoration = structure(Unicode(""),sync=TRUE),
+    #' @field required_version Minimum required ipywidgets version in which the
+    #'        current widget class is supported.
+    required_version = c(8,0,0)
+   )
+)
+
+#' @describeIn Togglebuttons The constructor for Togglebuttons styles
+#' @param ... Arguments passed to the inializer
+#' @export
+ToggleButtonStyle <- function(...) ToggleButtonStyleClass$new(...)
+
 
 #' @rdname Togglebuttons
 #' @export
@@ -85,7 +117,9 @@ ToggleButtonClass <- R6Class_("ToggleButton",
     #' @field button_style The string that describes the button style
     button_style = structure(StrEnum(
         c("primary","success","info","warning","danger",""),
-        default=""))
+        default="")),
+    #' @field style The toggle button style, an object of class "ToggleButtonStyleClass"
+    style = structure(R6Instance(ToggleButtonStyleClass),sync=TRUE)
    )
 )
 
