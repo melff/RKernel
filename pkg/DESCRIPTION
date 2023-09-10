@@ -1,7 +1,7 @@
 Package: RKernel
 Title: Yet another R kernel for Jupyter
-Version: 0.4
-Date: 2022-11-10
+Version: 0.5
+Date: 2023-09-10
 Authors@R: c(
     person('Martin', 'Elff', 
            email = 'martin@elff.eu',
