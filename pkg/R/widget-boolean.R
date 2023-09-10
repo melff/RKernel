@@ -6,6 +6,26 @@
 #' @name Checkboxes
 NULL
 
+#' @rdname Checkboxes
+#' @export
+CheckboxStyleClass <- R6Class_("CheckboxStyle",
+   inherit = DescriptionStyleClass,
+   public = list(
+    #' @field _model_name Name of the Javascript model in the frontend
+    `_model_name` = structure(Unicode("CheckboxStyleModel"),sync=TRUE),
+    #' @field background The background color
+    background = structure(Unicode(""),sync=TRUE),
+    #' @field required_version Minimum required ipywidgets version in which the
+    #'        current widget class is supported.
+    required_version = c(8,0,0)
+   )
+)
+
+#' @describeIn Checkboxes The constructor for checkbox widgets
+#' @param ... Arguments passed to the inializer
+#' @export
+CheckboxStyle <- function(...) CheckboxStyleClass$new(...)
+
 #' @rdname Checkboxes 
 #' @export
 CheckboxClass <- R6Class_("Checkbox",
@@ -22,14 +42,17 @@ CheckboxClass <- R6Class_("Checkbox",
     #' @field indent Boolean, whether to indent the checkbox
     indent = structure(Boolean(TRUE),sync=TRUE),
     #' @field value Boolean, whether the box is checked
-    value = structure(Boolean(FALSE),sync=TRUE)
+    value = structure(Boolean(FALSE),sync=TRUE),
+    #' @field style The checkbox style, an object of class "CheckboxStyleClass"
+    style = structure(R6Instance(CheckboxStyleClass),sync=TRUE)
    )
 )
 
-#' @describeIn Checkboxes A checkbox constructor
+#' @describeIn Checkboxes The constructor for checkbox styles
 #' @param ... Arguments passed to the inializer
 #' @export
 Checkbox <- function(...) CheckboxClass$new(...)
+
 
 #' Tobble-Button Widgets
 #'
