@@ -21,7 +21,7 @@ Date_to_json <- function(dateObj) {
     year <- as.integer(format(value,"%Y"))
     month <- as.integer(format(value,"%m"))
     day <- as.integer(format(value,"%d"))
-    value <- list(year=year,month=month-1,date=day)
+    value <- list(year=year,month=month-1L,date=day)
     value
 }
 
@@ -40,9 +40,9 @@ DatePickerClass <- R6Class_("DatePicker",
        #' @field disabled Boolean, whether the user can make changes 
        disabled = structure(Boolean(FALSE),sync=TRUE),
        #' @field min Minimum selectable date
-       min = structure(Date(),sync=TRUE),
+       min = structure(Date(),sync=TRUE,from_json=Date_from_json,to_json=Date_to_json),
        #' @field max Maximum selectable date
-       max = structure(Date(),sync=TRUE),
+       max = structure(Date(),sync=TRUE,from_json=Date_from_json,to_json=Date_to_json),
        #' @field step Date step used for the picker in days
        step = structure(Integer(1),sync=TRUE),
        #' @description Check wether "value" is within range.

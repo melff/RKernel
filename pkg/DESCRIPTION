@@ -73,6 +73,7 @@ Collate:
     'widget-button.R'
     'widget-color.R'
     'widget-date.R'
+    'widget-datetime.R'
     'widget-env-browser.R'
     'widget-float.R'
     'widget-integer.R'

@@ -1,7 +1,6 @@
 #' Date Traitlets
 #'
 #' @description A class and constructor of date traitlets.
-#'   These are Dict traitlets with year, month, and day components.
 #'
 #' @include traitlets-vector.R
 #' @name DateClass
@@ -30,7 +29,7 @@ DateClass <- R6Class_("DateClass",
             value
         },
         #' @description Initialize the traitlet.
-        #' @param initial An optional Date object or date tring
+        #' @param initial An optional Date object or date string
         #' @param year An optional integer
         #' @param month An optional integer
         #' @param day An optional integer
@@ -56,14 +55,6 @@ DateClass <- R6Class_("DateClass",
     )
 )
 
-leapyear <- function(x){
-    res <- FALSE
-    if(x %% 4 == 0) res <- TRUE
-    if(x %% 100 == 0) res <- FALSE
-    if(x %% 400 == 0) res <- TRUE
-}
-
-
 #' @rdname DateClass
 #' @param ... Arguments that are passed to the initialize method of 'DictClass'
 #' @export
@@ -76,4 +67,53 @@ Date <- function(...)TraitInstance(...,Class=DateClass)
 as.Date.DateClass <- function(x,...) {
     x$value
 }
+
+
+#' Datetime Traitlets
+#'
+#' @description A class and constructor of datetime traitlets.
+#'
+#' @include traitlets-vector.R
+#' @name DatetimeClass
+NULL
+
+#' @rdname DatetimeClass
+#' @export
+DatetimeClass <- R6Class_("DatetimeClass",
+                      inherit = TraitClass,
+                      public = list(
+                          #' @field value A date.
+                          value = as.POSIXct(numeric(0)),
+                          #' @field coerce Logical value, whether assignments to the value field should
+                          #'    be coerced to the appropriate type.
+                          coerce = TRUE,
+                          #' @description Check the value assigned to the traitlet.
+                          #' @param value The value assigned to the traitlet.
+                          validator=function(value){
+                              if(self$coerce){
+                                  value <- as.POSIXct(value)
+                              }
+                              else {    
+                                  if(!inherits(value,"POSIXct") || length(value) != 1)
+                                      stop("DatetimeClass: single date value required")
+                              }
+                              value
+                          },
+                          #' @description Initialize the traitlet.
+                          #' @param initial An optional POSIXct object or an object coercive into such an object
+                          #' @param coerce An optional logical value
+                          initialize=function(initial=as.POSIXct(integer(0)),
+                                              coerce=TRUE){
+                              self$coerce <- coerce
+                              initial <- as.POSIXct(initial)
+                              super$initialize(initial)
+                          }
+                      )
+                      )
+
+#' @rdname DatetimeClass
+#' @param ... Arguments that are passed to the initialize method of 'DictClass'
+#' @export
+Datetime <- function(...)TraitInstance(...,Class=DatetimeClass)
+
 
