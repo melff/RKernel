@@ -95,7 +95,7 @@ DatetimeClass <- R6Class_("DatetimeClass",
                               }
                               else {    
                                   if(!inherits(value,"POSIXct") || length(value) != 1)
-                                      stop("DatetimeClass: single date value required")
+                                      stop("DatetimeClass: single datetime value required")
                               }
                               value
                           },
@@ -112,7 +112,7 @@ DatetimeClass <- R6Class_("DatetimeClass",
                       )
 
 #' @rdname DatetimeClass
-#' @param ... Arguments that are passed to the initialize method of 'DictClass'
+#' @param ... Arguments that are passed to the initialize method of 'DatetimeClass'
 #' @export
 Datetime <- function(...)TraitInstance(...,Class=DatetimeClass)
 

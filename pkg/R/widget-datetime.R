@@ -1,5 +1,5 @@
 #' Datetime Picker Widgets
-#' @description An R6 class and constructor function for date picker widgets
+#' @description An R6 class and constructor function for datetime picker widgets
 #' @include widget-value.R
 #' @name DatetimePicker
 NULL
@@ -209,3 +209,5 @@ NaiveDatetimePickerClass <- R6Class_("NaiveDatetimePicker",
 #' @param ... Arguments passed to the inializer
 #' @export
 NaiveDatetimePicker <- function(...) NaiveDatetimePickerClass$new(...)
+
+
