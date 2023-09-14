@@ -107,3 +107,9 @@ get_jupyter_ipywidgets_version <- function(){
         v <- jupyter_widgets_version$ipywidgets
     return(v)
 }
+
+has_iw_ver <- function(test){
+    v <- get_jupyter_ipywidgets_version()
+    ii <- seq_along(test)
+    all(test==v[ii])
+}

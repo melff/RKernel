@@ -22,10 +22,16 @@ PlayClass <- R6Class_("Play",
        step = structure(Integer(1L),sync=TRUE),
        #' @field _playing A Boolean traitlet, indicates wether the player widget
        #'    is running.
-       `_playing` = structure(Boolean(FALSE),sync=TRUE),
+       `_playing` = structure(Boolean(FALSE),sync=!has_iw_ver(8)),
+       #' @field playing A Boolean traitlet, indicates wether the player widget
+       #'    is running.
+       playing = structure(Boolean(FALSE),sync=has_iw_ver(8)),
        #' @field _repeat A Boolean traitlet, indicates wether the the repeat toggle
        #'    is on.
-       `_repeat` = structure(Boolean(FALSE),sync=TRUE),
+       `_repeat` = structure(Boolean(FALSE),sync=!has_iw_ver(8)),
+       #' @field repeat A Boolean traitlet, indicates wether the the repeat toggle
+       #'    is on.
+       'repeat' = structure(Boolean(FALSE),sync=has_iw_ver(8)),
        #' @field show_repeat A Boolean traitlet, determines whether
        #'    to show a repeat toggle button.
        show_repeat = structure(Boolean(TRUE),sync=TRUE)
