@@ -116,4 +116,50 @@ DatetimeClass <- R6Class_("DatetimeClass",
 #' @export
 Datetime <- function(...)TraitInstance(...,Class=DatetimeClass)
 
+#' Time Traitlets
+#'
+#' @description A class and constructor of time traitlets.
+#'
+#' @include traitlets-vector.R
+#' @name TimeClass
+NULL
+
+#' @rdname TimeClass
+#' @export
+TimeClass <- R6Class_("TimeClass",
+                      inherit = TraitClass,
+                      public = list(
+                          #' @field value A date.
+                          value = as.POSIXct(numeric(0)),
+                          #' @field coerce Logical value, whether assignments to the value field should
+                          #'    be coerced to the appropriate type.
+                          coerce = TRUE,
+                          #' @description Check the value assigned to the traitlet.
+                          #' @param value The value assigned to the traitlet.
+                          validator=function(value){
+                              if(self$coerce){
+                                  value <- as.POSIXct(value)
+                              }
+                              else {    
+                                  if(!inherits(value,"POSIXct") || length(value) != 1)
+                                      stop("TimeClass: single time value required")
+                              }
+                              value
+                          },
+                          #' @description Initialize the traitlet.
+                          #' @param initial An optional POSIXct object or an object coercive into such an object
+                          #' @param coerce An optional logical value
+                          initialize=function(initial=as.POSIXct(integer(0)),
+                                              coerce=TRUE){
+                              self$coerce <- coerce
+                              initial <- as.POSIXct(initial)
+                              super$initialize(initial)
+                          }
+                      )
+                      )
+
+#' @rdname DatetimeClass
+#' @param ... Arguments that are passed to the initialize method of 'TimeClass'
+#' @export
+Time <- function(...)TraitInstance(...,Class=TimeClass)
 
