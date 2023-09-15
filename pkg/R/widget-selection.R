@@ -191,7 +191,7 @@ ListboxSelectClass <- R6Class_("ListboxSelect",
 #' @param value A trait.
 #' @param ... Any other arguments, ignored.
 #' @export
-ListboxSelect <- function(options,value,...) ListboxSelectClass$new(options=options,value=value,...)
+ListBox <- function(options,value,...) ListboxSelectClass$new(options=options,value=value,...)
 
 
 #' @rdname SelectionWidget
@@ -387,4 +387,5 @@ ListboxSelectMultipleClass <- R6Class_("ListboxSelectMultiple",
 #' @param value A trait.
 #' @param ... Any other arguments, ignored.
 #' @export
-ListboxSelectMultiple <- function(options,value,...) ListboxSelectMultipleClass$new(options=options,value=value,...)
+ListBoxMultiple <- function(options,value,...) ListboxSelectMultipleClass$new(options=options,value=value,...)
+
