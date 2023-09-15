@@ -37,14 +37,18 @@ LayoutClass <- R6Class_("Layout",
     align_self = structure(StrEnum(c("auto","flex-start","flex-end","center","baseline","stretch"),
                                    optional=TRUE),
                            sync=TRUE),
-    # border_top = structure(Unicode(character(0)),sync=TRUE),
-    # border_right = structure(Unicode(character(0)),sync=TRUE),
-    # border_bottom = structure(Unicode(character(0)),sync=TRUE),
-    # border_left = structure(Unicode(character(0)),sync=TRUE),
     #' @field bottom Position from bottom, an optional string that should, if non-empty, contain a valid CSS dimension
     bottom = structure(Unicode(character(0)),sync=TRUE),
     #' @field border An optional string with a valid CSS border specification
-    border = structure(Unicode(character(0)),sync=TRUE),
+    border = structure(Unicode(character(0)),sync=!has_iw_ver(8)),
+    #' @field border_top An optional string with a valid CSS border specification
+    border_top = structure(Unicode(character(0)),sync=has_iw_ver(8)),
+    #' @field border_right An optional string with a valid CSS border specification
+    border_right = structure(Unicode(character(0)),sync=has_iw_ver(8)),
+    #' @field border_bottom An optional string with a valid CSS border specification
+    border_bottom = structure(Unicode(character(0)),sync=has_iw_ver(8)),
+    #' @field border_left An optional string with a valid CSS border specification
+    border_left = structure(Unicode(character(0)),sync=has_iw_ver(8)),
     #' @field display An optional string with a valid CSS display property
     display = structure(Unicode(character(0)),sync=TRUE),
     #' @field flex An optional string with a valid CSS flex property
@@ -126,26 +130,32 @@ LayoutClass <- R6Class_("Layout",
     grid_column = structure(Unicode(character(0)),sync=TRUE),
     #' @field grid_area An optional string, if non-empty should be valid CSS code for the
     #'       grid-area property
-    grid_area = structure(Unicode(character(0)),sync=TRUE)
-   )#, For later ipywidgets version
-   # active=list(
-   #   border = function(value){
-   #     if(missing(value)){
-   #       found <- NULL
-   #       for(side in c("top","right","bottom","left")){
-   #         old <- found
-   #         border_side <- self[[paste0("border_",side)]]
-   #         found <- as.character(border_side)
-   #         if(!length(found)) return(NULL)
-   #         if(length(old) && found != old) return(NULL)
-   #       }
-   #       return(found)
-   #     }
-   #     for(side in c("top","right","bottom","left")){
-   #       self[[paste0("border_",side)]] <- value
-   #     }
-   #   }
-   # )
+    grid_area = structure(Unicode(character(0)),sync=TRUE),
+    #' @description Synchronize border traits
+    #' @param nm Name of the trait (a dummy argument)
+    #' @param self The object
+    #' @param value A CSS string
+    observe_border = function(nm,self,value){
+      nms <- names(value)
+      if("top" %in% nms) self$border_top <- value["top"]
+      else if("bottom" %in% nms) self$border_bottom <- value["bottom"]
+      else if("left" %in% nms) self$border_left <- value["left"]
+      else if("right" %in% nms) self$border_right <- value["right"]
+      else {
+        self$traits$border_top$set(value)
+        self$traits$border_bottom$set(value)
+        self$traits$border_left$set(value)
+        self$traits$border_right$set(value)
+      }
+      self$send_state()
+    },
+    #' @description Initialize an object
+    #' @param ... Arguments passed to the superclass initializer
+    initialize = function(...){
+      super$initialize(...)
+      if(has_iw_ver(8)) self$observe("border",self$observe_border)
+    }
+   )
 )
 
 #' @describeIn Layout The Layout constructor function
