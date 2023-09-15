@@ -73,3 +73,20 @@ TabClass <- R6Class_("Tab",
 #' @param ... Arguments passed to the superclass constructor
 #' @export
 Tab <- function(...) ContainerClass_new(Class=TabClass,...)
+
+#' @rdname SelectionContainer 
+#' @export
+StackClass <- R6Class_("Stack",
+    inherit = SelectionContainerClass,
+    public=list(
+        #' @field _model_name Name of the Javascript model in the frontend.
+        `_model_name` = structure(Unicode("StackModel"),sync=TRUE),
+        #' @field _view_name Name of the Javascript view in the frontend.
+        `_view_name` = structure(Unicode("StackView"),sync=TRUE)
+    )
+)
+
+#' @describeIn SelectionContainer The construction function for accordion widgets.
+#' @param ... Arguments passed to the superclass constructor
+#' @export
+Stack <- function(...) ContainerClass_new(Class=StackClass,...)
