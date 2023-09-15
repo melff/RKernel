@@ -14,7 +14,7 @@ SelectionContainerClass <- R6Class_("Box",
        #' @field _titles A dictionary of strings, for internal use only
        `_titles`=structure(Dict(),sync=!has_iw_ver(8)),
        #' @field titles A dictionary of strings, exposed since ipywidgets 8.
-       titles=structure(Vector(),sync=has_iw_ver(8)),
+       titles=structure(Vector(class="character"),sync=has_iw_ver(8)),
        #' @field selected_index An integer, the field currently selected.
        selected_index = structure(Integer(0L),sync=TRUE),
        #' @description Validate the index, i.e. check whether it is within range.
@@ -116,7 +116,7 @@ TabClass <- R6Class_("Tab",
 #' @describeIn SelectionContainer The construction function for accordion widgets.
 #' @param ... Arguments passed to the superclass constructor
 #' @export
-Tab <- function(...) ContainerClass_new(Class=TabClass,...)
+Tab <- function(children,...) ContainerClass_new(Class=TabClass,children=children,...)
 
 #' @rdname SelectionContainer 
 #' @export
