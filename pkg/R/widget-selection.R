@@ -240,6 +240,37 @@ ToggleButtonsClass <- R6Class_("ToggleButtons",
 #' @export
 ToggleButtons <- function(options,value,...) ToggleButtonsClass$new(options=options,value=value,...)
 
+#' @rdname SelectionWidget
+#' @include widget-slider.R
+#' @export
+SelectionSliderClass <- R6Class_("SelectionSlider",
+  inherit = SelectionWidgetClass,
+  public = list(
+      #' @field _model_name Name of the Javascript model in the frontend.
+      `_model_name` = structure(Unicode("SelectionSliderModel"),sync=TRUE),
+      #' @field _view_name Name of the Javascript view in the frontend.
+      `_view_name` = structure(Unicode("SelectionSliderView"),sync=TRUE),
+       #' @field orientation A Unicode string, either "horizontal" or "vertical"
+       orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
+       #' @field readout A logical value, whether the value should be showns (read out)
+       readout = structure(Boolean(TRUE),sync=TRUE),
+       #' @field continuous_update A logical value, whether values should be updated as the slider is moved by the user
+       continuous_update = structure(Boolean(TRUE),sync=TRUE),
+       #' @field style A SliderStyle widget
+       style = structure(R6Instance(SliderStyleClass),sync=TRUE),
+       #' @field behavior A string that describes the ddragging behavior.
+       behavior = structure(StrEnum(c("drag-tap","drag-snap","tap","drag","snap")),sync=has_iw_ver(8))
+  )
+)
+
+#' @describeIn SelectionWidget The construction function for listbox widgets with multiple selections.
+#' 
+#' @param options A named vector or a vector coerceable into a character vector.
+#' @param value A trait.
+#' @param ... Any other arguments, ignored.
+#' @export
+SelectionSlider <- function(options,value,...) SelectionSliderClass$new(options=options,value=value,...)
+
 
 
 #' @rdname SelectionWidget
@@ -389,3 +420,34 @@ ListboxSelectMultipleClass <- R6Class_("ListboxSelectMultiple",
 #' @export
 ListBoxMultiple <- function(options,value,...) ListboxSelectMultipleClass$new(options=options,value=value,...)
 
+#' @rdname SelectionWidget
+#' @include widget-slider.R
+#' @export
+SelectionRangeSliderClass <- R6Class_("SelectionRangeSlider",
+  inherit = MultipleSelectionWidgetClass,
+  public = list(
+      #' @field _model_name Name of the Javascript model in the frontend.
+      `_model_name` = structure(Unicode("SelectionRangeSliderModel"),sync=TRUE),
+      #' @field _view_name Name of the Javascript view in the frontend.
+      `_view_name` = structure(Unicode("SelectionRangeSliderView"),sync=TRUE),
+      #' @field value Minimum and maximum selected values
+      #' @field orientation A Unicode string, either "horizontal" or "vertical"
+      orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
+      #' @field readout A logical value, whether the value should be showns (read out)
+      readout = structure(Boolean(TRUE),sync=TRUE),
+      #' @field continuous_update A logical value, whether values should be updated as the slider is moved by the user
+      continuous_update = structure(Boolean(TRUE),sync=TRUE),
+      #' @field style A SliderStyle widget
+      style = structure(R6Instance(SliderStyleClass),sync=TRUE),
+      #' @field behavior A string that describes the ddragging behavior.
+      behavior = structure(StrEnum(c("drag-tap","drag-snap","tap","drag","snap")),sync=has_iw_ver(8))
+  )
+)
+
+#' @describeIn SelectionWidget The construction function for listbox widgets with multiple selections.
+#' 
+#' @param options A named vector or a vector coerceable into a character vector.
+#' @param value A trait.
+#' @param ... Any other arguments, ignored.
+#' @export
+SelectionRangeSlider <- function(options,value,...) SelectionRangeSliderClass$new(options=options,value=value,...)
