@@ -126,7 +126,10 @@ StackClass <- R6Class_("Stack",
         #' @field _model_name Name of the Javascript model in the frontend.
         `_model_name` = structure(Unicode("StackModel"),sync=TRUE),
         #' @field _view_name Name of the Javascript view in the frontend.
-        `_view_name` = structure(Unicode("StackView"),sync=TRUE)
+        `_view_name` = structure(Unicode("StackView"),sync=TRUE),
+        #' @field required_version Minimum required ipywidgets version in which the
+        #'        current widget class is supported.
+        required_version = list(from=c(8,0,0))
     )
 )
 
