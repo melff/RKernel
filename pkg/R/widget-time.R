@@ -1,7 +1,7 @@
-#' Datetime Picker Widgets
-#' @description An R6 class and constructor function for date picker widgets
+#' Time Picker Widgets
+#' @description An R6 class and constructor function for time picker widgets
 #' @include widget-value.R
-#' @name DatetimePicker
+#' @name TimePicker
 NULL
 
 
