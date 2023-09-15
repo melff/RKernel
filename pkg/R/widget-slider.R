@@ -41,7 +41,7 @@ IntSliderClass <- R6Class_("IntSlider",
        #' @field style A SliderStyle widget
        style = structure(R6Instance(SliderStyleClass),sync=TRUE),
        #' @field behavior A string that describes the ddragging behavior.
-       behavior = structure(StrEnum(c("drag-tap","drag-snap","tap","drag","snap")))
+       behavior = structure(StrEnum(c("drag-tap","drag-snap","tap","drag","snap")),sync=has_iw_ver(8))
    ))
 
 #' @describeIn Slider An integer slider constructor
@@ -82,7 +82,7 @@ IntRangeSliderClass <- R6Class_("IntRangeSlider",
        #' @field style A SliderStyle widget
        style = structure(R6Instance(SliderStyleClass),sync=TRUE),
        #' @field behavior A string that describes the ddragging behavior.
-       behavior = structure(StrEnum(c("drag-tap","drag-snap","tap","drag","snap")))
+       behavior = structure(StrEnum(c("drag-tap","drag-snap","tap","drag","snap")),sync=has_iw_ver(8))
    ))
 
 #' @describeIn Slider An integer range slider constructor
