@@ -20,7 +20,8 @@ VectorClass <- R6Class_("Vector",
         #' @param value A value to be assigned as the traitlet value
         validator=function(value){
             if(!is.list(value)) stop("value must be a list")
-            self$class <- class(value[[1]])
+            if(!length(self$class))
+                self$class <- class(value[[1]])
             if(length(value)>1){
                 n <- length(value)
                 for(i in 2:n){
@@ -29,6 +30,13 @@ VectorClass <- R6Class_("Vector",
                 }
             }
             value
+        },
+        #' @param class String, optional common class
+        #' @param ... Arguments passed to the superclass initializer
+        initialize = function(class=NULL,...){
+            super$initialize(...)
+            if(!missing(class))
+                self$class <- class
         }
 ))
 
