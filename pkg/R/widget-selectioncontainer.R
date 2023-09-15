@@ -12,7 +12,9 @@ SelectionContainerClass <- R6Class_("Box",
    inherit = BoxClass,
    public = list(
        #' @field _titles A dictionary of strings, for internal use only
-       `_titles`=structure(Dict(),sync=TRUE),
+       `_titles`=structure(Dict(),sync=!has_iw_ver(8)),
+       #' @field titles A dictionary of strings, exposed since ipywidgets 8.
+       titles=structure(Vector(),sync=has_iw_ver(8)),
        #' @field selected_index An integer, the field currently selected.
        selected_index = structure(Integer(0L),sync=TRUE),
        #' @description Validate the index, i.e. check whether it is within range.
@@ -27,15 +29,57 @@ SelectionContainerClass <- R6Class_("Box",
        #' @param index The index number of the element to be changed.
        #' @param title A character string, the intended title.
        set_title = function(index,title){
-           index <- sprintf("%d",as.integer(index))
-           self[["_titles"]][[index]] <- title
-           self$send_state("_titles")
+           if(has_iw_ver(8)){
+               index <- as.integer(index) + 1L
+               titles <- self$titles
+               if(!length(titles)) titles <- character(0)
+               self$titles[[index]] <- titles
+               self$send_state("titles")
+           }
+           else {
+               self$validate_index(index)
+               index <- sprintf("%d",as.integer(index))
+               self[["_titles"]][[index]] <- title
+               self$send_state("_titles")
+           }
        },
        #' @description Get the title of one of the elements.
        #' @param index The index number of the element to be enquired.
        get_title = function(index){
-           index <- sprintf("%d",as.integer(index))
-           self[["_titles"]][[index]]
+           if(has_iw_ver(8)){
+               index <- as.integer(index) + 1L
+               self[["titles"]][[index]]
+           }
+           else {
+               self$validate_index(index)
+               index <- sprintf("%d",as.integer(index))
+               self[["_titles"]][[index]]
+           }
+       },
+       #' @description An initializer function
+       #' @param children A list of widgets
+       #' @param ... Other arguments, passed to the superclass method
+       initialize = function(children=list(),...){
+           super$initialize(children=unname(children),...)
+           nms <- names(children)
+           if(length(nms)){
+               log_out("SelectionContainerClass$initialize")
+               log_out(nms,use.print=TRUE)
+               if(has_iw_ver(8)){
+                   self$traits[["titles"]] <- nms
+                   self$send_state("titles")
+               }
+               else {
+                   titles <- list()
+                   for(i in seq_along(nms)){
+                       index <- sprintf("%d",as.integer(i - 1))
+                       log_out(index)
+                       titles[[index]] <- nms[i]
+                   }
+                   self$traits[["_titles"]]$set(titles)
+                   self$send_state("_titles")
+               }
+           }
        }
    )
 )
