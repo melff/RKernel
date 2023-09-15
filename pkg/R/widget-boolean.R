@@ -17,7 +17,7 @@ CheckboxStyleClass <- R6Class_("CheckboxStyle",
     background = structure(Unicode(""),sync=TRUE),
     #' @field required_version Minimum required ipywidgets version in which the
     #'        current widget class is supported.
-    required_version = c(8,0,0)
+    required_version = list(from=c(8,0,0))
    )
 )
 
@@ -85,7 +85,7 @@ ToggleButtonStyleClass <- R6Class_("ToggleButtonStyle",
     text_decoration = structure(Unicode(""),sync=TRUE),
     #' @field required_version Minimum required ipywidgets version in which the
     #'        current widget class is supported.
-    required_version = c(8,0,0)
+    required_version = list(from=c(8,0,0))
    )
 )
 

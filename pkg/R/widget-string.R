@@ -21,7 +21,7 @@ StringStyleClass <- R6Class_("StringStyle",
     text_color = structure(Unicode(""),sync=TRUE),
     #' @field required_version Minimum required ipywidgets version in which the
     #'        current widget class is supported.
-    required_version = c(8,0,0)
+    required_version = list(from=c(8,0,0))
    )
 )
 
@@ -44,7 +44,7 @@ LabelStyleClass <- R6Class_("LabelStyle",
     text_decoration = structure(Unicode(""),sync=TRUE),
     #' @field required_version Minimum required ipywidgets version in which the
     #'        current widget class is supported.
-    required_version = c(8,0,0)
+    required_version = list(from=c(8,0,0))
    )
 )
 
@@ -64,7 +64,7 @@ TextStyleClass <- R6Class_("TextStyle",
     `_model_name` = structure(Unicode("TextStyleModel"),sync=TRUE),
     #' @field required_version Minimum required ipywidgets version in which the
     #'        current widget class is supported.
-     required_version = c(8,0,0)
+     required_version = list(from=c(8,0,0))
    )
 )
 
@@ -83,7 +83,7 @@ HTMLStyleClass <- R6Class_("HTMLStyle",
     `_model_name` = structure(Unicode("HTMLStyleModel"),sync=TRUE),
     #' @field required_version Minimum required ipywidgets version in which the
     #'        current widget class is supported.
-     required_version = c(8,0,0)
+     required_version = list(from=c(8,0,0))
    )
 )
 
@@ -102,7 +102,7 @@ HTMLMathStyleClass <- R6Class_("HTMLMathStyle",
     `_model_name` = structure(Unicode("HTMLMathStyleModel"),sync=TRUE),
     #' @field required_version Minimum required ipywidgets version in which the
     #'        current widget class is supported.
-    required_version = c(8,0,0)
+    required_version = list(from=c(8,0,0))
    )
 )
 

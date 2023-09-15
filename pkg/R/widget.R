@@ -264,13 +264,18 @@ WidgetClass <- R6Class_("Widget",
     },
     #' @field required_version Minimum required ipywidgets version in which the
     #'        current widget class is supported.
-    required_version = c(7,0,0),
+    required_version = list(from=c(7,0,0)),
     #' @description Check whether current widget class is supported by ipywidgets
     check_version = function(){
+      req <- self$required_version
       v <- get_jupyter_ipywidgets_version()
       v <- v*c(100,10,1)
-      r <- self$required_version*c(100,10,1)
-      supported <- all(v >= r)
+      from_v <- req$from*c(100,10,1)
+      supported <- all(v >= from_v)
+      if(length(req$before)){
+        before_v <- req$before*c(100,10,1)
+        supported <- supported && all(before_v < v)
+      }
       if(!supported) warning("Widget not supported by this version of ipywidgets - expect the unexpected.")
     }
   ),
