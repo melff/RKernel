@@ -1,4 +1,4 @@
-#' An Unicode String Vector Trait
+#' A Unicode String Vector Trait
 #' 
 #' @include traitlets.R
 #' @export
