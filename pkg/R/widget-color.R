@@ -20,7 +20,7 @@ ColorPickerClass <- R6Class_("ColorPicker",
     #' @field disabled Boolean, whether the button is disabled
     disabled = structure(Boolean(FALSE),sync=TRUE),
     #' @field value Unicode string, the color value
-    value = structure(Unicode("black"),sync=TRUE)
+    value = structure(Color("black"),sync=TRUE)
    )
 )
 
