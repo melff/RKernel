@@ -51,6 +51,7 @@ color_hsla_re <- sprintf('^hsla\\(%s,%s,%s,%s\\)$',
 #' A Color String Trait
 #'
 #' @include traitlets-unicode.R
+#' @name ColorTrait
 #' @export
 ColorTraitClass <- R6Class_("Color",
     inherit=UnicodeClass,

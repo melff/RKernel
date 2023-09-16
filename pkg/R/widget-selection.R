@@ -316,7 +316,6 @@ SelectionRangeSliderClass <- R6Class_("SelectionRangeSlider",
       `_model_name` = structure(Unicode("SelectionRangeSliderModel"),sync=TRUE),
       #' @field _view_name Name of the Javascript view in the frontend.
       `_view_name` = structure(Unicode("SelectionRangeSliderView"),sync=TRUE),
-      #' @field value Minimum and maximum selected values
       #' @field orientation A Unicode string, either "horizontal" or "vertical"
       orientation = structure(StrEnum(c("horizontal","vertical"),default="horizontal"),sync=TRUE),
       #' @field readout A logical value, whether the value should be showns (read out)
