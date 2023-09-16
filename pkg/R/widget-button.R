@@ -67,7 +67,7 @@ ButtonClass <- R6Class_("Button",
     #' @field button_style The string that describes the button style
     button_style = structure(StrEnum(
         c("primary","success","info","warning","danger",""),
-        default="")),
+        default=""),sync=TRUE),
     #' @field tooltip An optional tooltip string
     tooltip = structure(Unicode(""),sync=TRUE),
     #' @field style The button style, an object of class "ButtonStyleClass"
