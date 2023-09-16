@@ -140,7 +140,7 @@ FloatClass <- R6Class_("Float",
         #'    be coerced to the appropriate type.
         #' @param optional Logical value, whether a length-zero value is allowed.
         #' @param length Integer number, the length the value should have.
-        initialize=function(initial,coerce=TRUE,
+        initialize=function(initial=numeric(0),coerce=TRUE,
                             optional=length(initial) == 0,
                             length=1L){
             self$optional <- optional
