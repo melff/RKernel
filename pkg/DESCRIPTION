@@ -91,5 +91,6 @@ Collate:
     'widget-string.R'
     'widget-taginput.R'
     'widget-time.R'
+    'widget-upload.R'
     'widget-virtual-table.R'
     'widget_link.R'
