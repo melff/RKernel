@@ -1,29 +1,49 @@
 #' Media widgets
 #' @description Classes and constructors to wrap media into widgets
-#' @include widget-dom.R
+#' @include widget-value.R
 #' @name MediaWidget
+NULL
 
 #' @rdname MediaWidget
 #' @export
 MediaWidgetClass <- R6Class_("MediaWidget",
-    inherit = DOMWidgetClass,
+    inherit = ValueWidgetClass,
     public = list(
-      #' @field _model_module Name of the Javascript model in the frontend.
-      `_model_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
-      #' @field _model_module_version Version of the Javascript model module in the frontend.
-      `_model_module_version` = structure(Unicode(jupyter_widgets_controls_version()),sync=TRUE),
-      #' @field _view_module Name of the Javascript view module in the frontend.
-      `_view_module` = structure(Unicode("@jupyter-widgets/controls"),sync=TRUE),
-      #' @field _view_module_version Version of the Javascript view module in the frontend.
-      `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version()),sync=TRUE),
+      #' @field format A string, giving the graphics fromat.
+      format = structure(Unicode("url"),sync=TRUE),
       #' @field value A \link{Bytes} traitlet.
       value = structure(Bytes(),sync=TRUE),
+      #' @description Create media widget from url
+      #' @param url A character string
+      #' @param width A character string with CSS width specification
+      #' @param height A character string with CSS height specification
+      from_url = function(url,width=NULL,height=NULL){
+          self$value <- charToRaw(url)
+          self$format <- "url"
+          if(!missing(width)) self$width <- width
+          if(!missing(height)) self$height <- height
+      },
+      #' @description Create media widget from file
+      #' @param filename A character string
+      from_file = function(filename){
+          data <- read_file(filename)
+          self$value <- data
+      },
       #' @description Add or remove a handler to be called if value 
       #'    is changed.
       #' @param handler A function that is called when the button is clicked.
       #' @param remove Logical value, whether the handler is to be removed.
       on_change = function(handler,remove=FALSE){
           self$observe("value",handler,remove)
+      },
+      #' @description Initialize an object
+      #' @param from_file An optional character string, name of the file from which to initialize the widget.
+      #' @param from_url An optional character string, URL from which to initialize the widget.
+      #' @param ... Other arguments, passed to the superclass initializer.
+      initialize = function(from_file=NULL,from_url=NULL,...){
+          super$initialize(...)
+          if(!missing(from_file)) self$from_file(filename=from_file)
+          else if(!missing(from_url)) self$from_url(url=from_url)
       }
     )
 )
@@ -42,17 +62,26 @@ ImageWidgetClass <- R6Class_("ImageWidget",
         #' @field width A string, describing the width in CSS language, e.g. "480px".
         width = structure(Unicode(""),sync=TRUE),
         #' @field height A string, describing the height in CSS language, e.g. "480px".
-        height = structure(Unicode(""),sync=TRUE)
+        height = structure(Unicode(""),sync=TRUE),
+        #' @description Create image widget from file
+        #' @param filename A character string
+        #' @param width A character string with CSS width specification
+        #' @param height A character string with CSS height specification
+        from_file = function(filename,width=NULL,height=NULL){
+            ext <- get_file_ext(filename)
+            fmt <- img_fmts[ext]
+            self$format <- fmt
+            data <- read_file(filename)
+            self$value <- data
+            if(!missing(width)) self$width <- width
+            if(!missing(height)) self$height <- height
+        }
     )
 )
 
 #' @describeIn MediaWidget The ImageWidget constructor function
-#' @param format A character string, the format of the image
-#' @param width The width of the image in pixels
-#' @param height The height of the image in pixels
 #' @export
-ImageWidget <- function(format="png",width,height)
-    ImageWidgetClass$new(format=format,width=width,height=height)
+ImageWidget <- function(...) ImageWidgetClass$new(...)
 
 
 #' @rdname MediaWidget 
@@ -71,24 +100,27 @@ VideoWidgetClass <- R6Class_("VideoWidget",
         #' @field height A string, describing the height in CSS language, e.g. "480px".
         height = structure(Unicode(""),sync=TRUE),
         #' @field autoplay Boolean, when TRUE the video starts when it is displayed.
-        autoplay = structure(Boolean(TRUE),sync=TRUE),
+        autoplay = structure(Boolean(FALSE),sync=TRUE),
         #' @field loop Boolean, when TRUE the video restarts after finishing.
-        loop = structure(Boolean(TRUE),sync=TRUE),
+        loop = structure(Boolean(FALSE),sync=TRUE),
         #' @field controls Boolean, when TRUE then video controls are shown.
-        controls = structure(Boolean(TRUE),sync=TRUE)
+        controls = structure(Boolean(TRUE),sync=TRUE),
+        #' @description Create image widget from file
+        #' @param filename A character string
+        #' @param width A character string with CSS width specification
+        #' @param height A character string with CSS height specification
+        from_file = function(filename,width=NULL,height=NULL){
+            data <- read_file(filename)
+            self$value <- data
+            if(!missing(width)) self$width <- width
+            if(!missing(height)) self$height <- height
+        }
     )
 )
 
 #' @describeIn MediaWidget The VideoWidget constructor function
-#' @param format A character string, the format of the image
-#' @param width The width of the image in pixels
-#' @param height The height of the image in pixels
-#' @param autoplay Logical, when TRUE the video starts when it is displayed.
-#' @param loop Logical, when TRUE the video restarts after finishing.
-#' @param controls Logical, when TRUE then video controls are shown.
 #' @export
-VideoWidget <- function(format="mp4",width,height,autoplay,loop,controls)
-    VideoWidgetClass$new(format=format,width=width,height=height,autoplay=autoplay,loop=loop,controls=controls)
+VideoWidget <- function(...) VideoWidgetClass$new(...)
 
 
 #' @rdname MediaWidget 
@@ -103,19 +135,35 @@ AudioWidgetClass <- R6Class_("AudioWidget",
         #' @field format A string, giving the audio fromat.
         format = structure(Unicode("mp3"),sync=TRUE),
         #' @field autoplay Boolean, when TRUE the video starts when it is displayed.
-        autoplay = structure(Boolean(TRUE),sync=TRUE),
+        autoplay = structure(Boolean(FALSE),sync=TRUE),
         #' @field loop Boolean, when TRUE the video restarts after finishing.
-        loop = structure(Boolean(TRUE),sync=TRUE),
+        loop = structure(Boolean(FALSE),sync=TRUE),
         #' @field controls Boolean, when TRUE then video controls are shown.
         controls = structure(Boolean(TRUE),sync=TRUE)
     )
 )
 
 #' @describeIn MediaWidget The AudioWidget constructor function
-#' @param format A character string, the format of the image
-#' @param autoplay Logical, when TRUE the video starts when it is displayed.
-#' @param loop Logical, when TRUE the video restarts after finishing.
-#' @param controls Logical, when TRUE then video controls are shown.
 #' @export
-AudioWidget <- function(format="mp3",autoplay,loop,controls)
-    AudioWidgetClass$new(format=format,autoplay=autoplay,loop=loop,controls=controls)
+AudioWidget <- function(...) AudioWidgetClass$new(...)
+
+
+
+get_file_ext <- function(fn){
+    bn <- basename(fn)
+    ext <- strsplit(bn,".",fixed=TRUE)[[1:2]]
+    ext
+}
+
+img_fmts <- c(
+    png = "png",
+    jpg = "jpeg",
+    jpeg = "jpeg"
+)
+
+read_file <- function(fn){
+    con <- file(fn,"rb")
+    data <- readBin(con,raw(),n=file.size(fn))
+    close(con)
+    data
+}
