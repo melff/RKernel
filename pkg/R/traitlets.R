@@ -191,7 +191,8 @@ HasTraits <- R6Class_("HasTraits",
       observers = list(),
       #' @description Install or remove an observer function.
       #' @param tn A string, the name of a trait.
-      #' @param observer A callback function
+      #' @param observer A callback function, which should take three arguments,
+      #'     (1) the trait name, (2) the object that has the trait, (3) 
       #' @param remove A logical value, indicates whether the observer is to be removed
       #'    or added
       observe=function(tn,observer,remove=FALSE){
