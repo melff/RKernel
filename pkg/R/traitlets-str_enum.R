@@ -7,7 +7,7 @@ StrEnumClass <- R6Class_("StrEnum",
    public=list(
        #' @field enum a character vector
        enum=character(0),
-       #' @field optional A logical value, whethe value can be empty.
+       #' @field optional A logical value, whether value can be empty.
        optional=FALSE,
        #' @description Check whether the assigned vector is one of the allowed enumerated strings.
        #' @param value A value to be assigned to the trait

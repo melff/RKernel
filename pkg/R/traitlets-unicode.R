@@ -11,6 +11,8 @@ UnicodeClass <- R6Class_("Unicode",
        length = 1,
        #' @field value The value of the unicode character vector
        value = character(0),
+       #' @field optional A logical value, whethe valuer can be empty.
+       optional=FALSE,
        #' @description A validator function
        #' @param value The value to be assigned
        validator=function(value){
