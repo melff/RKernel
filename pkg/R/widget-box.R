@@ -28,7 +28,7 @@ BoxClass <- R6Class_("Box",
     #' @field _view_module_version Version of the module where the view is defined
     `_view_module_version` = structure(Unicode(jupyter_widgets_controls_version()),sync=TRUE),
     #' @field children A generic vector with the widgets in the container
-    children = structure(Vector(),sync=TRUE),
+    children = structure(List(),sync=TRUE,auto_unbox=FALSE),
     #' @field box_style The string that describes the button style
     box_style = structure(StrEnum(
         c("primary","success","info","warning","danger",""),
