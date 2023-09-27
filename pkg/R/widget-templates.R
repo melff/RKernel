@@ -180,3 +180,95 @@ AppLayoutClass <- R6Class_("AppLayout",
 #' @export
 AppLayout <- function(...)AppLayoutClass$new(...)
 
+
+
+#' @rdname LayoutTemplates
+#' @export
+GridspecLayoutClass <- R6Class_("GridspecLayout",
+    inherit = TemplateBaseClass,
+    public = list(
+        #' @description Initializer function
+        #' @param nrow A positive integer, the number of rows
+        #' @param ncol A positive integer, the number of columns
+        #' @param ... Other arguments, passed to the superclass initializer
+        initialize = function(nrow,ncol,...){
+            if(nrow < 1 || ncol < 1) stop("'nrow' and 'ncol' must be positive integers")
+            nrow <- as.integer(nrow)
+            ncol <- as.integer(ncol)
+            super$initialize(...)
+            private$nrow <- nrow
+            private$ncol <- ncol
+            private$grid_template_areas <- matrix(".",nrow=nrow,ncol=ncol)
+            private$grid_template_rows <- sprintf('repeat(%d, 1fr)',nrow)
+            private$grid_template_columns <- sprintf('repeat(%d, 1fr)',ncol)
+        },
+        #' @description Set widget in grid cells
+        #' @param i The rows into which the widget is to be placed
+        #' @param j The columns into which the widget is to be placed
+        #' @param value A widget
+        set_item = function(i,j,value){
+            if(!inherits(value,"DOMWidget")) stop("'value' must be a DOM widget.")
+            old_ids <- unique(private$grid_template_areas[i,j])
+            old_ids <- setdiff(old_ids,".")
+            if(length(old_ids)){
+                to_remove <- private$grid_children[old_ids]
+                for(w in to_remove)
+                    w$layout$grid_area <- character(0)
+                private$grid_children[old_ids] <- NULL
+            }
+            private$counter <- private$counter + 1L
+            obj_id <- sprintf('widget%03d',private$counter)
+            value$layout$grid_area <- obj_id
+            private$grid_children[[obj_id]] <- value
+            private$grid_template_areas[i,j] <- obj_id
+            private$update_layout()
+        },
+        #' @description Get widget from grid cells
+        #' @param i The rows where the widget is located
+        #' @param j The columns where the widget is located
+        get_item = function(i,j){
+            obj_id <- private$grid_template_areas[i,j]
+            private$grid_children[obj_id]
+        }
+    ),
+    private = list(
+        nrow = 0L,
+        ncol = 0L,
+        grid_template_areas = character(0),
+        grid_template_rows = character(0),
+        grid_template_columns = character(0),
+        grid_children = list(),
+        counter = 0L,
+        update_layout = function(){
+            grid_template_areas_css <- paste(
+                paste0("\"",apply(private$grid_template_areas,1,paste,collapse=" "),"\""),
+                collapse="\n"
+            )
+            self$layout$grid_template_columns <- private$grid_template_columns
+            self$layout$grid_template_rows <- private$grid_template_rows
+            self$layout$grid_template_areas <- grid_template_areas_css
+            self$children <- unname(private$grid_children)
+        }
+    )
+)
+
+#' @rdname LayoutTemplates
+#' @export
+GridspecLayout <- function(...)GridspecLayoutClass$new(...)
+
+#' @rdname LayoutTemplates
+#' @export
+"[.GridspecLayout" <- function(x,i,j,...,drop=TRUE){
+    res <- x$get_item(i,j)
+    if(length(res) == 1 && drop)
+        return(res[[1]])
+    else return(res)
+}
+
+#' @rdname LayoutTemplates
+#' @export
+"[<-.GridspecLayout" <- function(x,i,j,value){
+    x$set_item(i,j,value)
+    return(x)
+}
+
