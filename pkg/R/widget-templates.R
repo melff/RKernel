@@ -272,3 +272,92 @@ GridspecLayout <- function(...)GridspecLayoutClass$new(...)
     return(x)
 }
 
+
+
+#' @rdname LayoutTemplates
+#' @export
+TwoByTwoLayoutClass <- R6Class_("TwoByTwoLayout",
+    inherit = TemplateBaseClass,
+    public = list(
+        #' @field top_left Widget that appears on the top left
+        top_left = Vector(),
+        #' @field top_right Widget that appears on the top right
+        top_right = Vector(),
+        #' @field bottom_left Widget that appears on the bottom left
+        bottom_left = Vector(),
+        #' @field bottom_right Widget that appears on the bottom right
+        bottom_right = Vector(),
+        #' @field merge Boolean, whether space of missing widgets chould be merged
+        #     with adjacent sections
+        merge = Boolean(TRUE),
+        #' @description Initializer method
+        #' @param ... Arguments, passed on to the superclass initializer
+        initialize = function(...){
+            super$initialize(...)
+            private$update_layout()
+            properties <- c("top_left","top_right",
+                            "bottom_left","bottom_right",
+                            "merge")
+            for(prop in properties)
+                self$observe(prop,private$update_layout)
+        }
+    ),
+    private = list(
+        update_layout = function(...){
+            grid_template_areas <- matrix(c(
+                "top-left","top-right",
+                "bottom-left","bottom-right"),
+                ncol=2,byrow=TRUE
+            )
+            all_children <- list(
+                'top-left' = self$top_left,
+                'top-right' = self$top_right,
+                'bottom-left' = self$bottom_left,
+                'bottom-right' = self$bottom_right
+            )
+            l <- sapply(all_children,length)
+            children <- all_children[l>0]
+            if(!length(children)) return()
+            for(position in names(children)){
+                child <- children[[position]]
+                child$layout$grid_area <- position
+            }
+            if(self$merge){
+                if(length(children) == 1){
+                    position <- names(children)[1]
+                    grid_template_areas[] <- position
+                } else {
+                    columns <- c("left","right")
+                    for(i in 1:2){
+                        top <- children[[paste0("top-",columns[i])]]
+                        bottom <- children[[paste0("bottom-",columns[i])]]
+                        i_neighbour <- (i %% 2) + 1
+                        if(!length(top) && !length(bottom)){
+                            # merge cells in column with neighbours in same row
+                            grid_template_areas[1,i] <- grid_template_areas[1,i_neighbour]
+                            grid_template_areas[2,i] <- grid_template_areas[2,i_neighbour]
+                        } else if(!length(top)){
+                            # merge with cell below
+                            grid_template_areas[1,i] <- grid_template_areas[2,i]
+                        } else if(!length(bottom)){
+                            # merge with cell above
+                            grid_template_areas[2,i] <- grid_template_areas[1,i]
+                        }
+                    }
+                }
+            }
+            grid_template_areas_css <- paste(
+                paste0("\"",apply(grid_template_areas,1,paste,collapse=" "),"\""),
+                collapse="\n"
+            )
+            self$layout$grid_template_columns <- "1fr 1fr"
+            self$layout$grid_template_rows <- "1fr 1fr"
+            self$layout$grid_template_areas <- grid_template_areas_css
+            self$children <- unname(children)
+        }
+    )
+)
+
+#' @export
+TwoByTwoLayout <- function(...)TwoByTwoLayoutClass$new(...)
+
