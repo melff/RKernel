@@ -116,7 +116,7 @@ TabClass <- R6Class_("Tab",
 #' @describeIn SelectionContainer The construction function for accordion widgets.
 #' @param ... Arguments passed to the superclass constructor
 #' @export
-Tab <- function(children,...) ContainerClass_new(Class=TabClass,children=children,...)
+Tab <- function(...) ContainerClass_new(Class=TabClass,...)
 
 #' @rdname SelectionContainer 
 #' @export

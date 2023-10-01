@@ -23,7 +23,7 @@ TemplateBaseClass <- R6Class_("TemplateBase",
         #' @field height The height CSS attribute
         height = Unicode(optional=TRUE),
         #' @description Initializer
-        #' @param ... Arguments, used to initialize the fields
+        #' @param ... Arguments used to initialize the fields
         initialize = function(...){
             super$initialize(...)
             private$copy_layout_props()
@@ -177,6 +177,8 @@ AppLayoutClass <- R6Class_("AppLayout",
     )
 )
 
+#' @rdname LayoutTemplates
+#' @param ... Arguments used to initialize the fields
 #' @export
 AppLayout <- function(...)AppLayoutClass$new(...)
 
@@ -253,10 +255,16 @@ GridspecLayoutClass <- R6Class_("GridspecLayout",
 )
 
 #' @rdname LayoutTemplates
+#' @param ... Arguments used to initialize the fields
 #' @export
 GridspecLayout <- function(...)GridspecLayoutClass$new(...)
 
 #' @rdname LayoutTemplates
+#' @param ... Other arguments, ignored
+#' @param x A GridspecLayout object
+#' @param i Integer value(s) referring to the row(s)
+#' @param j Integer value(s) referring to the column(s)
+#' @param drop Logical, whether the result is a widget or a list with one element if both i an j select a single element
 #' @export
 "[.GridspecLayout" <- function(x,i,j,...,drop=TRUE){
     res <- x$get_item(i,j)
@@ -266,6 +274,7 @@ GridspecLayout <- function(...)GridspecLayoutClass$new(...)
 }
 
 #' @rdname LayoutTemplates
+#' @param value One or more widgets put at the idicated positions in the grid
 #' @export
 "[<-.GridspecLayout" <- function(x,i,j,value){
     x$set_item(i,j,value)
@@ -358,6 +367,8 @@ TwoByTwoLayoutClass <- R6Class_("TwoByTwoLayout",
     )
 )
 
+#' @rdname LayoutTemplates
+#' @param ... Arguments used to initialize the fields
 #' @export
 TwoByTwoLayout <- function(...)TwoByTwoLayoutClass$new(...)
 

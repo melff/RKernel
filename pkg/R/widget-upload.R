@@ -34,15 +34,15 @@ FileUploadClass <- R6Class_("FileUpload",
        #' @field value The uploaded data.
        value = structure(Unicode(length=NA),sync=TRUE,auto_unbox=FALSE),
        #' @description A generic initializer function
-       #' @param value A value to initialize instance with
-       #' @param ... Any other arguments, ignored.
-       initialize = function(value,...){
+       #' @param ... Any arguments used to initialize the fields of the object
+       initialize = function(...){
            super$initialize(...)
-           warning("Unfortunately file upload does not work. This seems so because some undocumented requirements are not met at the Javascript frontend side. [Help wanted]")
+           warning("Unfortunately file upload does not work. [Help wanted]")
        }       
    ))
 
 
 #' @describeIn FileUpload The FileUpload constructor function
+#' @param ... Any arguments used to initialize the fields of the object
 #' @export
 FileUpload <- function(...) FileUploadClass$new(...)

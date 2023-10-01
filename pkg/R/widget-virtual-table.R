@@ -18,6 +18,14 @@ get_virtable_widget_css <- function(){
     raw_html(virtable_widget_css)
 }
 
+#' Widgets to show tabular data
+#'
+#' This is a widget that can be used to potentially large tabular data objects, such as data frames.
+#' It is also a potential backend for the \code{\link{View}} function.
+#'
+#' @param x A tabular data object, such as a data frame or a tibble.
+#' @param pagesize Number of rows and columns that are shown by the widget.
+#' 
 #' @export
 virtable_widget <- function(x,
         pagesize=getOption("rkernel_view_size",c(10,10))){
@@ -302,12 +310,18 @@ virtable_widget <- function(x,
     outerbox
 }
 
+#' @describeIn virtable_widget Format a section of a tabular object to be used by \code{virtable_widget}.
+#' @param x A tabular object, e.g. a data frame
+#' @param i Integer values, indexing rows
+#' @param j Integer values, indexing cols
 #' @export
 fmt_tab_section <- function(x,i,j) UseMethod("fmt_tab_section")
 
+#' @describeIn virtable_widget Default method
 #' @export
 fmt_tab_section.default <- function(x,i,j) format(x[i,j])
 
+#' @describeIn virtable_widget Dibble method
 #' @export
 fmt_tab_section.tbl_df <- function(x,i,j)  
     format(

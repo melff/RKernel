@@ -5,8 +5,8 @@
 #' or by using the DataTable Javascript library. The latter is the case if the system option "View.backend"
 #' is set to "dataTable" or if this option is not set. Otherwise a 'virtable_widget' is used.
 #'
-#' @param x an \R object which can be coerced to a data frame with non-zero numbers of rows and columns.
-#' @param title a string used as title. Currently unused.
+#' @param x An \R object which can be coerced to a data frame with non-zero numbers of rows and columns.
+#' @param title A string used as title. Currently unused.
 #' 
 #' @export
 View <- function(x,

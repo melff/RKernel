@@ -80,6 +80,7 @@ ImageWidgetClass <- R6Class_("ImageWidget",
 )
 
 #' @describeIn MediaWidget The ImageWidget constructor function
+#' @param ... Any arguments used to initialize the fields of the object
 #' @export
 ImageWidget <- function(...) ImageWidgetClass$new(...)
 
@@ -119,6 +120,7 @@ VideoWidgetClass <- R6Class_("VideoWidget",
 )
 
 #' @describeIn MediaWidget The VideoWidget constructor function
+#' @param ... Any arguments used to initialize the fields of the object
 #' @export
 VideoWidget <- function(...) VideoWidgetClass$new(...)
 
@@ -144,6 +146,7 @@ AudioWidgetClass <- R6Class_("AudioWidget",
 )
 
 #' @describeIn MediaWidget The AudioWidget constructor function
+#' @param ... Any arguments used to initialize the fields of the object
 #' @export
 AudioWidget <- function(...) AudioWidgetClass$new(...)
 
