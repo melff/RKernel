@@ -1,4 +1,4 @@
-#' Tag Input Widgets
+#' Tags Input Widgets
 #'
 #' @description Classes and constructors to great tag input widgets
 #'
@@ -56,7 +56,7 @@ TagsInputClass <- R6Class_("TagsInput",
        #' @field _view_name Name of the Javascript view in the frontend.
        `_view_name` = structure(Unicode("TagsInputView"),sync=TRUE),
        #' @field value A list of tags as unicode strings
-       value = structure(Unicode(length=NA),sync=TRUE,auto_unbox=FALSE),
+       value = structure(Unicode("",length=NA),sync=TRUE,auto_unbox=FALSE),
        #' @field tag_style The string that describes the tag style
        tag_style = structure(StrEnum(
            c("primary","success","info","warning","danger",""),
@@ -68,7 +68,7 @@ TagsInputClass <- R6Class_("TagsInput",
 #' @describeIn TagsInput A taginput constructor
 #' @param ... Arguments passed to the inializer
 #' @export
-TagsInput <- function(value="",...) TagsInputClass$new(value=value,...)
+TagsInput <- function(...) TagsInputClass$new(...)
 
 
 #' @rdname TagsInput
@@ -89,7 +89,7 @@ ColorsInputClass <- R6Class_("ColorsInput",
 #' @describeIn TagsInput A color taginput constructor
 #' @param ... Arguments passed to the inializer
 #' @export
-ColorsInput <- function(value="",...) ColorsInputClass$new(value=value,...)
+ColorsInput <- function(...) ColorsInputClass$new(...)
 
 
 #' @rdname TagsInput

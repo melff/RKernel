@@ -89,7 +89,7 @@ Collate:
     'widget-selectioncontainer.R'
     'widget-sidecar.R'
     'widget-string.R'
-    'widget-taginput.R'
+    'widget-tagsinput.R'
     'widget-templates.R'
     'widget-time.R'
     'widget-upload.R'
