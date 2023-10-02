@@ -121,7 +121,7 @@ Kernel <- R6Class("Kernel",
     #' @param data Execution result in rich format
     #' @param metadata A list with metadata
     execute_result = function(data,metadata=emptyNamedList){
-      log_out("kernel$execute_result")
+      # log_out("kernel$execute_result")
       # log_out(sprintf("msg_type = %s",msg_type))
       content <- list(data=data,
                       metadata=metadata,

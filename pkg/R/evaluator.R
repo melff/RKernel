@@ -142,7 +142,7 @@ Evaluator <- R6Class("Evaluator",
             private$assign_exports()
             em <- EventManager(type="eval")
             em$activate()
-            log_out("evaluator$startup() complete")
+            # log_out("evaluator$startup() complete")
             private$jupyterhub_prefix <- Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")
 
         },
