@@ -177,9 +177,10 @@ WidgetClass <- R6Class_("Widget",
     #' @param data Data sent by the frontend
     handle_comm_msg = function(comm,data){
       # print(data)
-      # log_out("=====================\n")
+      # log_out("=====================")
+      # log_out("handle_comm_msg")
       # log_out(data,use.print=TRUE)
-      # log_out(str(data),use.print=TRUE)
+      # log_out(data,use.str=TRUE)
       method <- data$method
       if(method=="update"){
         # cat("------------------\n")
