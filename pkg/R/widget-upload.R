@@ -23,22 +23,44 @@ FileUploadClass <- R6Class_("FileUpload",
        disabled = structure(Boolean(FALSE),sync=TRUE),
        #' @field icon A character string, the font-awesome without the 'fa-' prefix.
        icon = structure(Unicode("upload"),sync=TRUE),
-       #' @field box_style The string that describes the button style
-       box_style = structure(StrEnum(
+       #' @field button_style The string that describes the button style
+       button_style = structure(StrEnum(
            c("primary","success","info","warning","danger",""),
-           default="")),
+           default=""),sync=TRUE),
        #' @field style The button style, an object of class "ButtonStyleClass".
        style = structure(R6Instance(ButtonStyleClass),sync=TRUE),
        #' @field error A string with an error message, if applicable.
        error = structure(Unicode(""),sync=TRUE),
        #' @field value The uploaded data.
-       value = structure(Unicode(length=NA),sync=TRUE,auto_unbox=FALSE),
+       value = structure(List(),sync=TRUE,auto_unbox=FALSE),
+       # value = structure(Unicode(length=NA),sync=TRUE,auto_unbox=FALSE),
        #' @description A generic initializer function
+       #' @param description The button description
        #' @param ... Any arguments used to initialize the fields of the object
-       initialize = function(...){
-           super$initialize(...)
-           warning("Unfortunately file upload does not work. [Help wanted]")
-       }       
+       initialize = function(description="Upload",...){
+           super$initialize(description=description,...)
+       }
+   ),
+   active = list(
+       #' @field names of the uploaded files
+       filename = function(value){
+           if(missing(value)) {
+               if(length(self$value)) return(sapply(self$value,"[[","name"))
+               else return(character(0))
+           }
+           else stop("file names cannot be changed")
+       },
+       contents = function(value){
+           if(missing(value)) {
+               if(length(self$value)) {
+                   contents <- lapply(self$value,"[[","content")
+                   if(length(contents) == 1) return(contents[[1]])
+                   else return(contents)
+               }
+               else return(NULL)
+           }
+           else stop("file contents cannot be changed")
+       }
    ))
 
 

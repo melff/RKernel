@@ -140,7 +140,7 @@ Kernel <- R6Class("Kernel",
         msg_type <- class(d)
       else stop("'display_data' or 'update_display_data' object required")
 
-      log_out("kernel$display_send")
+      # log_out("kernel$display_send")
       # log_out(sprintf("msg_type = %s",msg_type))
       
       private$send_message(type=msg_type,
@@ -216,6 +216,7 @@ Kernel <- R6Class("Kernel",
     #' @param metadata An optional list with metadata.
     #' @param buffers An optional list of raw vectors.
     send_comm_msg = function(id,data,metadata=emptyNamedList,buffers=NULL){
+      # log_out("kernel$send_comm_msg")
       private$send_message(type="comm_msg",debug=FALSE,
                    parent=private$parent$shell,
                    socket_name="iopub",
@@ -233,6 +234,7 @@ Kernel <- R6Class("Kernel",
     #' @param metadata An optional list with metadata.
     #' @param buffers An optional list of raw vectors.
     send_comm_open = function(id,target_name,data,metadata=emptyNamedList,buffers=NULL){
+      # log_out("kernel$send_comm_open")
       private$send_message(type="comm_open",debug=FALSE,
                    parent=private$parent$shell,
                    socket_name="iopub",
@@ -251,6 +253,7 @@ Kernel <- R6Class("Kernel",
     #' @param metadata An optional list with metadata.
     #' @param buffers An optional list of raw vectors.
     send_comm_close = function(id,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
+      # log_out("kernel$send_comm_close")
       private$send_message(type="comm_close",debug=FALSE,
                    parent=private$parent$shell,
                    socket_name="iopub",
@@ -515,8 +518,11 @@ Kernel <- R6Class("Kernel",
     },
 
     handle_comm_msg = function(msg){
+      # log_out("kernel$handle_comm_msg")
+      # log_out(msg,use.str=TRUE)
       id <- msg$content$comm_id
       data <- msg$content$data
+      data$buffers <- msg$buffers
       self$comm_manager$handle_msg(id,data)
     },
 
@@ -587,8 +593,11 @@ Kernel <- R6Class("Kernel",
     },
 
     respond_shell = function(req,debug=FALSE){
-      # log_out("respond_shell")
+      if(debug)
+        log_out("respond_shell")
       msg <- private$get_message("shell")
+      if(debug)
+         log_out(msg,use.str=TRUE)
       private$parent$shell <- msg
       if(!length(msg)) return(TRUE)
       private$send_message(type="status",
@@ -635,7 +644,12 @@ Kernel <- R6Class("Kernel",
         i <- i + 1
         # self$cat("i = %d", i)
       }
+      # log_out("kernel$get_message")
+      # log_out("wire_in:")
+      # log_out(wire_in,use.str=TRUE)
       msg <- private$wire_unpack(wire_in)
+      # log_out("msg:")
+      # log_out(msg,use.str=TRUE)
       # self$cat("Got message from socket", socket_name)
       if(!length(private$session)){
         header <- msg$header
@@ -651,7 +665,7 @@ Kernel <- R6Class("Kernel",
                             metadata=emptyNamedList,buffers=NULL){
       if(self$is_child()) return(NULL)
       msg <- private$msg_new(type,parent,content,metadata)
-       if(debug) {
+      if(debug) {
          msg_body <- msg[c("header","parent_header","metadata","content")]
          msg_body <- to_json(msg_body,auto_unbox=TRUE)
          self$log_out(prettify(msg_body))
@@ -676,24 +690,38 @@ Kernel <- R6Class("Kernel",
     },
 
     wire_unpack = function(wire_in){
+      # log_out("wire_unpack")
       l <- length(wire_in)
       found <- FALSE
-      for(i in 1:l)
+      # for(i in 1:l){
+      #   log_out(paste(sprintf("[[%d]]",i), rawToChar(wire_in[[i]])))
+      # }
+      for(i in 1:l){
         if(identical(wire_in[[i]],WIRE_DELIM)) {
           found <- TRUE
           break
         }
-      if(!found) return(NULL)
-      if(i + 5 < l) return(NULL)
+      }
+      # log_out(sprintf("i = %d",i))
+      # log_out(sprintf("l = %d",l))
+      if(!found) {
+        log_error("WIRE_DELIM not found")
+        return(NULL)
+      }
       signature <- rawToChar(wire_in[[i+1]])
+      # log_out(signature)
       msg <- wire_in[i + 2:5]
-      if(signature != private$get_signature(msg)) return(NULL)
-      msg <- lapply(msg,fromRawJSON)
+      # log_out(private$get_signature(msg))
+      if(signature != private$get_signature(msg)) {
+        log_error("Incorrect signature")
+        return(NULL)
+      }
+      msg <- lapply(msg,fromRawJSON,simplifyDataFrame=FALSE,simplifyMatrix=FALSE)
       names(msg) <- c("header","parent_header","metadata","content")
       if(i > 1)
         msg$identities <- wire_in[1:(i-1)]
       if(l > i + 5)
-        msg$extra <- wire_in[(i+5):l]
+        msg$buffers <- wire_in[(i+6):l]
       return(msg)
     },
 
@@ -778,10 +806,10 @@ Kernel <- R6Class("Kernel",
 
 #' @include json.R
 
-fromRawJSON <- function(raw_json) {
+fromRawJSON <- function(raw_json,...) {
     json <- rawToChar(raw_json)
     Encoding(json) <- "UTF-8"
-    fromJSON(json)
+    fromJSON(json,...)
 }
 
 toRawJSON <- function(x,...){

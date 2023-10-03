@@ -59,6 +59,7 @@ WidgetClass <- R6Class_("Widget",
     },
     #' @description Open a connection to the frontend
     open = function(){
+      # log_out("widget$open()")
       if(!length(self[["_model_id"]])){
         manager <- get_comm_manager()
         if(!manager$has_handlers("jupyter.widget"))
@@ -118,6 +119,7 @@ WidgetClass <- R6Class_("Widget",
     #' @description Update the synchronized states, usually with information from the frontend
     #' @param state A list of values for the synchronized traits
     set_state = function(state){
+      # log_out("widget$set_state")
       keys <- names(state)
       for(k in keys){
         # cat("Updating",k)
@@ -170,30 +172,57 @@ WidgetClass <- R6Class_("Widget",
     #' @param comm The 'comm' object that is opened
     #' @param data Data sent by the frontend
     handle_comm_opened = function(comm,data){
+      # log_out("=====================")
+      # log_out("handle_comm_opened")
       state <- data$state
     },
     #' @description Handle a message from the frontend
     #' @param comm The 'comm' object via which the message is received
-    #' @param data Data sent by the frontend
-    handle_comm_msg = function(comm,data){
+    #' @param msg Message sent by the frontend
+    handle_comm_msg = function(comm,msg){
       # print(data)
       # log_out("=====================")
       # log_out("handle_comm_msg")
       # log_out(data,use.print=TRUE)
-      # log_out(data,use.str=TRUE)
-      method <- data$method
+      # log_out(msg,use.str=TRUE)
+      method <- msg$method
       if(method=="update"){
         # cat("------------------\n")
-        state <- data$state
+        msg <- self$handle_buffers(msg)
+        state <- msg$state
         # print(state)
         self$set_state(state)
       }
       else if(method=="request_state")
         self$send_state()
       else if(method=="custom"){
-        if("content" %in% names(data))
-          self$handle_custom_msg(data$content)
+        if("content" %in% names(msg))
+          self$handle_custom_msg(msg$content)
       }
+    },
+    #' @description Handle buffers in message
+    #' @param msg A comm message
+    handle_buffers = function(msg){
+      # log_out("handle_buffers")
+      # log_out(msg$state,use.print=TRUE)
+      # log_out(msg$buffer_paths,use.print=TRUE)
+      # log_out(msg$buffers,use.str=TRUE)
+      buffers <- msg$buffers
+      buffer_paths <- msg$buffer_paths
+      if(length(buffers)){
+        if(length(buffers) != length(buffer_paths)) log_error("Number of buffers and buffer_paths must be equal")
+        else {
+          for(i in 1:length(buffers)){
+            buffer_path <- buffer_paths[[i]]
+            state_component <- buffer_path[1]
+            j <- as.integer(buffer_path[2]) + 1L
+            buffer_name <- buffer_path[3]
+            msg$state[[state_component]][[j]][[buffer_name]] <- buffers[[j]]
+          }
+          # log_out(msg$state,use.str=TRUE)
+        }
+      }
+      return(msg)
     },
     #' @description Call the custom message handlers
     #' @param content The data received
