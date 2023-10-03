@@ -63,8 +63,8 @@ SelectionContainerClass <- R6Class_("Box",
            super$initialize(children=unname(children),...)
            nms <- names(children)
            if(length(nms)){
-               log_out("SelectionContainerClass$initialize")
-               log_out(nms,use.print=TRUE)
+               # log_out("SelectionContainerClass$initialize")
+               # log_out(nms,use.print=TRUE)
                if(has_iw_ver(8)){
                    self$traits[["titles"]] <- nms
                    self$send_state("titles")

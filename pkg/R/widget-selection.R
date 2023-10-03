@@ -228,8 +228,8 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
       #' @description Validate an index.
       #' @param index An index, the index to be checked.
       validate_index = function(index){
-          log_out("MultipleSelectionWidgetClass$validate_index")
-          log_out(index,use.print=TRUE)
+          # log_out("MultipleSelectionWidgetClass$validate_index")
+          # log_out(index,use.print=TRUE)
           options_labels <- self[["_options_labels"]]
           len <- length(options_labels)
           if(length(index) > 0){
@@ -244,8 +244,8 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
       #' @param value Names of selectable options.
       #' @param ... Any other arguments, ignored.
       initialize = function(options,value,...){
-          log_out("MultipleSelectionWidgetClass$validate_index")
-          super$initialize(...)
+          # log_out("MultipleSelectionWidgetClass$validate_index")
+          # super$initialize(...)
           options <- as.character(options)
           self[["_options_labels"]] <- options
           self$validate("index",self$validate_index)
