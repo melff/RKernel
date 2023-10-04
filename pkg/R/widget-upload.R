@@ -39,6 +39,30 @@ FileUploadClass <- R6Class_("FileUpload",
        #' @param ... Any arguments used to initialize the fields of the object
        initialize = function(description="Upload",...){
            super$initialize(description=description,...)
+       },
+       #' @description Handle buffers in message
+       #' @param msg A comm message
+       handle_buffers = function(msg){
+           # log_out("handle_buffers")
+           # log_out(msg$state,use.print=TRUE)
+           # log_out(msg$buffer_paths,use.print=TRUE)
+           # log_out(msg$buffers,use.str=TRUE)
+           buffers <- msg$buffers
+           buffer_paths <- msg$buffer_paths
+           if(length(buffers)){
+               if(length(buffers) != length(buffer_paths)) log_error("Number of buffers and buffer_paths must be equal")
+               else {
+                   for(i in 1:length(buffers)){
+                       buffer_path <- buffer_paths[[i]]
+                       state_component <- buffer_path[1]
+                       j <- as.integer(buffer_path[2]) + 1L
+                       buffer_name <- buffer_path[3]
+                       msg$state[[state_component]][[j]][[buffer_name]] <- buffers[[j]]
+                   }
+               # log_out(msg$state,use.str=TRUE)
+               }
+           }
+           return(msg)
        }
    ),
    active = list(
