@@ -13,6 +13,8 @@ WIRE_DELIM <- charToRaw("<IDS|MSG>")
 
 kernel <- new.env()
 
+fn_kernel_logfile <- file.path(dirname(tempdir()),"RKernel.log")
+
 #' The Kernel Class
 #'
 #' @description An object of this class handles the low-level communication with
@@ -53,6 +55,9 @@ Kernel <- R6Class("Kernel",
       replace_in_package("base","print",evaluator$print)
       replace_in_package("base","cat",evaluator$cat)
       replace_in_package("tools","httpd",evaluator$httpd)
+      private$logfile <- file(fn_kernel_logfile,"a")
+      # private$logfile <- stderr()
+      # private$logfile <- socketConnection(port=6111)
     },
 
     #' @field evaluator See \code{\link{Evaluator}}.
@@ -279,8 +284,10 @@ Kernel <- R6Class("Kernel",
         else if(use.str)
           message <- paste(capture.output(self$str(message)),collapse="\n")
         else message <- paste(message,...,collapse="")
-        self$cat(crayon::green(format(Sys.time()),"\t",message,"\n"),
-                 file=stderr())
+        message <- paste(crayon::green(format(Sys.time()),"\t",message,"\n"))
+        # self$cat(message,file=stderr())
+        message <- paste("INFO:",message)
+        self$cat(message,file=private$logfile)
       },error=function(e){
         self$log_error(sprintf("Error in %s",dcl))
         msg <- conditionMessage(e)
@@ -291,15 +298,19 @@ Kernel <- R6Class("Kernel",
     #' Show a warning in the Jupyter server log
     #' @param message A string to be shown in the log
     log_warning = function(message){
-      self$cat(crayon::bgYellow(format(Sys.time()),"\t",message,"\n"),
-                       file=stderr())
+      message <- paste(crayon::bgYellow(format(Sys.time()),"\t",message,"\n"))
+      # self$cat(message,file=stderr())
+        message <- paste("WARNING:",message)
+      self$cat(message,file=private$logfile)
     },
     #' @description
     #' Show an error message in the Jupyter server log
     #' @param message A string to be shown in the log
     log_error = function(message){
-      self$cat(crayon::bgRed(format(Sys.time()),"\t",message,"\n"),
-                       file=stderr())
+      message <- crayon::bgRed(format(Sys.time()),"\t",message,"\n")
+      # self$cat(message,file=stderr())
+      message <- paste("ERROR:",message)
+      self$cat(message,file=private$logfile)
     },
     #' @description
     #' Add a service to the kernel, i.e. a function that is called in each
@@ -799,8 +810,9 @@ Kernel <- R6Class("Kernel",
       self$cat <- .BaseNamespaceEnv$cat
       self$str <- utils::str
       self$httpd <- tools:::httpd
-    }
-
+    },
+    
+    logfile = NULL
   )
 )
 
