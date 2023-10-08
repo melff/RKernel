@@ -290,15 +290,16 @@ Context <- R6Class("Context",
            }
        },
 
-       std_out = list(con=NULL,current=NULL,previous=NULL),
-       std_err = list(con=NULL,current=NULL,previous=NULL),
+       std_out = as.environment(list(con=NULL,current=NULL,previous=NULL)),
+       std_err = as.environment(list(con=NULL,current=NULL,previous=NULL)),
 
        get_output = function(x){
-           # log_out("get_output")
+           # log_out("== get_output ===========================")
            # cat("\n",file=x$con)
            x$previous <- x$current
            x$current <- textConnectionValue(x$con)
-           # log_out(sprintf("text_output = %s\n",paste(sQuote(x$current),collapse=",")))
+           # log_out(sprintf("****previous****\n%s",paste(x$previous,collapse="\n")))
+           # log_out(sprintf("****current****\n%s",paste(x$current,collapse="\n")))
            nlines <- length(x$previous)
            if(nlines > 0)
                current_text_output <- tail(x$current,-nlines)
