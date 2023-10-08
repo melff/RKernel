@@ -28,7 +28,7 @@ View.default <- function(x,title=deparse(substitute(x)),...)
     x <- as.data.frame(x)
     if(ncol(x) == 1)
         colnames(x) <- title
-    if(getOption("View.backend","dataTable")=="dataTable")
+    if(getOption("View.backend","virtable_widget")=="dataTable")
         dataTable(x)
     else
         virtable_widget(x)
@@ -43,7 +43,7 @@ View.data.frame <- function(x,title=deparse(substitute(x)),...)
 
     # cls <- class(x)
     # title <- paste0(cls,": ",title)
-    if(getOption("View.backend","dataTable")=="dataTable")
+    if(getOption("View.backend","virtable_widget")=="dataTable")
         dataTable(x)
     else
         virtable_widget(x)
