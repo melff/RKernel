@@ -428,7 +428,7 @@ Kernel <- R6Class("Kernel",
                                              msg$content$allow_stdin,
                                              msg$content$silent,
                                              msg$content$store_history),
-                    error=function(e)"errored",
+                    error=function(e)structure("errored",message=conditionMessage(e)),#,traceback=.traceback()),
                     interrupt=function(e)"interrupted"
                     )
       # r <- self$evaluator$eval_cell(msg$content$code)
@@ -438,6 +438,17 @@ Kernel <- R6Class("Kernel",
       aborted <- self$evaluator$is_aborted(reset=TRUE)
       if(is.character(r) && (identical(r[1],"errored") || identical(r[1],"interrupted")))
         aborted <- TRUE
+      if(is.character(r)) {
+        log_error(r)
+        msg <- attr(r,"message")
+        if(length(msg)) log_error(msg)
+        # tb <- attr(r,"traceback")
+        # if(length(tb)){
+        #   # tb <- unlist(tb)
+        #   # log_error(paste(tb,sep="\n"))
+        #   log_error(tb,use.print=TRUE)
+        # }
+      }
       content <- list(status = status,
                       execution_count = execution_count)
       if(length(payload))
