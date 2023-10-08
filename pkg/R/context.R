@@ -14,7 +14,6 @@ Context <- R6Class("Context",
        #'   the context.
        initialize = function(envir=list(),
                              attachment=list()){
-           private$connection <- textConnection(NULL,"w",local=TRUE)
            private$envir <- envir
            private$attachment <- attachment
            private$id <- UUIDgenerate()
@@ -25,6 +24,9 @@ Context <- R6Class("Context",
            em <- EventManager(type="output")
            private$output_manager <- em
            em$activate()
+           # log_out(private$std_out$con,use.print=TRUE)
+           # log_out(private$std_out$err,use.print=TRUE)
+           # log_out("context$initialize complete")
        },
 
        #' @description
@@ -79,7 +81,7 @@ Context <- R6Class("Context",
                            exit=noop),
                           silent=TRUE))
                self$last.value <- ev
-               cat("\n",file=private$connection)
+               # cat("\n",file=private$std_out$con)
                private$handle_event("eval")
                try(withCallingHandlers(
                    private$handle_event("result",ev$value,ev$visible),
@@ -113,7 +115,11 @@ Context <- R6Class("Context",
                private$condition_manager$activate()
            }
            private$handle_event("enter")
-           sink(private$connection,split=FALSE)
+           private$std_out$con <- textConnection(NULL,"w",local=TRUE)
+           private$std_err$con <- textConnection(NULL,"w",local=TRUE)
+           sink(private$std_out$con,split=FALSE)
+           sink(private$std_err$con,split=FALSE,type="message")
+           # log_out("context$enter complete")
 
        },
 
@@ -137,7 +143,9 @@ Context <- R6Class("Context",
            }
 
            sink()
-
+           sink(type="message")
+           close(private$std_out$con)
+           close(private$std_err$con)
        },
 
        #' @description
@@ -254,25 +262,15 @@ Context <- R6Class("Context",
        },
        #' @description
        #' Get text output produced by the expressions last evaluated.
-       get_text = function(){
-           # log_out("get_text")
-           cat("\n",file=private$connection)
-           private$prev_text_output <- private$text_output
-           # log_out(sprintf("prev_text_output = %s\n",paste(sQuote(private$prev_text_output),collapse=",")))
-           private$text_output <- textConnectionValue(private$connection)
-           # log_out(sprintf("text_output = %s\n",paste(sQuote(private$text_output),collapse=",")))
-           nlines <- length(private$prev_text_output)
-           if(nlines > 0)
-               current_text_output <- tail(private$text_output,-nlines)
-           else
-               current_text_output <- private$text_output
-           if(length(current_text_output)){
-               current_text_output <- paste(current_text_output,collapse="\n")
-              # Ignore empty lines of output
-               if(!identical(current_text_output,"\n"))
-                   return(current_text_output)
-               else return("")
-           } else return("")
+       get_stdout = function(){
+           # log_out("context$get_stdout")
+           private$get_output(private$std_out)
+       },
+       #' @description
+       #' Get message output produced by the expressions last evaluated.
+       get_stderr = function(){
+           # log_out("context$get_stderr")
+           private$get_output(private$std_err)
        }
    ),
    private = list(
@@ -292,12 +290,29 @@ Context <- R6Class("Context",
            }
        },
 
-       connection = NULL,
-       # A function to be called when text ouput is captured or NULL. Should
-       #    be either specified by the constuctor or by inheriting classes.
-       
-       text_output = NULL,
-       prev_text_output = NULL,
+       std_out = list(con=NULL,current=NULL,previous=NULL),
+       std_err = list(con=NULL,current=NULL,previous=NULL),
+
+       get_output = function(x){
+           # log_out("get_output")
+           # cat("\n",file=x$con)
+           x$previous <- x$current
+           x$current <- textConnectionValue(x$con)
+           # log_out(sprintf("text_output = %s\n",paste(sQuote(x$current),collapse=",")))
+           nlines <- length(x$previous)
+           if(nlines > 0)
+               current_text_output <- tail(x$current,-nlines)
+           else
+               current_text_output <- x$current
+           if(length(current_text_output)){
+               current_text_output <- paste(current_text_output,collapse="\n")
+              # Ignore empty lines of output
+               if(!identical(current_text_output,"\n"))
+                   return(current_text_output)
+               else return("")
+           } else return("")
+       },
+
        envir = NULL,
        attachment = NULL,
        id = character(0),

@@ -680,13 +680,20 @@ Evaluator <- R6Class("Evaluator",
         },
 
         handle_text = function(...) {
-            text <- private$context$get_text()
-            # log_out(sprintf("handle_text(%s)",text))
             # log_out("handle_text")
-            # log_out(text,use.print=TRUE)
-            if(nzchar(text)){
-                text <- paste(text,collapse="\n")
-                private$kernel$stream(text = text,
+            msg <- private$context$get_stderr() 
+            out <- private$context$get_stdout()
+            # log_out(sprintf("handle_text(%s)",text))
+            # log_out(msg,use.print=TRUE)
+            # log_out(out,use.print=TRUE)
+            if(any(nzchar(msg))){
+                msg <- paste(msg,collapse="\n")
+                private$kernel$stream(text = msg,
+                                      stream = "stderr")
+            }
+            if(any(nzchar(out))){
+                out <- paste(out,collapse="\n")
+                private$kernel$stream(text = out,
                                       stream = "stdout")
             }
         },

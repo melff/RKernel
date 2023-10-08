@@ -143,10 +143,18 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         
         handle_text = function(...) {
             # log_out("Widget-context: handle_text")
-            text <- self$context$get_text()
-            text <- paste(text,collapse="\n")
-            private$stream(text = text,
-                        stream = "stdout")
+            msg <- self$context$get_stderr() 
+            out <- self$context$get_stdout()
+            if(any(nzchar(msg))){
+                msg <- paste(msg,collapse="\n")
+                private$stream(text = msg,
+                               stream = "stderr")
+            }
+            if(any(nzchar(out))){
+                out <- paste(out,collapse="\n")
+                private$stream(text = out,
+                               stream = "stdout")
+            }
         },
         
         last_plot_id = character(0),
