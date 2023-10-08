@@ -495,8 +495,8 @@ Evaluator <- R6Class("Evaluator",
                               height = 400L,
                               class = "rkernel-iframe",
                               style = "border-style:none",...){
-            cl <- match.call()
-            log_out(deparse1(cl))
+            # cl <- match.call()
+            # log_out(deparse1(cl))
             id <- UUIDgenerate()
             path <- paste0("/iframe/",id,"/")
             url <- paste0(self$get_url(),path)
