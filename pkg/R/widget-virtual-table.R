@@ -25,10 +25,12 @@ get_virtable_widget_css <- function(){
 #'
 #' @param x A tabular data object, such as a data frame or a tibble.
 #' @param pagesize Number of rows and columns that are shown by the widget.
+#' @param continuous_update Logical, whether sliders should lead continuous updates.
 #' 
 #' @export
 virtable_widget <- function(x,
-        pagesize=getOption("rkernel_view_size",c(10,10))){
+        pagesize=getOption("rkernel_view_size",c(10,10)),
+        continuous_update=TRUE){
     row_pagesize <- min(pagesize[1],nrow(x))
     col_pagesize <- min(pagesize[2],ncol(x))
     if(is.na(col_pagesize))
@@ -37,10 +39,10 @@ virtable_widget <- function(x,
     row_control <- FloatSlider(value=100,min=0,max=100,
                                orientation="vertical",
                                readout=FALSE,
-                               continuous_update=FALSE)
+                               continuous_update=continuous_update)
     col_control <- FloatSlider(value=0,min=0,max=100,
                                readout=FALSE,
-                               continuous_update=FALSE)
+                               continuous_update=continuous_update)
     
     scroll_up_button <- Button(icon="angle-up")
     scroll_up_button$add_class("scroll-up-button")
@@ -117,8 +119,12 @@ virtable_widget <- function(x,
                             )
 
     
-    outerbox <- VBox(message_widget,page_control_box,innerbox,
-                     layout=Layout(overflow='hidden'))
+    outerbox <- VBox(message_widget,
+                     page_control_box,
+                     innerbox#,
+                     #layout=Layout(overflow='hidden')
+                     )
+    outerbox$layout$overflow <- 'hidden'
     outerbox$add_class("scrolling-table")
     
     toggle_page_controls <- function(...){
