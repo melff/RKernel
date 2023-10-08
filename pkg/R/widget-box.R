@@ -52,7 +52,7 @@ BoxClass <- R6Class_("Box",
    )
 )
 
-ContainerClass_new <- function(Class,...){
+ContainerClass_new <- function(Class,layout=NULL,...){
     args <- list(...)
     argnames <- names(args)
     if(!length(argnames)){
@@ -70,13 +70,16 @@ ContainerClass_new <- function(Class,...){
         else
             call_args <- args
     }
-    do.call(Class$new,call_args)
+    res <- do.call(Class$new,call_args)
+    if(!missing(layout))
+        res$layout <- layout
+    return(res)
 }
 
 #' @describeIn Boxes A baseline box constructor
 #' @param ... Arguments passed to the superclass constructor
 #' @export
-Box <- function(...) ContainerClass_new(Class=BoxClass,...)
+Box <- function(...,layout=NULL) ContainerClass_new(Class=BoxClass,layout=layout,...)
 
 #' @rdname Boxes
 #' @export
@@ -94,8 +97,8 @@ HBoxClass <- R6Class_("HBox",
 #' @param ... Arguments passed to the superclass constructor
 #' @param wrap Logical value, whether lines of widgets should be wrapped?
 #' @export
-HBox <- function(...,wrap=FALSE) {
-    box <- ContainerClass_new(Class=HBoxClass,...)
+HBox <- function(...,layout=NULL,wrap=FALSE) {
+    box <- ContainerClass_new(Class=HBoxClass,layout=layout,...)
     if(wrap && !length(box$layout$flex_flow))
         box$layout$flex_flow <- "wrap"
     box
@@ -117,8 +120,8 @@ VBoxClass <- R6Class_("VBox",
 #' @param ... Arguments passed to the superclass constructor
 #' @param wrap Logical value, whether lines of widgets should be wrapped?
 #' @export
-VBox <- function(...,wrap=FALSE) {
-    box <- ContainerClass_new(Class=VBoxClass,...)
+VBox <- function(...,layout=NULL,wrap=FALSE) {
+    box <- ContainerClass_new(Class=VBoxClass,layout=layout,...)
     if(wrap && !length(box$layout$flex_flow))
         box$layout$flex_flow <- "wrap"
     box
@@ -139,4 +142,4 @@ GridBoxClass <- R6Class_("GridBox",
 #' @describeIn Boxes A grid box constructor
 #' @param ... Arguments passed to the superclass constructor
 #' @export
-GridBox <- function(...) ContainerClass_new(Class=GridBoxClass,...)
+GridBox <- function(...,layout=NULL) ContainerClass_new(Class=GridBoxClass,layout=layout,...)
