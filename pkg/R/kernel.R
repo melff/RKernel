@@ -285,8 +285,8 @@ Kernel <- R6Class("Kernel",
           message <- paste(capture.output(self$str(message)),collapse="\n")
         else message <- paste(message,...,collapse="")
         message <- paste(crayon::green(format(Sys.time()),"\t",message,"\n"))
-        # self$cat(message,file=stderr())
         message <- paste("INFO:",message)
+        # self$cat(message,file=stderr())
         self$cat(message,file=private$logfile)
       },error=function(e){
         self$log_error(sprintf("Error in %s",dcl))
@@ -298,18 +298,18 @@ Kernel <- R6Class("Kernel",
     #' Show a warning in the Jupyter server log
     #' @param message A string to be shown in the log
     log_warning = function(message){
-      message <- paste(crayon::bgYellow(format(Sys.time()),"\t",message,"\n"))
+      message <- paste(crayon::yellow(format(Sys.time()),"\t",message,"\n"))
+      message <- paste("WARNING:",message)
       # self$cat(message,file=stderr())
-        message <- paste("WARNING:",message)
       self$cat(message,file=private$logfile)
     },
     #' @description
     #' Show an error message in the Jupyter server log
     #' @param message A string to be shown in the log
     log_error = function(message){
-      message <- crayon::bgRed(format(Sys.time()),"\t",message,"\n")
-      # self$cat(message,file=stderr())
+      message <- crayon::red(format(Sys.time()),"\t",message,"\n")
       message <- paste("ERROR:",message)
+      # self$cat(message,file=stderr())
       self$cat(message,file=private$logfile)
     },
     #' @description
