@@ -82,7 +82,7 @@ List <- function(...)TraitInstance(...,Class=ListClass)
 #' @describeIn to_json S3 method for 'ListClass' objects
 #' @export
 to_json.List <- function(x,auto_unbox=TRUE,...){
-    value <- lapply(x$get(),to_json)
+    value <- unname(lapply(x$get(),to_json))
     # if(length(value) == 1)
     #     value <- list(value)
     value
