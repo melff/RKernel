@@ -11,7 +11,7 @@ Date_from_json <- function(value) {
                      value$date,
                      sep="-")
     value <- as.Date(datestr,"%Y-%m-%d")
-    log_out(value,use.print=TRUE)
+    # log_out(value,use.print=TRUE)
     
     value
 }
