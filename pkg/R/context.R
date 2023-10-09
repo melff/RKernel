@@ -24,6 +24,8 @@ Context <- R6Class("Context",
            em <- EventManager(type="output")
            private$output_manager <- em
            em$activate()
+           private$std_out$con <- textConnection(NULL,"w",local=TRUE)
+           private$std_err$con <- textConnection(NULL,"w",local=TRUE)
            # log_out(private$std_out$con,use.print=TRUE)
            # log_out(private$std_out$err,use.print=TRUE)
            # log_out("context$initialize complete")
@@ -115,8 +117,8 @@ Context <- R6Class("Context",
                private$condition_manager$activate()
            }
            private$handle_event("enter")
-           private$std_out$con <- textConnection(NULL,"w",local=TRUE)
-           private$std_err$con <- textConnection(NULL,"w",local=TRUE)
+           # private$std_out$con <- textConnection(NULL,"w",local=TRUE)
+           # private$std_err$con <- textConnection(NULL,"w",local=TRUE)
            sink(private$std_out$con,split=FALSE)
            sink(private$std_err$con,split=FALSE,type="message")
            # log_out("context$enter complete")
@@ -144,8 +146,8 @@ Context <- R6Class("Context",
 
            sink()
            sink(type="message")
-           close(private$std_out$con)
-           close(private$std_err$con)
+           # close(private$std_out$con)
+           # close(private$std_err$con)
        },
 
        #' @description
@@ -295,7 +297,7 @@ Context <- R6Class("Context",
 
        get_output = function(x){
            # log_out("== get_output ===========================")
-           # cat("\n",file=x$con)
+           cat("\n",file=x$con)
            x$previous <- x$current
            x$current <- textConnectionValue(x$con)
            # log_out(sprintf("****previous****\n%s",paste(x$previous,collapse="\n")))
