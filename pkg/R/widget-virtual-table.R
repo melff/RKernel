@@ -104,7 +104,8 @@ virtable_widget <- function(x,
     tab_container <- HTML(layout=Layout(overflow="auto"))
     
     page_control_box <- VBox(row_pagesize_control,col_pagesize_control)
-    
+    page_control_box$layout <- Layout(display="none")
+
     message_widget <- Label()
 
     page_control_button <- ToggleButton(icon="lock",
