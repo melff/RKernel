@@ -67,6 +67,7 @@ Kernel <- R6Class("Kernel",
     #' @description
     #' Run the kernel.
     run = function(){
+      log_out("*** RKernel started ***")
       self$evaluator$startup()
       continue <- TRUE
       while(continue) {
@@ -440,14 +441,14 @@ Kernel <- R6Class("Kernel",
         aborted <- TRUE
       if(is.character(r)) {
         log_error(r)
-        msg <- attr(r,"message")
-        if(length(msg)) log_error(msg)
-        # tb <- attr(r,"traceback")
-        # if(length(tb)){
-        #   # tb <- unlist(tb)
-        #   # log_error(paste(tb,sep="\n"))
-        #   log_error(tb,use.print=TRUE)
-        # }
+        r_msg <- attr(r,"message")
+        if(length(r_msg)) log_error()
+        tb <- attr(r,"traceback")
+        if(length(tb)){
+          tb <- unlist(tb)
+          log_error(paste(tb,sep="\n"))
+          # log_error(tb,use.print=TRUE)
+        }
       }
       content <- list(status = status,
                       execution_count = execution_count)
