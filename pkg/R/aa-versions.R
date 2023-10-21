@@ -2,37 +2,33 @@ jupyter_widgets_version <- new.env()
 
 jupyter_widgets_base_version <- function(){
 
-    if(!length(get0("ipywidgets",envir=jupyter_widgets_version)))
-        set_jupyter_widget_versions()
-     
+    v <- widget_module_versions()
+
     jupyter_widgets_version$base
 }
 
 jupyter_widgets_controls_version <- function(){
 
-    if(!length(get0("ipywidgets",envir=jupyter_widgets_version)))
-        set_jupyter_widget_versions()
+    v <- widget_module_versions()
 
     jupyter_widgets_version$controls
 }
 
 jupyter_widgets_protocol_version <- function(){
 
-    if(!length(get0("ipywidgets",envir=jupyter_widgets_version)))
-        set_jupyter_widget_versions()
+    v <- widget_module_versions()
 
     jupyter_widgets_version$protocol
 }
 
 jupyter_widgets_output_version <- function(){
 
-    if(!length(get0("ipywidgets",envir=jupyter_widgets_version)))
-        set_jupyter_widget_versions()
+    v <- widget_module_versions()
 
     jupyter_widgets_version$output
 }
 
-pull_jupyter_ipywidgets_version <- function(){
+ipywidgets_version_from_jupyter <- function(){
     jupy.version <- system("jupyter --version",intern=TRUE)
     iwidgets.version <- grep("ipywidgets",jupy.version,value=TRUE)
     iwidgets.version <- trimws(strsplit(iwidgets.version,":")[[1]][2])
@@ -41,11 +37,14 @@ pull_jupyter_ipywidgets_version <- function(){
     iwidgets.version
 }
 
+enquire_ipywidgets_version <- function(){
+    if(getOption("widgets_version_from_jupyter",FALSE))
+        ipywidgets_version_from_jupyter()
+    else getOption("widgets_version",c(8,0,0))
+} 
 
+install_widget_module_versions <- function(v){
 
-set_jupyter_widget_versions <- function(){
-
-    v <- pull_jupyter_ipywidgets_version()
     jupyter_widgets_version$ipywidgets <- v
 
     # __protocol_version__
@@ -99,17 +98,17 @@ set_jupyter_widget_versions <- function(){
     
 }
 
-get_jupyter_ipywidgets_version <- function(){
+widget_module_versions <- function(){
     if(!length(get0("ipywidgets",envir=jupyter_widgets_version))){
-        v <- pull_jupyter_ipywidgets_version
-        jupyter_widgets_version$ipywidgets <- v
+        v <- enquire_ipywidgets_version()
+        install_widget_module_versions(v)
     } else
         v <- jupyter_widgets_version$ipywidgets
     return(v)
 }
 
 has_iw_ver <- function(test){
-    v <- get_jupyter_ipywidgets_version()
+    v <- widget_module_versions()
     ii <- seq_along(test)
     all(test==v[ii])
 }

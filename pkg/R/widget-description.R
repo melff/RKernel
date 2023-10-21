@@ -59,11 +59,11 @@ DescriptionWidgetClass <- R6Class_("DescriptionWidget",
     #' @field description An optional description string
     description = structure(Unicode(""),sync=TRUE),
     #' @field description_tooltip An optional description tooltip
-    description_tooltip = structure(Unicode(""),sync=get_jupyter_ipywidgets_version()[1] < 8),
+    description_tooltip = structure(Unicode(""),sync=widget_module_versions()[1] < 8),
     #' @field tooltip An optional description tooltip
-    tooltip = structure(Unicode(""),sync=get_jupyter_ipywidgets_version()[1] >= 8),
+    tooltip = structure(Unicode(""),sync=widget_module_versions()[1] >= 8),
     #' @field description_html Boolean, whether HTML is allowed in the description
-    description_html = structure(Boolean(FALSE),sync=get_jupyter_ipywidgets_version()[1] >= 8),
+    description_html = structure(Boolean(FALSE),sync=widget_module_versions()[1] >= 8),
     #' @field style A "DescriptionStyle" object
     style = structure(R6Instance(DescriptionStyleClass),sync=TRUE)
   )
