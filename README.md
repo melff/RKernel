@@ -43,8 +43,8 @@ This kernel differs from the already existing [*IRKernel*](http://irkernel.githu
   - It is possible to make use of the Widgets infrastructure provided by
     [*ipywidgets*](https://ipywidgets.readthedocs.io) to constructed interactive
     user interfaces. These can be used with jupyter notebooks, JupyterLab and
-    [*voilà*](https://voila.readthedocs.io). However, only *ipywidgets*  
-    version 7.x is supported. Supported for 8.0 is planned.
+    [*voilà*](https://voila.readthedocs.io). *ipywidgets* are supported up to 
+    version 8.0.
   - [HTML widgets](https://cran.r-project.org/package=htmlwidgets) generally
     work. However, *some* htmlwidgets (notably those created with
     [*plotly*](https://plotly.com/r/)) displayed with the setting
