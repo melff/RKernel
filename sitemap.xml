@@ -1,327 +1,327 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://melff.github.io/mclogit/404.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://melff.github.io/mclogit/authors.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://melff.github.io/mclogit/index.html</loc>
   </url>
   <url>
-    <loc>/reference/Boolean.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Boolean.html</loc>
   </url>
   <url>
-    <loc>/reference/BoundedFloatRangeWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/BoundedFloatRangeWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/BoundedFloatText.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/BoundedFloatText.html</loc>
   </url>
   <url>
-    <loc>/reference/BoundedFloatWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/BoundedFloatWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/BoundedIntText.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/BoundedIntText.html</loc>
   </url>
   <url>
-    <loc>/reference/BoundedIntWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/BoundedIntWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/BoundedLogFloatWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/BoundedLogFloatWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/Boxes.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Boxes.html</loc>
   </url>
   <url>
-    <loc>/reference/BreakPoint.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/BreakPoint.html</loc>
   </url>
   <url>
-    <loc>/reference/Buttons.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Buttons.html</loc>
   </url>
   <url>
-    <loc>/reference/Bytes.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Bytes.html</loc>
   </url>
   <url>
-    <loc>/reference/CSS.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/CSS.html</loc>
   </url>
   <url>
-    <loc>/reference/CallbackDispatcher.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/CallbackDispatcher.html</loc>
   </url>
   <url>
-    <loc>/reference/Checkboxes.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Checkboxes.html</loc>
   </url>
   <url>
-    <loc>/reference/ColorPicker.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/ColorPicker.html</loc>
   </url>
   <url>
-    <loc>/reference/ColorTrait.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/ColorTrait.html</loc>
   </url>
   <url>
-    <loc>/reference/Comm.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Comm.html</loc>
   </url>
   <url>
-    <loc>/reference/CommManager.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/CommManager.html</loc>
   </url>
   <url>
-    <loc>/reference/Context.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Context.html</loc>
   </url>
   <url>
-    <loc>/reference/CoreWidgetClass.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/CoreWidgetClass.html</loc>
   </url>
   <url>
-    <loc>/reference/DOMWidgetClass.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/DOMWidgetClass.html</loc>
   </url>
   <url>
-    <loc>/reference/DateClass.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/DateClass.html</loc>
   </url>
   <url>
-    <loc>/reference/DatePicker.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/DatePicker.html</loc>
   </url>
   <url>
-    <loc>/reference/DatetimeClass.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/DatetimeClass.html</loc>
   </url>
   <url>
-    <loc>/reference/DatetimePicker.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/DatetimePicker.html</loc>
   </url>
   <url>
-    <loc>/reference/Debugger.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Debugger.html</loc>
   </url>
   <url>
-    <loc>/reference/DescriptionStyle.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/DescriptionStyle.html</loc>
   </url>
   <url>
-    <loc>/reference/DescriptionWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/DescriptionWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/Dict.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Dict.html</loc>
   </url>
   <url>
-    <loc>/reference/Evaluator.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Evaluator.html</loc>
   </url>
   <url>
-    <loc>/reference/EventManager.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/EventManager.html</loc>
   </url>
   <url>
-    <loc>/reference/FileUpload.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/FileUpload.html</loc>
   </url>
   <url>
-    <loc>/reference/Fixed.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Fixed.html</loc>
   </url>
   <url>
-    <loc>/reference/Float.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Float.html</loc>
   </url>
   <url>
-    <loc>/reference/FloatText.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/FloatText.html</loc>
   </url>
   <url>
-    <loc>/reference/FloatWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/FloatWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/Graphics.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Graphics.html</loc>
   </url>
   <url>
-    <loc>/reference/HasTraits.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/HasTraits.html</loc>
   </url>
   <url>
-    <loc>/reference/IFrame.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/IFrame.html</loc>
   </url>
   <url>
-    <loc>/reference/IntText.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/IntText.html</loc>
   </url>
   <url>
-    <loc>/reference/IntWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/IntWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/Integer.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Integer.html</loc>
   </url>
   <url>
-    <loc>/reference/Javascript.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Javascript.html</loc>
   </url>
   <url>
-    <loc>/reference/Kernel.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Kernel.html</loc>
   </url>
   <url>
-    <loc>/reference/LaTeXMath.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/LaTeXMath.html</loc>
   </url>
   <url>
-    <loc>/reference/Layout.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Layout.html</loc>
   </url>
   <url>
-    <loc>/reference/LayoutTemplates.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/LayoutTemplates.html</loc>
   </url>
   <url>
-    <loc>/reference/List.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/List.html</loc>
   </url>
   <url>
-    <loc>/reference/MediaWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/MediaWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/OutputWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/OutputWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/Page.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Page.html</loc>
   </url>
   <url>
-    <loc>/reference/Play.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Play.html</loc>
   </url>
   <url>
-    <loc>/reference/PlotWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/PlotWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/Progress.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Progress.html</loc>
   </url>
   <url>
-    <loc>/reference/R6Class_.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/R6Class_.html</loc>
   </url>
   <url>
-    <loc>/reference/R6Instance.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/R6Instance.html</loc>
   </url>
   <url>
-    <loc>/reference/R6TraitClass.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/R6TraitClass.html</loc>
   </url>
   <url>
-    <loc>/reference/SelectionContainer.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/SelectionContainer.html</loc>
   </url>
   <url>
-    <loc>/reference/SelectionWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/SelectionWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/Sidecar.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Sidecar.html</loc>
   </url>
   <url>
-    <loc>/reference/Slider.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Slider.html</loc>
   </url>
   <url>
-    <loc>/reference/StrEnum.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/StrEnum.html</loc>
   </url>
   <url>
-    <loc>/reference/StrEnumClass.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/StrEnumClass.html</loc>
   </url>
   <url>
-    <loc>/reference/StringWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/StringWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/TagsInput.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/TagsInput.html</loc>
   </url>
   <url>
-    <loc>/reference/TimeClass.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/TimeClass.html</loc>
   </url>
   <url>
-    <loc>/reference/TimePicker.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/TimePicker.html</loc>
   </url>
   <url>
-    <loc>/reference/Togglebuttons.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Togglebuttons.html</loc>
   </url>
   <url>
-    <loc>/reference/Trace.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Trace.html</loc>
   </url>
   <url>
-    <loc>/reference/Traitlets.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Traitlets.html</loc>
   </url>
   <url>
-    <loc>/reference/Unicode.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Unicode.html</loc>
   </url>
   <url>
-    <loc>/reference/UnicodeClass.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/UnicodeClass.html</loc>
   </url>
   <url>
-    <loc>/reference/Valid.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Valid.html</loc>
   </url>
   <url>
-    <loc>/reference/ValueWidgetClass.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/ValueWidgetClass.html</loc>
   </url>
   <url>
-    <loc>/reference/Vector.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Vector.html</loc>
   </url>
   <url>
-    <loc>/reference/View.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/View.html</loc>
   </url>
   <url>
-    <loc>/reference/WidgetLink.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/WidgetLink.html</loc>
   </url>
   <url>
-    <loc>/reference/Widgets.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/Widgets.html</loc>
   </url>
   <url>
-    <loc>/reference/add_displayed_classes.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/add_displayed_classes.html</loc>
   </url>
   <url>
-    <loc>/reference/add_paged_classes.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/add_paged_classes.html</loc>
   </url>
   <url>
-    <loc>/reference/alert.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/alert.html</loc>
   </url>
   <url>
-    <loc>/reference/cell.options.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/cell.options.html</loc>
   </url>
   <url>
-    <loc>/reference/dataTable.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/dataTable.html</loc>
   </url>
   <url>
-    <loc>/reference/dictionary.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/dictionary.html</loc>
   </url>
   <url>
-    <loc>/reference/display.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/display.html</loc>
   </url>
   <url>
-    <loc>/reference/display_data.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/display_data.html</loc>
   </url>
   <url>
-    <loc>/reference/display_id.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/display_id.html</loc>
   </url>
   <url>
-    <loc>/reference/envBrowser.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/envBrowser.html</loc>
   </url>
   <url>
-    <loc>/reference/help.start.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/help.start.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/install.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/install.html</loc>
   </url>
   <url>
-    <loc>/reference/interaction.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/interaction.html</loc>
   </url>
   <url>
-    <loc>/reference/ls_str.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/ls_str.html</loc>
   </url>
   <url>
-    <loc>/reference/main.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/main.html</loc>
   </url>
   <url>
-    <loc>/reference/mkWidget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/mkWidget.html</loc>
   </url>
   <url>
-    <loc>/reference/raw_html.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/raw_html.html</loc>
   </url>
   <url>
-    <loc>/reference/register_magic_handler.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/register_magic_handler.html</loc>
   </url>
   <url>
-    <loc>/reference/remove_displayed_classes.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/remove_displayed_classes.html</loc>
   </url>
   <url>
-    <loc>/reference/remove_paged_classes.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/remove_paged_classes.html</loc>
   </url>
   <url>
-    <loc>/reference/services.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/services.html</loc>
   </url>
   <url>
-    <loc>/reference/sharedHelpServer.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/sharedHelpServer.html</loc>
   </url>
   <url>
-    <loc>/reference/to_json.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/to_json.html</loc>
   </url>
   <url>
-    <loc>/reference/tracing_source.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/tracing_source.html</loc>
   </url>
   <url>
-    <loc>/reference/virtable_widget.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/virtable_widget.html</loc>
   </url>
   <url>
-    <loc>/reference/with.Context.html</loc>
+    <loc>https://melff.github.io/mclogit/reference/with.Context.html</loc>
   </url>
 </urlset>
