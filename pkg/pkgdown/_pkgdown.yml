@@ -2,4 +2,16 @@ url: https://melff.github.io/mclogit
 template:
   bootstrap: 5
   bootswatch: sandstone
-  
+reference:  
+- title: "Display facilities"
+  contents:
+  - CSS
+- title: "Traitlets"
+  contents:
+  - Boolean
+- title: "Widgets"
+  contents:
+  - BoundedFloatRangeWidget
+- title: "Internal functions"
+  contents:
+  - CallbackDispatcher
