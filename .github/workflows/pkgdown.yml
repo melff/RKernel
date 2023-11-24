@@ -37,15 +37,11 @@ jobs:
       - name: Copy Readme
         run: cp -a README.md pkg
 
-      - name: Run roxygen2 and build pages
+      - name: Run roxygen2
         run: roxygen2::roxygenize(package.dir="pkg")
         shell: Rscript {0}
-          
-      - name: Run dir
-        run: dir("pkg", recursive=TRUE)
-        shell: Rscript {0}
         
-      - name: Run pkgdown
+      - name: Build site
         run: pkgdown::build_site_github_pages(pkg = "pkg", dest_dir = "../docs", new_process = FALSE, install = FALSE)
         shell: Rscript {0}
             
