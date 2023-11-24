@@ -55,7 +55,7 @@ This kernel differs from the already existing [*IRKernel*](http://irkernel.githu
   - There is also a support for virtual table display (based on the ipywidget
     infrastructure).
     
-![Display-demo.gif](https://github.com/melff/RKernel/blob/main/gifs/Display-demo.gif)
+![Display-demo.gif](https://raw.githubusercontent.com/melff/RKernel/main/gifs/Display-demo.gif)
    
     
 Some demonstration notebooks can be found [here](https://tmphub.elff.eu/user-redirect/).
