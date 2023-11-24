@@ -4,7 +4,7 @@ This is a re-creation from scratch of an [*R*](http://www.r-project.org) kernel
 for [*Jupyter*](http://juypter.org).
 
 
-![Interactive-distributions-demo.gif](https://github.com/melff/RKernel/blob/main/gifs/Display-demo.gif)
+![Interactive-distributions-demo.gif](https://raw.githubusercontent.com/melff/RKernel/main/gifs/Display-demo.gif)
 
 To install run the following lines in *R*:
 
