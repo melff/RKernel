@@ -38,12 +38,17 @@ jobs:
         run: cp -a README.md pkg
 
       - name: Run roxygen2 and build pages
-        run: 
-          - roxygen2::roxygenize(package.dir="pkg")
-          - dir("pkg")
-          - pkgdown::build_site_github_pages(pkg = "pkg", dest_dir = "../docs", new_process = FALSE, install = FALSE)
+        run: roxygen2::roxygenize(package.dir="pkg")
         shell: Rscript {0}
-
+          
+      - name: Run dir
+        run: dir("pkg", recursive=TRUE)
+        shell: Rscript {0}
+        
+      - name: Run pkgdown
+        run: pkgdown::build_site_github_pages(pkg = "pkg", dest_dir = "../docs", new_process = FALSE, install = FALSE)
+        shell: Rscript {0}
+            
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4.4.1
