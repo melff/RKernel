@@ -8,6 +8,8 @@ reference:
   - CSS
   - IFrame
   - Javascript
+  - LaTeXMath
+  - Page
   - View
   - add_displayed_classes
   - add_paged_classes
@@ -28,11 +30,10 @@ reference:
   - DatetimeClass
   - DatetimePicker
   - Dict
-  - Fixed
   - Float
+  - HasTraits
   - Integer
   - List
-  - Page
   - StrEnum
   - StrEnumClass
   - TimeClass
@@ -59,11 +60,11 @@ reference:
   - DescriptionStyle
   - DescriptionWidget
   - FileUpload
+  - Fixed
   - FloatText
   - FloatWidget
   - IntText
   - IntWidget
-  - LaTeXMath
   - Layout
   - LayoutTemplates
   - MediaWidget
@@ -86,10 +87,13 @@ reference:
   - dataTable
 - title: "Interactions"
   contents: 
-  - BreakPoint
-  - Trace
   - interaction
   - mkWidget
+- title: "Debugging"
+  contents: 
+  - BreakPoint
+  - Trace
+  - tracing_source
 - title: "Utilities"
   contents: 
   - cell.options
@@ -105,7 +109,6 @@ reference:
   - Evaluator
   - EventManager
   - Graphics
-  - HasTraits
   - Kernel
   - R6Class_
   - R6Instance
@@ -117,5 +120,4 @@ reference:
   - services
   - sharedHelpServer
   - to_json
-  - tracing_source
   - virtable_widget
