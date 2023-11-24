@@ -3,8 +3,7 @@
 This is a re-creation from scratch of an [*R*](http://www.r-project.org) kernel
 for [*Jupyter*](http://juypter.org).
 
-
-![Interactive-distributions-demo.gif](pkg/vignettes/web_only/gifs/Interactive-distributions-demo.gif)
+![Interactive-distributions-demo.gif](gifs/Interactive-distributions-demo.gif)
 
 To install run the following lines in *R*:
 
@@ -55,7 +54,7 @@ This kernel differs from the already existing [*IRKernel*](http://irkernel.githu
   - There is also a support for virtual table display (based on the ipywidget
     infrastructure).
     
-![Display-demo.gif](pkg/vignettes/web_only/gifs/Display-demo.gif)
+![Display-demo.gif](gifs/Display-demo.gif)
    
     
 Some demonstration notebooks can be found [here](https://tmphub.elff.eu/user-redirect/).
