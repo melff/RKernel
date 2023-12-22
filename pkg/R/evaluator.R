@@ -187,6 +187,11 @@ Evaluator <- R6Class("Evaluator",
             # log_out(sys.frames(),use.print=TRUE)
             # log_out(sys.parents(),use.print=TRUE)
 
+            cparsed <- private$parse_special_comments(code)
+            if(length(cparsed)){
+                private$context$evaluate(cparsed,envir=.GlobalEnv)
+            }
+
             private$results <- list()
             if(private$aborted) return(private$results)
 
@@ -1044,7 +1049,47 @@ Evaluator <- R6Class("Evaluator",
                 obj <- get(n,envir=exports)
                 assign(n,obj,envir=private$env)
             }
+        },
+
+        parse_special_comments = function(code){
+            exprs <- list()
+            opt_exprs <- private$parse_opt_special_comments(code)
+            par_exprs <- NULL
+            par_exprs <- private$parse_par_special_comments(code)
+            c(opt_exprs,par_exprs)
+        },
+
+        parse_opt_special_comments = function(code){
+            code <- getMatch(code,gregexpr("#\\+opt:.*",code,perl=TRUE))
+            if(length(code) && any(nzchar(code))){
+                code <- gsub("#+opt:","",code,fixed=TRUE)
+                code <- trimws(code)
+                code <- paste0("cell.options(",code,")")
+                expr <- parse(text=code)
+                for(i in seq_along(expr)){
+                    expr[[i]][[1]] <- self$cell.options
+                }
+            }
+            else expr <- NULL
+            expr
+        },
+
+        parse_par_special_comments = function(code){
+            code <- getMatch(code,gregexpr("#\\+par:.*?\n",code))
+            if(length(code) && any(nzchar(code))){
+                code <- gsub("#+par:","",code,fixed=TRUE)
+                code <- trimws(code)
+                code <- paste0("cell.par(",code,")")
+                expr <- parse(text=code)
+                for(i in seq_along(expr)){
+                    expr[[i]][[1]] <- self$cell.par
+                }
+            }
+            else expr <- NULL
+            expr
         }
+
+        
     )
 
 )
