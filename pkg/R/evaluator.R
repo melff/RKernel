@@ -992,13 +992,13 @@ Evaluator <- R6Class("Evaluator",
             port <- private$read_help_port_file()
             prefix <- private$jupyterhub_prefix
             if(port == 0){
-                log_out("Port is 0 starting new help server")
+                # log_out("Port is 0 starting new help server")
                 private$start_shared_help_server(port)
                 while(port == 0){
                     port <- private$read_help_port_file()
                     Sys.sleep(0.01)
                 }
-                log_out(sprintf("New port number is %d",port))
+                # log_out(sprintf("New port number is %d",port))
                 private$update_help_url(port)
             }
             return(port)
