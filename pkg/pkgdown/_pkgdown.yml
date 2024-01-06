@@ -1,7 +1,6 @@
 url: https://melff.github.io/RKernel
 template:
-  bootstrap: 5
-  bootswatch: preferably
+  package: preferably
 reference:  
 - title: "Display facilities"
   contents:
