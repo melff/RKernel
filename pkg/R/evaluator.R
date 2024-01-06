@@ -814,8 +814,11 @@ Evaluator <- R6Class("Evaluator",
             private$kernel$log_error(text)
             stop_on_error <- getOption("rkernel_stop_on_error")
             if(stop_on_error){
-                calls <- sys.calls()
                 private$aborted <- TRUE
+            }
+            show_traceback <- getOption("rkernel_show_traceback",stop_on_error)
+            if(show_traceback){
+                calls <- sys.calls()
                 #drop_prev <- private$nframes - 2
                 #calls <- tail(calls,-drop_prev)
                 calls <- head(calls,-6)
@@ -832,6 +835,11 @@ Evaluator <- R6Class("Evaluator",
                 private$kernel$send_error(name = "ERROR",
                                           value = "",
                                           traceback = list(traceback)
+                                          )
+            } else {
+                private$kernel$send_error(name = "ERROR",
+                                          value = "",
+                                          traceback = NULL
                                           )
             }
         },
