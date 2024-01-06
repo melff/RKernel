@@ -142,8 +142,9 @@ Evaluator <- R6Class("Evaluator",
             private$assign_exports()
             em <- EventManager(type="eval")
             em$activate()
-            # log_out("evaluator$startup() complete")
+            # log_out("=== evaluator$startup() complete ==================================")
             private$jupyterhub_prefix <- Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")
+            # log_out(dev.list(),use.print=TRUE)
 
         },
         #' @description
@@ -171,6 +172,8 @@ Evaluator <- R6Class("Evaluator",
                 eventmanagers$eval$send("cell_completed")
                 return()
             }
+            
+            # log_out(dev.list(),use.print=TRUE)
 
             # if("var_dic_list" %in% objects(envir=.GlobalEnv)) 
             #     rm(var_dic_list,envir=.GlobalEnv)
@@ -188,8 +191,8 @@ Evaluator <- R6Class("Evaluator",
             # log_out(sys.parents(),use.print=TRUE)
 
             cparsed <- private$parse_special_comments(code)
-            if(length(cparsed)){
-                private$context$evaluate(cparsed,envir=.GlobalEnv)
+            if(length(cparsed$immediate)){
+                private$context$evaluate(cparsed$immediate,envir=.GlobalEnv)
             }
 
             private$results <- list()
@@ -203,13 +206,21 @@ Evaluator <- R6Class("Evaluator",
                                       stream="stderr")
             }
             else {
+                if(length(cparsed$in_cell))
+                    expressions <- c(cparsed$in_cell,expressions)
                 if(store_history){
                     private$new_cell <- TRUE
                     self$cell_no <- self$cell_no + 1
                     # log_out(sprintf("== BEGIN CELL [%d] ==",self$cell_no))
                 }
-                # log_out(code)
+                private$graphics$open(width = getOption("jupyter.plot.width",6),
+                                      height = getOption("jupyter.plot.height",6),
+                                      res = getOption("jupyter.plot.res",96),
+                                      pointsize = getOption("jupyter.plot.pointsize",12),
+                                      units = getOption("jupyter.plot.units","in"))
+                private$graphics$activate()
                 private$context$evaluate(expressions,envir=.GlobalEnv)
+                private$graphics$close()
                 if(!silent)
                     current_value <- private$context$last.value
                 if(store_history){
@@ -538,10 +549,8 @@ Evaluator <- R6Class("Evaluator",
         #' Restart/recreate the graphics device if for whatever reason 
         #' it was closed needs to be reinitialized
         restart_graphics = function(){
-            dev_cur <- dev.cur()
-            if(dev_cur > 1)
-                dev.off(dev_cur)
-            private$graphics$create()
+            private$graphics$close()
+            private$graphics$open()
             private$graphics$activate()
         },
         #' @description
@@ -709,7 +718,7 @@ Evaluator <- R6Class("Evaluator",
         handle_graphics = function(...) {
 
             if(!private$graphics$is_active()) return(NULL)
-            plt <- private$graphics$get_plot()
+            plt <- private$graphics$get()
 
             if(!length(plt) || !private$graphics$complete_page()) return(NULL)
             new_page <- private$graphics$new_page(reset=TRUE)
@@ -772,7 +781,7 @@ Evaluator <- R6Class("Evaluator",
             sleep_after_graphics <- getOption("sleep_after_graphics",0)
             if(sleep_after_graphics > 0)
                 Sys.sleep(sleep_after_graphics)
-
+            private$graphics$activate()
         },
 
         handle_message = function(m) {
@@ -904,7 +913,7 @@ Evaluator <- R6Class("Evaluator",
         handle_iframe = function(path,query,...){
             # log_out("handle_iframe: %s",path)
             path <- strsplit(path,"/")[[1]]
-            log_out(path,use.print=TRUE)
+            # log_out(path,use.print=TRUE)
             id <- path[3]
             body <- private$iframes[[id]]
             list(payload=body,
@@ -1064,7 +1073,8 @@ Evaluator <- R6Class("Evaluator",
             opt_exprs <- private$parse_opt_special_comments(code)
             par_exprs <- NULL
             par_exprs <- private$parse_par_special_comments(code)
-            c(opt_exprs,par_exprs)
+            list(immediate=opt_exprs,
+                 in_cell=par_exprs)
         },
 
         parse_opt_special_comments = function(code){

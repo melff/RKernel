@@ -165,7 +165,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             # log_out("Widget-context: handle_graphics")
 
             if(!private$graphics$is_active()) return(NULL)
-            plt <- private$graphics$get_plot()
+            plt <- private$graphics$get()
 
             if(!length(plt) || !private$graphics$complete_page()) return(NULL)
             new_page <- private$graphics$new_page(reset=TRUE)

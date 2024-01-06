@@ -80,31 +80,52 @@ GraphicsDevice <- R6Class("GraphicsDevice",
             em$activate()
             private$event_manager <- em
             em$on("plot_new",private$plot_new_hook)
-            private$device()
+            self$open()
             private$empty_plot <- recordPlot()
+            self$close()
         },
         is_active = function(){
             private$dev_num == dev.cur()
         },
-        create = function(){
-            private$device()
+        open = function(...){
+            private$device(...)
+        },
+        close = function(){
+            if(private$dev_num %in% dev.list()){
+                dev.off(private$dev_num)
+                private$dev_num <- 0
+            }
         },
         activate = function(){
-            if(private$dev_num != dev.cur()){
-                private$other_dev = dev.cur()
-                dev.set(private$dev_num)
+            if(private$dev_num %in% dev.list()){
+                if(private$dev_num != dev.cur()){
+                    private$other_dev = dev.cur()
+                    dev.set(private$dev_num)
+                }
+                private$event_manager$activate()
             }
-            private$event_manager$activate()
-            
         },
         suspend = function(){
             private$event_manager$suspend()
             if(private$other_dev > 0)
                 dev.set(private$other_dev)
         },
-        get_plot = function(){
+        get = function(save=TRUE){
             plt <- recordPlot()
+            if(save)
+                private$current_plot <- plt
             return(plt)
+        },
+        save = function(){
+            private$current_plot <- recordPlot()
+        },
+        restore = function(plt=NULL){
+            if(is.null(plt))
+                plt <- private$current_plot
+            else 
+                private$current_plot <- plt
+            if(!is.null(private$current_plot))
+                replayPlot(plt)
         },
         new_page = function(reset=FALSE){
             result <- isTRUE(private$plot_new_called)
@@ -116,7 +137,7 @@ GraphicsDevice <- R6Class("GraphicsDevice",
             self$is_active() && par("page")
         },
         empty = function(){
-            self$empty_plot
+            private$empty_plot
         },
         clear = function(){
             replayPlot(self$empty_plot)
@@ -160,21 +181,25 @@ GraphicsDevice <- R6Class("GraphicsDevice",
                           units = getOption("jupyter.plot.units","in"),
                           ...){
             dev <- get(private$dev_name)
-            if(is.null(filename))
-                dev(filename=private$dev_filename,
-                    width=width,
-                    height=height,
-                    res=res,
-                    units=units,
-                    ...)
+            if(is.null(filename)){
+                filename <- private$dev_filename
+            }
+            dev(filename=filename,
+                width=width,
+                height=height,
+                res=res,
+                units=units,
+                ...)
             private$dev_num <- dev.cur()
+            # log_out(private$dev_num,use.print=TRUE)
             dev.control(displaylist="enable")
             
             # log_out('private$device')
             # log_out("private$dev_num==",private$dev_num)
 
         },
-        empty_plot = NULL
+        empty_plot = NULL,
+        current_plot = NULL
     )
 )
 
