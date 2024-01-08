@@ -24,8 +24,6 @@ DAPServer <- R6Class("DAPServer",
               command = request$command,
               body = body
           )
-          if(request$command != "debugInfo")
-              log_out(response,use.print=TRUE)
           return(response)
       },
       debugInfo = function(request){
@@ -83,6 +81,9 @@ DAPServer <- R6Class("DAPServer",
           else {
               type <- self$get_structured_type(var)
               value <- self$get_structured_val(var)
+              vref <- self$vref_counter
+              self$vref_counter <- self$vref_counter + 1L
+              self$var_children[[vref]] <- list(name=varname,envir=envir,start_index=1L)
           }
           res <- list(
               name = varname,
@@ -111,6 +112,7 @@ DAPServer <- R6Class("DAPServer",
           return(NULL)
       },
       reply_variables = function(request){
+          log_out(">> reply_variables")
           vref <- request$arguments$variablesReference
           children_desc <- self$var_children[[vref]]
           if(!length(children_desc))
@@ -121,13 +123,19 @@ DAPServer <- R6Class("DAPServer",
           if(!length(var)) return(NULL)
           l <- length(var)
           i0 <- children_desc$start_index
-          n <- min(self$chunk_size, l - i0 + 1L)
+          if(is.list(var))
+              m <- self$list_chunk_size
+          else 
+              m <- self$vector_chunk_size
+          n <- min(m, l - i0 + 1L)
           ii <- seq.int(from=i0,
                         length=n)
           if(is.atomic(var) && is.vector(var)) self$show_vector(var, ii, varname, l)
+          else if(is.list(var)) self$show_list(var,ii,varname,l)
           else return(NULL)
       },
       show_vector = function(x,ii,name,l){
+          log_out(">>>>> show_vector")
           nms <- names(x)
           if(!length(nms))
               nms <- paste0("[",ii,"]")
@@ -154,12 +162,60 @@ DAPServer <- R6Class("DAPServer",
           }
           list(variables=unname(variables))
       },
+      show_list = function(x,ii,name,l){
+          log_out(">>>>> show_list")
+          nms <- names(x)
+          if(!length(nms))
+              nms <- paste0("[[",ii,"]]")
+          zch <- !nzchar(nms)
+          if(any(zch))
+              nms[zch] <- paste0("[[",ii[zch],"]]")
+          nms <- format(nms)
+          vals <- x[ii]
+          enms <- paste0(name,"[[",ii,"]]")
+          variables <- Map(self$show_list_elt,vals,nms,enms)
+          if(max(ii) < l){
+              n <- max(ii) + 1L
+              more_elts <- list(
+                  name = paste0("[",n,":",l,"]"),
+                  type = "str",
+                  value = "...",
+                  evaluateName = paste0(name,"[",n,":",l,"]"),
+                  variablesReference=0L
+              )
+              variables <- c(variables,list(more_elts))
+          }
+          list(variables=unname(variables))
+      },
       show_elt = function(val,name,ename,type){
           list(name=name,
                value=val,
                type=type,
                evaluateName=ename,
                variablesReference=0L)
+      },
+      show_list_elt = function(val,name,ename){
+          log_out(">>>>>>>>>> show_list_elt")
+          if(is.atomic(val)) {
+              if(length(val) == 1){
+                  value <- format(val)
+                  type <- typeof(val)
+                  type <- paste0(type," ",value)
+              }
+              else {
+                  type <- self$get_atomic_type(val)
+                  value <- self$get_atomic_val(val)
+              }
+          }
+          type <- self$get_structured_type(val)
+          value <- self$get_structured_val(val)
+          list(
+              name = name,
+              value = value,
+              type = type,
+              evaluateName = ename,
+              variablesReference = 0L
+          )
       },
       is_started = FALSE,
       kernel = NULL,
@@ -172,6 +228,7 @@ DAPServer <- R6Class("DAPServer",
       ),
       vref_counter = 1L,
       var_children = list(),
-      chunk_size = 25L
+      vector_chunk_size = 25L,
+      list_chunk_size = 100L
   )
 )
