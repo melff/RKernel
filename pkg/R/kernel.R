@@ -623,11 +623,7 @@ Kernel <- R6Class("Kernel",
          log_out(msg,use.str=TRUE)
       private$parent$shell <- msg
       if(!length(msg)) return(TRUE)
-      private$send_message(type="status",
-                           parent=private$parent$shell,
-                           socket_name="iopub",
-                           content=list(
-                             execution_state="busy"))
+      private$send_busy(private$parent$shell)
       if(debug)
         self$log_out(paste("Got a", msg$header$msg_type, "request ..."))
       # cat("Got a", msg$header$msg_type, "request ...\n")
@@ -642,15 +638,26 @@ Kernel <- R6Class("Kernel",
              complete_request = private$complete_reply(msg),
              comm_info_request = private$comm_info_reply(msg)
              )
-
-      private$send_message(type="status",
-                           parent=private$parent$shell,
-                           socket_name="iopub",
-                           content=list(
-                             execution_state="idle"))
+      private$send_idle(private$parent$shell)
       return(TRUE)
     },
 
+    send_busy = function(parent){
+      private$send_message(type="status",
+                           parent=parent,
+                           socket_name="iopub",
+                           content=list(
+                             execution_state="busy"))
+    },
+
+    send_idle = function(parent){
+      private$send_message(type="status",
+                           parent=parent,
+                           socket_name="iopub",
+                           content=list(
+                             execution_state="idle"))
+    },
+    
     get_message = function(socket_name){
       if(self$is_child()) return(NULL)
       socket <- private$sockets[[socket_name]]
