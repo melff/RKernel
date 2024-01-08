@@ -11,5 +11,8 @@
      "GOTO_NUM_THREADS":     "1",
      "OMP_NUM_THREADS":      "1"
  },
- "language":"R"
+ "language":"R",
+ "metadata": {
+     "debugger": true
+ }
 }

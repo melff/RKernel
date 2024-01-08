@@ -39,6 +39,7 @@ Collate:
     'comms.R'
     'compare-plots.R'
     'context.R'
+    'dap-server.R'
     'dataTable.R'
     'debugging.R'
     'display.R'

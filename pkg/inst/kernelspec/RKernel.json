@@ -6,5 +6,8 @@
           "--args", 
           "{connection_file}"],
  "display_name":"R (RKernel)",
- "language":"R"
+ "language":"R",
+ "metadata": {
+     "debugger": true
+ }
 }

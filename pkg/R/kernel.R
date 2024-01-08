@@ -471,6 +471,18 @@ Kernel <- R6Class("Kernel",
     display_id = character(0),
     last_display = function() private$display_id,
 
+    handle_debug_request = function(msg){
+      if(is.null(private$DAPServer))
+        private$DAPServer <- DAPServer$new(self)
+      request <- msg$content
+      reply <- private$DAPServer$handle(request)
+      private$send_message(type="debug_reply",
+                           parent=private$parent$control,
+                           socket="control",
+                           content=reply)
+    },
+    DAPServer = NULL,
+
     kernel_info_reply = function(msg){
       rversion <- paste0(version$major,".",version$minor)
       response <- list(protocol_version= PROTOCOL_VERSION,
@@ -483,7 +495,8 @@ Kernel <- R6Class("Kernel",
                          mimetype = "text/x-r-source",
                          file_extension = ".R",
                          version = rversion),
-                       banner = version$version.string)
+                       banner = version$version.string,
+                       debugger = TRUE)
       private$send_message(type="kernel_info_reply",
                            parent=private$parent$shell,
                            socket_name="shell",
@@ -611,6 +624,12 @@ Kernel <- R6Class("Kernel",
       if(msg$header$msg_type=="shutdown_request"){
         # cat("shutdown_request received")
         return(FALSE)
+      }
+      else if(msg$header$msg_type=="debug_request"){
+        private$send_busy(private$parent$control)
+        private$handle_debug_request(msg)
+        private$send_idle(private$parent$control)
+        return(TRUE)
       }
       else return(TRUE)
     },
