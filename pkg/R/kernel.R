@@ -475,7 +475,11 @@ Kernel <- R6Class("Kernel",
       if(is.null(private$DAPServer))
         private$DAPServer <- DAPServer$new(self)
       request <- msg$content
-      reply <- private$DAPServer$handle(request)
+      reply <- try(private$DAPServer$handle(request))
+      if(inherits(reply,"try-error")){
+        log_error(reply)
+        return(NULL)
+      }
       private$send_message(type="debug_reply",
                            parent=private$parent$control,
                            socket="control",
