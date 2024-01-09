@@ -886,9 +886,18 @@ check_page_payload <- function(payload){
 
 get_current_kernel <- function() kernel$current
 
-log_out <- function(...) kernel$current$log_out(...)
-log_error <- function(...) kernel$current$log_error(...)
-log_warning <- function(...) kernel$current$log_warning(...)
+log_out <- function(...) {
+  if(inherits(kernel$current,"Kernel")) kernel$current$log_out(...)
+  else message(...)
+}
+log_error <- function(...) {
+  if(inherits(kernel$current,"Kernel")) kernel$current$log_error(...)
+  else stop(...)
+}
+log_warning <- function(...) {
+  if(inherits(kernel$current,"Kernel")) kernel$current$log_warning(...)
+  else warning(...)
+}
 
 replace_in_package <- function(pkg_name,name,value){
   env_name <- paste0("package:",pkg_name)
