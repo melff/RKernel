@@ -26,7 +26,9 @@ display <- function(...){
 #' @return An object of class "display_data"
 #' 
 #' @export
-display_data <- function(x,...) UseMethod("display_data")
+display_data <- function(x,...) {
+    UseMethod("display_data")
+}
 
 #' @describeIn display_data Default method
 #'
@@ -53,6 +55,10 @@ display_data.default <- function(x,...,
         else
             d <- list(data=data)
     } 
+    else if(length(dim(x))==2) {
+        x <- as.data.frame(x)
+        return(display_data(x))
+    }
     else {
         rkernel_mime_types <- getOption("rkernel_mime_types",
                                         c("text/plain",

@@ -11,10 +11,9 @@ DAPServer <- R6Class("DAPServer",
                          debugInfo = self$debugInfo(request),
                          initialize = self$debug_init(request),
                          attach = self$debug_attach(request),
-                         # setExceptionBreakpoints = self$empty_reply(request),
                          inspectVariables = self$inspect_variables(request),
-                         # configurationDone = self$empty_reply(request),
                          variables = self$reply_variables(request),
+                         richInspectVariables = self$rich_inspect_variable(request),
                          self$empty_reply(request)
                          )
           response <- list(
@@ -58,6 +57,16 @@ DAPServer <- R6Class("DAPServer",
               body <- list(variables = unname(variables))
           }
           return(body)
+      },
+      rich_inspect_variable = function(request){
+          varname <- request$arguments$variableName
+          thing <- self$get_thing(varname)
+          # log_out(thing,use.str=TRUE)
+          if(!length(thing$value))
+              body <- display_data(data=list("text/html"=sprintf("Information from frontend: \"%s\"",request$arguments)))
+          else 
+              body <- display_data(thing$value)
+          return(unclass(body))
       },
       inspect_thing = function(path,name=tail(path,n=1L)){
           desc <- self$get_thing(path)
