@@ -64,6 +64,8 @@ Kernel <- R6Class("Kernel",
     evaluator = list(),
     #' @field comm_manager See \code{\link{CommManagerClass}}.
     comm_manager = list(),
+    #' @field DAPServer The current DAP server
+    DAPServer = NULL,
     #' @description
     #' Run the kernel.
     run = function(){
@@ -472,10 +474,10 @@ Kernel <- R6Class("Kernel",
     last_display = function() private$display_id,
 
     handle_debug_request = function(msg){
-      if(is.null(private$DAPServer))
-        private$DAPServer <- DAPServer$new(self)
+      if(is.null(self$DAPServer))
+        self$DAPServer <- DAPServer$new(self)
       request <- msg$content
-      reply <- try(private$DAPServer$handle(request))
+      reply <- try(self$DAPServer$handle(request))
       if(inherits(reply,"try-error")){
         log_error(reply)
         return(NULL)
@@ -485,7 +487,6 @@ Kernel <- R6Class("Kernel",
                            socket="control",
                            content=reply)
     },
-    DAPServer = NULL,
 
     kernel_info_reply = function(msg){
       rversion <- paste0(version$major,".",version$minor)
