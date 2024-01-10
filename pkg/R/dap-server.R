@@ -234,9 +234,11 @@ DAPServer <- R6Class("DAPServer",
               nms[zch] <- paste0("[",ii[zch],"]")
           nms <- format(nms)
           vals <- format(x[ii])
-          type <- class(x) 
-          if(type %in% names(self$types)) 
+          type <- class(x)[1]
+          if(any(type %in% names(self$types))) {
+              type <- intersect(type,names(self$types))
               type <- self$types[type]
+          }
           else
               type <- "str" # To avoid NaN in the frontend
           enms <- paste0(ename,"[",ii,"]")
