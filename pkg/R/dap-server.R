@@ -126,6 +126,11 @@ DAPServer <- R6Class("DAPServer",
                   x <- attributes(x)
                   ename <- sprintf("attributes(%s)",ename)
               }
+              else if(isS4(x)){
+                  ename <- i
+                  slotname <- gsub("@","",i,fixed=TRUE)
+                  x <- slot(x,slotname)
+              }
               else if(is.list(x)){
                   if(is.numeric(i) && i <= length(x) || is.character(i))
                       x <- x[[i]]
@@ -177,7 +182,8 @@ DAPServer <- R6Class("DAPServer",
           n <- min(m, l - i0 + 1L)
           ii <- seq.int(from=i0,
                         length=n)
-          if(self$is.vectorlike(x)) self$show_vector(thing, ii,l)
+          if(isS4(x)) self$show_S4(thing)
+          else if(self$is.vectorlike(x)) self$show_vector(thing, ii,l)
           else if(is.list(x)) self$show_list(thing,ii,path,l)
           else if(is.function(x)) self$show_function(thing)
           else NULL
@@ -214,7 +220,7 @@ DAPServer <- R6Class("DAPServer",
       },
       is.vectorlike = function(x){
           # A more 'inclusive' variant of 'is.vector'
-          is.atomic(x) && !is.array(x) || (isS4(x) && is.vector(x@.Data))
+          is.atomic(x) || (isS4(x) && is.vector(x@.Data))
       },
       show_vector = function(thing,ii,l){
           x <- thing$value
@@ -270,6 +276,19 @@ DAPServer <- R6Class("DAPServer",
           if(length(attributes(x))){
               att_el <- self$add_atts(thing)
               elements <- c(att_el,elements)
+          }
+          unname(elements)
+      },
+      show_S4 = function(thing){
+          x <- thing$value
+          ename <- thing$ename
+          path <- thing$path
+          nms <- paste0("@",slotNames(x))
+          ii <- seq_along(nms)
+          elements <- list()
+          for(i in ii){
+              n <- nms[i]
+              elements[[i]] <- self$inspect_thing(c(path,list(n)),name=n)
           }
           unname(elements)
       },
