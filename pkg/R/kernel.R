@@ -442,7 +442,7 @@ Kernel <- R6Class("Kernel",
       if(is.character(r)) {
         log_error(r)
         r_msg <- attr(r,"message")
-        if(length(r_msg)) log_error()
+        if(length(r_msg)) log_error(r_msg)
         tb <- attr(r,"traceback")
         if(length(tb)){
           tb <- unlist(tb)
