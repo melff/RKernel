@@ -18,13 +18,16 @@ DAPServer <- R6Class("DAPServer",
                          )
           response <- list(
               type = "response",
+              seq = self$response_seq,
               request_seq = request$seq,
               success = TRUE,
               command = request$command,
               body = body
           )
+          self$response_seq <- self$response_seq + 1L
           return(response)
       },
+      response_seq = 1L,
       event = function(body){
           content <- list(
               seq = self$event_seq,
