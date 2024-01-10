@@ -937,6 +937,13 @@ add_service <- function(run,init=NULL){
 remove_service <- function(run){
   k <- get_current_kernel()
   k$remove_service(run)
+#' @title Do a step of the kernel loop
+#' This function should be called in long-running loops to allow the kernel to react to
+#' UI events
+#' @export
+step <- function(){
+  k <- get_current_kernel()
+  if(length(k)) k$poll_and_respond()
 }
 
 
