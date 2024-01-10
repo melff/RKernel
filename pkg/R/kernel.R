@@ -402,7 +402,17 @@ Kernel <- R6Class("Kernel",
         continue <- FALSE
       }
       return(input)
+    },
+    #' @description
+    #' Send a debug event to the frontend
+    #' @param content A list, content provided by the debug adapter
+    send_debug_event = function(content){
+      private$send_message(type="debug_event",
+                           parent=private$parent$control,
+                           socket="iopub",
+                           content=content)
     }
+    
   ),
 
   private = list(

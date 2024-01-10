@@ -25,6 +25,16 @@ DAPServer <- R6Class("DAPServer",
           )
           return(response)
       },
+      event = function(body){
+          content <- list(
+              seq = self$event_seq,
+              type = "event",
+              body = body
+          )
+          self$kernel$send_debug_envent(content)
+          self$event_seq <- self$event_seq + 1L
+      },
+      event_seq = 1L,
       debugInfo = function(request){
           list(
               isStarted = self$is_started,
