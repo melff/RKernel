@@ -74,7 +74,7 @@ DAPServer <- R6Class("DAPServer",
           ename <- desc$ename
           vref <- 0L
           if(is.atomic(x)) {
-              if(length(x) == 1){
+              if(length(x) <= 1){
                   value <- format(x)
                   type <- class(x)
                   if(length(path) == 1)
