@@ -1,19 +1,24 @@
 DAPServer <- R6Class("DAPServer",
   public = list(
-      initialize = function(kernel){
+      initialize = function(kernel,evaluator=NULL){
           self$kernel <- kernel
           self$envir <- globalenv()
+          if(inherits(evaluator,"Evaluator"))
       },
       handle = function(request){
-          if(request$command != "debugInfo")
+          if(request$command != "debugInfo"){
               log_out(sprintf("DAPServer: got command '%s",request$command))
+              log_out(request$arguments,use.print=TRUE)
+          }
           body <- switch(request$command,
                          debugInfo = self$debugInfo(request),
                          initialize = self$debug_init(request),
                          attach = self$debug_attach(request),
+                         disconnect = self$debug_disconnect(request),
                          inspectVariables = self$inspect_variables(request),
                          variables = self$reply_variables(request),
                          richInspectVariables = self$rich_inspect_variable(request),
+                         dumpCell = self$dumpCell(request),
                          self$empty_reply(request)
                          )
           response <- list(
@@ -29,9 +34,11 @@ DAPServer <- R6Class("DAPServer",
       },
       response_seq = 1L,
       event = function(event,body=NULL){
+          
           content <- list(
               seq = self$event_seq,
               type = "event",
+              event = event,
               body = body
           )
           self$kernel$send_debug_event(content)
@@ -51,12 +58,38 @@ DAPServer <- R6Class("DAPServer",
               exceptionPaths = list()
           )
       },
+      client_info = NULL,
       debug_init = function(request){
+          self$client_info <- request$arguments
+          self$event(event="initialized")
+          self$event(event="process",
+                     body=list(
+                         systemProcessId=Sys.getpid(),
+                         name=Sys.which("R"),
+                         isLocalProcess=TRUE,
+                         startMethod="attach"
+                     ))
+          self$event(event="thread",
+                     body=list(
+                         reason="started",
+                         threadId=1L
+                     ))
           list(
-              supportsSetVariable = TRUE
+              supportsSetVariable = TRUE,
+              supportsConfigurationDoneRequest = TRUE,
+              exceptionBreakpointFilters = list(
+                  filter = "stop",
+                  label = "Runtime error",
+                  default = FALSE,
+                  description = "Break when an error occurs that is not caught by a try() or tryCactch() expression"
+              )
           )
       },
       debug_attach = function(request){
+          self$is_started <- TRUE
+          return(NULL)
+      },
+      debug_disconnect = function(request){
           self$is_started <- TRUE
           return(NULL)
       },
@@ -70,6 +103,15 @@ DAPServer <- R6Class("DAPServer",
               body <- list(variables = unname(variables))
           }
           return(body)
+      },
+      dumpCell = function(request){
+          code = request$arguments$code
+          src_filename <- tempfile("codecell",fileext=".R")
+          writeLines(code,con=src_filename)
+          log_out(sprintf("dumped cell to '%s'",src_filename))
+          list(
+              sourcePath = src_filename
+          )
       },
       rich_inspect_variable = function(request){
           varname <- request$arguments$variableName
@@ -338,6 +380,7 @@ DAPServer <- R6Class("DAPServer",
       is_started = FALSE,
       kernel = NULL,
       envir = NULL,
+      evaluator = NULL,
       types = c(
           "integer"="int",
           "logical"="bool",
