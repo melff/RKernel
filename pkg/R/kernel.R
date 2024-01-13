@@ -50,6 +50,7 @@ Kernel <- R6Class("Kernel",
       comm_manager <- CommManager(self,evaluator)
       self$comm_manager <- comm_manager
       self$evaluator <- evaluator
+      self$DAPServer <- DAPServer$new(self)
       kernel$current <- self
       private$save_io_handlers()
       replace_in_package("base","print",evaluator$print)
@@ -484,8 +485,6 @@ Kernel <- R6Class("Kernel",
     last_display = function() private$display_id,
 
     handle_debug_request = function(msg){
-      if(is.null(self$DAPServer))
-        self$DAPServer <- DAPServer$new(self)
       request <- msg$content
       reply <- try(self$DAPServer$handle(request))
       if(inherits(reply,"try-error")){
