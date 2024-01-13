@@ -81,7 +81,7 @@ class RSession(object):
     def writeline(self,line):
         self.proc.stdin.writelines([line + '\n'])
 
-    def readline(self, stream='stdout', timeout= None):
+    def readline(self, stream='stdout', timeout = None, colorize = True):
         if stream == 'stdout':
             q = self.stdout_queue
         elif stream == 'stderr':
@@ -89,9 +89,13 @@ class RSession(object):
         try:
             line = q.get(block = timeout is not None,
                          timeout = timeout)
+            q.task_done()
         except Empty:
             return None
-        return line.rstrip(os.linesep)
+        line = line.rstrip(os.linesep)
+        if colorize and stream == 'stderr':
+            line = colored(line,'res')
+        return line
 
     def printlines(self):
         while True:
