@@ -1,56 +1,94 @@
 import os
-
+from pprint import pformat
 import rsession
 from rsession import RSession
-
 import json
-
-def repl(self):
-    if self.running():
-        self.printlines()
-    while self.running():
-        line = input('> ')
-        try:
-            self.writeline(line)
-            self.writeline(" ")
-            self.printlines()
-        except BrokenPipeError:
-            pass
-
-
 
 R = RSession()
 R.start(silent=True)
-#repl(R)
+
+R.writeline("cat('Hello World!')")
+R.read()
+
 
 R.writeline("library(httpgd)")
 R.writeline("library(jsonlite)")
-R.writeline("hgd(silent=TRUE)")
+R.writeline("hgd(silent=TRUE,width=700,height=700)")
 
 def json_command(self,command):
     jsoncmd = "toJSON(" + command + ")"
     self.writeline(jsoncmd)
-    out = None
-    out = self.readline()
+    out = self.read(timeout=0.1)
+    if(len(out) > 0):
+        out = json.loads(out)
+    else:
+        out = None
     return out
 
-from pprint import pprint
-
 def get_hgd_state(self):
-    return json_command(self,"hgd_state()")
+    try:
+        out = json_command(self,"hgd_state()")
+    except:
+        return None
+    res = dict()
+    if isinstance(out,dict):
+        for key,value in out.items():
+            res[key] = value[0]
+    else:
+        res = out
+    return res
 
 def get_hgd_info(self):
-    return json_command(self,"hgd_info()")
-
+    try:
+        out = json_command(self,"hgd_info()")
+    except:
+        return None
+    res = dict()
+    for key,value in out.items():
+        if isinstance(value,list) and len(value) == 1:
+            res[key] = value[0]
+        else:
+            res[key] = value
+    return res
     
-pprint(get_hgd_state(R))
+get_hgd_state(R)
 
-pprint(get_hgd_info(R))
+get_hgd_info(R)
 
-R.writeline("plot(rnorm(20))")
-R.writeline("abline(h=0)")
-R.writeline("dev.size()")
+hgd_desc = get_hgd_state(R)
 
+import urllib
+import urllib.request
+
+def poll_hgd_state(h):
+    url = "http://{host}:{port}/state?token={token}".format(**h)
+    f = urllib.request.urlopen(url)
+    data = f.read().decode("utf-8")
+    return json.loads(data)
+
+def get_hgd_graphics(h,format='svg'):
+    d = h.copy()
+    d['id'] = d['hsize'] - 1
+    d['renderer'] = format
+    url = "http://{host}:{port}/plot?token={token}&id={id}&renderer={renderer}".format(**d)
+    f = urllib.request.urlopen(url)
+    data = f.read()
+    return data
+
+
+
+def cmp_hstate(state1,state2):
+    try:
+        server_eq = state1['host'] == state2['host']
+        server_eq = server_eq and state1['port'] == state2['port']
+        server_eq = server_eq and state1['token'] == state2['token']
+    except:
+        server_eq = None
+    try:
+        state_eq = state1['upid'] == state2['upid']
+    except:
+        state_eq = None
+    return (server_eq, state_eq)
 
 #R.quit()
 
@@ -69,46 +107,54 @@ def source(filename):
     srcfile.close()
     return lines
 
-def run_lines(lines):
+
+
+def run_lines(lines,echo=False):
     res = []
-    for i in range(len(RLines)):
-        R.writeline(RLines[i])
+    h_desc = get_hgd_state(R)
+    h_state = poll_hgd_state(h_desc)
+    for i in range(len(lines)):
+        if echo:
+            res.append("%d. %s"% (i,lines[i]))
+        R.writeline(lines[i])
         while True:
-            out = R.readline(stream='stderr',timeout=0.1)
-            if out == None:
+            out = R.read(stream='stderr',timeout=0.1)
+            if len(out) == 0:
                 break
             else:
+                out = "%d. %s"% (i,out)
                 res.append(out)
-        
         while True:
-            out = R.readline(timeout=0.1)
-            if out == None:
+            out = R.read(timeout=0.1)
+            if len(out) == 0:
                 break
             else:
+                out = "%d. %s"% (i,out)
                 res.append(out)
+        h_state_old = h_state
+        h_state = poll_hgd_state(h_desc)
+        if h_state != None and isinstance(h_state,dict) and ('upid' in h_state):
+            res.append('%d. <graphics uip %d>' % (i,h_state['upid']))
+        else:
+            res.append('%d. <graphics is down?>' % i)
+            res.append(pformat(h_state))
+        (server_changed, device_changed) = cmp_hstate(h_state,h_state_old)
+    R.writeline("cat('-- Done!--\n')")
+    done = R.read()
+    res.append(done)
     return res
 
-res = run_lines(RLines)
+res = run_lines(RLines,echo=True)
 print('\n'.join(res))
 
 srclines = source("dummy-script.R")
-res = run_lines(RLines)
+res = run_lines(srclines,echo=True)
+print('\n'.join(res))
+
+res = run_lines(["example(points)"],echo=True)
 print('\n'.join(res))
 
 
-def run_code(code):
-    res = []
-    R.writeline(code)
-    while True:
-        std_err = R.readline(stream='stderr',timeout=0.1)
-        std_out = R.readline(stream='stdout',timeout=0.1)
-        if std_err != None:
-            res.append(std_err)
-        if std_out != None:
-            res.append(std_out)
-        if std_err == None and std_out == None:
-            break
-    return res
 
-res = run_code(RCode)
-print('\n'.join(res))
+
+

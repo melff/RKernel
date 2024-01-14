@@ -1,11 +1,12 @@
 r <- 0L
-#browser()
 for(i in 1:4){
     cat(sprintf("%d. ",i))
-    cat("Hello World!\n")
+    cat("Hello World!")
+    Sys.sleep(0.15)
     r <- r + 1L
 }
-#stop("Oopsie!")
+
+
 fun <- function(){
     for(i in 1:4){
         print(sprintf("%d. ",i))
@@ -14,6 +15,5 @@ fun <- function(){
     }
 }
 
-#debug(fun)
 
 fun()
