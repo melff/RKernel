@@ -4,26 +4,16 @@ from termcolor import colored
 
 from subprocess import *
 
+from signal import SIGINT
+
 import threading
 from threading import Thread, Event
 from queue import Queue, Empty
 
-class Thread2(Thread):
-
-    def __init__(self, *args, **kwargs):
-        super(Thread2,self).__init__(*args,**kwargs)
-        self._stop_event = Event()
-
-    def stop(self):
-        self._stop_event.set()
-
-    def stopped(self):
-        self._stop_event.is_set()
-        
 
 class RSession(object):
 
-    def start(self,silent = False):
+    def start(self,silent = True):
         
         args = ["R",
                      "--no-save",
@@ -45,25 +35,30 @@ class RSession(object):
         self.stdout_queue = Queue()
         self.stderr_queue = Queue()
 
-        def _readline(stream, queue):
+        # See github/pexpect/popen_spawn.py
+        def _read(stream, queue):
             '''
             Collect lines from 'stream' and put them in 'quque'.
             '''
-            thread = threading.current_thread()
-            while not thread.stopped():
-                line = stream.readline()
-                if line:
-                    queue.put(line)
-                else:
-                    break
+            fileno = stream.fileno()
+            while True:
+                buf = b''
+                try:
+                    buf = os.read(fileno,1024)
+                except OSError as e:
+                    pass
+                if not buf:
+                    queue.put(None)
+                    return
+                queue.put(buf)
 
-        self.thread_stdout = Thread2(target = _readline,
+        self.thread_stdout = Thread(target = _read,
                                     args = (self.proc.stdout,
                                             self.stdout_queue))
         self.thread_stdout.daemon = True
         self.thread_stdout.start()
 
-        self.thread_stderr = Thread2(target = _readline,
+        self.thread_stderr = Thread(target = _read,
                                     args = (self.proc.stderr,
                                             self.stderr_queue))
         self.thread_stderr.daemon = True
@@ -72,44 +67,47 @@ class RSession(object):
     def quit(self):
         self.flush(stream='stdout')
         self.flush(stream='stderr')
-        self.thread_stdout.stop()
-        self.thread_stderr.stop()
-        #self.proc.terminate()
         self.writeline("q()")
         self.proc.wait()
 
+    def interrupt(self):
+        self.proc.send_signal(SIGINT)
+
+    def terminate(self):
+        self.flush(stream='stdout')
+        self.flush(stream='stderr')
+        self.proc.terminate()
+
+    def kill(self):
+        self.flush(stream='stdout')
+        self.flush(stream='stderr')
+        self.proc.kill()
+        
     def writeline(self,line):
         self.proc.stdin.writelines([line + '\n'])
 
-    def readline(self, stream='stdout', timeout = None, colorize = True):
+    def read1(self, stream='stdout', timeout = None):
         if stream == 'stdout':
             q = self.stdout_queue
         elif stream == 'stderr':
             q = self.stderr_queue
         try:
-            line = q.get(block = timeout is not None,
-                         timeout = timeout)
-            q.task_done()
+            b = q.get(block = timeout is not None,
+                      timeout = timeout)
         except Empty:
             return None
-        line = line.rstrip(os.linesep)
-        if colorize and stream == 'stderr':
-            line = colored(line,'res')
-        return line
+        return b
 
-    def printlines(self):
+    def read(self, stream='stdout', timeout = None, colorize = True):
+        r = b''
         while True:
-            e = self.readline('stderr')
-            o = self.readline('stdout')
-            if e == None and o == None:
+            b = self.read1(stream = stream, timeout = timeout)
+            if b == None:
                 break
             else:
-                if e:
-                    e = colored(e,"red")
-                    print(e)
-                if o:
-                    print(o)
-                    
+                r = r + b
+        return r.decode('utf-8')
+            
     def running(self):
         r = self.proc.poll()
         return r == None
@@ -124,7 +122,7 @@ class RSession(object):
                 line = q.get_nowait()
             except EndOfStream:
                 break
-                         
 
+    
             
 class EndOfStream(Exception): pass
