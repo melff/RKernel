@@ -5,31 +5,47 @@ from rsession import RSession
 import json
 
 R = RSession()
-R.start(silent=True)
 
-R.writeline("cat('Hello World!')")
-R.read()
+R.start()
+intro = R.find_prompt()
+print(intro)
 
+R.run("cat('Hello World!')")
+R.run("example(ls)")
 
-R.writeline("library(httpgd)")
-R.writeline("library(jsonlite)")
-R.writeline("hgd(silent=TRUE,width=700,height=700)")
+R.run("stop('Oopsie!')")
+
+ml = """for(i in 1:3)
+print(i)
+"""
+
+R.sendline(ml)
+
+R.run(ml)
+
+ml = """for(i in 1:3)
+"""
+R.run(ml)
+
+R.run("print(i)")
+
+R.sendline("library(httpgd)")
+R.sendline("library(jsonlite)")
+R.sendline("hgd(silent=TRUE,width=700,height=700)")
 
 def json_command(self,command):
     jsoncmd = "toJSON(" + command + ")"
-    self.writeline(jsoncmd)
+    out = self.run(jsoncmd)
     out = self.read(timeout=0.1)
-    if(len(out) > 0):
-        out = json.loads(out)
+    stdout = out['stdout']
+    if(len(stdout) > 0):
+        result = json.loads(stdout)
     else:
-        out = None
-    return out
+        result = None
+    return result
 
 def get_hgd_state(self):
-    try:
-        out = json_command(self,"hgd_state()")
-    except:
-        return None
+    out = json_command(self,"hgd_state()")
     res = dict()
     if isinstance(out,dict):
         for key,value in out.items():
@@ -116,7 +132,7 @@ def run_lines(lines,echo=False):
     for i in range(len(lines)):
         if echo:
             res.append("%d. %s"% (i,lines[i]))
-        R.writeline(lines[i])
+        R.sendline(lines[i])
         while True:
             out = R.read(stream='stderr',timeout=0.1)
             if len(out) == 0:
@@ -139,7 +155,7 @@ def run_lines(lines,echo=False):
             res.append('%d. <graphics is down?>' % i)
             res.append(pformat(h_state))
         (server_changed, device_changed) = cmp_hstate(h_state,h_state_old)
-    R.writeline("cat('-- Done!--\n')")
+    R.sendline("cat('-- Done!--\n')")
     done = R.read()
     res.append(done)
     return res
