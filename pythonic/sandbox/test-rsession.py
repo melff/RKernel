@@ -1,7 +1,12 @@
 import os
+import sys
+import inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir) 
 from pprint import pformat
-import rsession
-from rsession import RSession
+from rkernel.rsession import RSession
 import json
 
 R = RSession()
@@ -15,13 +20,6 @@ R.run("example(ls)")
 
 R.run("stop('Oopsie!')")
 
-ml = """for(i in 1:3)
-print(i)
-"""
-
-R.sendline(ml)
-
-R.run(ml)
 
 ml = """for(i in 1:3)
 """
@@ -29,15 +27,29 @@ R.run(ml)
 
 R.run("print(i)")
 
-R.sendline("library(httpgd)")
-R.sendline("library(jsonlite)")
-R.sendline("hgd(silent=TRUE,width=700,height=700)")
+
+ml = """for(i in 1:3)
+    print(i)"""
+R.run(ml)
+
+R.cmd("ls()")
+
+R.cmd("ls(")
+
+R.cmd("ls(]")
+
+
+R.cmd("library(httpgd)")
+R.cmd("library(jsonlite)")
+R.cmd("hgd(silent=TRUE,width=700,height=700)")
+
+R.run("example(points)")
+
+
 
 def json_command(self,command):
-    jsoncmd = "toJSON(" + command + ")"
-    out = self.run(jsoncmd)
-    out = self.read(timeout=0.1)
-    stdout = out['stdout']
+    jsoncmd = "jsonlite::toJSON({" + command + "})"
+    stdout, stderr = self.cmd(jsoncmd)
     if(len(stdout) > 0):
         result = json.loads(stdout)
     else:
@@ -108,69 +120,22 @@ def cmp_hstate(state1,state2):
 
 #R.quit()
 
-RCode = """cat("Hello World!")
+RCode = """cat("Hello World!\n")
 plot(rnorm(20))
 abline(h=0)
 dev.size()
 print("Hello again!")
 """
 
-RLines = RCode.split("\n")
-
-def source(filename):
-    srcfile = open(filename,"r")
-    lines = [line.rstrip(os.linesep) for line in srcfile.readlines()]
-    srcfile.close()
-    return lines
 
 
-
-def run_lines(lines,echo=False):
-    res = []
-    h_desc = get_hgd_state(R)
-    h_state = poll_hgd_state(h_desc)
-    for i in range(len(lines)):
-        if echo:
-            res.append("%d. %s"% (i,lines[i]))
-        R.sendline(lines[i])
-        while True:
-            out = R.read(stream='stderr',timeout=0.1)
-            if len(out) == 0:
-                break
-            else:
-                out = "%d. %s"% (i,out)
-                res.append(out)
-        while True:
-            out = R.read(timeout=0.1)
-            if len(out) == 0:
-                break
-            else:
-                out = "%d. %s"% (i,out)
-                res.append(out)
-        h_state_old = h_state
-        h_state = poll_hgd_state(h_desc)
-        if h_state != None and isinstance(h_state,dict) and ('upid' in h_state):
-            res.append('%d. <graphics uip %d>' % (i,h_state['upid']))
-        else:
-            res.append('%d. <graphics is down?>' % i)
-            res.append(pformat(h_state))
-        (server_changed, device_changed) = cmp_hstate(h_state,h_state_old)
-    R.sendline("cat('-- Done!--\n')")
-    done = R.read()
-    res.append(done)
-    return res
-
-res = run_lines(RLines,echo=True)
-print('\n'.join(res))
 
 srclines = source("dummy-script.R")
-res = run_lines(srclines,echo=True)
-print('\n'.join(res))
-
-res = run_lines(["example(points)"],echo=True)
-print('\n'.join(res))
+R.run(srclines)
 
 
+json.loads(R.cmd("toJSON(ls())")[0])
 
+json.loads(R.cmd("toJSON(list(a=1,b=2))")[0])
 
 

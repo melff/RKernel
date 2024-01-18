@@ -1,3 +1,4 @@
 /RKernel.Rcheck/
 /*.gz
 /.Rhistory
+/**/__pycache__

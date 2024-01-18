@@ -35,7 +35,7 @@ class RSession(object):
         # See github/pexpect/popen_spawn.py
         def _read(stream, queue):
             '''
-            Collect lines from 'stream' and put them in 'quque'.
+            Collect bytes from 'stream' and put them in 'quque'.
             '''
             fileno = stream.fileno()
             while True:
@@ -84,6 +84,9 @@ class RSession(object):
         if '\n' in line:
             raise MultipleLines
         self.proc.stdin.writelines([line + '\n'])
+        
+    def sendall(self,line):
+        self.proc.stdin.writelines([line + '\n'])
 
     def read1(self, stream='stdout', timeout = None):
         if stream == 'stdout':
@@ -99,7 +102,7 @@ class RSession(object):
 
     last_output = ''
     
-    def read(self, stream='stdout', timeout = None):
+    def read(self, stream='stdout', timeout = None, break_on = None):
         r = b''
         while True:
             b = self.read1(stream = stream, timeout = timeout)
@@ -107,6 +110,8 @@ class RSession(object):
                 break
             else:
                 r = r + b
+                if break_on is not None and break_on in b:
+                    break
         if len(r) > 0:
             r = r.decode('utf-8')
             if stream == 'stdout':
@@ -114,7 +119,10 @@ class RSession(object):
         else:
             r = None
         return r
-
+    
+    def readline(self, stream='stdout', timeout = None):
+        return self.read(stream = stream, timeout = timeout, break_on = b'\n')
+        
     def found_prompt(self,prompt = '> '):
         if len(self.last_output) < 1:
             return False
@@ -122,7 +130,7 @@ class RSession(object):
 
     def find_prompt(self,prompt = '> ', pop = True):
         while not self.found_prompt(prompt):
-            self.read(timeout = .1)
+            self.read()
         res = self.last_output.rstrip(prompt)
         if pop:
             self.last_output = prompt
@@ -142,54 +150,91 @@ class RSession(object):
                 line = q.get_nowait()
             except EndOfStream:
                 break
-
+            
     def run(self,text,prompt = '> ', coprompt = '+ '):
         if not self.found_prompt(prompt) and not self.found_prompt(coprompt):
             raise NotAtPrompt
         if not isinstance(text,list):
             text = text.split('\n')
-        stdout = []
-        stderr = []
-        numlines = len(text)
-        for i in range(numlines):
-            line = text.pop(0)
+        for line in text:
             self.sendline(line)
             while True:
-                stderr1 = self.read(stream='stderr',timeout=.1)
-                stdout1 = self.read(timeout=.1)
-                if stderr1 is not None:
-                    stderr.append(stderr1)
-                if stdout1 is not None:
+                stderr = self.read(stream='stderr',timeout=0.1)
+                stdout = self.read(timeout=0.1)
+                if stderr is not None:
+                    self.handle_stderr(stderr)
+                if stdout is not None:
                     if self.found_prompt(coprompt):
                         break
                     if self.found_prompt(prompt):
-                        stdout1 = stdout1.rstrip(prompt)
-                        stdout.append(stdout1)
+                        stdout = stdout.rstrip(prompt)
+                        self.handle_stdout(stdout)
+                        self.handle_prompt()
                         break
                     else:
-                        stdout.append(stdout1)
-            if self.found_prompt(prompt):
-                stdout = ''.join(stdout)
-                if len(stdout) == 0:
-                    stdout = None
-                stderr = ''.join(stderr)
-                if len(stderr) == 0:
-                    stderr = None
-                rest = ''.join(text)
-                if len(rest) == 0:
-                    rest = None
-                return dict(stdout=stdout,
-                            stderr=stderr,
-                            rest=rest)
+                        self.handle_stdout(stdout)
         if self.found_prompt(coprompt):
             self.interrupt()
             self.find_prompt(prompt)
             raise InputIncomplete
         else:
-            return None # This should never be reached.
-                    
+            self.find_prompt(prompt)
+
+    def cmd(self,text,prompt = '> ', coprompt = '+ '):
+        if not self.found_prompt(prompt) and not self.found_prompt(coprompt):
+            raise NotAtPrompt
+        if isinstance(text,list):
+            text = '\n'.join(text)
             
+        stdout = ''
+        stderr = ''
+
+        self.sendall(text)
+        while True:
+            stderr1 = self.read(stream='stderr',timeout=0.1)
+            if stderr1 is not None:
+                stderr += stderr1
+            stdout1 = self.read(timeout=0.1)
+            if stdout1 is not None:
+                stdout += stdout1
+                if self.found_prompt(coprompt):
+                    break
+                if self.found_prompt(prompt):
+                    break
+        if self.found_prompt(coprompt):
+            self.interrupt()
+            self.find_prompt(prompt)
+            raise InputIncomplete
+        else:
+            stdout = stdout.rstrip(prompt)
+            self.find_prompt(prompt)
+            return (stdout,stderr)
+
+    def handle_stdout(self,text):
+        text = colored(text,self.stdout_color)
+        print(text,end='')
+        #print("<update graphics>")
+
+    def handle_stderr(self,text):
+        text = colored(text,self.stderr_color)
+        print(text,end='')
+
+    def handle_prompt(self):
+        pass
+        
+    stdout_color = "green"
+    stderr_color = "red"
+
+    def source(filename):
+        srclines = source(filename)
+        
 class EndOfStream(Exception): pass
 class NotAtPrompt(Exception): pass
 class MultipleLines(Exception): pass
 class InputIncomplete(Exception): pass
+
+def source(filename):
+    srcfile = open(filename,"r")
+    lines = [line.rstrip(os.linesep) for line in srcfile.readlines()]
+    srcfile.close()
+    return lines
