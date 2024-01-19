@@ -1,4 +1,4 @@
-from ipykernel.kernelapp import IPKernelApp
+from .kernelapp import KernelApp
 from . import RKernel
 
-IPKernelApp.launch_instance(kernel_class=RKernel)
+KernelApp.launch_instance(kernel_class=RKernel)

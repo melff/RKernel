@@ -127,6 +127,11 @@ dev.size()
 print("Hello again!")
 """
 
+def source(filename):
+    srcfile = open(filename,"r")
+    lines = [line.rstrip(os.linesep) for line in srcfile.readlines()]
+    srcfile.close()
+    return lines
 
 
 

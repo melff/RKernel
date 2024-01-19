@@ -10,6 +10,9 @@ import threading
 from threading import Thread, Event
 from queue import Queue, Empty
 
+import logging
+from logging import DEBUG
+logger = logging.getLogger("rsession")
 
 class RSession(object):
 
@@ -128,9 +131,9 @@ class RSession(object):
             return False
         return self.last_output.endswith(prompt)
 
-    def find_prompt(self,prompt = '> ', pop = True):
+    def find_prompt(self,prompt = '> ', pop = True, timeout = None):
         while not self.found_prompt(prompt):
-            self.read()
+            self.read(timeout = timeout)
         res = self.last_output.rstrip(prompt)
         if pop:
             self.last_output = prompt
@@ -181,15 +184,15 @@ class RSession(object):
             self.find_prompt(prompt)
 
     def cmd(self,text,prompt = '> ', coprompt = '+ '):
-        if not self.found_prompt(prompt) and not self.found_prompt(coprompt):
+        if not self.found_prompt(prompt):
             raise NotAtPrompt
-        if isinstance(text,list):
-            text = '\n'.join(text)
+        if not isinstance(text,str):
+            raise TypeError
             
         stdout = ''
         stderr = ''
 
-        self.sendall(text)
+        self.sendline(text)
         while True:
             stderr1 = self.read(stream='stderr',timeout=0.1)
             if stderr1 is not None:

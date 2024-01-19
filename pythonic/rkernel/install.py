@@ -14,7 +14,7 @@ kernel_json = {
 }
 
 
-def install_my_kernel_spec(user=True, prefix=None):
+def install_spec(user=True, prefix=None):
     with TemporaryDirectory() as td:
         os.chmod(td, 0o755) # Starts off as 700, not user readable
         with open(os.path.join(td, 'kernel.json'), 'w') as f:
@@ -53,7 +53,7 @@ def main(argv=None):
     if not args.prefix and not _is_root():
         args.user = True
 
-    install_my_kernel_spec(user=args.user, prefix=args.prefix)
+    install_spec(user=args.user, prefix=args.prefix)
 
 if __name__ == '__main__':
     main()

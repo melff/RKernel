@@ -3,3 +3,4 @@
 __version__ = '1.0'
 
 from .kernel import RKernel
+from .rsession import RSession
