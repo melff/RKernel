@@ -3,7 +3,6 @@ DAPServer <- R6Class("DAPServer",
       initialize = function(kernel,evaluator=NULL){
           self$kernel <- kernel
           self$envir <- globalenv()
-          if(inherits(evaluator,"Evaluator"))
       },
       handle = function(request){
           if(request$command != "debugInfo"){
