@@ -65,7 +65,8 @@ install:
 
 .PHONY: installspec
 installspec:
-	Rscript --vanilla -e 'RKernel::installspec()'
+	. bin/activate; \
+	python rkernel/install.py
 
 .PHONY: build-and-install
 build-and-install: build install
