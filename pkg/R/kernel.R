@@ -900,18 +900,66 @@ check_page_payload <- function(payload){
 
 get_current_kernel <- function() kernel$current
 
-log_out <- function(...) {
-  if(inherits(kernel$current,"Kernel")) kernel$current$log_out(...)
-  else message(...)
+
+log_fn <- "/tmp/RKernel.log"
+
+print_ <- function(...){
+  k <- get_current_kernel()
+  if(!is.null(k)) k$print(...)
+  else print(...)
 }
-log_error <- function(...) {
-  if(inherits(kernel$current,"Kernel")) kernel$current$log_error(...)
-  else stop(...)
+
+cat_ <- function(...){
+  k <- get_current_kernel()
+  if(!is.null(k)) k$cat(...)
+  else cat(...)
 }
-log_warning <- function(...) {
-  if(inherits(kernel$current,"Kernel")) kernel$current$log_warning(...)
-  else warning(...)
+
+str_ <- function(...){
+  k <- get_current_kernel()
+  if(!is.null(k)) k$str(...)
+  else str(...)
 }
+
+
+log_out = function(message,...,use.print=FALSE,use.str=FALSE){
+  dcl <- deparse1(match.call())
+  tryCatch({
+    if(use.print)
+      message <- paste0("\n",paste0(capture.output(print_(message)),collapse="\n"))
+    else if(use.str)
+      message <- paste(capture.output(str_(message)),collapse="\n")
+    else message <- paste(message,...,collapse="")
+    message <- paste(crayon::green(format(Sys.time()),"\t",message,"\n"))
+    message <- paste("INFO:",message)
+        # self$cat(message,file=stderr())
+    cat_(message,file=log_fn,append=TRUE)
+  },error=function(e){
+    log_error(sprintf("Error in %s",dcl))
+    msg <- conditionMessage(e)
+    log_error(msg)
+  })
+}
+
+#' @description
+#' Show a warning in the Jupyter server log
+#' @param message A string to be shown in the log
+log_warning = function(message){
+  message <- paste(crayon::yellow(format(Sys.time()),"\t",message,"\n"))
+  message <- paste("WARNING:",message)
+      # self$cat(message,file=stderr())
+  cat_(message,file=log_fn,append=TRUE)
+}
+#' @description
+#' Show an error message in the Jupyter server log
+#' @param message A string to be shown in the log
+log_error = function(message){
+  message <- crayon::red(format(Sys.time()),"\t",message,"\n")
+  message <- paste("ERROR:",message)
+      # self$cat(message,file=stderr())
+  cat_(message,file=log_fn,append=TRUE)
+}
+
 
 replace_in_package <- function(pkg_name,name,value){
   env_name <- paste0("package:",pkg_name)
