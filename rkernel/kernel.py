@@ -1,13 +1,17 @@
 import json
-from ipykernel.kernelbase import Kernel
+import zmq
 
-from traitlets import Any, Bool, HasTraits, Instance, List, Type, observe, observe_compat
+from ipykernel.kernelbase import Kernel
 
 from .rsession import RSession
 
 from .utils import *
 
-class RKernelSession(RSession,HasTraits):
+from pprint import pprint
+
+from threading import Thread
+
+class RKernelSession(RSession):
     "Subclass of RSession to handle interaction"
 
     kernel = None
@@ -15,7 +19,6 @@ class RKernelSession(RSession,HasTraits):
     def start(self):
         super().start()
         self.kernel.banner = self.find_prompt(timeout=1)
-        self.cmd("attach(new.env(),name='tools:rsession')")
         
     def handle_stdout(self,text):
         self.kernel.stream(text,stream='stdout')
@@ -57,8 +60,10 @@ class RKernel(Kernel):
     def start(self):
         """Start the kernel."""
         self.rsession.start()
+        self.r_zmq_init() 
+        self.r_zmq_setup_req() 
+        self.r_zmq_setup_rsp() 
         super().start()
-        self.rsession.source_env("complete.R")
 
     def stream(self,text,stream='stdout'):
             stream_content = {'name': stream, 'text': text}
@@ -88,6 +93,62 @@ class RKernel(Kernel):
                 'user_expressions': {},
                }
 
-    def clear_output(self):
-        self.current_line = ''
-    
+    def do_is_complete(self, code):
+        content = dict(code = code)
+        msg = dict(type = 'is_complete_request', content = content)
+        response = self.r_zmq_request(msg)
+        return {"status": response['status'],
+                "indent": ""}
+
+    def r_zmq_init(self):
+        res = self.rsession.cmd("RKernel::zmq_init()")
+        self.zmq_context = zmq.Context()
+
+    def r_zmq_setup_req(self):
+        port = random_port()
+        res = self.rsession.cmd("RKernel::zmq_new_responder(%d)" % port)
+        self.r_zmq_req_port = port
+        context = self.zmq_context
+        socket = context.socket(zmq.REQ)
+        url = "tcp://localhost:%d" % port
+        socket.connect(url)
+        self.r_zmq_req_so = socket
+
+    def r_zmq_setup_rsp(self):
+        port = random_port()
+        res = self.rsession.cmd("RKernel::zmq_new_requester(%d)" % port)
+        self.r_zmq_rsp_port = port
+        context = self.zmq_context
+        socket = context.socket(zmq.REP)
+        url = "tcp://*:%d" % port
+        socket.bind(url)
+        self.r_zmq_rsp_so = socket
+
+        def _serve():
+            while True:
+                self.r_zmq_respond()
+
+        self.r_zmq_thread = Thread(target = _serve)
+        self.r_zmq_thread.daemon = True
+        self.r_zmq_thread.start()
+
+
+    def r_zmq_request(self,req):
+        port = self.r_zmq_req_port
+        res = self.rsession.cmd_nowait("RKernel::zmq_reply(%d)" % port)
+        req = json.dumps(req,separators=(',', ':')).encode("utf-8")
+        self.r_zmq_req_so.send_multipart([req])
+        resp = self.r_zmq_req_so.recv_multipart()
+        self.rsession.find_prompt()
+        return json.loads(resp[0].decode("utf-8"))
+
+    def r_zmq_respond(self):
+        port = self.r_zmq_rsp_port
+        req = self.r_zmq_rsp_so.recv_multipart()
+        print("Recieved '%s'" % req)
+        req = json.loads(req[0].decode("utf-8"))
+        resp = req
+        resp = json.dumps(resp,separators=(',', ':')).encode("utf-8")
+        self.r_zmq_rsp_so.send_multipart([resp])
+
+
