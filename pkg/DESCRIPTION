@@ -47,6 +47,7 @@ Collate:
     'events.R'
     'graphics.R'
     'install.R'
+    'is-complete.R'
     'json.R'
     'kernel.R'
     'magic-codes.R'
@@ -96,3 +97,4 @@ Collate:
     'widget-upload.R'
     'widget-virtual-table.R'
     'widget_link.R'
+    'zmq.R'

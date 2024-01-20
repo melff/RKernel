@@ -10,7 +10,7 @@ is_unexpected_string <- function(code)
 
 code_is_complete <- function(code){
     status <- tryCatch({
-        parse(text=code)
+        str2expression(code)
         "complete"
     },
     error = conditionMessage)
