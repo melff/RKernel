@@ -162,11 +162,12 @@ class RSession(object):
                     if self.found_prompt(coprompt):
                         break
                     if self.found_prompt(prompt):
-                        stdout = stdout.rstrip(prompt)
+                        stdout = stdout.strip(prompt)
                         self.handle_stdout(stdout)
                         self.handle_prompt()
                         break
                     else:
+                        stdout = stdout.strip(prompt)
                         self.handle_stdout(stdout)
         if self.found_prompt(coprompt):
             self.interrupt()
@@ -182,6 +183,12 @@ class RSession(object):
             raise TypeError
 
         self.sendline(text)
+        if self.found_prompt(coprompt):
+            self.interrupt()
+            self.find_prompt(prompt)
+            raise InputIncomplete
+        else:
+            self.find_prompt(prompt)
 
     def cmd(self,text,prompt = '> ', coprompt = '+ '):
         if not self.found_prompt(prompt):
@@ -209,7 +216,7 @@ class RSession(object):
             self.find_prompt(prompt)
             raise InputIncomplete
         else:
-            stdout = stdout.rstrip(prompt)
+            stdout = stdout.strip(prompt)
             self.find_prompt(prompt)
             return (stdout,stderr)
 

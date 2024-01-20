@@ -7,6 +7,9 @@ from pprint import pprint, pformat
 from threading import Thread
 from termcolor import colored
 
+JSON_SEP = '\x10'
+JSON_START = '\x12'
+JSON_END = '\x14'
 
 
 class RKernelSession(RSession):
@@ -19,10 +22,10 @@ class RKernelSession(RSession):
         self.kernel.banner = self.find_prompt(timeout=1)
         
     def handle_stdout(self,text):
-        self.kernel.stream(text,stream='stdout')
+        self.kernel.handle_stdout(text)
 
     def handle_stderr(self,text):
-        self.kernel.stream(text,stream='stderr')
+        self.kernel.handle_stderr(text)
 
     def source(self,filename):
         path = os.path.join(R_files_path(),filename)
@@ -48,6 +51,8 @@ class RKernel(Kernel):
 
     rsession = None
     banner = ''
+
+    debug = False
     
     def __init__(self, **kwargs):
         """Initialize the kernel."""
@@ -64,10 +69,17 @@ class RKernel(Kernel):
         super().start()
 
     def stream(self,text,stream='stdout'):
+        if not self.debug:
             stream_content = {'name': stream, 'text': text}
             self.send_response(self.iopub_socket, 'stream', stream_content)
+        else:
+            if stream=='stdout':
+                text = colored(text,self.rsession.stdout_color)
+            elif stream=='stderr':
+                text = colored(text,self.rsession.stderr_color)
+            print(text,end='')
 
-    def display(self,display_id,data,metadata=dict(),update=False):
+    def display(self,data,metadata=dict(),transient=dict(),update=False):
         msg_type = 'update_display_data'
         if not update:
             msg_type = 'display_data'
@@ -75,7 +87,7 @@ class RKernel(Kernel):
         display_content = dict(
             data = data,
             metadata = metadata,
-            transient = dict(display_id=display_id)
+            transient = transient
         )
         self.send_response(self.iopub_socket, msg_type, display_content)
         
@@ -149,4 +161,20 @@ class RKernel(Kernel):
         resp = json.dumps(resp,separators=(',', ':')).encode("utf-8")
         self.r_zmq_rsp_so.send_multipart([resp])
 
+    def handle_stdout(self,text):
+        chunks = text.split(JSON_SEP)
+        for chunk in chunks:
+            if chunk.startswith(JSON_START) or chunk.endswith(JSON_END):
+                if not chunk.startswith(JSON_START) or not chunk.endswith(JSON_END):
+                    raise JSONerror
+                chunk = chunk.lstrip(JSON_START).rstrip(JSON_END)
+                display_data = json.loads(chunk)
+                self.display(**display_data)
+            else:
+                self.stream(chunk,stream='stdout')
 
+    def handle_stderr(self,text):
+        self.stream(text,stream='stdout')
+
+class JSONerror(Exception):
+    pass

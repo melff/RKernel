@@ -5,6 +5,11 @@ get_help_port <- function(){
     evaluator$current$get_help_port()
 }
 
+#' @import json.R
+
+JSON_START <- '\x10\x12'
+JSON_END <- '\x14\x10'
+
 #' Display an R Object
 #'
 #' @param ... Arguments passed to 'display_data' methods
@@ -13,8 +18,13 @@ display <- function(...){
     # log_out("display")
     d <- display_data(...)
     kernel <- get_current_kernel()
-    kernel$display_data(data=d$data,
-                        metadata=d$metadata)
+    if(!is.null(kernel))
+        kernel$display_data(data=d$data,
+                            metadata=d$metadata)
+    else {
+        d <- to_json(unclass(d))
+        cat_(JSON_START,d,JSON_END)
+    }
 }
 
 #' Prepare an R Object for Being Displayed
