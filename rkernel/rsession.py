@@ -183,6 +183,14 @@ class RSession(object):
         else:
             self.find_prompt(prompt)
 
+    def cmd_nowait(self,text,prompt = '> ', coprompt = '+ '):
+        if not self.found_prompt(prompt):
+            raise NotAtPrompt
+        if not isinstance(text,str):
+            raise TypeError
+
+        self.sendline(text)
+
     def cmd(self,text,prompt = '> ', coprompt = '+ '):
         if not self.found_prompt(prompt):
             raise NotAtPrompt
