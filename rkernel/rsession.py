@@ -1,18 +1,10 @@
 import os
-
 from termcolor import colored
-
 from subprocess import *
-
 from signal import SIGINT
-
 import threading
 from threading import Thread, Event
 from queue import Queue, Empty
-
-import logging
-from logging import DEBUG
-logger = logging.getLogger("rsession")
 
 class RSession(object):
 

@@ -1,15 +1,13 @@
 import json
 import zmq
-
 from ipykernel.kernelbase import Kernel
-
 from .rsession import RSession
-
 from .utils import *
-
-from pprint import pprint
-
+from pprint import pprint, pformat
 from threading import Thread
+from termcolor import colored
+
+
 
 class RKernelSession(RSession):
     "Subclass of RSession to handle interaction"
