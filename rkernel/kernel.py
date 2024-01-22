@@ -55,6 +55,8 @@ class RKernel(Kernel):
     banner_suffix = ''
     
     debug = False
+
+    log_file = None
     
     def __init__(self, **kwargs):
         """Initialize the kernel."""
@@ -77,14 +79,18 @@ class RKernel(Kernel):
         self.rsession.env["R_LIBS_USER"] = R_LIBS_USER
         self.banner_suffix += "User-installed packages are in '%s'\n" % R_LIBS_USER
 
+        self.log_file = open("/tmp/pyRKernel.log","a")
+
     def start(self):
         """Start the kernel."""
+        # self.log_out("======== Starting kernel ========")
         self.rsession.start()
         self.banner += self.banner_suffix
         self.r_zmq_init() 
         self.r_zmq_setup_sender() 
         self.r_zmq_setup_receiver() 
         super().start()
+        # self.log_out("Kernel started")
 
     def stream(self,text,stream='stdout'):
         if not self.debug:
@@ -105,8 +111,13 @@ class RKernel(Kernel):
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
 
+        # self.log_out("do_execute")
+
+        self.rsession.interrupted = False
         self.rsession.run(code)
 
+        # self.log_out("run complete - sending reply")
+        
         return {'status': 'ok',
                 # The base class increments the execution count
                 'execution_count': self.execution_count,
@@ -174,6 +185,7 @@ class RKernel(Kernel):
         return msk != 0
 
     def handle_stdout(self,text):
+        # self.log_out("handle_stdout")
         if ETB in text:
             chunks = text.split(ETB)
             for chunk in chunks:
@@ -187,9 +199,16 @@ class RKernel(Kernel):
             if len(text) > 0:
                 self.stream(text,stream='stdout')
 
+        # self.log_out("handle_stdout - done")
 
     def handle_stderr(self,text):
         self.stream(text,stream='stdout')
+
+    def log_out(self,text):
+        now = format(datetime.now())
+        text = 'KERNEL: ' + now + ' ' + text
+        self.log_file.write(text + '\n')
+        self.log_file.flush()
 
 class JSONerror(Exception):
     pass
