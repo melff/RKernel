@@ -11,42 +11,55 @@ zmq_env <- new.env()
 zmq_init <- function(){
     zmq_env$context <- zmq.ctx.new()
     zmq_env$sockets <- list()
+    zmq_env$ports <- integer()
 }
 
 #' @export
-zmq_new_responder <- function(port){
-    socket <- zmq.socket(zmq_env$context, ZMQ.ST()$REP)
-    addr <- sprintf("tcp://*:%d",port)
-    index <- as.character(port)
-    zmq.bind(socket,addr)
-    zmq_env$sockets[[index]] <- socket
-}
-
-#' @export
-zmq_new_requester <- function(port){
-    socket <- zmq.socket(zmq_env$context, ZMQ.ST()$REQ)
+zmq_new_receiver <- function(port){
+    socket <- zmq.socket(zmq_env$context, ZMQ.ST()$PULL)
     addr <- sprintf("tcp://localhost:%d",port)
     index <- as.character(port)
     zmq.connect(socket,addr)
     zmq_env$sockets[[index]] <- socket
+    zmq_env$ports["receiver"] <- as.integer(port)
+}
+
+#' @export
+zmq_new_sender <- function(port){
+    socket <- zmq.socket(zmq_env$context, ZMQ.ST()$PUSH)
+    addr <- sprintf("tcp://localhost:%d",port)
+    index <- as.character(port)
+    zmq.connect(socket,addr)
+    zmq_env$sockets[[index]] <- socket
+    zmq_env$ports["sender"] <- as.integer(port)
 }
 
 
 
 #' @export
-zmq_receive <- function(port){
+zmq_receive <- function(){
+    log_out("zmq_receive")
+    port <- zmq_env$ports["receiver"]
     index <- as.character(port)
     socket <- zmq_env$sockets[[index]]
+    # log_out(socket,use.str=TRUE)
     content <- zmq.recv.multipart(socket,unserialize=FALSE)
+    # log_out(content,use.str=TRUE)
+    content <- fromRawJSON(content[[1]])
     return(content)
 }
 
 #' @export
-zmq_send <- function(port,content){
+zmq_send <- function(content){
+    log_out("zmq_send")
+    log_out(content,use.str=TRUE)
+    port <- zmq_env$ports["sender"]
     index <- as.character(port)
     socket <- zmq_env$sockets[[index]]
-    content <- append(content,list(raw(0)))
+    content <- toRawJSON(content)
+    content <- append(list(content),list(raw(0)))
     zmq.send.multipart(socket,content,serialize=FALSE)
+    log_out("message sent")
 }
 
 #' @export
@@ -59,11 +72,10 @@ zmq_shutdown <- function(){
 zmq_handlers <- list()
 
 #' @export
-zmq_reply <- function(port){
-    log_out("zmq_reply")
-    msg <- zmq_receive(port)
-    log_out(msg,use.str=TRUE)
-    msg <- fromRawJSON(msg[[1]])
+zmq_reply <- function(){
+    # log_out("zmq_reply")
+    msg <- zmq_receive()
+    # log_out(msg,use.str=TRUE)
     type <- msg$type
     handler <- zmq_handlers[[type]]
     if(length(handler)){
@@ -72,9 +84,7 @@ zmq_reply <- function(port){
     else {
         response <- zmq_default_handler(msq)
     }
-    log_out(response,use.str=TRUE)
-    response <- toRawJSON(response)
-    zmq_send(port,list(response))
+    zmq_send(response)
 }
 
 zmq_default_handler <- function(msg){
@@ -96,13 +106,3 @@ zmq_handlers$is_complete_request <- function(msg){
     )
 }
 
-#' @export
-zmq_request <- function(port,msg){
-    msg <- toRawJSON(msg)
-    tryCatch(zmq_send(port,list(msg)),
-             error=function(e) log_error(conditionMessage(e)))
-    response <- tryCatch(zmq_receive(port),
-             error=function(e) log_error(conditionMessage(e)))
-    response <- fromRawJSON(response[[1]])
-    return(response)
-}

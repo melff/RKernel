@@ -82,8 +82,8 @@ class RKernel(Kernel):
         self.rsession.start()
         self.banner += self.banner_suffix
         self.r_zmq_init() 
-        self.r_zmq_setup_req() 
-        self.r_zmq_setup_rsp() 
+        self.r_zmq_setup_sender() 
+        self.r_zmq_setup_receiver() 
         super().start()
 
     def stream(self,text,stream='stdout'):
@@ -129,55 +129,56 @@ class RKernel(Kernel):
                 "indent": ""}
 
     def r_zmq_init(self):
+        # print("r_zmq_init")
         res = self.rsession.cmd("RKernel::zmq_init()")
         self.zmq_context = zmq.Context()
 
-    def r_zmq_setup_req(self):
+    def r_zmq_setup_sender(self):
         port = random_port()
-        res = self.rsession.cmd("RKernel::zmq_new_responder(%d)" % port)
-        self.r_zmq_req_port = port
+        res = self.rsession.cmd("RKernel::zmq_new_receiver(%d)" % port)
+        self.r_zmq_send_port = port
         context = self.zmq_context
-        socket = context.socket(zmq.REQ)
-        url = "tcp://localhost:%d" % port
-        socket.connect(url)
-        self.r_zmq_req_so = socket
-
-    def r_zmq_setup_rsp(self):
-        port = random_port()
-        res = self.rsession.cmd("RKernel::zmq_new_requester(%d)" % port)
-        self.r_zmq_rsp_port = port
-        context = self.zmq_context
-        socket = context.socket(zmq.REP)
+        socket = context.socket(zmq.PUSH)
         url = "tcp://*:%d" % port
         socket.bind(url)
-        self.r_zmq_rsp_so = socket
+        self.r_zmq_send_so = socket
 
-        def _serve():
-            while True:
-                self.r_zmq_respond()
-
-        self.r_zmq_thread = Thread(target = _serve)
-        self.r_zmq_thread.daemon = True
-        self.r_zmq_thread.start()
-
+    def r_zmq_setup_receiver(self):
+        port = random_port()
+        res = self.rsession.cmd("RKernel::zmq_new_sender(%d)" % port)
+        self.r_zmq_recv_port = port
+        context = self.zmq_context
+        socket = context.socket(zmq.PULL)
+        url = "tcp://*:%d" % port
+        socket.bind(url)
+        self.r_zmq_recv_so = socket
 
     def r_zmq_request(self,req):
-        port = self.r_zmq_req_port
-        res = self.rsession.cmd_nowait("RKernel::zmq_reply(%d)" % port)
-        req = json.dumps(req,separators=(',', ':')).encode("utf-8")
-        self.r_zmq_req_so.send_multipart([req])
-        resp = self.r_zmq_req_so.recv_multipart()
+        # print("r_zmq_request")
+        res = self.rsession.cmd_nowait("RKernel::zmq_reply()")
+        self.r_zmq_send(req)
+        resp = self.r_zmq_receive()
         self.rsession.find_prompt()
-        return json.loads(resp[0].decode("utf-8"))
+        return resp
 
-    def r_zmq_respond(self):
-        port = self.r_zmq_rsp_port
-        req = self.r_zmq_rsp_so.recv_multipart()
-        print("Recieved '%s'" % req)
+    def r_zmq_send(self,msg):
+        # print("r_zmq_send")
+        msg = json.dumps(msg,separators=(',', ':')).encode("utf-8")
+        self.r_zmq_send_so.send_multipart([msg])
+
+    def r_zmq_receive(self):
+        # print("r_zmq_receive")
+        req = self.r_zmq_recv_so.recv_multipart()
         req = json.loads(req[0].decode("utf-8"))
-        resp = req
-        resp = json.dumps(resp,separators=(',', ':')).encode("utf-8")
-        self.r_zmq_rsp_so.send_multipart([resp])
+        return req
+
+    def r_zmq_flush(self):
+        while self.r_zmq_poll(timeout=1):
+            self.r_zmq_recv_so.recv_multipart()
+
+    def r_zmq_poll(self,timeout=1):
+        msk = self.r_zmq_recv_so.poll(timeout=timeout)
+        return msk != 0
 
     def handle_stdout(self,text):
         chunks = text.split(JSON_SEP)
