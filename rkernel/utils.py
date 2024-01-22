@@ -20,3 +20,13 @@ def random_port():
         s.bind(('', 0))
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         return s.getsockname()[1]
+
+def dQuote(string):
+    return '"' + string + '"'
+
+def sQuote(string):
+    return "'" + string + "'"
+
+def R_c_wrap(strings):
+    string = ', '.join(strings)
+    return "c(" + string + ")"
