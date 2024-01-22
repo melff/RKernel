@@ -7,8 +7,11 @@ ARCHIVE := $(PACKAGE)_$(VERSION).tar.gz
 
 RCHKIMG := kalibera-rchk-master-def.simg
 
+export R_LIBS_USER = $(PWD)/lib/R/library
+
 .PHONY: default
-default: roxygenize install-quick
+
+default: roxygenize install-quick sync-Rlib
 
 .PHONY: all
 all: build install installspec
@@ -68,6 +71,10 @@ installspec:
 	. bin/activate; \
 	python rkernel/install.py
 
+sync-Rlib:
+	rsync -ai lib/R/library/ $(HOME)/.jupyter/R/library/
+	rsync -ai lib/R/library/ $(HOME)/.local/pipx/venvs/jupyter/lib/R/library
+
 .PHONY: build-and-install
 build-and-install: build install
 
@@ -125,3 +132,7 @@ clean-reverse:
 
 install-deps:
 	Rscript --vanilla -e 'devtools::install_deps(pkg="${SRCDIR}")'
+
+# install-basic-deps:
+# 	Rscript --vanilla -e 'install.packages(c("devtools","roxygen2"),repos="https://cloud.r-project.org")'
+
