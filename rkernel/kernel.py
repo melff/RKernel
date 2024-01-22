@@ -97,16 +97,9 @@ class RKernel(Kernel):
                 text = colored(text,self.rsession.stderr_color)
             print(text,end='')
 
-    def display(self,data,metadata=dict(),transient=dict(),update=False):
-        msg_type = 'update_display_data'
-        if not update:
-            msg_type = 'display_data'
-            
-        display_content = dict(
-            data = data,
-            metadata = metadata,
-            transient = transient
-        )
+    def display(self,display_request):
+        msg_type = display_request['type']    
+        display_content = display_request['content']
         self.send_response(self.iopub_socket, msg_type, display_content)
         
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
@@ -181,16 +174,19 @@ class RKernel(Kernel):
         return msk != 0
 
     def handle_stdout(self,text):
-        chunks = text.split(JSON_SEP)
-        for chunk in chunks:
-            if chunk.startswith(JSON_START) or chunk.endswith(JSON_END):
-                if not chunk.startswith(JSON_START) or not chunk.endswith(JSON_END):
-                    raise JSONerror
-                chunk = chunk.lstrip(JSON_START).rstrip(JSON_END)
-                display_data = json.loads(chunk)
-                self.display(**display_data)
-            else:
-                self.stream(chunk,stream='stdout')
+        if ETB in text:
+            chunks = text.split(ETB)
+            for chunk in chunks:
+                if chunk.startswith(DISPLAY_START):
+                    resp = self.r_zmq_receive()
+                    self.display(resp)
+                else:
+                    if len(chunk) > 0:
+                        self.stream(chunk,stream='stdout')
+        else:
+            if len(text) > 0:
+                self.stream(text,stream='stdout')
+
 
     def handle_stderr(self,text):
         self.stream(text,stream='stdout')

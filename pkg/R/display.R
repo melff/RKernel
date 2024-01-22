@@ -5,10 +5,10 @@ get_help_port <- function(){
     evaluator$current$get_help_port()
 }
 
-#' @import json.R
+#' @include json.R
 
-JSON_START <- '\x10\x12'
-JSON_END <- '\x14\x10'
+ETB <- '\x17'
+DISPLAY_START <- '[!display]'
 
 #' Display an R Object
 #'
@@ -22,10 +22,22 @@ display <- function(...){
         kernel$display_data(data=d$data,
                             metadata=d$metadata)
     else {
-        d <- to_json(unclass(d))
-        cat_(JSON_START,d,JSON_END)
+        
+        d <- list(type=class(d),
+                  content=unclass(d))
+        # log_out("display")
+        # log_out("display_data:")
+        # log_out(d,use.str=TRUE)
+        cat_(ETB)
+        cat_(DISPLAY_START)
+        zmq_send(d)
+        cat_(ETB)
+        # cat_('')
     }
 }
+
+#' @export
+print.display_data <- function(x,...) display(x,...)
 
 #' Prepare an R Object for Being Displayed
 #'
