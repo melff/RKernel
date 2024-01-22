@@ -222,3 +222,7 @@ display_data.Graphics <- function(x,
     structure(d,class=cl)
 }
 
+empty20x20 <- local({
+    imf <- system.file("images/empty20x20.png",package="RKernel")
+    readBin(imf, raw(), file.info(imf)$size)
+})
