@@ -112,3 +112,6 @@ has_iw_ver <- function(test){
     ii <- seq_along(test)
     all(test==v[ii])
 }
+
+#' @export
+works_pythonic <- function() TRUE
