@@ -8,20 +8,29 @@ from queue import Queue, Empty
 
 class RSession(object):
 
+    env = dict()
+    
     def start(self):
         
         args = ["R",
-                     "--no-save",
-                     "--no-restore",
-                     "--no-readline",
-                     "--interactive"]
+                "--no-save",
+                "--no-restore",
+                "--no-readline",
+                "--interactive"]
 
+        if len(self.env) > 0:
+            env = os.environ.copy()
+            env.update(self.env)
+        else:
+            env = None
+            
         self.proc = Popen(args,
                           stdin=PIPE,
                           stdout=PIPE,
                           stderr=PIPE,
                           encoding='utf8',
                           text=True,
+                          env=env,
                           bufsize=0)
 
         self.stdout_queue = Queue()
