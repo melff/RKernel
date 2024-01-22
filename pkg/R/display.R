@@ -720,43 +720,6 @@ IFrame <- function(url,width="100%",height="70ex",class=NULL,srcdoc=FALSE){
                  "text/html"=text_html)
 }
 
-#' Send a graphics file to the frontend
-#'
-#' @description Send embed the contents of an png, jpeg, pdf, or svg file in
-#'      the frontend or add a link to it
-#'      (sending raw data and urls soon to be added)
-#' 
-#' @param jpeg The path to a jpeg file
-#' @param pdf The path to a pdf file
-#' @param png The path to a png file
-#' @param svg The path to a svg file
-#' @export
-Graphics <- function(jpeg,pdf,png,svg){
-    data <- list()
-    metadata <- list()
-    if(!missing(jpeg)){
-        data[["image/jpeg"]] <- readBin(jpeg, raw(), file.info(jpeg)$size)
-        metadata[["image/jpeg"]] <- list(width=attr(jpeg,"width"),
-                                         height=attr(jpeg,"height"))
-    }
-    if(!missing(pdf)){
-        data[["application/pdf"]] <- readBin(pdf, raw(), file.info(pdf)$size)
-        metadata[["application/pdf"]] <- list(width=attr(pdf,"width"),
-                                              height=attr(pdf,"height"))
-    }
-    if(!missing(png)){
-        data[["image/png"]] <- readBin(png, raw(), file.info(png)$size)
-        metadata[["image/png"]] <- list(width=attr(png,"width"),
-                                        height=attr(png,"height"))
-    }
-    if(!missing(svg)){
-        data[["image/svg+xml"]] <- readChar(svg, file.info(svg)$size,useBytes=TRUE)
-        metadata[["image/svg+xml"]] <- list(width=attr(svg,"width"),
-                                            height=attr(svg,"height"))
-    }
-    display_data(data=data,metadata=metadata)
-}
-
 #' Send raw HTML code to the frontend
 #'
 #' @description Send raw HTML code in a character string to the
