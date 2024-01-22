@@ -11,6 +11,7 @@ kernel_json = {
     "argv": [sys.executable, "-m", "rkernel", "-f", "{connection_file}"],
     "display_name": "RKernel (new pythonic)",
     "language": "R",
+    "interrupt_mode": "message"
 }
 
 

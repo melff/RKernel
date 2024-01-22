@@ -1,3 +1,4 @@
+import os
 import json
 import zmq
 from ipykernel.kernelbase import Kernel
@@ -210,5 +211,30 @@ class RKernel(Kernel):
         self.log_file.write(text + '\n')
         self.log_file.flush()
 
+    async def interrupt_request(self, stream, ident, parent):
+        """Handle an interrupt request."""
+        # self.log_out("interrupt_request received")
+        if not self.session:
+            return
+        content: dict[str, t.Any] = {"status": "ok"}
+        # self.log_out("trying to interrupt session")
+        try:
+            self.rsession.interrupt()
+        except OSError as err:
+            import traceback
+        
+            content = {
+                "status": "error",
+                "traceback": traceback.format_stack(),
+                "ename": str(type(err).__name__),
+                "evalue": str(err),
+            }
+        # self.log_out("Setting self.rsession.interrupted = True")
+        # self.log_out("interrupt_request completed")
+        self.session.send(stream, "interrupt_reply", content, parent, ident=ident)
+        return
+
+
+        
 class JSONerror(Exception):
     pass
