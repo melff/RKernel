@@ -6,10 +6,10 @@ from .utils import *
 from pprint import pprint, pformat
 from threading import Thread
 from termcolor import colored
+from datetime import datetime
 
-JSON_SEP = '\x10'
-JSON_START = '\x12'
-JSON_END = '\x14'
+ETB = '\x17'
+DISPLAY_START = '[!display]'
 
 
 class RKernelSession(RSession):
@@ -19,7 +19,7 @@ class RKernelSession(RSession):
 
     def start(self):
         super().start()
-        self.kernel.banner = self.find_prompt(timeout=1)
+        self.kernel.banner += self.find_prompt(timeout=1)
         
     def handle_stdout(self,text):
         self.kernel.handle_stdout(text)
@@ -52,6 +52,8 @@ class RKernel(Kernel):
     rsession = None
     banner = ''
 
+    banner_suffix = ''
+    
     debug = False
     
     def __init__(self, **kwargs):
@@ -60,9 +62,25 @@ class RKernel(Kernel):
         self.rsession = RKernelSession()
         self.rsession.kernel = self
 
+        if "VIRTUAL_ENV" in os.environ:
+            VIRTUAL_ENV = os.getenv("VIRTUAL_ENV")
+            self.banner += "VIRTUAL_ENV = %s\n" % VIRTUAL_ENV
+            R_LIBS_USER = os.path.join(VIRTUAL_ENV,"lib","R","library")
+        elif "JUPYTER_CONFIG_DIR" in os.environ:
+            JUPYTER_CONFIG_DIR = os.getenv("JUPYTER_CONFIG_DIR")
+            R_LIBS_USER = os.path.join(JUPYTER_CONFIG_DIR,"R","library")
+        else:
+            JUPYTER_CONFIG_DIR = os.path.join(os.path.expanduser("~"),".jupyter")
+            R_LIBS_USER = os.path.join(JUPYTER_CONFIG_DIR,"R","library")
+        if not os.path.isdir(R_LIBS_USER):
+            os.makedirs(R_LIBS_USER)
+        self.rsession.env["R_LIBS_USER"] = R_LIBS_USER
+        self.banner_suffix += "User-installed packages are in '%s'\n" % R_LIBS_USER
+
     def start(self):
         """Start the kernel."""
         self.rsession.start()
+        self.banner += self.banner_suffix
         self.r_zmq_init() 
         self.r_zmq_setup_req() 
         self.r_zmq_setup_rsp() 
