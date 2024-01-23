@@ -80,7 +80,7 @@ class RKernel(Kernel):
         self.rsession.env["R_LIBS_USER"] = R_LIBS_USER
         self.banner_suffix += "User-installed packages are in '%s'\n" % R_LIBS_USER
 
-        self.log_file = open("/tmp/pyRKernel.log","a")
+        self.log_file = open("/tmp/RKernel.log","a")
 
     def start(self):
         """Start the kernel."""
