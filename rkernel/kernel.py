@@ -115,9 +115,9 @@ class RKernel(Kernel):
 
         # self.log_out("do_execute")
 
-        self.rsession.interrupted = False
+        self.r_run_cell_begin_hooks()
         self.rsession.run(code)
-        self.r_display_changed_graphics()
+        self.r_run_cell_end_hooks()
 
         # self.log_out("run complete - sending reply")
         
@@ -190,8 +190,11 @@ class RKernel(Kernel):
     def r_start_graphics(self):
         self.rsession.cmd_nowait("RKernel::start_graphics()")
 
-    def r_display_changed_graphics(self):
-        self.rsession.run("RKernel::display_changed_graphics()")
+    def r_run_cell_begin_hooks(self):
+        self.rsession.run("RKernel::run_cell_begin_hooks()")
+
+    def r_run_cell_end_hooks(self):
+        self.rsession.run("RKernel::run_cell_end_hooks()")
 
     def handle_stdout(self,text):
         # self.log_out("handle_stdout")
