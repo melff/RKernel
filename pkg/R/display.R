@@ -864,11 +864,11 @@ cat_with_hooks  <- function (..., file = "", sep = " ", fill = FALSE, labels = N
     .Internal(cat(list(...), file, sep, fill, labels, append))
 }
 
-print_orig <- getFromNamespace("print","base")
+print_ <- getFromNamespace("print","base")
 
 print_with_hooks <- function(x,...){
     run_output_hooks()
-    print_orig(x,...)
+    print_(x,...)
 }
 
 str_ <- getFromNamespace("str","utils")
