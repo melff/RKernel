@@ -200,42 +200,48 @@ display_data.htmlwidget <- function(x,...,
 #' @importFrom uuid UUIDgenerate
 #' @export
 display_data.recordedplot <- function(x,
-                                      width=getOption("jupyter.plot.width",6),
-                                      height=getOption("jupyter.plot.height",6),
-                                      pointsize=getOption("jupyter.plot.pointsize",12),
-                                      resolution=getOption("jupyter.plot.res",150),
-                                      scale=getOption("jupyter.plot.scale",.5),
-                                      units=getOption("jupyter.plot.units","in"),
-                                      metadata=emptyNamedList,
-                                      id=UUIDgenerate(),
-                                      update=FALSE,
-                                      ...){
+                                  width=getOption("jupyter.plot.width",7),
+                                  height=getOption("jupyter.plot.height",7),
+                                  resolution=getOption("jupyter.plot.res",144),
+                                  id=UUIDgenerate(),
+                                  update=FALSE,
+                                  ...){
 
     rkernel_graphics_types <- getOption("jupyter.graphics.types",
-                                        c("image/png","application/pdf"))
+                                        c("image/svg+xml",
+                                          "image/png","application/pdf"))
+    
+    formats <- sapply(rkernel_graphics_types,x$mime2format)
+    mime_types <- sapply(rkernel_graphics_types,x$format2mime)
 
+    g <- Graphics$new(width = width,
+                      height = height)
+    replayPlot(x)
+    
     mime_data <- list()
     mime_metadata <- list()
 
-    for(mime in rkernel_graphics_types){
-        mime_data[[mime]] <- mime_graphics(x,
-                                           mime=mime,
-                                           width=width,
-                                           height=height,
-                                           pointsize=pointsize,
-                                           scale=scale,
-                                           res=resolution,
-                                           units=units)
-        mime_metadata[[mime]] <- list(
-            width=width*resolution*scale,
-            height=height*resolution*scale)
-        if(mime=="image/svg+xml")
-            mime_metadata[[mime]]$isolated <-TRUE
+    for(i in seq_along(formats)){
+        mime_i <- mime_types[i]
+        format_i <- formats[i]
+        mime_data_i <- g$render(type=format_i,
+                                dpi=resolution)
+        mime_data[[mime_i]] <- mime_data_i
+        width_i <- width * g$dpi
+        height_i <- height * g$dpi
+        mime_metadata[[mime_i]] <- list(
+            width = width_i,
+            height = height_i
+        )
+        if(mime_i == "image/svg+xml")
+            mime_metadata[[mime_i]]$isolated <- TRUE
     }
-
-    d <- list(data=mime_data)
-    d$metadata <- mime_metadata
-    d$transient <- list(display_id=id)
+    g.close()
+    rm(g)
+    
+    d <- list(data = mime_data,
+              metadata = mime_metadata)
+              transient = list(display_id = id)
     if(update) cl <- "update_display_data"
     else cl <- "display_data"
     structure(d,class=cl)

@@ -237,7 +237,8 @@ display_data.Graphics <- function(x,
     for(i in seq_along(formats)){
         mime_i <- mime_types[i]
         format_i <- formats[i]
-        mime_data_i <- x$render(type=format_i)
+        mime_data_i <- x$render(type=format_i,
+                                dpi=resolution)
         mime_data[[mime_i]] <- mime_data_i
         width_i <- width * x$dpi
         height_i <- height * x$dpi
