@@ -7,7 +7,7 @@ get_help_port <- function(){
 
 #' @include json.R
 
-ETB <- '\x17'
+DLE <- '\x10'
 DISPLAY_START <- '[!display]'
 
 #' Display an R Object
@@ -21,10 +21,11 @@ display <- function(...){
         # log_out("display")
         # log_out("display_data:")
         # log_out(d,use.str=TRUE)
-        cat_(ETB)
-        cat_(DISPLAY_START)
-        zmq_send(d)
-        cat_(ETB)
+    cat_(DLE)
+    cat_(DISPLAY_START)
+    # log_out(d,use.str=TRUE)
+    zmq_send(d)
+    cat_(DLE)
         # cat_('')
     }
 }

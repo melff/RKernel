@@ -9,7 +9,7 @@ from threading import Thread
 from termcolor import colored
 from datetime import datetime
 
-ETB = '\x17'
+DLE = '\x10'
 DISPLAY_START = '[!display]'
 
 
@@ -187,8 +187,8 @@ class RKernel(Kernel):
 
     def handle_stdout(self,text):
         # self.log_out("handle_stdout")
-        if ETB in text:
-            chunks = text.split(ETB)
+        if DLE in text:
+            chunks = text.split(DLE)
             for chunk in chunks:
                 if chunk.startswith(DISPLAY_START):
                     resp = self.r_zmq_receive()
