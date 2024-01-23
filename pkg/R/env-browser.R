@@ -18,7 +18,7 @@ get2 <- function(nm,env,parent=NULL){
 #     htmlEscape(trimws(res))
 # }
 
-#' A HTML version of 'ls.str()'
+#' @title A HTML version of 'ls.str()'
 #'
 #' This function is deprecated. Use \code{\link{envBrowser}} instead.
 #'
