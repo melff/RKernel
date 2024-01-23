@@ -191,10 +191,10 @@ class RKernel(Kernel):
         self.rsession.cmd_nowait("RKernel::start_graphics()")
 
     def r_run_cell_begin_hooks(self):
-        self.rsession.run("RKernel::run_cell_begin_hooks()")
+        self.rsession.run("RKernel::runHooks('cell-begin')")
 
     def r_run_cell_end_hooks(self):
-        self.rsession.run("RKernel::run_cell_end_hooks()")
+        self.rsession.run("RKernel::runHooks('cell-end')")
 
     def handle_stdout(self,text):
         # self.log_out("handle_stdout")

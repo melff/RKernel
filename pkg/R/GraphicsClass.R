@@ -188,7 +188,7 @@ graphics <- new.env()
 start_graphics <- function(){
     graphics$current <- Graphics()
     add_output_hook(display_changed_graphics,"graphics")
-    add_cell_end_hook(display_changed_graphics,"graphics")
+    setHook('cell-end',display_changed_graphics)
     setHook('before.plot.new',graphics_apply_changed_dims)
     setHook('before.plot.new',display_changed_graphics)
     setHook('before.grid.newpage',graphics_apply_changed_dims)
