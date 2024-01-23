@@ -3,8 +3,9 @@
 #' @export
 GraphicsClass <- R6Class("Graphics",
     public = list(
-        initialize = function(width = 7,
-                              height = 7){
+        initialize = function(...) self$open(...),
+        open = function(width = 7,
+                        height = 7){
             private$width <- width
             private$height <- height
             stopifnot(width > 0)
@@ -24,6 +25,11 @@ GraphicsClass <- R6Class("Graphics",
             private$host <- state$host
             private$port <- state$port
             private$token <- state$token
+            log_out(sprintf("Opened graphics at port %d",private$port))
+        },
+        close = function(){
+            hgd_close(private$dev_num)
+            log_out(sprintf("Closed graphics at port %d",private$port))
         },
         active = function(){
             dev.cur() == private$dev_num  
@@ -75,12 +81,7 @@ GraphicsClass <- R6Class("Graphics",
                              which    = private$dev_num)
             mime <- private$mime[type]
             binary <- private$binary_format[type]
-            # return(list(
-            #     data = data,
-            #     mime = unname(mime),
-            #     binary = unname(binary),
-            #     type = type
-            # ))
+            # log_out(sprintf("Rendered graphics at port %d",private$port))
             return(data)
         },
         url = function(type,
@@ -130,7 +131,10 @@ GraphicsClass <- R6Class("Graphics",
             if(height < 0) height <- private$height
             else private$height <- height
             dev.set(private$dev_num)
-            hgd_plot(renderer="meta", width = width, height = height)
+            dpi <- self$dpi
+            hgd_plot(renderer="meta", 
+                     width = width * dpi, 
+                     height = height * dpi)
         },
         mime2format = function(mime){
             mime <- mime[1]
@@ -148,9 +152,6 @@ GraphicsClass <- R6Class("Graphics",
                 mime <- unique(private$mime[format])
                 return(mime)
             }
-        },
-        close = function(){
-            dev.off(private$dev_num)
         },
         live_url = function(){
             dev.set(private$dev_num)
@@ -187,14 +188,29 @@ graphics <- new.env()
 start_graphics <- function(){
     graphics$current <- Graphics()
     add_output_hook(display_changed_graphics,"graphics")
+    add_cell_end_hook(display_changed_graphics,"graphics")
+    setHook('before.plot.new',graphics_apply_changed_dims)
+    setHook('before.plot.new',display_changed_graphics)
+    setHook('before.grid.newpage',graphics_apply_changed_dims)
+    setHook('before.grid.newpage',display_changed_graphics)
 }
 
 #' @export
 display_changed_graphics <- function(...){
     g <- graphics$current
-    if(g$new_page() || g$updated()){
+    if((g$new_page() || g$updated()) && par("page")){
         display(g)
         g$checkpoint()
+    }
+}
+
+graphics_apply_changed_dims <- function(){
+    if(any_option_changed("jupyter.plot.width","jupyter.plot.height")){
+        g <- graphics$current
+        cur_dim <- g$get_dims()
+        g$set_dims(width=getOption("jupyter.plot.width",unname(cur_dim["width"])),
+                   height=getOption("jupyter.plot.height",unname(cur_dim["height"])))
+        save_options("jupyter.plot.width","jupyter.plot.height")
     }
 }
 

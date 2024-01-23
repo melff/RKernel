@@ -38,6 +38,7 @@ Collate:
     'aa-versions.R'
     'callbacks.R'
     'cell-hooks.R'
+    'check-options.R'
     'comms.R'
     'compare-plots.R'
     'completions.R'
