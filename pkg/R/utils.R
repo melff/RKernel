@@ -27,23 +27,6 @@ emptyNamedList <- structure(list(),names=character(0))
 
 log_fn <- "/tmp/RKernel.log"
 
-print_ <- function(...){
-  k <- get_current_kernel()
-  if(!is.null(k)) k$print(...)
-  else print(...)
-}
-
-cat_ <- function(...){
-  k <- get_current_kernel()
-  if(!is.null(k)) k$cat(...)
-  else cat(...)
-}
-
-str_ <- function(...){
-  k <- get_current_kernel()
-  if(!is.null(k)) k$str(...)
-  else str(...)
-}
 
 
 log_out = function(message,...,use.print=FALSE,use.str=FALSE){

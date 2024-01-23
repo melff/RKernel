@@ -8,15 +8,15 @@ get2 <- function(nm,env,parent=NULL){
 
 #' @importFrom utils str
 
-str_ <- function(nm,envir,parent=NULL){
-    res <- tryCatch(capture.output(str(get2(nm,envir,parent))),
-                    error=function(e)e)
-    if(inherits(res,"error")){
-        res <- "<missing>"
-    }
-    res <- gsub("\\t","",res)
-    htmlEscape(trimws(res))
-}
+# str_ <- function(nm,envir,parent=NULL){
+#     res <- tryCatch(capture.output(str(get2(nm,envir,parent))),
+#                     error=function(e)e)
+#     if(inherits(res,"error")){
+#         res <- "<missing>"
+#     }
+#     res <- gsub("\\t","",res)
+#     htmlEscape(trimws(res))
+# }
 
 #' A HTML version of 'ls.str()'
 #'

@@ -17,14 +17,7 @@ DISPLAY_START <- '[!display]'
 display <- function(...){
     # log_out("display")
     d <- display_data(...)
-    kernel <- get_current_kernel()
-    if(!is.null(kernel))
-        kernel$display_data(data=d$data,
-                            metadata=d$metadata)
-    else {
-        
-        d <- list(type=class(d),
-                  content=unclass(d))
+    
         # log_out("display")
         # log_out("display_data:")
         # log_out(d,use.str=TRUE)
@@ -503,7 +496,6 @@ display_data.help_files_with_topic <- function(x,...,
 #'     reasons only.
 #' @param remote A character string. This formal argument exists for compatibility
 #'     reasons only.
-#' @include evaluator.R
 #' @export
 help.start <- function(update = FALSE, 
                        gui = "irrelevant", 
@@ -531,7 +523,6 @@ help.start <- function(update = FALSE,
     else cl <- "display_data"
     structure(d,class=cl)
 }
-register_export(help.start)
 
 help_start <- help.start
 
@@ -834,9 +825,7 @@ alert <- function(text){
                         metadata=d$metadata)
 }
 
-print_ <- function (x, ...) {
-    if(any(class(x) %in% getOption("rkernel_displayed_classes"))){
-        display(x)
+
     }
     else UseMethod("print")
 }
