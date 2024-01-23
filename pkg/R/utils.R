@@ -29,16 +29,16 @@ log_fn <- "/tmp/RKernel.log"
 
 
 
-log_out = function(message,...,use.print=FALSE,use.str=FALSE){
+log_out <- function(message,...,use.print=FALSE,use.str=FALSE){
   dcl <- deparse1(match.call())
   tryCatch({
     if(use.print)
       message <- paste0("\n",paste0(capture.output(print_(message)),collapse="\n"))
     else if(use.str)
-      message <- paste(capture.output(str_(message)),collapse="\n")
+      message <- paste(capture.output(str(message)),collapse="\n")
     else message <- paste(message,...,collapse="")
     message <- paste(crayon::green(format(Sys.time()),"\t",message,"\n"))
-    message <- paste("INFO:",message)
+    message <- paste("R INFO:",message)
         # self$cat(message,file=stderr())
     cat_(message,file=log_fn,append=TRUE)
   },error=function(e){
@@ -53,7 +53,7 @@ log_out = function(message,...,use.print=FALSE,use.str=FALSE){
 #' @param message A string to be shown in the log
 log_warning = function(message){
   message <- paste(crayon::yellow(format(Sys.time()),"\t",message,"\n"))
-  message <- paste("WARNING:",message)
+  message <- paste("R WARNING:",message)
       # self$cat(message,file=stderr())
   cat_(message,file=log_fn,append=TRUE)
 }
@@ -62,19 +62,22 @@ log_warning = function(message){
 #' @param message A string to be shown in the log
 log_error = function(message){
   message <- crayon::red(format(Sys.time()),"\t",message,"\n")
-  message <- paste("ERROR:",message)
+  message <- paste("R ERROR:",message)
       # self$cat(message,file=stderr())
   cat_(message,file=log_fn,append=TRUE)
 }
 
 
-replace_in_package <- function(pkg_name,name,value){
+replace_in_package <- function(pkg_name,name,value,update.env=FALSE){
   env_name <- paste0("package:",pkg_name)
   if(env_name %in% search())
     env <- as.environment(env_name)
   else
     env <- getNamespace(pkg_name)
   .BaseNamespaceEnv$unlockBinding(name, env)
+  if(update.env){
+      environment(value) <- env
+  }
   assign(name, value, env)
   .BaseNamespaceEnv$lockBinding(name, env)
 }

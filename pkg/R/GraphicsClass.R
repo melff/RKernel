@@ -24,14 +24,27 @@ GraphicsClass <- R6Class("Graphics",
             private$host <- state$host
             private$port <- state$port
             private$token <- state$token
-            private$hsize <- state$hsize
-            private$upid <- state$upid
         },
         active = function(){
             dev.cur() == private$dev_num  
         },
         activate = function(){
             dev.set(private$dev_num)
+        },
+        checkpoint = function(){
+            if(self$active()){
+                state <- hgd_state()
+                private$hsize <- state$hsize
+                private$upid <- state$upid
+            }
+        },
+        new_page = function(){
+            state <- hgd_state()
+            state$hsize > private$hsize
+        },
+        updated = function(){
+            state <- hgd_state()
+            state$upid > private$upid
         },
         render = function(type,
                           mime,
@@ -62,9 +75,6 @@ GraphicsClass <- R6Class("Graphics",
                              which    = private$dev_num)
             mime <- private$mime[type]
             binary <- private$binary_format[type]
-            state <- hgd_state()
-            private$hsize <- state$hsize
-            private$upid <- state$upid
             # return(list(
             #     data = data,
             #     mime = unname(mime),
@@ -97,8 +107,6 @@ GraphicsClass <- R6Class("Graphics",
             host <- private$host
             port <- private$port
             state <- hgd_state()
-            private$hsize <- state$hsize
-            private$upid <- state$upid
             renderer <- type
             token <- private$token
             index <- private$hsize - 1L
@@ -144,12 +152,6 @@ GraphicsClass <- R6Class("Graphics",
         close = function(){
             dev.off(private$dev_num)
         },
-        get_hsize = function(){
-            private$hsize
-        },
-        get_upid = function(){
-            private$upid
-        },
         live_url = function(){
             dev.set(private$dev_num)
             hgd_url()
@@ -178,6 +180,23 @@ Graphics <- function(...)GraphicsClass$new(...)
 
 #' @export
 print.Graphics <- function(x,...) display(x)
+
+graphics <- new.env()
+
+#' @export
+start_graphics <- function(){
+    graphics$current <- Graphics()
+    add_output_hook(display_changed_graphics,"graphics")
+}
+
+#' @export
+display_changed_graphics <- function(...){
+    g <- graphics$current
+    if(g$new_page() || g$updated()){
+        display(g)
+        g$checkpoint()
+    }
+}
 
 #' @include display.R
 #' @importFrom uuid UUIDgenerate

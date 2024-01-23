@@ -12,7 +12,6 @@ from datetime import datetime
 DLE = '\x10'
 DISPLAY_START = '[!display]'
 
-
 class RKernelSession(RSession):
     "Subclass of RSession to handle interaction"
 
@@ -89,7 +88,9 @@ class RKernel(Kernel):
         self.banner += self.banner_suffix
         self.r_zmq_init() 
         self.r_zmq_setup_sender() 
-        self.r_zmq_setup_receiver() 
+        self.r_zmq_setup_receiver()
+        self.r_install_hooks()
+        self.r_start_graphics()
         super().start()
         # self.log_out("Kernel started")
 
@@ -116,6 +117,7 @@ class RKernel(Kernel):
 
         self.rsession.interrupted = False
         self.rsession.run(code)
+        self.r_display_changed_graphics()
 
         # self.log_out("run complete - sending reply")
         
@@ -185,6 +187,12 @@ class RKernel(Kernel):
         msk = self.r_zmq_recv_so.poll(timeout=timeout)
         return msk != 0
 
+    def r_start_graphics(self):
+        self.rsession.cmd_nowait("RKernel::start_graphics()")
+
+    def r_display_changed_graphics(self):
+        self.rsession.run("RKernel::display_changed_graphics()")
+
     def handle_stdout(self,text):
         # self.log_out("handle_stdout")
         if DLE in text:
@@ -234,6 +242,8 @@ class RKernel(Kernel):
         self.session.send(stream, "interrupt_reply", content, parent, ident=ident)
         return
 
+    def r_install_hooks(self):
+        self.rsession.cmd("RKernel::install_output_hooks()")
 
         
 class JSONerror(Exception):
