@@ -211,7 +211,7 @@ class RKernel(Kernel):
         # self.log_out("handle_stdout - done")
 
     def handle_stderr(self,text):
-        self.stream(text,stream='stdout')
+        self.stream(text,stream='stderr')
 
     def log_out(self,text):
         now = format(datetime.now())
