@@ -68,11 +68,14 @@ GraphicsClass <- R6Class("Graphics",
             if(height < 0) height <- private$height
             else private$height <- height
             if(dpi < 0) dpi <- self$dpi
-            if(type == "png")
+            width <- width * self$dpi
+            height <- height * self$dpi
+            if(type == "png"){
                zoom <- dpi/self$dpi
+               width <- width * zoom
+               height <- height * zoom
+            }
             else zoom <- 1L
-            width <- width * dpi
-            height <- height * dpi
             dev.set(private$dev_num)
             data <- hgd_plot(width    = width,
                              height   = height,
