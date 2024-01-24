@@ -91,6 +91,8 @@ class RKernel(Kernel):
         self.r_zmq_setup_receiver()
         self.r_install_hooks()
         self.r_start_graphics()
+        self.r_set_help_port()
+        self.r_set_help_displayed()
         super().start()
         # self.log_out("Kernel started")
 
@@ -248,6 +250,12 @@ class RKernel(Kernel):
     def r_install_hooks(self):
         self.rsession.cmd("RKernel::install_output_hooks()")
 
+    def r_set_help_port(self):
+        port = random_port()
+        self.rsession.cmd("RKernel::set_help_port(%d)" % port)
+
+    def r_set_help_displayed(self):
+        self.rsession.cmd("RKernel::set_help_displayed(TRUE)")
         
 class JSONerror(Exception):
     pass

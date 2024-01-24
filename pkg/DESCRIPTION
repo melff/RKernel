@@ -47,6 +47,7 @@ Collate:
     'dictionary.R'
     'env-browser.R'
     'events.R'
+    'help.R'
     'hooks.R'
     'is-complete.R'
     'scrolling-table.R'
