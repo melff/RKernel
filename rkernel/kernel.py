@@ -81,6 +81,8 @@ class RKernel(Kernel):
 
         self.log_file = open("/tmp/RKernel.log","a")
 
+        # self.rsession.env["_R_HELP_ENABLE_ENHANCED_HTML_"] = "FALSE"
+        
     def start(self):
         """Start the kernel."""
         # self.log_out("======== Starting kernel ========")

@@ -48,6 +48,7 @@ help_server <- new.env()
 set_help_port <- function(port){
     help_server$current <- HelpServer$new(port)
     options(help.ports=port)
+    # replace_in_package("tools","example2html",my_example2html)
 }
 
 get_help_url <- function(){
@@ -317,3 +318,8 @@ format_item <- function(x){
     x2 <- paste0("      ",x2)
     paste0(c(x[1],x2,""),collapse="\n")
 }
+
+my_example2html <- function(topic, package, Rhome = "", env = NULL){
+    "Not yet implemented"
+}
+
