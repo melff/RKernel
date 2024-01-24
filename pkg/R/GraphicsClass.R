@@ -198,19 +198,23 @@ start_graphics <- function(){
 #' @export
 display_changed_graphics <- function(...){
     g <- graphics$current
-    if((g$new_page() || g$updated()) && par("page")){
-        display(g)
-        g$checkpoint()
+    if(g$active()){
+        if((g$new_page() || g$updated()) && par("page")){
+            display(g)
+            g$checkpoint()
+        }
     }
 }
 
 graphics_apply_changed_dims <- function(){
-    if(any_option_changed("jupyter.plot.width","jupyter.plot.height")){
-        g <- graphics$current
-        cur_dim <- g$get_dims()
-        g$set_dims(width=getOption("jupyter.plot.width",unname(cur_dim["width"])),
-                   height=getOption("jupyter.plot.height",unname(cur_dim["height"])))
-        save_options("jupyter.plot.width","jupyter.plot.height")
+    g <- graphics$current
+    if(g$active()){
+        if(any_option_changed("jupyter.plot.width","jupyter.plot.height")){
+            cur_dim <- g$get_dims()
+            g$set_dims(width=getOption("jupyter.plot.width",unname(cur_dim["width"])),
+                       height=getOption("jupyter.plot.height",unname(cur_dim["height"])))
+            save_options("jupyter.plot.width","jupyter.plot.height")
+        }
     }
 }
 
