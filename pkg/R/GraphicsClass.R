@@ -1,4 +1,4 @@
-
+#' @importFrom base64enc dataURI
 #' @import httpgd
 #' @export
 GraphicsClass <- R6Class("Graphics",
@@ -87,6 +87,17 @@ GraphicsClass <- R6Class("Graphics",
             # log_out(sprintf("Rendered graphics at port %d",private$port))
             return(data)
         },
+        to_html = function(){
+            data <- self$render("svgp")
+            encoded_data <- dataURI(data=data,mime="image/svg+xml",encoding=NULL)
+            tmpl <- "<!DOCTYPE html><html><image src=\"%s\"></html>"
+            html <- sprintf(tmpl,encoded_data)
+            paste0(DLE,html,DLE)
+        },
+        to_svg = function(){
+            data <- self$render("svgp")
+            paste0(DLE,"<!DOCTYPE svg>",data,DLE)
+        },
         url = function(type,
                        mime,
                        width=-1,
@@ -160,7 +171,8 @@ GraphicsClass <- R6Class("Graphics",
             dev.set(private$dev_num)
             hgd_url()
         },
-        dpi = 72 # from pdf()
+        dpi = 72, # from pdf()
+        delivery_mode = "display"
     ),
     private = list(
         plt = NULL,
@@ -190,20 +202,25 @@ graphics <- new.env()
 #' @export
 start_graphics <- function(){
     graphics$current <- Graphics()
-    add_output_hook(display_changed_graphics,"graphics")
-    setHook('cell-end',display_changed_graphics)
+    add_output_hook(send_changed_graphics,"graphics")
+    setHook('cell-end',send_changed_graphics)
     setHook('before.plot.new',graphics_apply_changed_dims)
-    setHook('before.plot.new',display_changed_graphics)
+    setHook('before.plot.new',send_changed_graphics)
     setHook('before.grid.newpage',graphics_apply_changed_dims)
-    setHook('before.grid.newpage',display_changed_graphics)
+    setHook('before.grid.newpage',send_changed_graphics)
 }
 
 #' @export
-display_changed_graphics <- function(...){
+send_changed_graphics <- function(...){
     g <- graphics$current
     if(g$active()){
         if((g$new_page() || g$updated()) && par("page")){
-            display(g)
+            if(g$delivery_mode == "display")
+                display(g)
+            else if(g$delivery_mode == "svg")
+                cat_(g$to_svg())
+            else if(g$delivery_mode == "html")
+                cat_(g$to_html())
             g$checkpoint()
         }
     }
@@ -253,8 +270,8 @@ display_data.Graphics <- function(x,
             width = width_i,
             height = height_i
         )
-        if(mime_i == "image/svg+xml")
-            mime_metadata[[mime_i]]$isolated <- TRUE
+        #if(mime_i == "image/svg+xml") # No longer necessary(?)
+        #    mime_metadata[[mime_i]]$isolated <- TRUE
     }
     
     d <- list(data = mime_data,

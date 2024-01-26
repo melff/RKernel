@@ -48,7 +48,7 @@ help_server <- new.env()
 set_help_port <- function(port){
     help_server$current <- HelpServer$new(port)
     options(help.ports=port)
-    # replace_in_package("tools","example2html",my_example2html)
+    replace_in_package("tools","example2html",example_html)
 }
 
 get_help_url <- function(){
@@ -323,3 +323,88 @@ my_example2html <- function(topic, package, Rhome = "", env = NULL){
     "Not yet implemented"
 }
 
+example_html <- function(topic,package = NULL,...) {
+    # topic <- deparse(substitute(topic))
+    g <- graphics$current
+    g$delivery_mode <- "svg"
+    on.exit(g$delivery_mode <- "display")
+    e <- capture.output(example(topic,package,local=TRUE,
+                                character.only=TRUE))
+    
+    e <- paste(e,collapse="\n")
+    e <- strsplit(e,"\x10",fixed=TRUE)[[1]]
+    
+    r <- character()
+    n <- nchar("<!DOCTYPE svg>")
+    for(i in seq_along(e)){
+        if(startsWith(e[i],"<!DOCTYPE svg>")){
+            r[i] <- paste0("<div class= 'figure'>",substr(e[i],start=n+1,nchar(e[i])),"</div>")
+        } else {
+            r[i] <- paste0("<pre>",e[i],"\n</pre>")
+        }
+    }
+    head <- c("<!DOCTYPE html>","<html>")
+    style <- "<style>
+  .doc {
+    width: 90ex;
+    margin: 0 auto;
+  }
+  .figure {
+    margin: 0 auto;
+    background: 'white';
+  }
+</style>"
+    description  <- paste("Examples for",package,"::",topic)
+    title <- paste0("<title>",description,"</title>")
+    head <- c(head,"<head>")
+    head <- c(head,title,style)
+    head <- c(head,"</head>")
+    headline <- c("<h1>",description,"</h1>")
+    body <- c(headline,r)
+    help_url <- paste0(get_help_url(),"/library/",package,"/html/",topic,".html")
+    back <- c("<p>",sprintf("<a href=\"%s\">",help_url),"Back to help page","</a>","</p>")
+    body <- c(body,back)
+    body <- c("<body>","<div class=\"doc\">",body,"</div>","</body>")
+    tail <- "</html>"
+
+    r <- paste(c(head,body,tail),collapse="\n")
+    return(list(payload=r))
+}
+
+demo_html <- function(topic,package = NULL,...) {
+    topic <- deparse(substitute(topic))
+    g <- graphics$current
+    g$delivery_mode <- "svg"
+    on.exit(g$delivery_mode <- "display")
+    e <- capture.output(demo(topic=topic,package,ask=FALSE,character.only=TRUE))
+    e <- c(e,capture.output(send_changed_graphics()))
+    e <- paste(e,collapse="\n")
+    e <- strsplit(e,"\x10",fixed=TRUE)[[1]]
+
+    r <- character()
+    n <- nchar("<!DOCTYPE svg>")
+    for(i in seq_along(e)){
+        if(startsWith(e[i],"<!DOCTYPE svg>")){
+            r[i] <- paste0("<div class= 'figure'>",substr(e[i],start=n+1,nchar(e[i])),"</div>")
+        } else {
+            r[i] <- paste0("<pre>",e[i],"\n</pre>")
+        }
+    }
+    r <- paste0(r,collapse="\n")
+    head <- "<!DOCTYPE html>\n<html>\n"
+    style<- "<style>
+  .doc {
+    width: 90ex;
+    margin: 0 auto;
+  }
+  .figure {
+    margin: 0 auto;
+    background: 'white';
+  }
+</style>"
+    body <- paste0("<body>\n<div class=\"doc\">\n",r,"</div>\n</body>")
+    tail <- "</html>"
+
+    r <- paste(head,style,body,tail,collapse="\n")
+    return(list(payload=r))
+}
