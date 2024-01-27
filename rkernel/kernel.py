@@ -157,7 +157,7 @@ class RKernel(Kernel):
             "status":       response['status']
         }
 
-    def do_comm_info_requst(self):
+    def do_comm_info_request(self):
         """TODO"""
         return {}
     
