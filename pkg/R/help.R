@@ -62,10 +62,12 @@ set_help_displayed <- function(on=TRUE){
     if(on){
         add_displayed_classes("help_files_with_topic")
         add_displayed_classes("hsearch")
+        add_displayed_classes("packageIQR")
     }
     else {
         remove_displayed_classes("help_files_with_topic")
         remove_displayed_classes("hsearch")
+        remove_displayed_classes("packageIQR")
     }
 }
 
@@ -415,4 +417,90 @@ demo_html <- function(topic,package = NULL,...) {
 
     r <- paste(c(head,body,tail),collapse="\n")
     return(list(payload=r))
+}
+
+#' @export
+display_data.packageIQR <- function(x,..., 
+    id=UUIDgenerate(), 
+    update=FALSE){
+    #tt <- capture.output(utils:::print.packageIQR(x))
+    
+    dt <- to_html_packageIQR(x)
+    tt <- to_text_packageIQR(x)
+
+    display_data(
+        "text/plain" = tt,
+        "text/html"=dt
+    )
+}
+
+to_html_packageIQR <- function(x){
+    
+    rdf <- as.data.frame(x$results)
+    rdf <- split(rdf,rdf$Package)
+    dt <- lapply(rdf,demo_table_html)
+    dt <- unlist(unname(dt))
+    dt <- c("<table class=\"demo-table\">",dt,"</table>")
+    demo_table_style <- "<style>
+table.demo-table td {
+    text-align: left !important;
+}
+table.demo-table td.pkg-title {
+    font-weight: bold;
+}
+table.demo-table {
+    margin: 0 auto;
+}
+table.demo-table tbody tr {
+    background: white !important;
+}
+</style>"
+    dt <- c(demo_table_style,dt)
+    dt <- paste(dt,collapse="\n")
+    dt
+}
+
+demo_table_html <- function(x){
+    pkgname <- x$Package[1]
+    item <- x$Item
+    title <- x$Title
+    lib_url <- paste0(get_help_url(),"/library/")
+    script_url <- paste0(lib_url,pkgname,"/demo/",item,".R")
+    run_url  <- paste0(lib_url,pkgname,"/Demo/",item)
+    script_tag <- sprintf("<a href=\"%s\">(Show code)</a>",script_url)
+    run_tag <- sprintf("<a href=\"%s\">(Run demo)</a>",run_url)
+    rows <- paste0("<tr>","<td>",title,"</td>","<td>",script_tag,"</td>","<td>",run_tag,"</td>","</tr>")
+    title <- sprintf("Demos in package '%s':",pkgname)
+    title <- paste0("<tr>","<td colspan=\"3\" class=\"pkg-title\">",title,"</td>","</tr>")
+    c(title,rows)
+}
+
+to_text_packageIQR <- function(x){
+    rdf <- as.data.frame(x$results)
+    pkg <- rdf$Package
+    rdf <- split(rdf,rdf$Package)
+    y <- unname(lapply(rdf,demo_table_text))
+    paste(unlist(y),collapse="\n")
+}
+
+demo_table_text <- function(x){
+    pkgname <- x$Package[1]
+    item <- x$Item
+    title <- x$Title
+    m <- cbind(item,title)
+    m <- apply(m,1,demo_table_textline,width_item=24,width_title=56)
+    m <- unlist(m)
+    c("",
+      sprintf("Demos in '%s':",pkgname),
+      "",
+      m)
+}
+
+demo_table_textline <- function(x,width_item=24,width_title=55){
+    x2 <- strwrap(x[2], width = width_item + 1 + width_title)
+    x1 <- rep("",length(x2))
+    x1[1] <- x[1]
+    x1 <- format(x1,width=width_item)
+    x2 <- format(x2)
+    apply(cbind(x1,x2),1,paste,collapse=" ")
 }
