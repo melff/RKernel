@@ -1,10 +1,14 @@
+completions <- new.env()
+completions$inited <- FALSE
+
 #' @description
 #' Provide completion for code given at point.
 #' @param code A character string with code to be checked for
 #'    completions.
 #' @param cursor_pos An integer, the current position of the cursor.
 get_completions <- function(code,cursor_pos){
-    if(!private$completions_inited) private$init_completions()
+    if(!completions$inited) 
+        init_completions()
 
     lines <- splitLines(code)
     line_length <- nchar(lines)
@@ -14,13 +18,13 @@ get_completions <- function(code,cursor_pos){
     if(!length(i) || !is.finite(i)) return(NULL)
     pos <- cursor_pos - line_start[i] 
     line <- lines[i]
-    private$cf$assignLinebuffer(line)
-    private$cf$assignEnd(pos)
-    match_info <- private$cf$guessTokenFromLine(update=FALSE)
-    private$cf$guessTokenFromLine()
-    private$cf$completeToken()
+    completions$assignLinebuffer(line)
+    completions$assignEnd(pos)
+    match_info <- completions$guessTokenFromLine(update=FALSE)
+    completions$guessTokenFromLine()
+    completions$completeToken()
 
-    matches <- private$cf$retrieveCompletions()
+    matches <- completions$retrieveCompletions()
     start <- line_start[i] + match_info$start
     end <- start + nchar(match_info$token)
 
@@ -33,10 +37,12 @@ get_completions <- function(code,cursor_pos){
 
 init_completions = function(){
     utils_ns <- asNamespace('utils')
-    private$cf$assignLinebuffer <- get(".assignLinebuffer",utils_ns)
-    private$cf$assignEnd <- get(".assignEnd",utils_ns)
-    private$cf$guessTokenFromLine <- get(".guessTokenFromLine",utils_ns)
-    private$cf$completeToken <- get(".completeToken",utils_ns)
-    private$cf$retrieveCompletions <- get(".retrieveCompletions",utils_ns)
-    private$completions_inited <- TRUE
+    completions$assignLinebuffer <- get(".assignLinebuffer",utils_ns)
+    completions$assignEnd <- get(".assignEnd",utils_ns)
+    completions$guessTokenFromLine <- get(".guessTokenFromLine",utils_ns)
+    completions$completeToken <- get(".completeToken",utils_ns)
+    completions$retrieveCompletions <- get(".retrieveCompletions",utils_ns)
+    completions$inited <- TRUE
 }
+
+splitLines <- function(text) strsplit(text,"\n",fixed=TRUE)[[1]]

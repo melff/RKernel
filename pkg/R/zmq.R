@@ -106,3 +106,15 @@ zmq_handlers$is_complete_request <- function(msg){
     )
 }
 
+zmq_handlers$complete_request <- function(msg){
+    code <- msg$content$code
+    cursor_pos <- msg$content$cursor_pos
+    response <- get_completions(code,cursor_pos)
+    list(
+        type = "complete_reply",
+        matches = response$matches,
+        cursor_start = response$start,
+        cursor_end = response$end,
+        status = "ok"
+    )
+}

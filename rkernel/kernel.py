@@ -144,13 +144,17 @@ class RKernel(Kernel):
 
     
     def do_complete(self, code, cursor_pos):
-        """TODO"""
+        content = dict(code = code,
+                       cursor_pos = cursor_pos)
+        msg = dict(type = 'complete_request',
+                   content = content)
+        response = self.r_zmq_request(msg)
         return {
-            "matches": [],
-            "cursor_end": cursor_pos,
-            "cursor_start": cursor_pos,
+            "matches":      response['matches'],
+            "cursor_end":   response['cursor_end'],
+            "cursor_start": response['cursor_start'],
             "metadata": {},
-            "status": "ok",
+            "status":       response['status']
         }
 
     def do_comm_info_requst(self):
