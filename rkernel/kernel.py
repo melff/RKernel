@@ -199,10 +199,12 @@ class RKernel(Kernel):
         self.r_zmq_recv_so = socket
 
     def r_zmq_request(self,req):
-        # print("r_zmq_request")
+        # self.log_out("r_zmq_request")
         res = self.rsession.cmd_nowait("RKernel::zmq_reply()")
         self.r_zmq_send(req)
         resp = self.r_zmq_receive()
+        # self.log_out("response received")
+        # self.log_out(pformat(resp))
         self.rsession.find_prompt()
         return resp
 
