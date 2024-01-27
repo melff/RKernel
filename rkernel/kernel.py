@@ -81,7 +81,10 @@ class RKernel(Kernel):
 
         self.log_file = open("/tmp/RKernel.log","a")
 
-        # self.rsession.env["_R_HELP_ENABLE_ENHANCED_HTML_"] = "FALSE"
+        comm_msg_types = ["comm_open", "comm_msg", "comm_close"]
+        for msg_type in comm_msg_types:
+            self.shell_handlers[msg_type] = getattr(self, msg_type)
+        
         
     def start(self):
         """Start the kernel."""
@@ -139,6 +142,33 @@ class RKernel(Kernel):
         return {"status": response['status'],
                 "indent": ""}
 
+    
+    def do_complete(self, code, cursor_pos):
+        """TODO"""
+        return {
+            "matches": [],
+            "cursor_end": cursor_pos,
+            "cursor_start": cursor_pos,
+            "metadata": {},
+            "status": "ok",
+        }
+
+    def do_comm_info_requst(self):
+        """TODO"""
+        return {}
+    
+    def do_inspect(self, code, cursor_pos, detail_level=0, omit_sections=()):
+        """TODO"""
+        return {"status": "ok", "data": {}, "metadata": {}, "found": False}
+        
+    def do_shutdown(self, restart):
+        """TODO"""
+        return {"status": "ok", "restart": restart}
+
+    async def do_debug_request(self, msg):
+        """TODO"""
+        raise NotImplementedError
+    
     def r_zmq_init(self):
         # print("r_zmq_init")
         res = self.rsession.cmd("RKernel::zmq_init()")
@@ -258,6 +288,30 @@ class RKernel(Kernel):
 
     def r_set_help_displayed(self):
         self.rsession.cmd("RKernel::set_help_displayed(TRUE)")
+
+    async def comm_info_request(self, stream, ident, parent):
+        """Handle comm_info_request """
+        if not self.session:
+            return
+        content = parent["content"]
+        target_name = content.get("target_name", None)
+
+        comms = self.do_comm_info_request()
+        reply_content = dict(comms=comms, status="ok")
+        msg = self.session.send(stream, "comm_info_reply", reply_content, parent, ident)
+        self.log.debug("%s", msg)
+
+    async def comm_open(self, stream, ident, parent):
+        """TODO Handle comm_open """
+        pass
+
+    async def comm_msg(self, stream, ident, parent):
+        """TODO Handle comm_msg """
+        pass
+
+    async def comm_close(self, stream, ident, parent):
+        """TODO Handle comm_close """
+        pass
         
 class JSONerror(Exception):
     pass
