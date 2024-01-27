@@ -452,7 +452,7 @@ table.demo-table {
     margin: 0 auto;
 }
 table.demo-table tbody tr {
-    background: white !important;
+    background: unset !important;
 }
 </style>"
     dt <- c(demo_table_style,dt)
