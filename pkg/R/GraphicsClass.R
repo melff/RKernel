@@ -54,6 +54,7 @@ GraphicsClass <- R6Class("Graphics",
         },
         render = function(type,
                           mime,
+                          page=0,
                           width=-1,
                           height=-1,
                           dpi=-1){
@@ -77,7 +78,8 @@ GraphicsClass <- R6Class("Graphics",
             }
             else zoom <- 1L
             dev.set(private$dev_num)
-            data <- hgd_plot(width    = width,
+            data <- hgd_plot(page     = page,
+                             width    = width,
                              height   = height,
                              zoom     = zoom,
                              renderer = type,
@@ -87,16 +89,15 @@ GraphicsClass <- R6Class("Graphics",
             # log_out(sprintf("Rendered graphics at port %d",private$port))
             return(data)
         },
-        to_html = function(){
-            data <- self$render("svgp")
-            encoded_data <- dataURI(data=data,mime="image/svg+xml",encoding=NULL)
-            tmpl <- "<!DOCTYPE html><html><image src=\"%s\"></html>"
-            html <- sprintf(tmpl,encoded_data)
-            paste0(DLE,html,DLE)
+        svg = function(page = 0){
+            self$render("svgp", page = page)
         },
-        to_svg = function(){
-            data <- self$render("svgp")
-            paste0(DLE,"<!DOCTYPE svg>",data,DLE)
+        png = function(page = 0){
+            self$render("png", page = page)
+        },
+        last_plot = function(){
+            state <- hgd_state()
+            state$hsize
         },
         url = function(type,
                        mime,
@@ -171,8 +172,7 @@ GraphicsClass <- R6Class("Graphics",
             dev.set(private$dev_num)
             hgd_url()
         },
-        dpi = 72, # from pdf()
-        delivery_mode = "display"
+        dpi = 72 # from pdf()
     ),
     private = list(
         plt = NULL,
@@ -208,21 +208,39 @@ start_graphics <- function(){
     setHook('before.plot.new',send_changed_graphics)
     setHook('before.grid.newpage',graphics_apply_changed_dims)
     setHook('before.grid.newpage',send_changed_graphics)
+    setHook('plot.new',send_new_plot)
+    setHook('grid.newpage',send_new_plot)
+    graphics$delivery_mode <- "diplay"
+    graphics$update_display <- FALSE
+    graphics$last_display <- ""
 }
 
+#' @importFrom uuid UUIDgenerate
 #' @export
 send_changed_graphics <- function(...){
     g <- graphics$current
+    dm <- graphics$delivery_mode
     if(g$active()){
-        if((g$new_page() || g$updated()) && par("page")){
-            if(g$delivery_mode == "display")
-                display(g)
-            else if(g$delivery_mode == "svg")
-                cat_(g$to_svg())
-            else if(g$delivery_mode == "html")
-                cat_(g$to_html())
-            g$checkpoint()
+        if(dm == "display"){
+            if(graphics$update_display && g$updated()){
+                id <- graphics$last_display
+                display(g,id=id,update=update)
+            }
+            else if((g$new_page() || g$updated()) && par("page")){
+                    id <- UUIDgenerate()
+                    graphics$last_display <- id
+                    display(g,id=id)
+            }
         }
+        g$checkpoint()
+    }
+}
+
+send_new_plot <- function(...){
+    g <- graphics$current
+    dm <- graphics$delivery_mode
+    if(g$active() && dm == "id" && par("page")){
+            cat_(send_graphics_id(g))
     }
 }
 
@@ -286,3 +304,15 @@ empty20x20 <- local({
     imf <- system.file("images/empty20x20.png",package="RKernel")
     readBin(imf, raw(), file.info(imf)$size)
 })
+
+HGD_ID  <- "[!hgd_id]"
+
+send_graphics_id <- function(g){
+    id <- g$last_plot()
+    if(id > 0){
+        cat_(DLE)
+        cat_(HGD_ID)
+        cat_(id)
+        cat_(DLE)
+    }
+}

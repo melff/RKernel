@@ -49,6 +49,7 @@ set_help_port <- function(port){
     help_server$current <- HelpServer$new(port)
     options(help.ports=port)
     replace_in_package("tools","example2html",example_html)
+    replace_in_package("tools","demo2html",demo_html)
 }
 
 get_help_url <- function(){
@@ -324,21 +325,22 @@ my_example2html <- function(topic, package, Rhome = "", env = NULL){
 }
 
 example_html <- function(topic,package = NULL,...) {
-    # topic <- deparse(substitute(topic))
     g <- graphics$current
-    g$delivery_mode <- "svg"
-    on.exit(g$delivery_mode <- "display")
+    graphics$delivery_mode <- "id"
+    on.exit(graphics$delivery_mode <- "display")
     e <- capture.output(example(topic,package,local=TRUE,
                                 character.only=TRUE))
     
     e <- paste(e,collapse="\n")
-    e <- strsplit(e,"\x10",fixed=TRUE)[[1]]
+    e <- strsplit(e,DLE,fixed=TRUE)[[1]]
     
     r <- character()
-    n <- nchar("<!DOCTYPE svg>")
+    n <- nchar(HGD_ID)
     for(i in seq_along(e)){
-        if(startsWith(e[i],"<!DOCTYPE svg>")){
-            r[i] <- paste0("<div class= 'figure'>",substr(e[i],start=n+1,nchar(e[i])),"</div>")
+        if(startsWith(e[i],HGD_ID)){
+            hgd_page <- substr(e[i],n+1,nchar(e[i]))
+            data <- g$svg(page=as.integer(hgd_page))
+            r[i] <- paste0("<div class= 'figure'>",data,"</div>")
         } else {
             r[i] <- paste0("<pre>",e[i],"\n</pre>")
         }
@@ -354,7 +356,7 @@ example_html <- function(topic,package = NULL,...) {
     background: 'white';
   }
 </style>"
-    description  <- paste("Examples for",package,"::",topic)
+    description  <- paste0("Examples for '",package,"::",topic,"'")
     title <- paste0("<title>",description,"</title>")
     head <- c(head,"<head>")
     head <- c(head,title,style)
@@ -372,26 +374,25 @@ example_html <- function(topic,package = NULL,...) {
 }
 
 demo_html <- function(topic,package = NULL,...) {
-    topic <- deparse(substitute(topic))
     g <- graphics$current
-    g$delivery_mode <- "svg"
-    on.exit(g$delivery_mode <- "display")
+    graphics$delivery_mode <- "id"
+    on.exit(graphics$delivery_mode <- "display")
     e <- capture.output(demo(topic=topic,package,ask=FALSE,character.only=TRUE))
-    e <- c(e,capture.output(send_changed_graphics()))
     e <- paste(e,collapse="\n")
-    e <- strsplit(e,"\x10",fixed=TRUE)[[1]]
+    e <- strsplit(e,DLE,fixed=TRUE)[[1]]
 
     r <- character()
-    n <- nchar("<!DOCTYPE svg>")
+    n <- nchar(HGD_ID)
     for(i in seq_along(e)){
-        if(startsWith(e[i],"<!DOCTYPE svg>")){
-            r[i] <- paste0("<div class= 'figure'>",substr(e[i],start=n+1,nchar(e[i])),"</div>")
+        if(startsWith(e[i],HGD_ID)){
+            hgd_page <- substr(e[i],n+1,nchar(e[i]))
+            data <- g$svg(page=as.integer(hgd_page))
+            r[i] <- paste0("<div class= 'figure'>",data,"</div>")
         } else {
             r[i] <- paste0("<pre>",e[i],"\n</pre>")
         }
     }
-    r <- paste0(r,collapse="\n")
-    head <- "<!DOCTYPE html>\n<html>\n"
+    head <- c("<!DOCTYPE html>","<html>")
     style<- "<style>
   .doc {
     width: 90ex;
@@ -402,9 +403,16 @@ demo_html <- function(topic,package = NULL,...) {
     background: 'white';
   }
 </style>"
-    body <- paste0("<body>\n<div class=\"doc\">\n",r,"</div>\n</body>")
+    description  <- paste0("Demo for '",package,"::",topic,"'")
+    title <- paste0("<title>",description,"</title>")
+    head <- c(head,"<head>")
+    head <- c(head,title,style)
+    head <- c(head,"</head>")
+    headline <- c("<h1>",description,"</h1>")
+    body <- c(headline,r)
+    body <- c("<body>","<div class=\"doc\">",body,"</div>","</body>")
     tail <- "</html>"
 
-    r <- paste(head,style,body,tail,collapse="\n")
+    r <- paste(c(head,body,tail),collapse="\n")
     return(list(payload=r))
 }
