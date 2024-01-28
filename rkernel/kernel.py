@@ -162,8 +162,16 @@ class RKernel(Kernel):
         return {}
     
     def do_inspect(self, code, cursor_pos, detail_level=0, omit_sections=()):
-        """TODO"""
-        return {"status": "ok", "data": {}, "metadata": {}, "found": False}
+        content = dict(code = code,
+                       cursor_pos = cursor_pos,
+                       detail_level = detail_level)
+        msg = dict(type = 'inspect_request',
+                   content = content)
+        response = self.r_zmq_request(msg)
+        return {"status":   response['status'], 
+                "data":     response['data'], 
+                "metadata": {}, 
+                "found":    response['found']}
         
     def do_shutdown(self, restart):
         """TODO"""

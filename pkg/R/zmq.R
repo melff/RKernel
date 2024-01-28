@@ -118,3 +118,17 @@ zmq_handlers$complete_request <- function(msg){
         status = "ok"
     )
 }
+
+zmq_handlers$inspect_request <- function(msg){
+    code <- msg$content$code
+    cursor_pos <- msg$content$cursor_pos
+    detail_level <- msg$content$detail_level
+    response <- inspect_reply(code,cursor_pos,detail_level)
+    list(
+        type = "inspect_reply",
+        found = response$found,
+        status = "ok",
+        data = response$data,
+        metadata = emptyNamedList
+    )
+}

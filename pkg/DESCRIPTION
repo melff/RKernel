@@ -49,6 +49,7 @@ Collate:
     'events.R'
     'help.R'
     'hooks.R'
+    'inspect-reply.R'
     'is-complete.R'
     'scrolling-table.R'
     'sharedHelp.R'

@@ -104,7 +104,9 @@ popout_button <- '<form class="help-popout-button" action="%s" method="get" targ
 #' @export 
 display_data.help_files_with_topic <- function(x,...,
                                           id=UUIDgenerate(),
-                                          update=FALSE){
+                                          update=FALSE,
+                                          embedded=FALSE,
+                                          include_button=TRUE){
 
     paths <- as.character(x)
     topic <- attr(x,"topic")
@@ -134,14 +136,33 @@ display_data.help_files_with_topic <- function(x,...,
         }
 
         if(length(paths) == 1){
-            help_url <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(paths),".html")
-            text_html <- paste(paste0(
-                "<iframe src='",help_url,"'"),
-                "style='width:100%;height:",help_page_height,";'",
-                "class='manpage'>",
+            help_lib_url <-paste0(get_help_url(),"/library/")
+            help_url <- paste0(help_lib_url,pkgname,"/html/",basename(paths),".html")
+            if(embedded) {
+                style <- c("<style>","
+                           .jp-RenderedHTMLCommon .embedded-help :not(pre) > code {
+                               background-color: unset !important;
+                           }
+                           .jp-RenderedHTMLCommon  .embedded-help tbody tr:nth-child(2n) {
+                               background-color: unset !important;
+                            }
+                           ",
+                           "</style>")
+                text_html <- capture.output(Rd2HTML(Rd, package = pkgname, outputEncoding = 'UTF-8',
+                                            standalone = FALSE, dynamic=TRUE))
+                text_html <- c("<div class=\"embedded-help-container\">",style,"<div class=\"embedded-help\">",text_html,"</div>","</div>")
+                text_html <- paste(text_html, collapse="\n")
+                text_html <- gsub("../../",help_lib_url,text_html,fixed=TRUE)
+                text_html <- gsub("<tr>","<tr style=\"background-color: unset;\">",text_html,fixed=TRUE)
+            } else {
+                text_html <- paste(paste0(
+                    "<iframe src='",help_url,"'"),
+                    "style='width:100%;height:",help_page_height,"'",
+                    "class='manpage'>",
                 # "frameborder='0' onload=window.parent.scrollTo(0,0)>",
-                "</iframe>",
-                sep="\n")
+                    "</iframe>",
+                    sep="\n")
+            }
         } 
         else {
             help_url <- paste0(get_help_url(),"/library/NULL/help/",URLencode(topic,reserved=TRUE))
@@ -152,9 +173,10 @@ display_data.help_files_with_topic <- function(x,...,
                 "</iframe>",
                 sep="\n")
         }
-
-        popout_button <- sprintf(popout_button,help_url)
-        text_html <- paste(text_html,popout_button_style,popout_button,sep="\n")
+        if(include_button){
+            popout_button <- sprintf(popout_button,help_url)
+            text_html <- paste(text_html,popout_button_style,popout_button,sep="\n")
+        }
 
     } 
     else {
