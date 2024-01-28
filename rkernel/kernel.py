@@ -139,8 +139,7 @@ class RKernel(Kernel):
         content = dict(code = code)
         msg = dict(type = 'is_complete_request', content = content)
         response = self.r_zmq_request(msg)
-        return {"status": response['status'],
-                "indent": ""}
+        return response['content']
 
     
     def do_complete(self, code, cursor_pos):
@@ -149,13 +148,7 @@ class RKernel(Kernel):
         msg = dict(type = 'complete_request',
                    content = content)
         response = self.r_zmq_request(msg)
-        return {
-            "matches":      response['matches'],
-            "cursor_end":   response['cursor_end'],
-            "cursor_start": response['cursor_start'],
-            "metadata": {},
-            "status":       response['status']
-        }
+        return response['content']
 
     def do_comm_info_request(self):
         """TODO"""
@@ -168,10 +161,7 @@ class RKernel(Kernel):
         msg = dict(type = 'inspect_request',
                    content = content)
         response = self.r_zmq_request(msg)
-        return {"status":   response['status'], 
-                "data":     response['data'], 
-                "metadata": {}, 
-                "found":    response['found']}
+        return response['content']
         
     def do_shutdown(self, restart):
         """TODO"""

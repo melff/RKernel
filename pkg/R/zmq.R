@@ -102,7 +102,10 @@ zmq_handlers$is_complete_request <- function(msg){
     status <- code_is_complete(code)
     list(
         type = "is_complete_reply",
-        status = status
+        content = list(
+            status = status,
+            indent = ""
+        )
     )
 }
 
@@ -112,10 +115,13 @@ zmq_handlers$complete_request <- function(msg){
     response <- get_completions(code,cursor_pos)
     list(
         type = "complete_reply",
-        matches = response$matches,
-        cursor_start = response$start,
-        cursor_end = response$end,
-        status = "ok"
+        content = list(
+            status = "ok",
+            matches = response$matches,
+            cursor_start = response$start,
+            cursor_end = response$end,
+            metadata = emptyNamedList
+        )
     )
 }
 
@@ -126,9 +132,11 @@ zmq_handlers$inspect_request <- function(msg){
     response <- inspect_reply(code,cursor_pos,detail_level)
     list(
         type = "inspect_reply",
-        found = response$found,
-        status = "ok",
-        data = response$data,
-        metadata = emptyNamedList
+        content = list(
+            found = response$found,
+            status = "ok",
+            data = response$data,
+            metadata = emptyNamedList
+        )
     )
 }
