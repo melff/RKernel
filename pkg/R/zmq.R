@@ -87,6 +87,17 @@ zmq_reply <- function(){
     zmq_send(response)
 }
 
+#' @export
+zmq_handle <- function(){
+    # log_out("zmq_handle")
+    msg <- zmq_receive()
+    # log_out(msg,use.str=TRUE)
+    type <- msg$type
+    handler <- zmq_handlers[[type]]
+    handler(msg)
+}
+
+
 zmq_default_handler <- function(msg){
   list(type="unknown_reply",
        content = list(
