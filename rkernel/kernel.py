@@ -11,6 +11,8 @@ from datetime import datetime
 
 DLE = '\x10'
 DISPLAY_START = '[!display]'
+COMM_MSG = '[!comm]'
+
 
 class RKernelSession(RSession):
     "Subclass of RSession to handle interaction"
@@ -114,9 +116,35 @@ class RKernel(Kernel):
 
     def display(self,display_request):
         msg_type = display_request['type']    
-        display_content = display_request['content']
-        self.send_response(self.iopub_socket, msg_type, display_content)
+        msg_content = display_request['content']
+        self.send_response(self.iopub_socket, 
+                           msg_type, 
+                           content = msg_content)
         
+    def handle_comm(self,msg):
+        # self.log_out("handle_comm")
+        # self.log_out(pformat(msg))
+        msg_type = msg['type']    
+        msg_content = msg['content']
+        if 'metadata' in msg:
+            metadata = msg['metadata']
+        else:
+            metadata = dict()
+        # self.stream(pformat(msg),stream='stderr')
+        if 'buffers' in msg:
+            msg_buffers = msg['buffers']
+            self.send_response(self.iopub_socket, 
+                               msg_type, 
+                               content = msg_content,
+                               buffers = msg_buffers,
+                               metadata = metadata)
+        else:
+            self.send_response(self.iopub_socket, 
+                               msg_type, 
+                               content = msg_content,
+                               metadata = metadata)
+        # self.log_out("done")
+            
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
 
@@ -149,10 +177,6 @@ class RKernel(Kernel):
                    content = content)
         response = self.r_zmq_request(msg)
         return response['content']
-
-    def do_comm_info_request(self):
-        """TODO"""
-        return {}
     
     def do_inspect(self, code, cursor_pos, detail_level=0, omit_sections=()):
         content = dict(code = code,
@@ -206,6 +230,14 @@ class RKernel(Kernel):
         self.rsession.find_prompt()
         return resp
 
+    def r_zmq_request_noreply(self,req):
+        # self.log_out("r_zmq_request_noreply")
+        res = self.rsession.cmd_nowait("RKernel::zmq_handle()")
+        # self.log_out(pformat(res))
+        self.r_zmq_send(req)
+        self.rsession.find_prompt()
+        # self.log_out("done")
+
     def r_zmq_send(self,msg):
         # print("r_zmq_send")
         msg = json.dumps(msg,separators=(',', ':')).encode("utf-8")
@@ -242,6 +274,9 @@ class RKernel(Kernel):
                 if chunk.startswith(DISPLAY_START):
                     resp = self.r_zmq_receive()
                     self.display(resp)
+                elif chunk.startswith(COMM_MSG):
+                    msg = self.r_zmq_receive()
+                    self.handle_comm(msg)
                 else:
                     if len(chunk) > 0:
                         self.stream(chunk,stream='stdout')
@@ -300,22 +335,56 @@ class RKernel(Kernel):
         content = parent["content"]
         target_name = content.get("target_name", None)
 
-        comms = self.do_comm_info_request()
-        reply_content = dict(comms=comms, status="ok")
+        request = dict(target_name = target_name)
+        msg = dict(type = 'comm_info_request',
+                   content = request)
+        response = self.r_zmq_request(msg)
+
+        reply_content = response['content']
         msg = self.session.send(stream, "comm_info_reply", reply_content, parent, ident)
-        self.log.debug("%s", msg)
 
     async def comm_open(self, stream, ident, parent):
-        """TODO Handle comm_open """
-        pass
+        """ Handle comm_open """
+        if not self.session:
+            return
+        content = parent["content"]
+        comm_id = content['comm_id']
+        target_name = content['target_name']
+        data = content['data']
+        request = dict(comm_id = comm_id,
+                       target_name = target_name,
+                       data = data)
+        msg = dict(type = 'comm_open',
+                   content = request)
+        self.r_zmq_request_noreply(msg)
 
     async def comm_msg(self, stream, ident, parent):
-        """TODO Handle comm_msg """
-        pass
+        """Handle comm_msg """
+        if not self.session:
+            return
+        content = parent["content"]
+        comm_id = content['comm_id']
+        data = content['data']
+        buffers = parent['buffers']
+        request = dict(comm_id = comm_id,
+                       data = data,
+                       buffers = buffers)
+        msg = dict(type = 'comm_msg',
+                   content = request)
+        self.r_zmq_request_noreply(msg)
 
     async def comm_close(self, stream, ident, parent):
-        """TODO Handle comm_close """
-        pass
+        """Handle comm_close """
+        if not self.session:
+            return
+        content = parent["content"]
+        comm_id = content['comm_id']
+        data = content['data']
+        request = dict(comm_id = comm_id,
+                       data = data)
+        msg = dict(type = 'comm_close',
+                   content = request)
+        self.r_zmq_request_noreply(msg)
         
 class JSONerror(Exception):
     pass
