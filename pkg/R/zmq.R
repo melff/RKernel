@@ -94,7 +94,12 @@ zmq_handle <- function(){
     # log_out(msg,use.str=TRUE)
     type <- msg$type
     handler <- zmq_handlers[[type]]
-    handler(msg)
+    tryCatch(handler(msg),
+             error=function(e){
+                 log_error(conditionMessage(e))
+                 log_error(msg,use.str=TRUE)
+                 })
+    # log_out("done")
 }
 
 
@@ -150,4 +155,51 @@ zmq_handlers$inspect_request <- function(msg){
             metadata = emptyNamedList
         )
     )
+}
+
+zmq_handlers$comm_info_request <- function(msg){
+      target_name <- NULL
+      if("target_name" %in% names(msg$content))
+          target_name <- msg$content$target_name
+      cm <- get_comm_manager()
+      comms <- cm$get_comms(target_name)
+      list(
+          type = "comm_info_reply",
+          content = list(
+              status = "ok",
+              comms = comms
+          )
+      )
+}
+
+zmq_handlers$comm_open <- function(msg){
+    # log_out("zmq_handler - comm open")
+    cm <- get_comm_manager()
+    target_name <- msg$content$target_name
+    id <- msg$content$comm_id
+    data <- msg$content$data
+    cm$handle_open(target_name,id,data)
+    # log_out("done")
+}
+
+zmq_handlers$comm_msg <- function(msg){
+    # log_out("zmq_handler - comm msg")
+    # log_out(msg,use.str=TRUE)
+    cm <- get_comm_manager()
+    id <- msg$content$comm_id
+    data <- msg$content$data
+    data$buffers <- msg$buffers
+    cm <- get_comm_manager()
+    cm$handle_msg(id,data)
+    # log_out("done")
+}
+
+zmq_handlers$comm_close <- function(msg){
+    # log_out("zmq_handler - comm close")
+    cm <- get_comm_manager()
+    id <- msg$content$comm_id
+    data <- msg$content$data
+    cm <- get_comm_manager()
+    cm$handle_close(id,data)
+    # log_out("done")
 }

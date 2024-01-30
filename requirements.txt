@@ -3,3 +3,4 @@ jupyter_client
 ipykernel
 traitlets
 termcolor
+ipywidgets

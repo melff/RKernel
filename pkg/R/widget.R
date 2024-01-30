@@ -50,12 +50,8 @@ WidgetClass <- R6Class_("Widget",
           self$observe(tn,handler)
         }
       }
-      kernel <- get_current_kernel()
-      #browser()
-      if(length(kernel)){
-        add_displayed_classes(class(self)[1])
-        if(open) self$open()
-      }
+      add_displayed_classes(class(self)[1])
+      if(open) self$open()
     },
     #' @description Open a connection to the frontend
     open = function(){
