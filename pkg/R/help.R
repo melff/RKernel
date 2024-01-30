@@ -282,8 +282,8 @@ display_data.hsearch <- function(x,...,
     for(field in x$fields){
         help_search_url <- paste0(help_search_url,paste0("&fields.",field,"=1"))
     }
-    if(x$ignore.case)
-        help_search_url <- paste0(help_search_url,"&ignore.cases=1")
+    # if(x$ignore.case)
+    #     help_search_url <- paste0(help_search_url,"&ignore.cases=1")
     if(x$type=="fuzzy")
         help_search_url <- paste0(help_search_url,"&agrep=1")
     else if(is.numeric(x$agrep))
