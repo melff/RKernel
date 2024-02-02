@@ -5,11 +5,15 @@ from signal import SIGINT
 import threading
 from threading import Thread, Event
 from queue import Queue, Empty
+from datetime import datetime
+from pprint import pprint, pformat
+
 
 class RSession(object):
 
     env = dict()
-    
+    log_file = None
+
     def start(self):
         
         args = ["R",
@@ -64,6 +68,9 @@ class RSession(object):
                                             self.stderr_queue))
         self.thread_stderr.daemon = True
         self.thread_stderr.start()
+
+        # self.log_file = open("/tmp/RKernel.log","a")
+        # self.log_out("-- Session started ---")
 
     def quit(self):
         self.flush(stream='stdout')
@@ -187,17 +194,41 @@ class RSession(object):
 
     def cmd_nowait(self,text,prompt = '> ', coprompt = '+ '):
         if not self.found_prompt(prompt):
+            # self.log_out("cmd_nowait: Not at promt")
+            # self.log_out(pformat(self.last_output))
             raise NotAtPrompt
         if not isinstance(text,str):
             raise TypeError
 
         self.sendline(text)
+
+    def process_output(self,prompt = '> ', coprompt = '+ '):
+        # self.log_out("RSession.process_output")
+        while True:
+            stderr = self.read(stream='stderr',timeout=0.001)
+            stdout = self.read(timeout=0.001)
+            
+            if stderr is not None:
+                # self.log_out(pformat(stderr))
+                self.handle_stderr(stderr)
+            if stdout is not None:
+                # self.log_out(pformat(stdout))
+                if self.found_prompt(coprompt):
+                    break
+                if self.found_prompt(prompt):
+                    stdout = stdout.strip(prompt)
+                    self.handle_stdout(stdout)
+                    break
+                else:
+                    stdout = stdout.strip(prompt)
+                    self.handle_stdout(stdout)
         if self.found_prompt(coprompt):
             self.interrupt()
             self.find_prompt(prompt)
             raise InputIncomplete
         else:
             self.find_prompt(prompt)
+        
 
     def cmd(self,text,prompt = '> ', coprompt = '+ '):
         if not self.found_prompt(prompt):
@@ -247,6 +278,13 @@ class RSession(object):
     def source(filename):
         srclines = source(filename)
         
+    def log_out(self,text):
+        now = format(datetime.now())
+        text = 'SESSION: ' + now + ' ' + text
+        self.log_file.write(text + '\n')
+        self.log_file.flush()
+
+
 class EndOfStream(Exception): pass
 class NotAtPrompt(Exception): pass
 class MultipleLines(Exception): pass
