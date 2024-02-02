@@ -1,8 +1,7 @@
 DAPServer <- R6Class("DAPServer",
   public = list(
-      initialize = function(kernel,evaluator=NULL){
-          self$kernel <- kernel
-          self$envir <- globalenv()
+      initialize = function(envir=globalenv()){
+          self$envir <- envir
       },
       handle = function(request){
           if(request$command != "debugInfo"){
@@ -40,7 +39,10 @@ DAPServer <- R6Class("DAPServer",
               event = event,
               body = body
           )
-          self$kernel$send_debug_event(content)
+          zmq_push(list(
+              type = "debug_event",
+              content = content
+          ))
           self$event_seq <- self$event_seq + 1L
       },
       event_seq = 1L,
@@ -377,7 +379,6 @@ DAPServer <- R6Class("DAPServer",
           return(0)
       },
       is_started = FALSE,
-      kernel = NULL,
       envir = NULL,
       evaluator = NULL,
       types = c(
@@ -394,3 +395,11 @@ DAPServer <- R6Class("DAPServer",
   )
 )
 
+dap_server <- new.env()
+dap_server$current <- NULL
+
+get_dap_server <- function(){
+    if(is.null(dap_server$current))
+        dap_server$current <- DAPServer$new()
+    dap_server$current
+}

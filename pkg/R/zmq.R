@@ -43,23 +43,25 @@ zmq_receive <- function(){
     index <- as.character(port)
     socket <- zmq_env$sockets[[index]]
     # log_out(socket,use.str=TRUE)
-    content <- zmq.recv.multipart(socket,unserialize=FALSE)
-    # log_out(content,use.str=TRUE)
-    content <- fromRawJSON(content[[1]])
-    return(content)
+    msg <- zmq.recv.multipart(socket,unserialize=FALSE)
+    msg <- fromRawJSON(msg[[1]])
+    # log_out(msg,use.str=TRUE)
+    # log_out("done")
+    return(msg)
 }
 
 #' @export
-zmq_send <- function(content){
+zmq_send <- function(msg){
     # log_out("zmq_send")
-    # log_out(content,use.str=TRUE)
+    # log_out(msg,use.str=TRUE)
     port <- zmq_env$ports["sender"]
     index <- as.character(port)
     socket <- zmq_env$sockets[[index]]
-    content <- toRawJSON(content)
-    content <- append(list(content),list(raw(0)))
-    zmq.send.multipart(socket,content,serialize=FALSE)
+    msg <- toRawJSON(msg)
+    msg <- append(list(msg),list(raw(0)))
+    zmq.send.multipart(socket,msg,serialize=FALSE)
     # log_out("message sent")
+    # log_out(msg,use.str=TRUE)
 }
 
 #' @export
@@ -75,6 +77,7 @@ zmq_handlers <- list()
 zmq_reply <- function(){
     # log_out("zmq_reply")
     msg <- zmq_receive()
+    # log_out("message recieved")
     # log_out(msg,use.str=TRUE)
     type <- msg$type
     handler <- zmq_handlers[[type]]
@@ -84,33 +87,52 @@ zmq_reply <- function(){
     else {
         response <- zmq_default_handler(msq)
     }
+    # log_out("handler success")
     zmq_send(response)
+    # log_out("done")
 }
 
 #' @export
 zmq_handle <- function(){
-    # log_out("zmq_handle")
+    log_out("zmq_handle")
     msg <- zmq_receive()
-    # log_out(msg,use.str=TRUE)
+    log_out(msg,use.str=TRUE)
     type <- msg$type
     handler <- zmq_handlers[[type]]
-    tryCatch(handler(msg),
-             error=function(e){
-                 log_error(conditionMessage(e))
-                 log_error(msg,use.str=TRUE)
+    if(length(handler)){
+        tryCatch(handler(msg),
+                 error=function(e){
+                     log_error(conditionMessage(e))
+                     log_error(msg,use.str=TRUE)
                  })
-    # log_out("done")
+    }
+    log_out("done")
+}
+
+DLE <- '\x10'
+ZMQ_PUSH <- '[!ZMQ_PUSH]'
+
+zmq_push <- function(msg){
+    log_out("zmq_push")
+    log_out(msg,use.str=TRUE)
+    cat_(DLE)
+    cat_(ZMQ_PUSH)
+    zmq_send(msg)
+    cat_(DLE)
+    cat_("")
+    log_out("zmq_push done")
 }
 
 
 zmq_default_handler <- function(msg){
-  list(type="unknown_reply",
-       content = list(
-           status    = "error",
-           name      = "UnkownRequest",
-           evalue    = msg$type,
-           traceback = list()
-       ))
+    # log_out("zmq-default-handler")
+    list(type="unknown_reply",
+         content = list(
+             status    = "error",
+             name      = "UnkownRequest",
+             evalue    = msg$type,
+             traceback = list()
+         ))
 }
 
 zmq_handlers$is_complete_request <- function(msg){
@@ -203,3 +225,15 @@ zmq_handlers$comm_close <- function(msg){
     cm$handle_close(id,data)
     # log_out("done")
 }
+
+
+zmq_handlers$debug_request <- function(msg){
+    ds <- get_dap_server()
+    request <- msg$content
+    response <- ds$handle(request)
+    list(
+        type = "debug_reply",
+        content = response
+    )
+}
+

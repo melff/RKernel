@@ -167,10 +167,7 @@ CommManagerClass <- R6Class("CommManager",
                         content = content,
                         metadata = metadata,
                         buffers = buffers)
-            cat_(DLE)
-            cat_(COMM_MSG)
-            zmq_send(msg)
-            cat_(DLE)
+            zmq_push(msg)
         }
     )
 )
@@ -179,8 +176,6 @@ CommManagerClass <- R6Class("CommManager",
 #' @param ... Arguments passed to the inializer
 #' @export
 CommManager <- function(...) CommManagerClass$new(...)
-
-COMM_MSG <- '[!comm]'
 
 #' Comms - connections between the kernel and the frontend
 #'
@@ -282,10 +277,7 @@ CommClass <- R6Class("Comm",
                         content = content,
                         metadata = metadata,
                         buffers = buffers)
-            cat_(DLE)
-            cat_(COMM_MSG)
-            zmq_send(msg)
-            cat_(DLE)
+            zmq_push(msg)
         }
     )
 )

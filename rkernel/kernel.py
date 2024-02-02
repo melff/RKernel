@@ -10,9 +10,7 @@ from termcolor import colored
 from datetime import datetime
 
 DLE = '\x10'
-DISPLAY_START = '[!display]'
-COMM_MSG = '[!comm]'
-
+ZMQ_PUSH = '[!ZMQ_PUSH]'
 
 class RKernelSession(RSession):
     "Subclass of RSession to handle interaction"
@@ -90,7 +88,7 @@ class RKernel(Kernel):
         
     def start(self):
         """Start the kernel."""
-        # self.log_out("======== Starting kernel ========")
+        self.log_out("======== Starting kernel ========")
         self.rsession.start()
         self.banner += self.banner_suffix
         self.r_zmq_init() 
@@ -149,6 +147,7 @@ class RKernel(Kernel):
                    allow_stdin=False):
 
         # self.log_out("do_execute")
+        # self.log_out(code)
 
         self.r_run_cell_begin_hooks()
         self.rsession.run(code)
@@ -191,10 +190,6 @@ class RKernel(Kernel):
         """TODO"""
         return {"status": "ok", "restart": restart}
 
-    async def do_debug_request(self, msg):
-        """TODO"""
-        raise NotImplementedError
-    
     def r_zmq_init(self):
         # print("r_zmq_init")
         res = self.rsession.cmd("RKernel::zmq_init()")
@@ -222,32 +217,43 @@ class RKernel(Kernel):
 
     def r_zmq_request(self,req):
         # self.log_out("r_zmq_request")
+        # self.log_out(pformat(req))
         res = self.rsession.cmd_nowait("RKernel::zmq_reply()")
         self.r_zmq_send(req)
+        # self.log_out("message sent")
+        # self.log_out(pformat(req))
         resp = self.r_zmq_receive()
         # self.log_out("response received")
         # self.log_out(pformat(resp))
         self.rsession.find_prompt()
+        # self.log_out("done")
         return resp
 
     def r_zmq_request_noreply(self,req):
         # self.log_out("r_zmq_request_noreply")
-        res = self.rsession.cmd_nowait("RKernel::zmq_handle()")
+        # self.log_out(pformat(req))
+        self.rsession.cmd_nowait("RKernel::zmq_handle()")
         # self.log_out(pformat(res))
         self.r_zmq_send(req)
-        self.rsession.find_prompt()
+        self.rsession.process_output()
         # self.log_out("done")
 
     def r_zmq_send(self,msg):
-        # print("r_zmq_send")
+        # self.log_out("r_zmq_send")
         msg = json.dumps(msg,separators=(',', ':')).encode("utf-8")
         self.r_zmq_send_so.send_multipart([msg])
+        # self.log_out("done")
 
     def r_zmq_receive(self):
-        # print("r_zmq_receive")
-        req = self.r_zmq_recv_so.recv_multipart()
-        req = json.loads(req[0].decode("utf-8"))
-        return req
+        # self.log_out("r_zmq_receive")
+        # res = self.r_zmq_recv_so.poll(timeout=1000)
+        # if(res == 0):
+        #     raise ZMQtimeout
+        msg = self.r_zmq_recv_so.recv_multipart()
+        msg = json.loads(msg[0].decode("utf-8"))
+        # self.log_out(pformat(msg))
+        # self.log_out("done")
+        return msg
 
     def r_zmq_flush(self):
         while self.r_zmq_poll(timeout=1):
@@ -266,17 +272,30 @@ class RKernel(Kernel):
     def r_run_cell_end_hooks(self):
         self.rsession.run("RKernel::runHooks('cell-end')")
 
+    def r_handle_zmq(self,msg):
+        # self.log_out("r_handle_zmq")
+        msg_type = msg['type']
+        if msg_type in ['display_data', 'update_display_data']:
+            self.display(msg)
+        elif msg_type in ["comm_open","comm_msg","comm_close"]:
+            self.handle_comm(msg)
+        elif msg_type == "debug_event":
+            self.handle_debug_event(msg)
+        else:
+            self.stream('Unknown message type',stream='stderr')
+
     def handle_stdout(self,text):
         # self.log_out("handle_stdout")
+        # self.log_out(pformat(text))
         if DLE in text:
             chunks = text.split(DLE)
             for chunk in chunks:
-                if chunk.startswith(DISPLAY_START):
-                    resp = self.r_zmq_receive()
-                    self.display(resp)
-                elif chunk.startswith(COMM_MSG):
+                if chunk.startswith(ZMQ_PUSH):
+                    self.log_out("ZMQ_PUSH received")
                     msg = self.r_zmq_receive()
-                    self.handle_comm(msg)
+                    # self.log_out(pformat(msg))
+                    self.r_handle_zmq(msg)
+                    self.log_out("ZMQ_PUSH done")
                 else:
                     if len(chunk) > 0:
                         self.stream(chunk,stream='stdout')
@@ -385,6 +404,46 @@ class RKernel(Kernel):
         msg = dict(type = 'comm_close',
                    content = request)
         self.r_zmq_request_noreply(msg)
+
+    @property
+    def kernel_info(self):
+        return {
+            "protocol_version": "5.3",
+            "implementation": self.implementation,
+            "implementation_version": self.implementation_version,
+            "language_info": self.language_info,
+            "banner": self.banner,
+            "help_links": self.help_links,
+            "debugger": False
+        }
+
+    async def debug_request(self, stream, ident, parent):
+        """Handle a debug request."""
+        # self.log_out("debug_request")
+        if not self.session:
+            return
+        # self.log_out(pformat(stream))
+        content = parent["content"]
+        # self.log_out(pformat(content))
+        msg = dict(type = 'debug_request',
+                   content = content)
+        response = self.r_zmq_request(msg)
+        # self.log_out(pformat(response))
+        reply_content = response['content']
+        msg = self.session.send(stream, "debug_reply", reply_content, parent, ident)
+
+    def handle_debug_event(self,msg):
+        # self.log_out("handle_debug_event")
+        msg_type = msg['type']
+        msg_content = msg['content']
+        self.send_response(self.iopub_socket,
+                           msg_type,
+                           content = msg_content)
+        # self.log_out("done")
+        # self.log_out(pformat(msg))
         
 class JSONerror(Exception):
+    pass
+
+class ZMQtimeout(Exception):
     pass

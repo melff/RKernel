@@ -51,6 +51,7 @@ Collate:
     'hooks.R'
     'inspect-reply.R'
     'is-complete.R'
+    'output.R'
     'scrolling-table.R'
     'sharedHelp.R'
     'traitlets.R'

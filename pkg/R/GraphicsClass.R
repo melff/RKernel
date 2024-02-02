@@ -25,11 +25,11 @@ GraphicsClass <- R6Class("Graphics",
             private$host <- state$host
             private$port <- state$port
             private$token <- state$token
-            log_out(sprintf("Opened graphics at port %d",private$port))
+            # log_out(sprintf("Opened graphics at port %d",private$port))
         },
         close = function(){
             hgd_close(private$dev_num)
-            log_out(sprintf("Closed graphics at port %d",private$port))
+            # log_out(sprintf("Closed graphics at port %d",private$port))
         },
         active = function(){
             dev.cur() == private$dev_num  
@@ -210,7 +210,7 @@ start_graphics <- function(){
     setHook('before.grid.newpage',send_changed_graphics)
     setHook('plot.new',send_new_plot)
     setHook('grid.newpage',send_new_plot)
-    graphics$delivery_mode <- "diplay"
+    graphics$delivery_mode <- "display"
     graphics$update_display <- FALSE
     graphics$last_display <- ""
 }
@@ -218,6 +218,7 @@ start_graphics <- function(){
 #' @importFrom uuid UUIDgenerate
 #' @export
 send_changed_graphics <- function(...){
+    # log_out("send_changed_graphics")
     g <- graphics$current
     dm <- graphics$delivery_mode
     if(g$active()){

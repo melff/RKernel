@@ -1,14 +1,11 @@
 #' @include json.R
 
-DLE <- '\x10'
-DISPLAY_START <- '[!display]'
-
 #' Display an R Object
 #'
 #' @param ... Arguments passed to 'display_data' methods
 #' @export
 display <- function(...){
-    # log_out("display")
+    log_out("display")
     d <- display_data(...)
     
     d <- list(type=class(d),
@@ -16,11 +13,7 @@ display <- function(...){
         # log_out("display")
         # log_out("display_data:")
         # log_out(d,use.str=TRUE)
-    cat_(DLE)
-    cat_(DISPLAY_START)
-    # log_out(d,use.str=TRUE)
-    zmq_send(d)
-    cat_(DLE)
+    zmq_push(d)
         # cat_('')
 }
 
