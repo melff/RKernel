@@ -29,13 +29,14 @@ log_fn <- "/tmp/RKernel.log"
 
 
 
-log_out <- function(message,...,use.print=FALSE,use.str=FALSE){
+log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
   dcl <- deparse1(match.call())
   tryCatch({
     if(use.print)
       message <- paste0("\n",paste0(capture.output(print_(message)),collapse="\n"))
-    else if(use.str)
-      message <- paste(capture.output(str_(message)),collapse="\n")
+    else if(use.str || serialize){
+        message <- to_json(message,pretty=TRUE,force=TRUE)
+    }
     else message <- paste(message,...,collapse="")
     message <- paste(crayon::green(format(Sys.time()),"\t",message,"\n"))
     message <- paste("R INFO:",message)
