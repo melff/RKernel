@@ -186,8 +186,10 @@ WidgetClass <- R6Class_("Widget",
         # cat("------------------\n")
         msg <- self$handle_buffers(msg)
         state <- msg$state
-        # print(state)
+        # print(state
+        self$sync_suspended <- TRUE
         self$set_state(state)
+        self$sync_suspended <- FALSE
       }
       else if(method=="request_state")
         self$send_state()
