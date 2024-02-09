@@ -41,7 +41,6 @@ Collate:
     'comms.R'
     'compare-plots.R'
     'completions.R'
-    'context.R'
     'dap-server.R'
     'dataTable.R'
     'dictionary.R'
