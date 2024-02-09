@@ -77,6 +77,8 @@ class RKernel(Kernel):
         if not os.path.isdir(R_LIBS_USER):
             os.makedirs(R_LIBS_USER)
         self.rsession.env["R_LIBS_USER"] = R_LIBS_USER
+        self.rsession.env["R_CLI_NUM_COLORS"] = "16777216"
+        
         self.banner_suffix += "User-installed packages are in '%s'\n" % R_LIBS_USER
 
         self.log_file = open("/tmp/RKernel.log","a")
