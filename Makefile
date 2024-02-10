@@ -71,9 +71,13 @@ installspec:
 	. bin/activate; \
 	python rkernel/install.py
 
+clear-Rlib:
+	rm -r $(HOME)/.jupyter/R/library/
+	rm -r $(HOME)/.local/pipx/venvs/jupyter/lib/R/library
+
 sync-Rlib:
-	rsync -aik lib/R/library/ $(HOME)/.jupyter/R/library/
-	rsync -aik lib/R/library/ $(HOME)/.local/pipx/venvs/jupyter/lib/R/library
+	rsync -ai lib/R/library/ $(HOME)/.jupyter/R/library/
+	rsync -ai lib/R/library/ $(HOME)/.local/pipx/venvs/jupyter/lib/R/library
 
 .PHONY: build-and-install
 build-and-install: build install
