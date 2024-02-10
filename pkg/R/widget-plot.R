@@ -24,20 +24,7 @@ SVGWidgetClass <- R6Class_(
                               height=NULL,
                               envir = new.env()){
             super$initialize(...)
-            context <- Context$new(envir=self$envir,
-                                   attachment=list(
-                                       display=self$display
-                                   ))
-            context$on_enter(private$enter)
-            context$on_exit(private$exit)
-
-            context$on_eval(private$handle_graphics)
-            self$context <- context
-            private$kernel <- get_current_kernel()
-            private$dev_num_other <- dev.cur()
-            private$new_device()
-            private$dev_num <- dev.cur()
-            dev.set(private$dev_num_other)
+            self$envir <- envir
             style <- character(0)
             if(length(width)){
                 style <- c(style,paste0("width:",width))
@@ -49,11 +36,20 @@ SVGWidgetClass <- R6Class_(
                 style <- paste0(style,collapse=";")
                 private$style <- style
             }
-        }
-    ),
-    private = list(
-        style = NULL,
-        handle_graphics = function(){
+            private$dev_num_other <- dev.cur()
+            private$new_device()
+            private$dev_num <- dev.cur()
+            dev.set(private$dev_num_other)
+        },
+        activate = function(){
+            private$dev_num_other <- dev.cur()
+            dev.set(private$dev_num)
+        },
+        suspend = function(){
+            if(private$dev_num_other > 1)
+                dev.set(private$dev_num_other)
+        },
+        render = function(){
             string <- private$svg_string()
             if(length(string)>1){
                 string <- string[length(string)]
@@ -61,22 +57,18 @@ SVGWidgetClass <- R6Class_(
             string <- private$set_dims(string)
             self$value <- string
         },
-        enter = function(){
-            private$dev_num_other <- dev.cur()
-            dev.set(private$dev_num)
-        },
-        exit = function(){
-            dev.set(private$dev_num_other)
-        },
-        kernel = NULL,
+        envir = NULL
+    ),
+    private = list(
+        style = NULL,
         dev_num = 0,
         dev_num_other = 0,
         svg_string = NULL,
         new_device = function(){
-            width <- getOption("jupyter.plot.width",6)
-            height <- getOption("jupyter.plot.height",6)
-            pointsize <- getOption("jupyter.plot.pointsize",12)
-            scale <- getOption("jupyter.plot.scale",0.5)
+            width <- getOption("widget.plot.width",6)
+            height <- getOption("widget.plot.height",6)
+            pointsize <- getOption("widget.plot.pointsize",12)
+            scale <- getOption("widget.plot.scale",0.5)
             private$svg_string <- svgstring(width=width,height=height,pointsize=pointsize,
                                             standalone=FALSE)
         },
@@ -102,9 +94,13 @@ SVGWidget <- function(...) SVGWidgetClass$new(...)
 #'    encapsulated by curly braces.
 #' @param enclos An enclosing environment.
 #' @export
-with.SVGWidget <- function(data,expr,enclos=parent.frame(),...)
-    data$context$eval(substitute(expr),enclos=enclos)
-
+with.SVGWidget <- function(data,expr,envir=list(),enclos=parent.frame(),...){
+    data$activate()
+    r <- eval(substitute(expr),envir=envir,enclos=enclos)
+    data$render()
+    data$suspend()
+    return(r)
+}
 
 #' @rdname PlotWidget
 #' @param ... Arguments, passed to the ImageWidget constructors.
