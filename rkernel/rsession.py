@@ -162,7 +162,7 @@ class RSession(object):
             except EndOfStream:
                 break
             
-    def run(self,text,prompt = '> ', coprompt = '+ '):
+    def run(self,text,prompt = '> ', coprompt = '+ ', timeout = 0.001):
         if not self.found_prompt(prompt) and not self.found_prompt(coprompt):
             raise NotAtPrompt
         if not isinstance(text,list):
@@ -170,8 +170,8 @@ class RSession(object):
         for line in text:
             self.sendline(line)
             while True:
-                stderr = self.read(stream='stderr',timeout=0.001)
-                stdout = self.read(timeout=0.001)
+                stderr = self.read(stream='stderr',timeout=timeout)
+                stdout = self.read(timeout=timeout)
                 if stderr is not None:
                     self.handle_stderr(stderr)
                 if stdout is not None:
@@ -202,11 +202,11 @@ class RSession(object):
 
         self.sendline(text)
 
-    def process_output(self,prompt = '> ', coprompt = '+ '):
+    def process_output(self,prompt = '> ', coprompt = '+ ', timeout = 0.001):
         # self.log_out("RSession.process_output")
         while True:
-            stderr = self.read(stream='stderr',timeout=0.001)
-            stdout = self.read(timeout=0.001)
+            stderr = self.read(stream='stderr',timeout=timeout)
+            stdout = self.read(timeout=timeout)
             
             if stderr is not None:
                 # self.log_out(pformat(stderr))
@@ -230,7 +230,7 @@ class RSession(object):
             self.find_prompt(prompt)
         
 
-    def cmd(self,text,prompt = '> ', coprompt = '+ '):
+    def cmd(self,text,prompt = '> ', coprompt = '+ ', timeout = 0.001):
         if not self.found_prompt(prompt):
             raise NotAtPrompt
         if not isinstance(text,str):
@@ -241,10 +241,10 @@ class RSession(object):
 
         self.sendline(text)
         while True:
-            stderr1 = self.read(stream='stderr',timeout=0.001)
+            stderr1 = self.read(stream='stderr',timeout=timeout)
             if stderr1 is not None:
                 stderr += stderr1
-            stdout1 = self.read(timeout=0.001)
+            stdout1 = self.read(timeout=timeout)
             if stdout1 is not None:
                 stdout += stdout1
                 if self.found_prompt(coprompt):

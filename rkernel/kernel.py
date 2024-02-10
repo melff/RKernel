@@ -64,6 +64,8 @@ class RKernel(Kernel):
 
     r_handlers = dict()
 
+    r_timeout = 0.001
+
     def __init__(self, **kwargs):
         """Initialize the kernel."""
         super().__init__(**kwargs)
@@ -207,7 +209,7 @@ class RKernel(Kernel):
 
     def r_zmq_setup_sender(self):
         port = random_port()
-        res = self.rsession.cmd("RKernel::zmq_new_receiver(%d)" % port)
+        res = self.rsession.cmd("RKernel::zmq_new_receiver(%d)" % port, timeout = self.r_timeout)
         self.r_zmq_send_port = port
         context = self.zmq_context
         socket = context.socket(zmq.PUSH)
@@ -217,7 +219,7 @@ class RKernel(Kernel):
 
     def r_zmq_setup_receiver(self):
         port = random_port()
-        res = self.rsession.cmd("RKernel::zmq_new_sender(%d)" % port)
+        res = self.rsession.cmd("RKernel::zmq_new_sender(%d)" % port, timeout = self.r_timeout)
         self.r_zmq_recv_port = port
         context = self.zmq_context
         socket = context.socket(zmq.PULL)
@@ -245,7 +247,7 @@ class RKernel(Kernel):
         self.rsession.cmd_nowait("RKernel::zmq_handle()")
         # self.log_out(pformat(res))
         self.r_zmq_send(req)
-        self.rsession.process_output()
+        self.rsession.find_prompt(timeout = self.r_timeout)
         # self.log_out("done")
 
     def r_zmq_send(self,msg):
@@ -365,15 +367,15 @@ class RKernel(Kernel):
         return
 
     def r_install_hooks(self):
-        self.rsession.cmd("RKernel::install_output_hooks()")
+        self.rsession.cmd("RKernel::install_output_hooks()", timeout = self.r_timeout)
 
     def r_set_help_port(self):
         port = random_port()
-        self.rsession.cmd("RKernel::set_help_port(%d)" % port)
+        self.rsession.cmd("RKernel::set_help_port(%d)" % port, timeout = self.r_timeout)
 
     def r_set_help_displayed(self):
-        self.rsession.cmd("RKernel::set_help_displayed(TRUE)")
-
+        self.rsession.cmd("RKernel::set_help_displayed(TRUE)", timeout = self.r_timeout)
+        
     def r_handle_json(self,jmsg):
         # self.log_out("r_handle_json")
         # self.log_out(pformat(jmsg))
