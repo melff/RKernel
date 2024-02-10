@@ -10,11 +10,7 @@ display <- function(...){
     
     d <- list(type=class(d),
               content=unclass(d))
-        # log_out("display")
-        # log_out("display_data:")
-        # log_out(d,use.str=TRUE)
-    zmq_push(d)
-        # cat_('')
+    json_send(d)
 }
 
 #' @export

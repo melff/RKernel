@@ -50,6 +50,7 @@ Collate:
     'hooks.R'
     'inspect-reply.R'
     'is-complete.R'
+    'json-connect.R'
     'output.R'
     'scrolling-table.R'
     'sharedHelp.R'

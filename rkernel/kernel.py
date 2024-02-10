@@ -9,8 +9,12 @@ from threading import Thread
 from termcolor import colored
 from datetime import datetime
 
+EOT = '\x04'
 DLE = '\x10'
+ETB = '\x17'
 ZMQ_PUSH = '[!ZMQ_PUSH]'
+JSON_MSG = '[!JSON]'
+CMD_PROMPT = '> '
 
 class RKernelSession(RSession):
     "Subclass of RSession to handle interaction"
@@ -57,7 +61,9 @@ class RKernel(Kernel):
     debug = False
 
     log_file = None
-    
+
+    r_handlers = dict()
+
     def __init__(self, **kwargs):
         """Initialize the kernel."""
         super().__init__(**kwargs)
@@ -86,8 +92,10 @@ class RKernel(Kernel):
         comm_msg_types = ["comm_open", "comm_msg", "comm_close"]
         for msg_type in comm_msg_types:
             self.shell_handlers[msg_type] = getattr(self, msg_type)
-        
-        
+
+        self.r_handlers['display_data'] = getattr(self,'display')
+        self.r_handlers['update_display_data'] = getattr(self,'display')
+
     def start(self):
         """Start the kernel."""
         self.log_out("======== Starting kernel ========")
@@ -286,6 +294,9 @@ class RKernel(Kernel):
         else:
             self.stream('Unknown message type',stream='stderr')
 
+    json_incomplete = False
+    json_frag = ''
+
     def handle_stdout(self,text):
         # self.log_out("handle_stdout")
         # self.log_out(pformat(text))
@@ -293,11 +304,25 @@ class RKernel(Kernel):
             chunks = text.split(DLE)
             for chunk in chunks:
                 if chunk.startswith(ZMQ_PUSH):
-                    self.log_out("ZMQ_PUSH received")
                     msg = self.r_zmq_receive()
                     # self.log_out(pformat(msg))
                     self.r_handle_zmq(msg)
-                    self.log_out("ZMQ_PUSH done")
+                elif chunk.startswith(JSON_MSG):
+                    # if len(chunk) > 70:
+                    #     self.log_out(repr((chunk[:70]+'...'+text[-10:])))
+                    # else:
+                    #     self.log_out(repr(chunk))
+                    if chunk.endswith(ETB):
+                        msg = chunk.removeprefix(JSON_MSG).removesuffix(ETB)
+                        self.r_handle_json(msg)
+                    else:
+                        self.json_incomplete = True
+                        self.json_frag = chunk.removeprefix(JSON_MSG)
+                elif chunk.endswith(ETB):
+                    msg = self.json_frag + chunk.removesuffix(ETB)
+                    self.json_frag = ''
+                    self.json_incomplete = False
+                    self.r_handle_json(msg)
                 else:
                     if len(chunk) > 0:
                         self.stream(chunk,stream='stdout')
@@ -349,6 +374,19 @@ class RKernel(Kernel):
     def r_set_help_displayed(self):
         self.rsession.cmd("RKernel::set_help_displayed(TRUE)")
 
+    def r_handle_json(self,jmsg):
+        # self.log_out("r_handle_json")
+        # self.log_out(pformat(jmsg))
+        msg = json.loads(jmsg)
+        msg_type = msg['type']
+        r_handler = self.r_handlers.get(msg_type,None)
+        if r_handler is None:
+            message = 'Unknown message type "%s"' % msg_type
+            self.stream(message,stream='stderr')
+            # self.log_out(message)
+        else:
+            r_handler(msg)
+        
     async def comm_info_request(self, stream, ident, parent):
         """Handle comm_info_request """
         if not self.session:
