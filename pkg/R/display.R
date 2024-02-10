@@ -196,8 +196,7 @@ display_data.recordedplot <- function(x,
     formats <- sapply(rkernel_graphics_types,x$mime2format)
     mime_types <- sapply(rkernel_graphics_types,x$format2mime)
 
-    g <- Graphics$new(width = width,
-                      height = height)
+    g <- Graphics()
     replayPlot(x)
     
     mime_data <- list()
@@ -218,7 +217,7 @@ display_data.recordedplot <- function(x,
         if(mime_i == "image/svg+xml")
             mime_metadata[[mime_i]]$isolated <- TRUE
     }
-    g.close()
+    g$close()
     rm(g)
     
     d <- list(data = mime_data,
