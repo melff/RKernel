@@ -5,7 +5,7 @@ from ipykernel.kernelbase import Kernel
 from .rsession import RSession
 from .utils import *
 from pprint import pprint, pformat
-from threading import Thread
+from threading import Thread, Lock, Event
 from termcolor import colored
 from datetime import datetime
 
@@ -66,6 +66,8 @@ class RKernel(Kernel):
 
     r_timeout = 0.001
 
+    r_zmq_watcher_enabled = None
+
     def __init__(self, **kwargs):
         """Initialize the kernel."""
         super().__init__(**kwargs)
@@ -98,6 +100,8 @@ class RKernel(Kernel):
         self.r_handlers['display_data'] = getattr(self,'display')
         self.r_handlers['update_display_data'] = getattr(self,'display')
 
+        self.r_zmq_watcher_enabled = Event()
+
     def start(self):
         """Start the kernel."""
         self.log_out("======== Starting kernel ========")
@@ -106,6 +110,7 @@ class RKernel(Kernel):
         self.r_zmq_init() 
         self.r_zmq_setup_sender() 
         self.r_zmq_setup_receiver()
+        self.r_zmq_watcher_start()
         self.r_install_hooks()
         self.r_start_graphics()
         self.r_set_help_port()
@@ -228,17 +233,19 @@ class RKernel(Kernel):
         self.r_zmq_recv_so = socket
 
     def r_zmq_request(self,req):
-        # self.log_out("r_zmq_request")
+        self.log_out("r_zmq_request")
         # self.log_out(pformat(req))
+        self.r_zmq_watcher_enabled.clear()
         res = self.rsession.cmd_nowait("RKernel::zmq_reply()")
         self.r_zmq_send(req)
-        # self.log_out("message sent")
+        self.log_out("message sent")
         # self.log_out(pformat(req))
         resp = self.r_zmq_receive()
-        # self.log_out("response received")
+        self.log_out("response received")
+        self.r_zmq_watcher_enabled.set()
         # self.log_out(pformat(resp))
         self.rsession.find_prompt()
-        # self.log_out("done")
+        self.log_out("done")
         return resp
 
     def r_zmq_request_noreply(self,req):
@@ -275,6 +282,28 @@ class RKernel(Kernel):
         msk = self.r_zmq_recv_so.poll(timeout=timeout)
         return msk != 0
 
+    def r_zmq_watcher_start(self):
+        
+        def r_zmq_watcher(socket,receive,event,handler):
+            while True:
+                msk = socket.poll()
+                if event.is_set():
+                    self.log_out("r_zmq_watcher - poll success")
+                    msg = receive()
+                    self.log_out("message received")
+                    self.log_out(pformat(msg))
+                    handler(msg)
+                    self.log_out("handler done")
+
+        self.r_zmq_watcher = Thread(target = r_zmq_watcher,
+                                    args = (self.r_zmq_recv_so,
+                                            self.r_zmq_receive,
+                                            self.r_zmq_watcher_enabled,
+                                            self.r_handle_zmq))
+        self.r_zmq_watcher.daemon = True
+        self.r_zmq_watcher.start()
+        self.r_zmq_watcher_enabled.set()
+        
     def r_start_graphics(self):
         self.rsession.cmd_nowait("RKernel::start_graphics()")
 
@@ -469,7 +498,8 @@ class RKernel(Kernel):
         # self.log_out(pformat(content))
         msg = dict(type = 'debug_request',
                    content = content)
-        response = self.r_zmq_request(msg)
+        # response = self.r_zmq_request(msg)
+        response = dict()
         # self.log_out(pformat(response))
         reply_content = response['content']
         msg = self.session.send(stream, "debug_reply", reply_content, parent, ident)
