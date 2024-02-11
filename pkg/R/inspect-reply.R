@@ -1,7 +1,11 @@
 inspect_reply <- function(code,cursor_pos,detail_level=0){
     word <- find_word_at(code,cursor_pos)
 
-    if(detail_level == 0){
+    if(!nzchar(word)){
+        d <- emptyNamedList
+        found <- FALSE
+    }
+    else if(detail_level == 0){
 
         obj <- get0(word,envir=.GlobalEnv)
         if(!is.null(obj)){
