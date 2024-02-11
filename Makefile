@@ -11,7 +11,7 @@ export R_LIBS_USER = $(PWD)/lib/R/library
 
 .PHONY: default
 
-default: install-quick sync-Rlib
+default: install-quick sync-Rlib installspec
 
 .PHONY: all
 all: roxygenize build install sync-Rlib installspec
