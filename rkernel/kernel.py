@@ -6,6 +6,7 @@ from .rsession import RSession
 from .utils import *
 from pprint import pprint, pformat
 from threading import Thread, Lock, Event
+from queue import Queue, Empty
 from termcolor import colored
 from datetime import datetime
 
@@ -66,8 +67,6 @@ class RKernel(Kernel):
 
     r_timeout = 0.001
 
-    r_zmq_watcher_enabled = None
-
     def __init__(self, **kwargs):
         """Initialize the kernel."""
         super().__init__(**kwargs)
@@ -110,7 +109,6 @@ class RKernel(Kernel):
         self.r_zmq_init() 
         self.r_zmq_setup_sender() 
         self.r_zmq_setup_receiver()
-        self.r_zmq_watcher_start()
         self.r_install_hooks()
         self.r_start_graphics()
         self.r_set_help_port()
@@ -222,16 +220,6 @@ class RKernel(Kernel):
         socket.bind(url)
         self.r_zmq_send_so = socket
 
-    def r_zmq_setup_receiver(self):
-        port = random_port()
-        res = self.rsession.cmd("RKernel::zmq_new_sender(%d)" % port, timeout = self.r_timeout)
-        self.r_zmq_recv_port = port
-        context = self.zmq_context
-        socket = context.socket(zmq.PULL)
-        url = "tcp://*:%d" % port
-        socket.bind(url)
-        self.r_zmq_recv_so = socket
-
     def r_zmq_request(self,req):
         self.log_out("r_zmq_request")
         # self.log_out(pformat(req))
@@ -240,7 +228,7 @@ class RKernel(Kernel):
         self.r_zmq_send(req)
         # self.log_out("message sent")
         # self.log_out(pformat(req))
-        resp = self.r_zmq_receive()
+        resp = self.r_zmq_receive(timeout = 1)
         self.log_out("response received")
         # self.r_zmq_watcher_enabled.set()
         self.log_out(pformat(resp))
@@ -263,48 +251,76 @@ class RKernel(Kernel):
         self.r_zmq_send_so.send_multipart([msg])
         # self.log_out("done")
 
-    def r_zmq_receive(self):
-        # self.log_out("r_zmq_receive")
-        # res = self.r_zmq_recv_so.poll(timeout=1000)
-        # if(res == 0):
-        #     raise ZMQtimeout
-        msg = self.r_zmq_recv_so.recv_multipart()
-        msg = json.loads(msg[0].decode("utf-8"))
-        # self.log_out(pformat(msg))
-        # self.log_out("done")
+    def r_zmq_receive(self,timeout = None):
+        msg = self.zmq_reply_q.get(timeout = timeout)
         return msg
 
-    def r_zmq_flush(self):
-        while self.r_zmq_poll(timeout=1):
-            self.r_zmq_recv_so.recv_multipart()
+    zmq_reply_q = None
+    zmq_comm_q = None
+    zmq_debug_q = None
+    zmq_display_q = None
 
-    def r_zmq_poll(self,timeout=1):
-        msk = self.r_zmq_recv_so.poll(timeout=timeout)
-        return msk != 0
+    r_zmq_watcher = None
+    r_comm_thread = None
+    r_debug_thread = None
 
-    def r_zmq_watcher_start(self):
-        
-        def r_zmq_watcher(socket,receive,event,handler):
+    def r_zmq_setup_receiver(self):
+
+        port = random_port()
+        res = self.rsession.cmd("RKernel::zmq_new_sender(%d)" % port, timeout = self.r_timeout)
+        self.r_zmq_recv_port = port
+        context = self.zmq_context
+
+        self.zmq_reply_q = Queue()
+        self.zmq_comm_q = Queue()
+        self.zmq_debug_q = Queue()
+        self.zmq_display_q = Queue()
+
+        def r_zmq_watcher(context,port,reply_q,comm_q,debug_q,display_q):
+            socket = context.socket(zmq.PULL)
+            url = "tcp://*:%d" % port
+            socket.bind(url)
             while True:
-                event.wait()
                 msk = socket.poll()
-                if event.is_set():
-                    self.log_out("r_zmq_watcher - poll success")
-                    msg = receive()
-                    self.log_out("message received")
-                    self.log_out(pformat(msg))
-                    handler(msg)
-                    self.log_out("handler done")
+                msg = socket.recv_multipart()
+                msg = json.loads(msg[0].decode("utf-8"))
+                msg_type = msg['type']
+                if msg_type in ('display_data', 'update_display_data'):
+                    display_q.put(msg)
+                elif msg_type in ("comm_open","comm_msg","comm_close"):
+                    comm_q.put(msg)
+                elif msg_type in ("debug_event"):
+                    debug_q.put(msg)
+                else:
+                    reply_q.put(msg)
 
         self.r_zmq_watcher = Thread(target = r_zmq_watcher,
-                                    args = (self.r_zmq_recv_so,
-                                            self.r_zmq_receive,
-                                            self.r_zmq_watcher_enabled,
-                                            self.r_handle_zmq))
+                                    args = (self.zmq_context,
+                                            self.r_zmq_recv_port,
+                                            self.zmq_reply_q,
+                                            self.zmq_comm_q,
+                                            self.zmq_debug_q,
+                                            self.zmq_display_q))
         self.r_zmq_watcher.daemon = True
         self.r_zmq_watcher.start()
-        # self.r_zmq_watcher_enabled.set()
-        
+
+        def r_msg_dispatcher(queue,handler):
+            while True:
+                msg = queue.get()
+                handler(msg)
+
+        self.r_comm_thread = Thread(target = r_msg_dispatcher,
+                                    args = (self.zmq_comm_q, 
+                                            self.handle_comm))
+        self.r_comm_thread.daemon = True
+        self.r_comm_thread.start()
+
+        self.r_debug_thread = Thread(target = r_msg_dispatcher,
+                                     args = (self.zmq_debug_q,
+                                             self.handle_debug_event))
+        self.r_debug_thread.daemon = True
+        self.r_debug_thread.start()
+
     def r_start_graphics(self):
         self.rsession.cmd_nowait("RKernel::start_graphics()")
 
@@ -313,18 +329,6 @@ class RKernel(Kernel):
 
     def r_run_cell_end_hooks(self):
         self.rsession.run("RKernel::runHooks('cell-end')")
-
-    def r_handle_zmq(self,msg):
-        # self.log_out("r_handle_zmq")
-        msg_type = msg['type']
-        if msg_type in ['display_data', 'update_display_data']:
-            self.display(msg)
-        elif msg_type in ["comm_open","comm_msg","comm_close"]:
-            self.handle_comm(msg)
-        elif msg_type == "debug_event":
-            self.handle_debug_event(msg)
-        else:
-            self.stream('Unknown message type',stream='stderr')
 
     json_incomplete = False
     json_frag = ''
