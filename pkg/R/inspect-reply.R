@@ -1,9 +1,11 @@
 inspect_reply <- function(code,cursor_pos,detail_level=0){
+    # log_out("inspect_reply")
     word <- find_word_at(code,cursor_pos)
+    # log_out(word,use.str=TRUE)
 
+    found <- FALSE
     if(!nzchar(word)){
         d <- emptyNamedList
-        found <- FALSE
     }
     else if(detail_level == 0){
 
@@ -50,15 +52,26 @@ inspect_reply <- function(code,cursor_pos,detail_level=0){
                 result_text <- c(result_text,
                                  capture.output(print_(FUN)))
                 result_text <- paste(result_text,collapse="\n")
+                found <- TRUE
             }
             else {
-                result_text <- capture.output(print_(ls.str(pos=1L)))
-                result_text <- paste(result_text,collapse="\n")
+                obj <- get0(word,envir=.GlobalEnv)
+                if(length(obj)){
+                    result_text <- paste0(word,": ")
+
+                    result_text <- c(result_text,
+                                     capture.output(str_(obj)))
+                    result_text <- paste(result_text,collapse="\n")
+                    found <- TRUE
+                }
+                else {
+                    result_text <- paste0(word,": [not found]")
+                    found <- FALSE
+                }
             }
             d <- list(
                 `text/plain` = result_text
             )
-            found <- TRUE
         }
 
     }
