@@ -235,17 +235,17 @@ class RKernel(Kernel):
     def r_zmq_request(self,req):
         self.log_out("r_zmq_request")
         # self.log_out(pformat(req))
-        self.r_zmq_watcher_enabled.clear()
+        # self.r_zmq_watcher_enabled.clear()
         res = self.rsession.cmd_nowait("RKernel::zmq_reply()")
         self.r_zmq_send(req)
-        self.log_out("message sent")
+        # self.log_out("message sent")
         # self.log_out(pformat(req))
         resp = self.r_zmq_receive()
         self.log_out("response received")
-        self.r_zmq_watcher_enabled.set()
-        # self.log_out(pformat(resp))
+        # self.r_zmq_watcher_enabled.set()
+        self.log_out(pformat(resp))
         self.rsession.find_prompt()
-        self.log_out("done")
+        # self.log_out("done")
         return resp
 
     def r_zmq_request_noreply(self,req):
@@ -286,6 +286,7 @@ class RKernel(Kernel):
         
         def r_zmq_watcher(socket,receive,event,handler):
             while True:
+                event.wait()
                 msk = socket.poll()
                 if event.is_set():
                     self.log_out("r_zmq_watcher - poll success")
@@ -302,7 +303,7 @@ class RKernel(Kernel):
                                             self.r_handle_zmq))
         self.r_zmq_watcher.daemon = True
         self.r_zmq_watcher.start()
-        self.r_zmq_watcher_enabled.set()
+        # self.r_zmq_watcher_enabled.set()
         
     def r_start_graphics(self):
         self.rsession.cmd_nowait("RKernel::start_graphics()")
