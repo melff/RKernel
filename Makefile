@@ -71,6 +71,9 @@ installspec:
 	. bin/activate; \
 	python rkernel/install.py
 
+copy-Rlib:
+	python copy-lib.py
+
 clear-Rlib:
 	rm -r $(HOME)/.jupyter/R/library/
 	rm -r $(HOME)/.local/pipx/venvs/jupyter/lib/R/library
