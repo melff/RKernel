@@ -122,3 +122,18 @@ str2iframe <- function(code,
     structure(iframe,class="iframe",id=id)
 }
 
+#' @export
+q_orig <- getFromNamespace("q","base")
+
+#' @export
+q_defunct <- function(save = "default", status = 0, runLast = TRUE) {
+    warning("\n'q()' and 'quit()' are deactivated for safety reasons.",
+            "\nPlease use the Jupyter frontend to shut down the kernel.",
+            call.=FALSE,immediate.=TRUE)
+}
+
+#' @export
+install_save_q <- function(){
+    replace_in_package("base","q",q_defunct)
+    replace_in_package("base","quit",q_defunct)
+}

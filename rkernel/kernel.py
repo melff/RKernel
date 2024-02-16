@@ -40,6 +40,13 @@ class RKernelSession(RSession):
             inp = ''
         return inp
         
+    def quit(self):
+        self.flush(stream='stdout')
+        self.flush(stream='stderr')
+        self.sendline("RKernel::q_orig()")
+        self.proc.wait()
+
+
 class RKernel(Kernel):
 
     implementation = 'RKernel-py'
@@ -403,6 +410,7 @@ class RKernel(Kernel):
 
     def r_install_hooks(self):
         self.rsession.cmd("RKernel::install_output_hooks()")
+        self.rsession.cmd("RKernel::install_save_q()")
 
     def r_set_help_port(self):
         port = random_port()
@@ -519,7 +527,7 @@ class RKernel(Kernel):
                            content = msg_content)
         # self.log_out("done")
         # self.log_out(pformat(msg))
-        
+
 class JSONerror(Exception):
     pass
 
