@@ -218,8 +218,15 @@ class RSession(object):
 
         self.sendline(text)
 
-    def at_browse_prompt(self, stdout):
-        return self.browse_prompt.search(stdout[-1]) is not None
+    def at_browse_prompt(self):
+        return self.browse_prompt.search(self.last_output) is not None
+
+    def debug_level(self):
+        m = self.browse_prompt.search(self.last_output)
+        if m is None:
+            return 0
+        else:
+            int(m.group(1))
 
     def process_output(self):
         # self.log_out("RSession.process_output")
@@ -231,12 +238,12 @@ class RSession(object):
             stderr = self.read(stream='stderr',timeout=timeout)
             stdout = self.read(timeout=timeout)
             if stderr is not None:
-                self.log_out(stderr)
+                # self.log_out(stderr)
                 self.handle_stderr(stderr)
             if stdout is not None:
                 # for stdout1 in stdout:
                 #     self.log_out(stdout1)
-                if self.at_browse_prompt(stdout):
+                if self.at_browse_prompt():
                     self.handle_browse_prompt(stdout)
                     break
                 elif self.found_prompt(coprompt):
@@ -284,56 +291,67 @@ class RSession(object):
             self.find_prompt(prompt)
             return (stdout,stderr)
 
-    def handle_stdout(self,text):
+    def handle_stdout(self, text):
         for line in text:
             line = colored(line,self.stdout_color)
             print(line,end='')
         #print("<update graphics>")
 
-    def handle_stderr(self,text):
+    def handle_stderr(self, text):
         text = colored(text,self.stderr_color)
         print(text,end='')
 
-    def handle_menu_prompt(self,text):
+    def handle_menu_prompt(self, text):
         inp = self.input(paste0(text))
         self.send(inp)
         self.send(EOT)
         self.send("\n")
 
+    def input(self, text):
+        inp = input(text)
+        return inp
+    
     def handle_browse_prompt(self, text):
         prompt = self.cmd_prompt
         coprompt = self.cont_prompt
         menu_prompt = self.menu_prompt
         timeout = self.timeout
-        inp = self.input(paste0(text))
+        inp = self.debug_input(paste0(text))
         self.sendline(inp)
         while True:
             stderr = self.read(stream='stderr',timeout=timeout)
             stdout = self.read(timeout=timeout)
             if stderr is not None:
-                self.log_out(stderr)
-                self.handle_stderr(stderr)
+                # self.log_out(stderr)
+                self.debug_handle_stderr(stderr)
             if stdout is not None:
-                if self.at_browse_prompt(stdout):
+                if self.at_browse_prompt():
                     inp = self.input(paste0(stdout))
                     self.sendline(inp)
                 elif self.found_prompt(prompt):
                     stdout[-1] = stdout[-1].strip(prompt)
-                    self.handle_stdout(stdout)
+                    self.debug_handle_stdout(stdout)
                     break
                 elif self.found_prompt(menu_prompt):
-                    self.handle_menu_prompt(stdout)
+                    self.debug_handle_menu_prompt(stdout)
                 else:
-                    self.handle_stdout(stdout)
+                    self.debug_handle_stdout(stdout)
 
+    def debug_input(self, text):
+        return self.input(text)
+
+    def debug_handle_stdout(self, text):
+        self.handle_stdout(text)
+        
+    def debug_handle_stderr(self, text):
+        self.handle_stderr(text)
+        
+    def debug_handle_menu_prompt(self, text):
+        self.handle_menu_prompt(text)
         
     stdout_color = "green"
     stderr_color = "red"
 
-    def input(self,text):
-        inp = input(text)
-        return inp
-    
     def source(filename):
         srclines = source(filename)
         
