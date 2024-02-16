@@ -34,7 +34,10 @@ class RKernelSession(RSession):
         self.kernel.handle_stderr(text)
 
     def input(self,text):
-        inp = self.kernel.raw_input(paste0(text))
+        try:
+            inp = self.kernel.raw_input(paste0(text))
+        except EOFError:
+            inp = ''
         return inp
         
     def source(self,filename):
