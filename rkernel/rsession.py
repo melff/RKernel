@@ -135,6 +135,8 @@ class RSession(object):
     last_output = ''
 
     def read(self, stream='stdout', timeout = None, break_on = None, block = None):
+        if not self.running():
+            return None
         if block is None:
             block = (timeout is not None)
         r = b''
