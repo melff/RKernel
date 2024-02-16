@@ -7,21 +7,34 @@ from threading import Thread, Event
 from queue import Queue, Empty
 from datetime import datetime
 from pprint import pprint, pformat
+import re
 
+EOT = '\x04'
+
+def paste0(l):
+    return ''.join(l)
 
 class RSession(object):
 
     env = dict()
     log_file = None
 
-    def start(self):
+    timeout = 0.001
+    cmd_prompt = '> '
+    cont_prompt = '+ '
+    menu_prompt = ': '
+    browse_prompt = re.compile("^Browse\[([0-9]+)\]> $")
+    
+    def start(self,start_threads=True,quiet=False):
         
         args = ["R",
                 "--no-save",
                 "--no-restore",
                 "--no-readline",
                 "--interactive"]
-
+        if quiet:
+            args += ["--silent"]
+        
         if len(self.env) > 0:
             env = os.environ.copy()
             env.update(self.env)
@@ -57,20 +70,22 @@ class RSession(object):
                     return
                 queue.put(buf)
 
-        self.thread_stdout = Thread(target = _read,
-                                    args = (self.proc.stdout,
-                                            self.stdout_queue))
-        self.thread_stdout.daemon = True
-        self.thread_stdout.start()
+        if start_threads:
+                
+            self.thread_stdout = Thread(target = _read,
+                                        args = (self.proc.stdout,
+                                                self.stdout_queue))
+            self.thread_stdout.daemon = True
+            self.thread_stdout.start()
 
-        self.thread_stderr = Thread(target = _read,
-                                    args = (self.proc.stderr,
-                                            self.stderr_queue))
-        self.thread_stderr.daemon = True
-        self.thread_stderr.start()
+            self.thread_stderr = Thread(target = _read,
+                                        args = (self.proc.stderr,
+                                                self.stderr_queue))
+            self.thread_stderr.daemon = True
+            self.thread_stderr.start()
 
-        # self.log_file = open("/tmp/RKernel.log","a")
-        # self.log_out("-- Session started ---")
+        self.log_file = open("/tmp/RKernel.log","a")
+        self.log_out("-- Session started ---")
 
     def quit(self):
         self.flush(stream='stdout')
@@ -90,6 +105,10 @@ class RSession(object):
         self.flush(stream='stdout')
         self.flush(stream='stderr')
         self.proc.kill()
+
+    def send(self,text):
+        self.proc.stdin.write(text)
+        self.proc.stdin.flush()
         
     def sendline(self,line):
         if '\n' in line:
@@ -99,24 +118,28 @@ class RSession(object):
     def sendall(self,line):
         self.proc.stdin.writelines([line + '\n'])
 
-    def read1(self, stream='stdout', timeout = None):
+    def read1(self, stream='stdout', timeout = None, block = None):
+        if block is None:
+            block = (timeout is not None)
         if stream == 'stdout':
             q = self.stdout_queue
         elif stream == 'stderr':
             q = self.stderr_queue
         try:
-            b = q.get(block = timeout is not None,
+            b = q.get(block = block,
                       timeout = timeout)
         except Empty:
             return None
         return b
 
     last_output = ''
-    
-    def read(self, stream='stdout', timeout = None, break_on = None):
+
+    def read(self, stream='stdout', timeout = None, break_on = None, block = None):
+        if block is None:
+            block = (timeout is not None)
         r = b''
         while True:
-            b = self.read1(stream = stream, timeout = timeout)
+            b = self.read1(stream = stream, timeout = timeout, block = block)
             if b == None:
                 break
             else:
@@ -126,7 +149,8 @@ class RSession(object):
         if len(r) > 0:
             r = r.decode('utf-8')
             if stream == 'stdout':
-                self.last_output = r
+                r = r.splitlines(keepends=True)
+                self.last_output = r[-1]
         else:
             r = None
         return r
@@ -139,10 +163,14 @@ class RSession(object):
             return False
         return self.last_output.endswith(prompt)
 
-    def find_prompt(self,prompt = '> ', pop = True, timeout = None):
+    def find_prompt(self,prompt = '> ', pop = True):
+        res = []
         while not self.found_prompt(prompt):
-            self.read(timeout = timeout)
-        res = self.last_output.rstrip(prompt)
+            r = self.read(timeout = self.timeout)
+            if r is not None:
+                res += r
+        if len(res) > 0:
+            res[-1] = res[-1].rstrip(prompt)
         if pop:
             self.last_output = prompt
         return res
@@ -161,30 +189,17 @@ class RSession(object):
                 line = q.get_nowait()
             except EndOfStream:
                 break
-            
-    def run(self,text,prompt = '> ', coprompt = '+ ', timeout = 0.001):
+
+    def run(self, text):
+        prompt = self.cmd_prompt
+        coprompt = self.cont_prompt
         if not self.found_prompt(prompt) and not self.found_prompt(coprompt):
             raise NotAtPrompt
         if not isinstance(text,list):
             text = text.split('\n')
         for line in text:
             self.sendline(line)
-            while True:
-                stderr = self.read(stream='stderr',timeout=timeout)
-                stdout = self.read(timeout=timeout)
-                if stderr is not None:
-                    self.handle_stderr(stderr)
-                if stdout is not None:
-                    if self.found_prompt(coprompt):
-                        break
-                    if self.found_prompt(prompt):
-                        stdout = stdout.strip(prompt)
-                        self.handle_stdout(stdout)
-                        self.handle_prompt()
-                        break
-                    else:
-                        stdout = stdout.strip(prompt)
-                        self.handle_stdout(stdout)
+            self.process_output()
         if self.found_prompt(coprompt):
             self.interrupt()
             self.find_prompt(prompt)
@@ -192,7 +207,8 @@ class RSession(object):
         else:
             self.find_prompt(prompt)
 
-    def cmd_nowait(self,text,prompt = '> ', coprompt = '+ '):
+    def cmd_nowait(self, text):
+        prompt = self.cmd_prompt
         if not self.found_prompt(prompt):
             # self.log_out("cmd_nowait: Not at promt")
             # self.log_out(pformat(self.last_output))
@@ -202,48 +218,55 @@ class RSession(object):
 
         self.sendline(text)
 
-    def process_output(self,prompt = '> ', coprompt = '+ ', timeout = 0.001):
+    def at_browse_prompt(self, stdout):
+        return self.browse_prompt.search(stdout[-1]) is not None
+
+    def process_output(self):
         # self.log_out("RSession.process_output")
+        prompt = self.cmd_prompt
+        coprompt = self.cont_prompt
+        menu_prompt = self.menu_prompt
+        timeout = self.timeout
         while True:
             stderr = self.read(stream='stderr',timeout=timeout)
             stdout = self.read(timeout=timeout)
-            
             if stderr is not None:
-                # self.log_out(pformat(stderr))
+                self.log_out(stderr)
                 self.handle_stderr(stderr)
             if stdout is not None:
-                # self.log_out(pformat(stdout))
-                if self.found_prompt(coprompt):
+                # for stdout1 in stdout:
+                #     self.log_out(stdout1)
+                if self.at_browse_prompt(stdout):
+                    self.handle_browse_prompt(stdout)
                     break
-                if self.found_prompt(prompt):
-                    stdout = stdout.strip(prompt)
+                elif self.found_prompt(coprompt):
+                    break
+                elif self.found_prompt(prompt):
+                    stdout[-1] = stdout[-1].strip(prompt)
                     self.handle_stdout(stdout)
                     break
-                else:
-                    stdout = stdout.strip(prompt)
-                    self.handle_stdout(stdout)
-        if self.found_prompt(coprompt):
-            self.interrupt()
-            self.find_prompt(prompt)
-            raise InputIncomplete
-        else:
-            self.find_prompt(prompt)
+                elif self.found_prompt(menu_prompt):
+                    self.handle_menu_prompt(stdout)
         
 
-    def cmd(self,text,prompt = '> ', coprompt = '+ ', timeout = 0.001):
+    def cmd(self, text):
+        prompt = self.cmd_prompt
+        coprompt = self.cont_prompt
+        menu_prompt = self.menu_prompt
+        timeout = self.timeout
         if not self.found_prompt(prompt):
             raise NotAtPrompt
         if not isinstance(text,str):
             raise TypeError
             
-        stdout = ''
+        stdout = []
         stderr = ''
 
         self.sendline(text)
         while True:
             stderr1 = self.read(stream='stderr',timeout=timeout)
             if stderr1 is not None:
-                stderr += stderr1
+                stderr += paste0(stderr1)
             stdout1 = self.read(timeout=timeout)
             if stdout1 is not None:
                 stdout += stdout1
@@ -256,25 +279,61 @@ class RSession(object):
             self.find_prompt(prompt)
             raise InputIncomplete
         else:
-            stdout = stdout.strip(prompt)
+            if len(stdout) > 0:
+                stdout = paste0(stdout).strip(prompt)
             self.find_prompt(prompt)
             return (stdout,stderr)
 
     def handle_stdout(self,text):
-        text = colored(text,self.stdout_color)
-        print(text,end='')
+        for line in text:
+            line = colored(line,self.stdout_color)
+            print(line,end='')
         #print("<update graphics>")
 
     def handle_stderr(self,text):
         text = colored(text,self.stderr_color)
         print(text,end='')
 
-    def handle_prompt(self):
-        pass
+    def handle_menu_prompt(self,text):
+        inp = self.input(paste0(text))
+        self.send(inp)
+        self.send(EOT)
+        self.send("\n")
+
+    def handle_browse_prompt(self, text):
+        prompt = self.cmd_prompt
+        coprompt = self.cont_prompt
+        menu_prompt = self.menu_prompt
+        timeout = self.timeout
+        inp = self.input(paste0(text))
+        self.sendline(inp)
+        while True:
+            stderr = self.read(stream='stderr',timeout=timeout)
+            stdout = self.read(timeout=timeout)
+            if stderr is not None:
+                self.log_out(stderr)
+                self.handle_stderr(stderr)
+            if stdout is not None:
+                if self.at_browse_prompt(stdout):
+                    inp = self.input(paste0(stdout))
+                    self.sendline(inp)
+                elif self.found_prompt(prompt):
+                    stdout[-1] = stdout[-1].strip(prompt)
+                    self.handle_stdout(stdout)
+                    break
+                elif self.found_prompt(menu_prompt):
+                    self.handle_menu_prompt(stdout)
+                else:
+                    self.handle_stdout(stdout)
+
         
     stdout_color = "green"
     stderr_color = "red"
 
+    def input(self,text):
+        inp = input(text)
+        return inp
+    
     def source(filename):
         srclines = source(filename)
         

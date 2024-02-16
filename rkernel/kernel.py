@@ -24,7 +24,8 @@ class RKernelSession(RSession):
 
     def start(self):
         super().start()
-        self.kernel.banner += self.find_prompt(timeout=1)
+        session_banner = self.find_prompt()
+        self.kernel.banner += ''.join(session_banner)
         
     def handle_stdout(self,text):
         self.kernel.handle_stdout(text)
@@ -32,6 +33,10 @@ class RKernelSession(RSession):
     def handle_stderr(self,text):
         self.kernel.handle_stderr(text)
 
+    def input(self,text):
+        inp = self.kernel.raw_input(paste0(text))
+        return inp
+        
     def source(self,filename):
         path = os.path.join(R_files_path(),filename)
         code = "source('%s')" % path
@@ -65,7 +70,9 @@ class RKernel(Kernel):
 
     r_handlers = dict()
 
-    r_timeout = 0.001
+    zmq_timeout = 0.1
+
+    _allow_stdin = True
 
     def __init__(self, **kwargs):
         """Initialize the kernel."""
@@ -202,7 +209,7 @@ class RKernel(Kernel):
         return response['content']
         
     def do_shutdown(self, restart):
-        """TODO"""
+        self.rsession.quit()
         return {"status": "ok", "restart": restart}
 
     def r_zmq_init(self):
@@ -212,7 +219,7 @@ class RKernel(Kernel):
 
     def r_zmq_setup_sender(self):
         port = random_port()
-        res = self.rsession.cmd("RKernel::zmq_new_receiver(%d)" % port, timeout = self.r_timeout)
+        res = self.rsession.cmd("RKernel::zmq_new_receiver(%d)" % port)
         self.r_zmq_send_port = port
         context = self.zmq_context
         socket = context.socket(zmq.PUSH)
@@ -228,7 +235,7 @@ class RKernel(Kernel):
         self.r_zmq_send(req)
         # self.log_out("message sent")
         # self.log_out(pformat(req))
-        resp = self.r_zmq_receive(timeout = 1)
+        resp = self.r_zmq_receive(timeout = self.zmq_timeout)
         self.log_out("response received")
         # self.r_zmq_watcher_enabled.set()
         self.log_out(pformat(resp))
@@ -242,7 +249,7 @@ class RKernel(Kernel):
         self.rsession.cmd_nowait("RKernel::zmq_handle()")
         # self.log_out(pformat(res))
         self.r_zmq_send(req)
-        self.rsession.find_prompt(timeout = self.r_timeout)
+        self.rsession.find_prompt()
         # self.log_out("done")
 
     def r_zmq_send(self,msg):
@@ -267,7 +274,7 @@ class RKernel(Kernel):
     def r_zmq_setup_receiver(self):
 
         port = random_port()
-        res = self.rsession.cmd("RKernel::zmq_new_sender(%d)" % port, timeout = self.r_timeout)
+        res = self.rsession.cmd("RKernel::zmq_new_sender(%d)" % port)
         self.r_zmq_recv_port = port
         context = self.zmq_context
 
@@ -336,35 +343,36 @@ class RKernel(Kernel):
     def handle_stdout(self,text):
         # self.log_out("handle_stdout")
         # self.log_out(pformat(text))
-        if DLE in text:
-            chunks = text.split(DLE)
-            for chunk in chunks:
-                if chunk.startswith(ZMQ_PUSH):
-                    msg = self.r_zmq_receive()
-                    # self.log_out(pformat(msg))
-                    self.r_handle_zmq(msg)
-                elif chunk.startswith(JSON_MSG):
-                    # if len(chunk) > 70:
-                    #     self.log_out(repr((chunk[:70]+'...'+text[-10:])))
-                    # else:
-                    #     self.log_out(repr(chunk))
-                    if chunk.endswith(ETB):
-                        msg = chunk.removeprefix(JSON_MSG).removesuffix(ETB)
+        for line in text:
+            if DLE in line:
+                chunks = line.split(DLE)
+                for chunk in chunks:
+                    if chunk.startswith(ZMQ_PUSH):
+                        msg = self.r_zmq_receive()
+                        # self.log_out(pformat(msg))
+                        self.r_handle_zmq(msg)
+                    elif chunk.startswith(JSON_MSG):
+                        # if len(chunk) > 70:
+                        #     self.log_out(repr((chunk[:70]+'...'+text[-10:])))
+                        # else:
+                        #     self.log_out(repr(chunk))
+                        if chunk.endswith(ETB):
+                            msg = chunk.removeprefix(JSON_MSG).removesuffix(ETB)
+                            self.r_handle_json(msg)
+                        else:
+                            self.json_incomplete = True
+                            self.json_frag = chunk.removeprefix(JSON_MSG)
+                    elif chunk.endswith(ETB):
+                        msg = self.json_frag + chunk.removesuffix(ETB)
+                        self.json_frag = ''
+                        self.json_incomplete = False
                         self.r_handle_json(msg)
                     else:
-                        self.json_incomplete = True
-                        self.json_frag = chunk.removeprefix(JSON_MSG)
-                elif chunk.endswith(ETB):
-                    msg = self.json_frag + chunk.removesuffix(ETB)
-                    self.json_frag = ''
-                    self.json_incomplete = False
-                    self.r_handle_json(msg)
-                else:
-                    if len(chunk) > 0:
-                        self.stream(chunk,stream='stdout')
-        else:
-            if len(text) > 0:
-                self.stream(text,stream='stdout')
+                        if len(chunk) > 0:
+                            self.stream(chunk,stream='stdout')
+            else:
+                if len(line) > 0:
+                    self.stream(line,stream='stdout')
 
         # self.log_out("handle_stdout - done")
 
@@ -401,14 +409,14 @@ class RKernel(Kernel):
         return
 
     def r_install_hooks(self):
-        self.rsession.cmd("RKernel::install_output_hooks()", timeout = self.r_timeout)
+        self.rsession.cmd("RKernel::install_output_hooks()")
 
     def r_set_help_port(self):
         port = random_port()
-        self.rsession.cmd("RKernel::set_help_port(%d)" % port, timeout = self.r_timeout)
+        self.rsession.cmd("RKernel::set_help_port(%d)" % port)
 
     def r_set_help_displayed(self):
-        self.rsession.cmd("RKernel::set_help_displayed(TRUE)", timeout = self.r_timeout)
+        self.rsession.cmd("RKernel::set_help_displayed(TRUE)")
         
     def r_handle_json(self,jmsg):
         # self.log_out("r_handle_json")
@@ -524,3 +532,7 @@ class JSONerror(Exception):
 
 class ZMQtimeout(Exception):
     pass
+
+
+def paste0(l):
+    return ''.join(l)
