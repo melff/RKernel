@@ -40,16 +40,6 @@ class RKernelSession(RSession):
             inp = ''
         return inp
         
-    def source(self,filename):
-        path = os.path.join(R_files_path(),filename)
-        code = "source('%s')" % path
-        return self.cmd(code)
-
-    def source_env(self,filename):
-        path = os.path.join(R_files_path(),filename)
-        code = "source('%s',local=as.environment('tools:rsession'))" % path
-        return self.cmd(code)
-        
 class RKernel(Kernel):
 
     implementation = 'RKernel-py'

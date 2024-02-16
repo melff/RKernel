@@ -354,9 +354,6 @@ class RSession(object):
     stdout_color = "green"
     stderr_color = "red"
 
-    def source(filename):
-        srclines = source(filename)
-        
     def log_out(self,text):
         now = format(datetime.now())
         text = 'SESSION: ' + now + ' ' + text
