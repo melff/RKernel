@@ -79,13 +79,14 @@ zmq_request <- function(){
     msg <- zmq_receive()
     # log_out("message recieved")
     # log_out(msg,use.str=TRUE)
+    envir <- parent.frame()
     type <- msg$type
     handler <- zmq_handlers[[type]]
     if(length(handler)){
-        response <- handler(msg)
+        response <- handler(msg,envir)
     }
     else {
-        response <- zmq_default_handler(msq)
+        response <- zmq_default_handler(msq,env)
     }
     # log_out("handler success")
     zmq_send(response)
@@ -97,10 +98,11 @@ zmq_request_noreply <- function(){
     log_out("zmq_request_noreply")
     msg <- zmq_receive()
     log_out(msg,use.str=TRUE)
+    envir <- parent.frame()
     type <- msg$type
     handler <- zmq_handlers[[type]]
     if(length(handler)){
-        tryCatch(handler(msg),
+        tryCatch(handler(msg,envir),
                  error=function(e){
                      log_error(conditionMessage(e))
                      log_error(msg,use.str=TRUE)
@@ -124,7 +126,7 @@ zmq_push <- function(msg){
 }
 
 
-zmq_default_handler <- function(msg){
+zmq_default_handler <- function(msg,...){
     # log_out("zmq-default-handler")
     list(type="unknown_reply",
          content = list(
@@ -135,7 +137,7 @@ zmq_default_handler <- function(msg){
          ))
 }
 
-zmq_handlers$is_complete_request <- function(msg){
+zmq_handlers$is_complete_request <- function(msg,...){
     code <- msg$content$code
     status <- code_is_complete(code)
     list(
@@ -147,7 +149,7 @@ zmq_handlers$is_complete_request <- function(msg){
     )
 }
 
-zmq_handlers$complete_request <- function(msg){
+zmq_handlers$complete_request <- function(msg,...){
     code <- msg$content$code
     cursor_pos <- msg$content$cursor_pos
     response <- get_completions(code,cursor_pos)
@@ -163,7 +165,7 @@ zmq_handlers$complete_request <- function(msg){
     )
 }
 
-zmq_handlers$inspect_request <- function(msg){
+zmq_handlers$inspect_request <- function(msg,...){
     code <- msg$content$code
     cursor_pos <- msg$content$cursor_pos
     detail_level <- msg$content$detail_level
@@ -179,7 +181,7 @@ zmq_handlers$inspect_request <- function(msg){
     )
 }
 
-zmq_handlers$comm_info_request <- function(msg){
+zmq_handlers$comm_info_request <- function(msg,...){
       target_name <- NULL
       if("target_name" %in% names(msg$content))
           target_name <- msg$content$target_name
@@ -194,7 +196,7 @@ zmq_handlers$comm_info_request <- function(msg){
       )
 }
 
-zmq_handlers$comm_open <- function(msg){
+zmq_handlers$comm_open <- function(msg,...){
     # log_out("zmq_handler - comm open")
     cm <- get_comm_manager()
     target_name <- msg$content$target_name
@@ -204,7 +206,7 @@ zmq_handlers$comm_open <- function(msg){
     # log_out("done")
 }
 
-zmq_handlers$comm_msg <- function(msg){
+zmq_handlers$comm_msg <- function(msg,...){
     # log_out("zmq_handler - comm msg")
     # log_out(msg,use.str=TRUE)
     cm <- get_comm_manager()
@@ -216,7 +218,7 @@ zmq_handlers$comm_msg <- function(msg){
     # log_out("done")
 }
 
-zmq_handlers$comm_close <- function(msg){
+zmq_handlers$comm_close <- function(msg,...){
     # log_out("zmq_handler - comm close")
     cm <- get_comm_manager()
     id <- msg$content$comm_id
@@ -227,10 +229,10 @@ zmq_handlers$comm_close <- function(msg){
 }
 
 
-zmq_handlers$debug_request <- function(msg){
+zmq_handlers$debug_request <- function(msg,envir,...){
     ds <- get_dap_server()
     request <- msg$content
-    response <- ds$handle(request)
+    response <- ds$handle(request,envir)
     list(
         type = "debug_reply",
         content = response

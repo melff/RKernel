@@ -9,6 +9,7 @@ from threading import Thread, Lock, Event
 from queue import Queue, Empty
 from termcolor import colored
 from datetime import datetime
+import shutil
 
 EOT = '\x04'
 DLE = '\x10'
@@ -22,10 +23,13 @@ class RKernelSession(RSession):
 
     kernel = None
 
+    temp_dir = ''
+
     def start(self):
         super().start()
         session_banner = self.find_prompt()
         self.kernel.banner += ''.join(session_banner)
+        self.temp_dir = self.cmd("cat(tempdir())")[0]
         
     def handle_stdout(self,text):
         self.kernel.handle_stdout(text)
@@ -70,6 +74,8 @@ class RKernel(Kernel):
 
     r_handlers = dict()
 
+    dbg_handlers = dict()
+
     zmq_timeout = 0.1
 
     _allow_stdin = True
@@ -107,6 +113,13 @@ class RKernel(Kernel):
         self.r_handlers['update_display_data'] = getattr(self,'display')
 
         self.r_zmq_watcher_enabled = Event()
+
+        self.dbg_handlers['debugInfo']  = self.debugInfo
+        self.dbg_handlers['initialize'] = self.debug_init
+        self.dbg_handlers['attach']     = self.debug_attach
+        self.dbg_handlers['disconnect'] = self.debug_disconnect
+        self.dbg_handlers['inspectVariables'] = self.debug_passthru
+        self.dbg_handlers['richInspectVariables'] = self.debug_passthru
 
     def start(self):
         """Start the kernel."""
@@ -231,7 +244,7 @@ class RKernel(Kernel):
         self.log_out("r_zmq_request")
         # self.log_out(pformat(req))
         # self.r_zmq_watcher_enabled.clear()
-        res = self.rsession.cmd_nowait("RKernel::zmq_reply()")
+        res = self.rsession.cmd_nowait("RKernel::zmq_request()")
         self.r_zmq_send(req)
         # self.log_out("message sent")
         # self.log_out(pformat(req))
@@ -322,11 +335,11 @@ class RKernel(Kernel):
         self.r_comm_thread.daemon = True
         self.r_comm_thread.start()
 
-        self.r_debug_thread = Thread(target = r_msg_dispatcher,
-                                     args = (self.zmq_debug_q,
-                                             self.handle_debug_event))
-        self.r_debug_thread.daemon = True
-        self.r_debug_thread.start()
+        # self.r_debug_thread = Thread(target = r_msg_dispatcher,
+        #                              args = (self.zmq_debug_q,
+        #                                      self.handle_debug_event))
+        # self.r_debug_thread.daemon = True
+        # self.r_debug_thread.start()
 
     def r_start_graphics(self):
         self.rsession.cmd_nowait("RKernel::start_graphics()")
@@ -499,35 +512,120 @@ class RKernel(Kernel):
             "language_info": self.language_info,
             "banner": self.banner,
             "help_links": self.help_links,
-            "debugger": False
+            "debugger": True
         }
 
-    async def debug_request(self, stream, ident, parent):
-        """Handle a debug request."""
-        # self.log_out("debug_request")
-        if not self.session:
-            return
-        # self.log_out(pformat(stream))
-        content = parent["content"]
-        # self.log_out(pformat(content))
-        msg = dict(type = 'debug_request',
-                   content = content)
-        # response = self.r_zmq_request(msg)
-        response = dict()
-        # self.log_out(pformat(response))
-        reply_content = response['content']
-        msg = self.session.send(stream, "debug_reply", reply_content, parent, ident)
+    async def do_debug_request(self, msg_content):
+        self.log_out('=========== do_debug_request ===========')
+        command = msg_content['command']
+        self.log_out('Command: %s' % command)
+        self.log_out(pformat(msg_content))
+        handler = self.dbg_handlers.get(command,None)
+        if handler is None:
+            reply_body = dict()
+            success = False
+        else:
+            reply_body = handler(msg_content)
+            success = True
+        self.log_out('Handler complete')
+        self.log_out('Response:')
+        self.log_out(pformat(reply_body))
+        reply_content = dict(
+            type = 'response',
+            command = command,
+            request_seq = msg_content['seq'],
+            body = reply_body,
+            success = success
+        )
+        return reply_content
 
-    def handle_debug_event(self,msg):
-        # self.log_out("handle_debug_event")
-        msg_type = msg['type']
-        msg_content = msg['content']
+    event_seq = 1
+    
+    def debug_event(self, event, body = None):
+        self.log_out('=========== debug_event ===========')
+        self.log_out('Event: %s' % event)
+        self.log_out('Body:')
+        self.log_out(pformat(body))
+        msg_type = 'debug_event'
+        msg_content = dict(
+            seq = self.event_seq,
+            type = 'event',
+            event = event,
+            body = body
+        )
         self.send_response(self.iopub_socket,
                            msg_type,
                            content = msg_content)
-        # self.log_out("done")
-        # self.log_out(pformat(msg))
+        self.event_seq += 1
 
+    dbg_started = False
+    dbg_client_info = None
+
+    def debugInfo(self, request):
+        reply = dict(
+            isStarted = self.dbg_started,
+            hashMethod = 'Murmur2',
+            hashSeed = 3339675911,
+            tmpFilePrefix = self.rsession.temp_dir,
+            tmpFileSuffix = '.R',
+            breakpoints = [],
+            stoppedThreads = [],
+            richRendering = True,
+            exceptionPaths = []
+        ) 
+        return reply
+
+    def debug_init(self, request):
+        self.dbg_client_info = request['arguments']
+        self.debug_event('initialized')
+        self.debug_event('process',
+                         body = dict(
+                             systemProcessId = self.rsession.pid(),
+                             name = shutil.which('R'),
+                             isLocalProcess = True,
+                             startMethod = 'attach'
+                         ))
+        self.debug_event('thread',
+                         body = dict(
+                             reason = 'started',
+                             threadId = 1
+                         ))
+        reply = dict(
+            supportsSetVariable = True,
+            supportsConfigurationDoneRequest = True,
+            supportsFunctionBreakpoints = True,
+            supportsConditionalBreakpoints = True,
+            supportsLogPoints = True,
+            supportsStepInTargetsRequest = True,
+            exceptionBreakpointFilters = [dict(
+                filter = 'stop',
+                label = 'Runtime error',
+                default = False,
+                description = 'Break when an error occurs that is not caught by a try() or tryCactch() expression'
+            )]
+        )
+        return reply
+
+    def debug_attach(self, request):
+        self.dbg_started = True
+        return dict()
+
+    def debug_disconnect(self, request):
+        self.dbg_started = False
+        return dict()
+
+    def debug_passthru(self, request_content):
+        self.log_out('=== debug_passthru ================')
+        self.log_out(pformat(request_content))
+        request = dict(
+            type = 'debug_request',
+            content = request_content
+        )
+        r_reply = self.r_zmq_request(request)
+        reply_body = r_reply['content']['body']
+        self.log_out(pformat(reply_body))
+        return reply_body
+    
 class JSONerror(Exception):
     pass
 

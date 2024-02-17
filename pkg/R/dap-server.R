@@ -1,23 +1,21 @@
 DAPServer <- R6Class("DAPServer",
   public = list(
-      initialize = function(envir=globalenv()){
-          self$envir <- envir
-      },
-      handle = function(request){
+      
+      handle = function(request,...){
           if(request$command != "debugInfo"){
               log_out(sprintf("DAPServer: got command '%s",request$command))
               log_out(request$arguments,use.print=TRUE)
           }
           body <- switch(request$command,
-                         debugInfo = self$debugInfo(request),
-                         initialize = self$debug_init(request),
-                         attach = self$debug_attach(request),
-                         disconnect = self$debug_disconnect(request),
-                         inspectVariables = self$inspect_variables(request),
-                         variables = self$reply_variables(request),
-                         richInspectVariables = self$rich_inspect_variable(request),
-                         dumpCell = self$dumpCell(request),
-                         self$empty_reply(request)
+                         debugInfo = self$debugInfo(request,...),
+                         initialize = self$debug_init(request,...),
+                         attach = self$debug_attach(request,...),
+                         disconnect = self$debug_disconnect(request,...),
+                         inspectVariables = self$inspect_variables(request,...),
+                         variables = self$reply_variables(request,...),
+                         richInspectVariables = self$rich_inspect_variable(request,...),
+                         dumpCell = self$dumpCell(request,...),
+                         self$empty_reply(request,...)
                          )
           response <- list(
               type = "response",
@@ -46,21 +44,8 @@ DAPServer <- R6Class("DAPServer",
           self$event_seq <- self$event_seq + 1L
       },
       event_seq = 1L,
-      debugInfo = function(request){
-          list(
-              isStarted = self$is_started,
-              hashMethod = "Murmur2",
-              hashSeed = 3339675911,
-              tmpFilePrefix = tempdir(),
-              tmpFileSuffix = ".R",
-              breakpoints = list(),
-              stoppedThreads = list(),
-              richRendering = TRUE,
-              exceptionPaths = list()
-          )
-      },
       client_info = NULL,
-      debug_init = function(request){
+      debug_init = function(request,...){
           self$client_info <- request$arguments
           self$event(event="initialized")
           self$event(event="process",
@@ -86,26 +71,25 @@ DAPServer <- R6Class("DAPServer",
               )
           )
       },
-      debug_attach = function(request){
+      debug_attach = function(request,...){
           self$is_started <- TRUE
           return(NULL)
       },
-      debug_disconnect = function(request){
+      debug_disconnect = function(request,...){
           self$is_started <- TRUE
           return(NULL)
       },
-      inspect_variables = function(request){
+      inspect_variables = function(request,envir,...){
           self$children <- list()
           body <- NULL
-          e <- self$envir
-          varnames <- ls(e)
+          varnames <- ls(envir)
           if(length(varnames)){
-              variables <- lapply(varnames,self$inspect_thing)
+              variables <- lapply(varnames,self$inspect_thing,envir=envir)
               body <- list(variables = unname(variables))
           }
           return(body)
       },
-      dumpCell = function(request){
+      dumpCell = function(request,...){
           code = request$arguments$code
           src_filename <- tempfile("codecell",fileext=".R")
           writeLines(code,con=src_filename)
@@ -114,9 +98,9 @@ DAPServer <- R6Class("DAPServer",
               sourcePath = src_filename
           )
       },
-      rich_inspect_variable = function(request){
+      rich_inspect_variable = function(request,envir,...){
           varname <- request$arguments$variableName
-          thing <- self$get_thing(varname)
+          thing <- self$get_thing(varname,envir)
           # log_out(thing,use.str=TRUE)
           if(!length(thing$value))
               body <- display_data(data=list("text/html"=sprintf("Information from frontend: \"%s\"",request$arguments)))
@@ -124,8 +108,8 @@ DAPServer <- R6Class("DAPServer",
               body <- display_data(thing$value)
           return(unclass(body))
       },
-      inspect_thing = function(path,name=tail(path,n=1L)){
-          desc <- self$get_thing(path)
+      inspect_thing = function(path,name=tail(path,n=1L),envir,...){
+          desc <- self$get_thing(path,envir)
           x <- desc$value
           ename <- desc$ename
           vref <- 0L
@@ -174,9 +158,9 @@ DAPServer <- R6Class("DAPServer",
           }
           return(vref)
       },
-      get_thing = function(path){
+      get_thing = function(path,envir){
           ename <- path[[1]]
-          x <- get0(ename,envir=self$envir)
+          x <- get0(ename,envir=env)
           for(i in tail(path,-1)){
               if(i == "@"){
                   x <- attributes(x)
@@ -379,8 +363,6 @@ DAPServer <- R6Class("DAPServer",
           return(0)
       },
       is_started = FALSE,
-      envir = NULL,
-      evaluator = NULL,
       types = c(
           "integer"="int",
           "logical"="bool",

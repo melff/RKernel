@@ -13,7 +13,7 @@ kernel_json = {
     "language": "R",
     "interrupt_mode": "message",
     "metadata": {
-        "debugger" : False
+        "debugger" : True
     }
 }
 
