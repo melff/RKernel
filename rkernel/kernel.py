@@ -246,7 +246,7 @@ class RKernel(Kernel):
     def r_zmq_request_noreply(self,req):
         # self.log_out("r_zmq_request_noreply")
         # self.log_out(pformat(req))
-        self.rsession.cmd_nowait("RKernel::zmq_handle()")
+        self.rsession.cmd_nowait("RKernel::zmq_request_noreply()")
         # self.log_out(pformat(res))
         self.r_zmq_send(req)
         self.rsession.find_prompt()

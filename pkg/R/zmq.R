@@ -74,8 +74,8 @@ zmq_shutdown <- function(){
 zmq_handlers <- list()
 
 #' @export
-zmq_reply <- function(){
-    # log_out("zmq_reply")
+zmq_request <- function(){
+    # log_out("zmq_request")
     msg <- zmq_receive()
     # log_out("message recieved")
     # log_out(msg,use.str=TRUE)
@@ -93,8 +93,8 @@ zmq_reply <- function(){
 }
 
 #' @export
-zmq_handle <- function(){
-    log_out("zmq_handle")
+zmq_request_noreply <- function(){
+    log_out("zmq_request_noreply")
     msg <- zmq_receive()
     log_out(msg,use.str=TRUE)
     type <- msg$type
