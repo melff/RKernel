@@ -256,7 +256,8 @@ class RSession(object):
                     break
                 elif self.found_prompt(menu_prompt):
                     self.handle_menu_prompt(stdout)
-        
+                else:
+                    self.handle_stdout(stdout)
 
     def cmd(self, text):
         prompt = self.cmd_prompt
