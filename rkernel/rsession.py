@@ -87,6 +87,9 @@ class RSession(object):
         self.log_file = open("/tmp/RKernel.log","a")
         self.log_out("-- Session started ---")
 
+    def pid(self):
+        return self.proc.pid
+        
     def quit(self):
         self.flush(stream='stdout')
         self.flush(stream='stderr')
