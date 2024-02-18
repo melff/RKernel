@@ -317,3 +317,24 @@ send_graphics_id <- function(g){
         cat_(DLE)
     }
 }
+
+#'@export
+graphics_url <- function(){
+    g <- graphics$current
+    g$live_url()
+}
+
+#'@export
+graphics_frame <- function(width = 600L,
+                           height = 500L,
+                           class = "rkernel-iframe",
+                           style = "border-style:none",...){
+    url <- graphics_url()
+    if_tmpl <- "
+                   <iframe src=\"%s\" width=\"%s\" height=\"%s\" class=\"%s\" style=\"%s\">
+                   </iframe>
+                   "
+    iframe <- sprintf(if_tmpl,url,width,height,class,style)
+    id <- UUIDgenerate()
+    structure(iframe,class="iframe",id=id)
+}

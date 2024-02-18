@@ -82,6 +82,7 @@ install_output_hooks <- function() {
     replace_in_package("base","print",print_with_hooks)
     replace_in_package("utils","str",str_with_hooks)
     replace_in_package("base","message",message_stdout)
+    add_displayed_classes("iframe")
 }
 
 output_hooks <- new.env()
