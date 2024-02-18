@@ -155,8 +155,8 @@ class RKernel(Kernel):
                            content = msg_content)
         
     def handle_comm(self,msg):
-        # self.log_out("handle_comm")
-        # self.log_out(pformat(msg))
+        self.log_out("+++ handle_comm")
+        self.log_out(pformat(msg))
         msg_type = msg['type']    
         msg_content = msg['content']
         if 'metadata' in msg:
@@ -177,7 +177,16 @@ class RKernel(Kernel):
                                content = msg_content,
                                metadata = metadata)
         # self.log_out("done")
-            
+        
+    def handle_r_request(self,msg):
+        self.log_out("+++ handle_r_request")
+        self.log_out(pformat(msg))
+        msg_type = msg['type']    
+        msg_content = msg['content']
+        if msg_type == 'input_request':
+            res = self.input_request(msg)
+            self.r_zmq_send(res)
+    
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
 
@@ -292,11 +301,12 @@ class RKernel(Kernel):
         context = self.zmq_context
 
         self.zmq_reply_q = Queue()
+        self.zmq_request_q = Queue()
         self.zmq_comm_q = Queue()
         self.zmq_debug_q = Queue()
         self.zmq_display_q = Queue()
 
-        def r_zmq_watcher(context,port,reply_q,comm_q,debug_q,display_q):
+        def r_zmq_watcher(context,port,reply_q,request_q,comm_q,debug_q,display_q):
             socket = context.socket(zmq.PULL)
             url = "tcp://*:%d" % port
             socket.bind(url)
@@ -309,6 +319,8 @@ class RKernel(Kernel):
                     display_q.put(msg)
                 elif msg_type in ("comm_open","comm_msg","comm_close"):
                     comm_q.put(msg)
+                elif msg_type in ("input_request"):
+                    request_q.put(msg)
                 elif msg_type in ("debug_event"):
                     debug_q.put(msg)
                 else:
@@ -318,6 +330,7 @@ class RKernel(Kernel):
                                     args = (self.zmq_context,
                                             self.r_zmq_recv_port,
                                             self.zmq_reply_q,
+                                            self.zmq_request_q,
                                             self.zmq_comm_q,
                                             self.zmq_debug_q,
                                             self.zmq_display_q))
@@ -334,6 +347,13 @@ class RKernel(Kernel):
                                             self.handle_comm))
         self.r_comm_thread.daemon = True
         self.r_comm_thread.start()
+
+        self.r_request_thread = Thread(target = r_msg_dispatcher,
+                                       args = (self.zmq_request_q, 
+                                               self.handle_r_request))
+        self.r_request_thread.daemon = True
+        self.r_request_thread.start()
+
 
         # self.r_debug_thread = Thread(target = r_msg_dispatcher,
         #                              args = (self.zmq_debug_q,
@@ -424,6 +444,7 @@ class RKernel(Kernel):
     def r_install_hooks(self):
         self.rsession.cmd("RKernel::install_output_hooks()")
         self.rsession.cmd("RKernel::install_save_q()")
+        self.rsession.cmd("RKernel::install_readline()")
 
     def r_set_help_port(self):
         port = random_port()
@@ -625,6 +646,17 @@ class RKernel(Kernel):
         reply_body = r_reply['content']['body']
         # self.log_out(pformat(reply_body))
         return reply_body
+
+    def input_request(self, msg):
+        content = msg['content']
+        password = content['password']
+        prompt = content['prompt']
+        if password:
+            res = self.getpass(prompt=prompt)
+        else:
+            res = self.raw_input(prompt=prompt)
+        return res
+            
     
 class JSONerror(Exception):
     pass

@@ -38,7 +38,7 @@ zmq_new_sender <- function(port){
 
 #' @export
 zmq_receive <- function(){
-    # log_out("zmq_receive")
+    log_out("zmq_receive")
     port <- zmq_env$ports["receiver"]
     index <- as.character(port)
     socket <- zmq_env$sockets[[index]]
@@ -46,21 +46,21 @@ zmq_receive <- function(){
     msg <- zmq.recv.multipart(socket,unserialize=FALSE)
     msg <- fromRawJSON(msg[[1]])
     # log_out(msg,use.str=TRUE)
-    # log_out("done")
+    log_out("done")
     return(msg)
 }
 
 #' @export
 zmq_send <- function(msg){
-    # log_out("zmq_send")
-    # log_out(msg,use.str=TRUE)
+    log_out("zmq_send")
+    log_out(msg,use.str=TRUE)
     port <- zmq_env$ports["sender"]
     index <- as.character(port)
     socket <- zmq_env$sockets[[index]]
     msg <- toRawJSON(msg)
     msg <- append(list(msg),list(raw(0)))
     zmq.send.multipart(socket,msg,serialize=FALSE)
-    # log_out("message sent")
+    log_out("message sent")
     # log_out(msg,use.str=TRUE)
 }
 
@@ -237,5 +237,19 @@ zmq_handlers$debug_request <- function(msg,envir,...){
         type = "debug_reply",
         content = response
     )
+}
+
+#' @export
+zmq_input_request <- function(prompt='',password = FALSE){
+    msg <- list(
+        type = 'input_request',
+        content = list(
+            prompt = prompt,
+            password = password
+        )
+    )
+    zmq_send(msg)
+    resp <- zmq_receive()
+    return(resp)
 }
 
