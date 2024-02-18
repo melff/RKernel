@@ -95,9 +95,9 @@ zmq_request <- function(){
 
 #' @export
 zmq_request_noreply <- function(){
-    log_out("zmq_request_noreply")
+    # log_out("zmq_request_noreply")
     msg <- zmq_receive()
-    log_out(msg,use.str=TRUE)
+    # log_out(msg,use.str=TRUE)
     envir <- parent.frame()
     type <- msg$type
     handler <- zmq_handlers[[type]]
@@ -108,21 +108,21 @@ zmq_request_noreply <- function(){
                      log_error(msg,use.str=TRUE)
                  })
     }
-    log_out("done")
+    # log_out("done")
 }
 
 DLE <- '\x10'
 ZMQ_PUSH <- '[!ZMQ_PUSH]'
 
 zmq_push <- function(msg){
-    log_out("zmq_push")
-    log_out(msg,use.str=TRUE)
+    # log_out("zmq_push")
+    # log_out(msg,use.str=TRUE)
     cat_(DLE)
     cat_(ZMQ_PUSH)
     zmq_send(msg)
     cat_(DLE)
     cat_("")
-    log_out("zmq_push done")
+    # log_out("zmq_push done")
 }
 
 

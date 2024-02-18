@@ -123,7 +123,7 @@ class RKernel(Kernel):
 
     def start(self):
         """Start the kernel."""
-        self.log_out("======== Starting kernel ========")
+        # self.log_out("======== Starting kernel ========")
         self.rsession.start()
         self.banner += self.banner_suffix
         self.r_zmq_init() 
@@ -181,7 +181,7 @@ class RKernel(Kernel):
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
 
-        # self.log_out("do_execute")
+        # self.log_out("======== do_execute ===================")
         # self.log_out(code)
 
         self.r_run_cell_begin_hooks()
@@ -241,7 +241,7 @@ class RKernel(Kernel):
         self.r_zmq_send_so = socket
 
     def r_zmq_request(self,req):
-        self.log_out("r_zmq_request")
+        # self.log_out("r_zmq_request")
         # self.log_out(pformat(req))
         # self.r_zmq_watcher_enabled.clear()
         res = self.rsession.cmd_nowait("RKernel::zmq_request()")
@@ -249,9 +249,9 @@ class RKernel(Kernel):
         # self.log_out("message sent")
         # self.log_out(pformat(req))
         resp = self.r_zmq_receive(timeout = self.zmq_timeout)
-        self.log_out("response received")
+        # self.log_out("response received")
         # self.r_zmq_watcher_enabled.set()
-        self.log_out(pformat(resp))
+        # self.log_out(pformat(resp))
         self.rsession.find_prompt()
         # self.log_out("done")
         return resp
@@ -516,10 +516,10 @@ class RKernel(Kernel):
         }
 
     async def do_debug_request(self, msg_content):
-        self.log_out('=========== do_debug_request ===========')
+        # self.log_out('=========== do_debug_request ===========')
         command = msg_content['command']
-        self.log_out('Command: %s' % command)
-        self.log_out(pformat(msg_content))
+        # self.log_out('Command: %s' % command)
+        # self.log_out(pformat(msg_content))
         handler = self.dbg_handlers.get(command,None)
         if handler is None:
             reply_body = dict()
@@ -527,9 +527,9 @@ class RKernel(Kernel):
         else:
             reply_body = handler(msg_content)
             success = True
-        self.log_out('Handler complete')
-        self.log_out('Response:')
-        self.log_out(pformat(reply_body))
+        # self.log_out('Handler complete')
+        # self.log_out('Response:')
+        # self.log_out(pformat(reply_body))
         reply_content = dict(
             type = 'response',
             command = command,
@@ -542,10 +542,10 @@ class RKernel(Kernel):
     event_seq = 1
     
     def debug_event(self, event, body = None):
-        self.log_out('=========== debug_event ===========')
-        self.log_out('Event: %s' % event)
-        self.log_out('Body:')
-        self.log_out(pformat(body))
+        # self.log_out('=========== debug_event ===========')
+        # self.log_out('Event: %s' % event)
+        # self.log_out('Body:')
+        # self.log_out(pformat(body))
         msg_type = 'debug_event'
         msg_content = dict(
             seq = self.event_seq,
@@ -615,15 +615,15 @@ class RKernel(Kernel):
         return dict()
 
     def debug_passthru(self, request_content):
-        self.log_out('=== debug_passthru ================')
-        self.log_out(pformat(request_content))
+        # self.log_out('=== debug_passthru ================')
+        # self.log_out(pformat(request_content))
         request = dict(
             type = 'debug_request',
             content = request_content
         )
         r_reply = self.r_zmq_request(request)
         reply_body = r_reply['content']['body']
-        self.log_out(pformat(reply_body))
+        # self.log_out(pformat(reply_body))
         return reply_body
     
 class JSONerror(Exception):

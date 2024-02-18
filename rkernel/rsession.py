@@ -85,7 +85,7 @@ class RSession(object):
             self.thread_stderr.start()
 
         self.log_file = open("/tmp/RKernel.log","a")
-        self.log_out("-- Session started ---")
+        # self.log_out("-- Session started ---")
 
     def pid(self):
         return self.proc.pid

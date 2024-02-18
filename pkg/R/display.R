@@ -5,9 +5,11 @@
 #' @param ... Arguments passed to 'display_data' methods
 #' @export
 display <- function(...){
-    log_out("display")
+    # log_out("=== DISPLAY ===")
     d <- display_data(...)
-    
+    # log_out(paste("Class:",class(d)))
+    # log_out(paste("ID:",display_id(d)))
+    # log_out(d,use.str=TRUE)
     d <- list(type=class(d),
               content=unclass(d))
     json_send(d)
