@@ -44,13 +44,20 @@ GraphicsClass <- R6Class("Graphics",
                 private$upid <- state$upid
             }
         },
+        new_cell = TRUE,
+        new_page_called = FALSE,
         new_page = function(){
             state <- hgd_state()
             state$hsize > private$hsize
         },
+        incomplete_layout = FALSE,
         updated = function(){
             state <- hgd_state()
             state$upid > private$upid
+        },
+        size = function(){
+            state <- hgd_state()
+            state$hsize
         },
         render = function(type,
                           mime,
@@ -204,6 +211,7 @@ start_graphics <- function(){
     graphics$current <- Graphics()
     add_output_hook(send_changed_graphics,"graphics")
     setHook('cell-end',send_changed_graphics)
+    setHook('cell-begin',graphics_new_cell)
     setHook('before.plot.new',graphics_apply_changed_dims)
     setHook('before.plot.new',send_changed_graphics)
     setHook('before.grid.newpage',graphics_apply_changed_dims)
@@ -211,26 +219,65 @@ start_graphics <- function(){
     setHook('plot.new',send_new_plot)
     setHook('grid.newpage',send_new_plot)
     graphics$delivery_mode <- "display"
-    graphics$update_display <- FALSE
     graphics$last_display <- ""
 }
 
 #' @importFrom uuid UUIDgenerate
 #' @export
 send_changed_graphics <- function(...){
-    # log_out("send_changed_graphics")
+    # log_out("======= send_changed_graphics ================")
     g <- graphics$current
     dm <- graphics$delivery_mode
+    use_update <- getOption("jupyter.update.graphics",TRUE)
+    new_display <- FALSE
+    update_display <- FALSE
     if(g$active()){
         if(dm == "display"){
-            if(graphics$update_display && g$updated()){
-                id <- graphics$last_display
-                display(g,id=id,update=update)
+            if(use_update){
+                if(g$new_page()){
+                    if(g$incomplete_layout)
+                        update_display <- TRUE
+                    else
+                        new_display <- TRUE
+                    g$incomplete_layout <- !par("page")
+                }
+                else if(g$updated()){
+                    update_display <- TRUE
+                    g$incomplete_layout <- FALSE
+                }
             }
-            else if((g$new_page() || g$updated()) && par("page")){
-                    id <- UUIDgenerate()
-                    graphics$last_display <- id
-                    display(g,id=id)
+            else {
+                if(g$new_cell){
+                    if(g$new_page() || g$updated())
+                        new_display <- TRUE
+                }
+                else {
+                    if(g$new_page()){
+                        if(g$incomplete_layout)
+                            update_display <- TRUE
+                        else
+                            new_display <- TRUE
+                        g$incomplete_layout <- !par("page")
+                    }
+                    else if(g$updated()){
+                        update_display <- TRUE
+                        g$incomplete_layout <- FALSE
+                    }
+                }
+            }
+            
+            if(new_display){
+                id <- UUIDgenerate()
+                graphics$last_display <- id
+                display(g,id=id)
+            }
+            else if(update_display){
+                id <- graphics$last_display
+                display(g,id=id,update=TRUE)
+            }
+            if(new_display || update_display) {
+                g$new_cell <- FALSE
+                g$new_page_called <- FALSE
             }
         }
         g$checkpoint()
@@ -239,10 +286,18 @@ send_changed_graphics <- function(...){
 
 send_new_plot <- function(...){
     g <- graphics$current
+    g$new_page_called <- TRUE
     dm <- graphics$delivery_mode
     if(g$active() && dm == "id" && par("page")){
             cat_(send_graphics_id(g))
     }
+}
+
+graphics_new_cell <- function(){
+    g <- graphics$current
+    if(g$active()){
+        g$new_cell <- TRUE
+    }    
 }
 
 graphics_apply_changed_dims <- function(){
@@ -292,10 +347,10 @@ display_data.Graphics <- function(x,
         #if(mime_i == "image/svg+xml") # No longer necessary(?)
         #    mime_metadata[[mime_i]]$isolated <- TRUE
     }
-    
+
     d <- list(data = mime_data,
-              metadata = mime_metadata)
-              transient = list(display_id = id)
+              metadata = mime_metadata,
+              transient = list(display_id = id))
     if(update) cl <- "update_display_data"
     else cl <- "display_data"
     structure(d,class=cl)
