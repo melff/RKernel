@@ -83,6 +83,7 @@ zmq_request <- function(){
     type <- msg$type
     handler <- zmq_handlers[[type]]
     if(length(handler)){
+        # log_out(sprintf("Found handler for '%s'", type))
         response <- handler(msg,envir)
     }
     else {
@@ -237,6 +238,13 @@ zmq_handlers$debug_request <- function(msg,envir,...){
         type = "debug_reply",
         content = response
     )
+}
+
+zmq_handlers$cell_magic <- function(msg,...){
+    req <- msg$content
+    dispatch_magic_handler(req$command,
+                           req$code,
+                           req$argsq)
 }
 
 #' @export

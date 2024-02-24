@@ -50,6 +50,10 @@ class RKernelSession(RSession):
         self.sendline("RKernel::q_orig()")
         self.proc.wait()
 
+import re
+
+perc_pat = re.compile("^%%[a-zA-Z0-9]+.*?\n")
+perc_arg_pat = re.compile("^%%([a-zA-Z0-9]+)(.*?)\n")
 
 class RKernel(Kernel):
 
@@ -193,9 +197,18 @@ class RKernel(Kernel):
         # self.log_out("======== do_execute ===================")
         # self.log_out(code)
 
-        self.r_run_cell_begin_hooks()
-        self.rsession.run(code)
-        self.r_run_cell_end_hooks()
+        mparsed = self.parse_magics(code)
+
+        if mparsed is None:
+            self.r_run_cell_begin_hooks()
+            self.rsession.run(code)
+            self.r_run_cell_end_hooks()
+        else:
+            self.rsession.run('')
+            req = dict(type='cell_magic',
+                       content = mparsed)
+            self.r_zmq_request_noreply(req)
+            self.rsession.process_output()
 
         # self.log_out("run complete - sending reply")
         
@@ -250,7 +263,7 @@ class RKernel(Kernel):
         self.r_zmq_send_so = socket
 
     def r_zmq_request(self,req):
-        # self.log_out("r_zmq_request")
+        # self.log_out("======= r_zmq_request")
         # self.log_out(pformat(req))
         # self.r_zmq_watcher_enabled.clear()
         res = self.rsession.cmd_nowait("RKernel::zmq_request()")
@@ -656,7 +669,36 @@ class RKernel(Kernel):
         else:
             res = self.raw_input(prompt=prompt)
         return res
-            
+
+    def parse_magics(self,code):
+        self.log_out("parse_magics")
+        m = perc_pat.search(code)
+        self.log_out(pformat(m))
+        if m is None:
+            return None
+        else:
+            perc_line = m.group(0)
+            self.log_out(repr(perc_line))
+            code = perc_pat.sub('',code)
+            self.log_out(code)
+            m = perc_arg_pat.search(perc_line)
+            command = m.group(1)
+            self.log_out(command)
+            args = m.group(2).strip()
+            self.log_out(repr(args))
+            try:
+                if len(args) > 0:
+                    args = args.split(' ')
+                    args = [a.split('=') for a in args]
+                    args = [(a[0], a[1]) for a in args]
+            except:
+                args = ''
+            self.log_out(args)
+            req = dict(command = command,
+                       args = args,
+                       code = code)
+            return req
+
     
 class JSONerror(Exception):
     pass
@@ -667,3 +709,4 @@ class ZMQtimeout(Exception):
 
 def paste0(l):
     return ''.join(l)
+

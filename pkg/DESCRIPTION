@@ -51,6 +51,7 @@ Collate:
     'inspect-reply.R'
     'is-complete.R'
     'json-connect.R'
+    'magic-codes.R'
     'output.R'
     'scrolling-table.R'
     'sharedHelp.R'
