@@ -13,7 +13,7 @@ HelpServer <- R6Class("HelpServer",
         },
         start = function(){
             options(help.ports = private$http_port)
-            suppressMessages(port <- tools::startDynamicHelp(TRUE))
+            suppressMessages(port <- tools::startDynamicHelp(NA))
             if(private$http_port!=port){
                 warning(sprintf("Changed help port from %d to %d",
                                 private$http_port,
@@ -48,6 +48,7 @@ help_server <- new.env()
 set_help_port <- function(port){
     help_server$current <- HelpServer$new(port)
     options(help.ports=port)
+    replace_in_package("utils","help.start",help_start)
     replace_in_package("tools","example2html",example_html)
     replace_in_package("tools","demo2html",demo_html)
 }
@@ -245,7 +246,7 @@ help.start <- function(update = FALSE,
 }
 
 help_start <- help.start
-
+help_start_orig <- getFromNamespace("help.start","utils")
 
 
 
