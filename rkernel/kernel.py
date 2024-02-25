@@ -207,10 +207,17 @@ class RKernel(Kernel):
         mparsed = self.parse_magics(code)
 
         if mparsed is None:
+            if re.search('^#!silent',code,flags=re.MULTILINE) is not None:
+                self.silent = True
+                self.log_out("Found '#!silent' comment")
+            else:
+                self.silent = False
+                self.log_out("Did not find '#!silent' comment")
             code = self.expand_special_comments(code,comment_pats)
             self.r_run_cell_begin_hooks()
             self.rsession.run(code)
             self.r_run_cell_end_hooks()
+            self.silent = False
         else:
             self.rsession.run('')
             req = dict(type='cell_magic',
@@ -397,41 +404,43 @@ class RKernel(Kernel):
     def handle_stdout(self,text):
         # self.log_out("handle_stdout")
         # self.log_out(pformat(text))
-        for line in text:
-            if DLE in line:
-                chunks = line.split(DLE)
-                for chunk in chunks:
-                    if chunk.startswith(ZMQ_PUSH):
-                        msg = self.r_zmq_receive()
-                        # self.log_out(pformat(msg))
-                        self.r_handle_zmq(msg)
-                    elif chunk.startswith(JSON_MSG):
-                        # if len(chunk) > 70:
-                        #     self.log_out(repr((chunk[:70]+'...'+text[-10:])))
-                        # else:
-                        #     self.log_out(repr(chunk))
-                        if chunk.endswith(ETB):
-                            msg = chunk.removeprefix(JSON_MSG).removesuffix(ETB)
+        if not self.silent:
+            for line in text:
+                if DLE in line:
+                    chunks = line.split(DLE)
+                    for chunk in chunks:
+                        if chunk.startswith(ZMQ_PUSH):
+                            msg = self.r_zmq_receive()
+                            # self.log_out(pformat(msg))
+                            self.r_handle_zmq(msg)
+                        elif chunk.startswith(JSON_MSG):
+                            # if len(chunk) > 70:
+                            #     self.log_out(repr((chunk[:70]+'...'+text[-10:])))
+                            # else:
+                            #     self.log_out(repr(chunk))
+                            if chunk.endswith(ETB):
+                                msg = chunk.removeprefix(JSON_MSG).removesuffix(ETB)
+                                self.r_handle_json(msg)
+                            else:
+                                self.json_incomplete = True
+                                self.json_frag = chunk.removeprefix(JSON_MSG)
+                        elif chunk.endswith(ETB):
+                            msg = self.json_frag + chunk.removesuffix(ETB)
+                            self.json_frag = ''
+                            self.json_incomplete = False
                             self.r_handle_json(msg)
                         else:
-                            self.json_incomplete = True
-                            self.json_frag = chunk.removeprefix(JSON_MSG)
-                    elif chunk.endswith(ETB):
-                        msg = self.json_frag + chunk.removesuffix(ETB)
-                        self.json_frag = ''
-                        self.json_incomplete = False
-                        self.r_handle_json(msg)
-                    else:
-                        if len(chunk) > 0:
-                            self.stream(chunk,stream='stdout')
-            else:
-                if len(line) > 0:
-                    self.stream(line,stream='stdout')
+                            if len(chunk) > 0:
+                                self.stream(chunk,stream='stdout')
+                else:
+                    if len(line) > 0:
+                        self.stream(line,stream='stdout')
 
         # self.log_out("handle_stdout - done")
 
     def handle_stderr(self,text):
-        self.stream(text,stream='stderr')
+        if not self.silent:
+            self.stream(text,stream='stderr')
 
     def log_out(self,text):
         now = format(datetime.now())
