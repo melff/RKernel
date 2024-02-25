@@ -303,12 +303,8 @@ graphics_new_cell <- function(){
 graphics_apply_changed_dims <- function(){
     g <- graphics$current
     if(g$active()){
-        if(any_option_changed("jupyter.plot.width","jupyter.plot.height")){
-            cur_dim <- g$get_dims()
-            g$set_dims(width=getOption("jupyter.plot.width",unname(cur_dim["width"])),
-                       height=getOption("jupyter.plot.height",unname(cur_dim["height"])))
-            save_options("jupyter.plot.width","jupyter.plot.height")
-        }
+        g$set_dims(width=getOption("jupyter.plot.width",7),
+                   height=getOption("jupyter.plot.height",7))
     }
 }
 
