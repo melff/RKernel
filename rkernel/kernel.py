@@ -18,6 +18,13 @@ ZMQ_PUSH = '[!ZMQ_PUSH]'
 JSON_MSG = '[!JSON]'
 CMD_PROMPT = '> '
 
+opts_pat = "^#\+opt:\\s(.*?)$"
+opts_repl = 'RKernel::cell.options(%s)'
+par_pat = "^#\+par:\\s(.*?)$"
+par_repl = 'RKernel::cell.par(%s)'
+
+comment_pats = [(opts_pat,opts_repl),(par_pat,par_repl)]
+
 class RKernelSession(RSession):
     "Subclass of RSession to handle interaction"
 
@@ -200,6 +207,7 @@ class RKernel(Kernel):
         mparsed = self.parse_magics(code)
 
         if mparsed is None:
+            code = self.expand_special_comments(code,comment_pats)
             self.r_run_cell_begin_hooks()
             self.rsession.run(code)
             self.r_run_cell_end_hooks()
@@ -456,6 +464,7 @@ class RKernel(Kernel):
 
     def r_install_hooks(self):
         self.rsession.cmd("RKernel::install_output_hooks()")
+        self.rsession.cmd("RKernel::install_cell_hooks()")
         self.rsession.cmd("RKernel::install_save_q()")
         self.rsession.cmd("RKernel::install_readline()")
 
@@ -699,7 +708,22 @@ class RKernel(Kernel):
                        code = code)
             return req
 
+    def expand_special_comments1 (self,code,pat,repl):    
+        matches = re.finditer(pat,code,flags=re.MULTILINE)
+        for m in matches:
+            old = m.group(0)
+            args = m.group(1)
+            new = repl % args
+            code = code.replace(old,new)
+        return code
+
+    def expand_special_comments(self,code,comment_pats):
+        for pat, repl in comment_pats:
+            code = self.expand_special_comments1(code,pat,repl)
+        return code
     
+
+
 class JSONerror(Exception):
     pass
 
