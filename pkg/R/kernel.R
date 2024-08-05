@@ -70,7 +70,6 @@ Kernel <- R6Class("Kernel",
       log_out("*** RKernel started ***")
       continue <- TRUE
       while(continue) {
-        # log_out("kernel loop")
         continue <- self$poll_and_respond()
       }
       self$r_session$close()
@@ -518,10 +517,12 @@ Kernel <- R6Class("Kernel",
     },
 
     comm_info_reply = function(msg){
+      return(NULL)
       target_name <- NULL
       if("target_name" %in% names(msg$content))
         target_name <- msg$content$target_name
       comms <- self$comm_manager$get_comms(target_name)
+      comms <- list()
       private$send_message(type="comm_info_reply",
                            parent=private$parent$shell,
                            socket_name="shell",
@@ -531,6 +532,7 @@ Kernel <- R6Class("Kernel",
     },
 
     handle_comm_open = function(msg){
+      return(NULL)
       target_name <- msg$content$target_name
       id <- msg$content$comm_id
       data <- msg$content$data
@@ -538,6 +540,7 @@ Kernel <- R6Class("Kernel",
     },
 
     handle_comm_msg = function(msg){
+      return(NULL)
       # log_out("kernel$handle_comm_msg")
       # log_out(msg,use.str=TRUE)
       id <- msg$content$comm_id
@@ -547,18 +550,11 @@ Kernel <- R6Class("Kernel",
     },
 
     handle_comm_close = function(msg){
+      return(NULL)
       id <- msg$content$comm_id
       data <- msg$content$data
       self$comm_manager$handle_close(id,data)
     },
-
-    services = list(),
-
-    run_services = function(){
-      for(service in private$services)
-        service()
-    },
-
 
     .pbd_env = new.env(),
     sockets = list(),
@@ -610,6 +606,7 @@ Kernel <- R6Class("Kernel",
         return(FALSE)
       }
       else if(msg$header$msg_type=="debug_request"){
+        log_out("debug_request received")
         private$send_busy(private$parent$control)
         private$handle_debug_request(msg)
         private$send_idle(private$parent$control)
@@ -618,7 +615,7 @@ Kernel <- R6Class("Kernel",
       else return(TRUE)
     },
 
-    respond_shell = function(req,debug=FALSE){
+    respond_shell = function(req,debug=TRUE){
       if(debug)
         log_out("respond_shell")
       msg <- private$get_message("shell")
