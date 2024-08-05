@@ -1,7 +1,7 @@
 Package: RKernel
 Title: Yet another R kernel for Jupyter
 Version: 1.0
-Date: 2024-01-21
+Date: 2024-08-03
 Authors@R: c(
     person('Martin', 'Elff', 
            email = 'martin@elff.eu',
@@ -29,7 +29,7 @@ Suggests:
     roxygen2
 SystemRequirements:
     jupyter
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Collate: 
     'json.R'
     'display.R'
@@ -50,11 +50,15 @@ Collate:
     'help.R'
     'hooks.R'
     'inspect-reply.R'
+    'install.R'
     'is-complete.R'
     'json-connect.R'
+    'kernel.R'
     'magic-codes.R'
+    'main.R'
     'output.R'
     'scrolling-table.R'
+    'session.R'
     'sharedHelp.R'
     'traitlets.R'
     'traitlets-R6instance.R'

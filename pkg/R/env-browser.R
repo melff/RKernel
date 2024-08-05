@@ -20,7 +20,7 @@ get2 <- function(nm,env,parent=NULL){
 
 #' @title A HTML version of 'ls.str()'
 #'
-#' This function is deprecated. Use \code{\link{envBrowser}} instead.
+#' @description This function is deprecated. Use \code{\link{envBrowser}} instead.
 #'
 #' @param pos integer indicating \code{\link[base]{search}} path position, or -1 for the current environment.
 #' @param name an optional name indicating search path position, see \code{\link[base]{ls}}.

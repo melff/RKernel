@@ -1,0 +1,13 @@
+{"argv": ["R",
+          "--slave",
+          "--vanilla", 
+          "-e", 
+          "RKernel::main()", 
+          "--args", 
+          "{connection_file}"],
+ "display_name":"R (RKernel)",
+ "language":"R",
+ "metadata": {
+     "debugger": false
+ }
+}

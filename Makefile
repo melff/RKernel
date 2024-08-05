@@ -7,14 +7,14 @@ ARCHIVE := $(PACKAGE)_$(VERSION).tar.gz
 
 RCHKIMG := kalibera-rchk-master-def.simg
 
-export R_LIBS_USER = $(PWD)/lib/R/library
+#export R_LIBS_USER = $(PWD)/lib/R/library
 
 .PHONY: default
 
-default: install-quick sync-Rlib installspec
+default: install-quick installspec
 
 .PHONY: all
-all: roxygenize build install sync-Rlib installspec
+all: roxygenize build install installspec
 
 .PHONY: describe
 describe:
@@ -68,19 +68,7 @@ install:
 
 .PHONY: installspec
 installspec:
-	. bin/activate; \
-	python rkernel/install.py
-
-copy-Rlib:
-	python copy-lib.py
-
-clear-Rlib:
-	rm -r $(HOME)/.jupyter/R/library/
-	rm -r $(HOME)/.local/pipx/venvs/jupyter/lib/R/library
-
-sync-Rlib:
-	rsync -ai lib/R/library/ $(HOME)/.jupyter/R/library/
-	rsync -ai lib/R/library/ $(HOME)/.local/pipx/venvs/jupyter/lib/R/library
+	Rscript --vanilla -e 'RKernel::installspec()'
 
 .PHONY: build-and-install
 build-and-install: build install
@@ -91,51 +79,6 @@ check-cran:
 
 roxygenize:
 	Rscript --vanilla -e 'roxygen2::roxygenize(package.dir="${SRCDIR}")'
-
-win-builder-devel:
-	curl -T $(ARCHIVE) ftp://win-builder.r-project.org/R-devel/
-
-win-builder-release:
-	curl -T $(ARCHIVE) ftp://win-builder.r-project.org/R-release/
-
-win-builder-oldrelease:
-	curl -T $(ARCHIVE) ftp://win-builder.r-project.org/R-oldrelease/
-
-rhub-macos:
-	Rscript --vanilla -e 'rhub::check("${ARCHIVE}",platform="macos-highsierra-release-cran",show_status = FALSE)'
-
-rhub-windows:
-	Rscript --vanilla -e 'rhub::check_on_windows("${ARCHIVE}",show_status = FALSE)'
-
-rhub-for-cran:
-	Rscript --vanilla -e 'rhub::check_for_cran("${ARCHIVE}",show_status = FALSE)'
-
-rhub-rchk:
-	Rscript --vanilla -e 'rhub::check("${ARCHIVE}",platform="ubuntu-rchk",show_status = FALSE)'
-
-rhub-windows-devel:
-	Rscript --vanilla -e 'rhub::check("${ARCHIVE}",platform="windows-x86_64-devel",show_status = FALSE)'
-
-rhub-windows-oldrel:
-	Rscript --vanilla -e 'rhub::check("${ARCHIVE}",platform="windows-x86_64-oldrel",show_status = FALSE)'
-
-rhub-debian-clang-devel:
-	Rscript --vanilla -e 'rhub::check("${ARCHIVE}",platform="debian-clang-devel",show_status = FALSE)'
-
-rhub-fedora-clang-devel:
-	Rscript --vanilla -e 'rhub::check("${ARCHIVE}",platform="fedora-clang-devel",show_status = FALSE)'
-
-rhub-list-checks:
-	Rscript -e 'rhub::list_my_checks("melff@elff.eu")'
-
-check-reverse:
-	rm -rfv depends/$(PACKAGE)_*
-	cp -v $(ARCHIVE) depends/ 
-	cp -rfv $(ARCHIVE) depends/*.Rcheck 
-	Rscript --vanilla -e 'options(repos="https://ftp.gwdg.de/pub/misc/cran/"); tools::check_packages_in_dir("depends",reverse="all",Ncpus=8); tools::check_packages_in_dir_details("depends")'
-
-clean-reverse:
-	rm -rfv depends/*
 
 install-deps:
 	Rscript --vanilla -e 'devtools::install_deps(pkg="${SRCDIR}")'

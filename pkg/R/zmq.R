@@ -106,7 +106,7 @@ zmq_request_noreply <- function(){
         tryCatch(handler(msg,envir),
                  error=function(e){
                      log_error(conditionMessage(e))
-                     log_error(msg,use.str=TRUE)
+                     #log_error(msg,use.str=TRUE)
                  })
     }
     # log_out("done")
