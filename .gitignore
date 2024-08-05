@@ -2,3 +2,5 @@
 /*.gz
 /.Rhistory
 /**/__pycache__
+/pkg/man/*.Rd
+/test/*
