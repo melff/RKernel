@@ -74,17 +74,18 @@ RKernelSession <- R6Class("RKernelSession",
     last_msg = list(),
     callbacks = list(),
     receive_output = function(timeout = 0){
-      poll_res <- poll(self$poll_conns, timeout)
+      poll_res <- self$poll_io(timeout)
+      log_out(poll_res,use.print=TRUE)
       res <- list()
-      if (poll_res[[1]] == "ready") {
-        sout <- conn_read_chars(self$poll_conns$stdout)
+      if (poll_res[1] == "ready") {
+        sout <- self$read_output()
         res$stdout <- sout
       }
-      if (poll_res[[2]] == "ready") {
-        serr <- conn_read_chars(self$poll_conns$stderr)
+      if (poll_res[2] == "ready") {
+        serr <- self$read_error()
         res$stderr <- serr
       }
-      if (poll_res[[3]] == "ready") {
+      if (poll_res[3] == "ready") {
         msg <- self$read()
         res$msg <- msg
       }
