@@ -50,12 +50,15 @@ Kernel <- R6Class("Kernel",
       private$logfile <- file(fn_kernel_logfile,"a")
       # private$logfile <- stderr()
       # private$logfile <- socketConnection(port=6111)
+      self$start_session()
+    },
+    start_session = function(){
       self$r_session <- RKernelSession$new(callbacks = list(
         stdout = self$stdout,
         stderr = self$stderr,
         msg = self$session_msg
       ))
-      log_out(self$r_session,use.print=TRUE)
+      log_out(self$r_session, use.print = TRUE)
     },
 
     #' @field r_session See \code{\link{RKernelSession}}.
@@ -415,22 +418,29 @@ Kernel <- R6Class("Kernel",
         error = function(e) structure("errored", message = conditionMessage(e)), # ,traceback=.traceback()),
         interrupt = function(e) "interrupted"
       )
-      log_out(r,use.print=TRUE)
+      # log_out(r,use.print=TRUE)
       status <- "ok"
       payload <- NULL
       aborted <- FALSE
-      if(is.character(r) && (identical(r[1],"errored") || identical(r[1],"interrupted")))
+      if (is.character(r) && (identical(r[1], "errored") || identical(r[1], "interrupted"))) {
         aborted <- TRUE
-      if(is.character(r)) {
+      }
+      if (is.character(r)) {
         log_error(r)
-        r_msg <- attr(r,"message")
-        if(length(r_msg)) log_error(r_msg)
-        tb <- attr(r,"traceback")
-        if(length(tb)){
+        r_msg <- attr(r, "message")
+        if (length(r_msg)) log_error(r_msg)
+        tb <- attr(r, "traceback")
+        if (length(tb)) {
           tb <- unlist(tb)
-          log_error(paste(tb,sep="\n"))
+          log_error(paste(tb, sep = "\n"))
           # log_error(tb,use.print=TRUE)
         }
+      }
+      if(!self$r_session$is_alive()){
+        aborted <- TRUE
+        self$stderr("\nR session ended - restarting ... ")
+        self$start_session()
+        self$stderr("done.\n")
       }
       content <- list(status = status,
                       execution_count = execution_count)
