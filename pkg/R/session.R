@@ -67,8 +67,19 @@ RKernelSession <- R6Class("RKernelSession",
         }
       }
     },
+    send_cmd = function(cmd, timeout = 0, drop_echo = TRUE){
+      self$send_input(cmd)
+      resp <- self$receive_output(timeout = timeout)
+      if (drop_echo) {
+        resp <- drop_echo(resp)
+      }
+      if (endsWith(resp$stdout, self$prompt)) {
+        resp$stdout <- gsub(self$prompt_regex, "", resp$stdout)
+      }
+      return(resp)
+    },
     send_input = function(text) {
-      text <- paste0(text, "\n")
+      if (!endsWith(text, "\n")) text <- paste0(text, "\n")
       while (TRUE) {
         text <- self$write_input(text)
         if (!length(text)) {
@@ -128,12 +139,9 @@ RKernelSession <- R6Class("RKernelSession",
           self$callbacks$stderr(resp$stderr)
         }
         if (!is.null(resp$stdout)) {
-          if (drop_echo) {
-            out_lines <- split_lines1(resp$stdout)
-            out_lines <- out_lines[-1]
-            sout <- paste(out_lines, collapse = "\n")
-          }
-          else sout <- resp$stdout
+          if (drop_echo) 
+            resp <- drop_echo(resp)
+          sout <- resp$stdout
           if (endsWith(sout, self$co_prompt)){
             sout <- gsub(self$co_prompt_regex, "", sout)
           }
@@ -148,7 +156,14 @@ RKernelSession <- R6Class("RKernelSession",
   )
 )
 
-split_lines1 <- function(x){
+split_lines1 <- function(x) {
   y <- strsplit(x, "\n", fixed = TRUE)
   unlist(y)
+}
+
+drop_echo <- function(resp) {
+  out_lines <- split_lines1(resp$stdout)
+  out_lines <- out_lines[-1]
+  resp$stdout <- paste(out_lines, collapse = "\n")
+  resp
 }
