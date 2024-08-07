@@ -58,7 +58,7 @@ RKernelSession <- R6Class("RKernelSession",
         }
         else {
             drop_echo <- TRUE
-            while(!self$prompt_found) {
+            while(self$is_alive() && !self$prompt_found) {
               resp <- self$receive_output(timeout = -1)
               log_out(paste0("Response:", resp$stdout))
               self$process_output(resp, drop_echo = drop_echo)
