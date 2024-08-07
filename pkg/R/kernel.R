@@ -841,25 +841,25 @@ Kernel <- R6Class("Kernel",
       self$httpd <- tools:::httpd
     },
     
-    logfile = NULL
+    logfile = NULL,
+
+    r_install_hooks = function(){
+      self$r_session$send_cmd("RKernel::install_output_hooks()")
+      self$r_session$send_cmd("RKernel::install_cell_hooks()")
+      self$r_session$send_cmd("RKernel::install_save_q()")
+      self$r_session$send_cmd("RKernel::install_readline()")
+    },
+    r_start_graphics = function(){
+      self$r_session$send_cmd("RKernel::start_graphics()")
+    },
+    r_run_cell_begin_hooks = function(){
+      self$r_session$send_cmd("RKernel::runHooks('cell-begin')")
+    },
+    r_run_cell_end_hooks = function(){
+      self$r_session$send_cmd("RKernel::runHooks('cell-end')")
+    }
   )
 )
-
-#' @include json.R
-
-fromRawJSON <- function(raw_json,...) {
-    json <- rawToChar(raw_json)
-    Encoding(json) <- "UTF-8"
-    fromJSON(json,...)
-}
-
-toRawJSON <- function(x,...){
-  json <- to_json(x,...)
-  charToRaw(json)
-}
-
-namedList <- function() structure(list(),names=character(0))
-emptyNamedList <- structure(list(),names=character(0))
 
 check_page_payload <- function(payload){
   for(i in seq_along(payload)){
@@ -877,29 +877,7 @@ check_page_payload <- function(payload){
 
 get_current_kernel <- function() kernel$current
 
-log_out <- function(...) {
-  if(inherits(kernel$current,"Kernel")) kernel$current$log_out(...)
-  else message(...)
-}
-log_error <- function(...) {
-  if(inherits(kernel$current,"Kernel")) kernel$current$log_error(...)
-  else stop(...)
-}
-log_warning <- function(...) {
-  if(inherits(kernel$current,"Kernel")) kernel$current$log_warning(...)
-  else warning(...)
-}
 
-replace_in_package <- function(pkg_name,name,value){
-  env_name <- paste0("package:",pkg_name)
-  if(env_name %in% search())
-    env <- as.environment(env_name)
-  else
-    env <- getNamespace(pkg_name)
-  .BaseNamespaceEnv$unlockBinding(name, env)
-  assign(name, value, env)
-  .BaseNamespaceEnv$lockBinding(name, env)
-}
 
 
 
