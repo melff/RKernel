@@ -11,6 +11,7 @@ RKernelSession <- R6Class("RKernelSession",
     co_prompt = "+ ",
     co_prompt_regex = "[+] $",
     prompt_found = FALSE,
+    banner = "",
     initialize = function(options = r_session_options(
                             stdout = "|",
                             stderr = "|",
@@ -28,15 +29,21 @@ RKernelSession <- R6Class("RKernelSession",
                               msg = print
                             )
                           ) {
-      super$initialize(options = options)
+      super$initialize(
+        options = options,
+        wait = FALSE
+      )
       self$poll_conns <- list(
         stdout = self$get_output_connection(),
         stderr = self$get_error_connection(),
         ctrl = self$get_poll_connection()
       )
       self$callbacks <- callbacks
+      resp <- self$receive_all_output(timeout = 1000)
+      banner <- resp$stdout
+      self$banner <- unlist(strsplit(banner, self$prompt))[1]
     },
-    run_code = function(code, prompt="> "){
+    run_code = function(code){
       lines <- split_lines1(code)
       n_lines <- length(lines)
       for (i in 1:n_lines) {
@@ -75,19 +82,41 @@ RKernelSession <- R6Class("RKernelSession",
     callbacks = list(),
     receive_output = function(timeout = 0){
       poll_res <- self$poll_io(timeout)
-      log_out(poll_res,use.print=TRUE)
       res <- list()
       if (poll_res[1] == "ready") {
-        sout <- self$read_output()
-        res$stdout <- sout
+        res$stdout <- self$read_output()
       }
       if (poll_res[2] == "ready") {
-        serr <- self$read_error()
-        res$stderr <- serr
+        res$stderr <- self$read_error()
       }
       if (poll_res[3] == "ready") {
         msg <- self$read()
         res$msg <- msg
+        res$stdout <- paste0(res$stdout, msg$stdout)
+        res$stderr <- paste0(res$stderr, msg$stderr)
+      }
+      return(res)
+    },
+    receive_all_output = function(timeout = 0){
+      poll_res <- self$poll_io(timeout)
+      res <- list()
+      while(any(poll_res == "ready")){
+          if (poll_res[1] == "ready") {
+            sout <- self$read_output()
+            res$stdout <- paste0(res$stdout, sout)
+          }
+          if (poll_res[2] == "ready") {
+            serr <- self$read_error()
+            res$stderr <- paste0(res$stderr, serr)
+          }
+          if (poll_res[3] == "ready") {
+            msg <- self$read()
+            res$msg <- msg
+            res$stdout <- paste0(res$stdout, msg$stdout)
+            res$stderr <- paste0(res$stderr, msg$stderr)
+            break
+          }
+          poll_res <- self$poll_io(timeout)
       }
       return(res)
     },
