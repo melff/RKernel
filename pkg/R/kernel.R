@@ -478,8 +478,8 @@ Kernel <- R6Class("Kernel",
                          mimetype = "text/x-r-source",
                          file_extension = ".R",
                          version = rversion),
-                       banner = version$version.string,
-                       debugger = TRUE)
+                       banner = self$r_session$banner,
+                       debugger = FALSE)
       private$send_message(type="kernel_info_reply",
                            parent=private$parent$shell,
                            socket_name="shell",
