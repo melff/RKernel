@@ -286,50 +286,6 @@ Kernel <- R6Class("Kernel",
                    buffers=buffers)
     },
     #' @description
-    #' Show a message in the Jupyter server log
-    #' @param message A string or object to be shown in the log.
-    #' @param ... More character strings, pasted to the message.
-    #' @param use.print Logical value, whether the function 'print()' should applied
-    #'        to the message.
-    #' @param use.str Logical value, whether 'str()' should be called and its output
-    #'        shown
-    log_out = function(message,...,use.print=FALSE,use.str=FALSE){
-      dcl <- deparse1(match.call())
-      tryCatch({
-        if(use.print)
-          message <- paste0("\n",paste0(capture.output(self$print(message)),collapse="\n"))
-        else if(use.str)
-          message <- paste(capture.output(self$str(message)),collapse="\n")
-        else message <- paste(message,...,collapse="")
-        message <- paste(crayon::green(format(Sys.time()),"\t",message,"\n"))
-        message <- paste("INFO:",message)
-        # cat(message,file=stderr())
-        cat(message,file=private$logfile)
-      },error=function(e){
-        self$log_error(sprintf("Error in %s",dcl))
-        msg <- conditionMessage(e)
-        self$log_error(msg)
-      })
-    },
-    #' @description
-    #' Show a warning in the Jupyter server log
-    #' @param message A string to be shown in the log
-    log_warning = function(message){
-      message <- paste(crayon::yellow(format(Sys.time()),"\t",message,"\n"))
-      message <- paste("WARNING:",message)
-      # self$cat(message,file=stderr())
-      cat(message,file=private$logfile)
-    },
-    #' @description
-    #' Show an error message in the Jupyter server log
-    #' @param message A string to be shown in the log
-    log_error = function(message){
-      message <- crayon::red(format(Sys.time()),"\t",message,"\n")
-      message <- paste("ERROR:",message)
-      # cat(message,file=stderr())
-      cat(message,file=private$logfile)
-    },
-    #' @description
     #' The parent of the message currently sent.
     #' @param channel A string, the relevant input channel.
     get_parent = function(channel="shell"){
