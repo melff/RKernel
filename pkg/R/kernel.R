@@ -417,7 +417,8 @@ Kernel <- R6Class("Kernel",
             status = "error",
             ename = r,
             evalue = r_msg,
-            traceback = tb
+            traceback = tb,
+            execution_count = execution_count 
           )
       }
       else {
@@ -845,7 +846,8 @@ Kernel <- R6Class("Kernel",
     handle_r_stdout = function(text){
       # log_out("handle_r_stdout")
       if (grepl(DLE, text)) {
-        text <- split_char1(text, DLE)
+        log_out("DLE found")
+        text <- split_string1(text, DLE)
       }
       for(chunk in text){
         if (startsWith(chunk, JSON_MSG)) {
@@ -884,7 +886,7 @@ Kernel <- R6Class("Kernel",
       msg <- fromJSON(json_msg)
       log_out(msg, print=TRUE)
       msg_type <- msg$type
-      msg_handler <- r_msg_handlers[[msg_type]]
+      msg_handler <- private$r_msg_handlers[[msg_type]]
       if(is.function(msg_handler)){
         msg_handler(msg)
       } else {
@@ -913,7 +915,7 @@ get_current_kernel <- function() kernel$current
 
 split_string1 <- function(text, pat){
   # log_out("split_string1")
-  unlist(strsplit(text, pat, fixed))
+  unlist(strsplit(text, pat, fixed = TRUE))
 }
 
 remove_prefix <- function(text, prefix){
