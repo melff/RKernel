@@ -50,32 +50,35 @@ RKernelSession <- R6Class("RKernelSession",
         self$prompt_found <- FALSE
         line <- lines[i]
         self$send_input(line)
-        log_out(paste0("Line:", line))
+        log_out(paste("Line:", line))
+        log_out(paste("R session state: ", self$get_state()))
         if (i < n_lines) {
               resp <- self$receive_output(timeout = -1)
-              log_out(paste0("Response:", resp$stdout))
+              log_out(paste("Response:", resp$stdout))
               self$process_output(resp, drop_echo = TRUE)
         }
         else {
             drop_echo <- TRUE
             while(self$is_alive() && !self$prompt_found) {
+              log_out(paste("R session state: ",self$get_state()))
               resp <- self$receive_output(timeout = -1)
-              log_out(paste0("Response:", resp$stdout))
+              log_out(paste("Response:", resp$stdout))
               self$process_output(resp, drop_echo = drop_echo)
               drop_echo <- FALSE
             }
         }
       }
     },
-    send_cmd = function(cmd, timeout = 0, drop_echo = TRUE){
+    send_cmd = function(cmd, timeout = 1, drop_echo = TRUE){
+      log_out("Send cmd",cmd)
       self$send_input(cmd)
-      resp <- self$receive_output(timeout = timeout)
+      resp <- self$receive_all_output(timeout = timeout)
+      log_out("Response:")
+      log_out(resp, use.print=TRUE)
       if (drop_echo) {
         resp <- drop_echo(resp)
       }
-      if (endsWith(resp$stdout, self$prompt)) {
-        resp$stdout <- gsub(self$prompt_regex, "", resp$stdout)
-      }
+      resp <- self$drop_prompt(resp)
       return(resp)
     },
     send_input = function(text) {
@@ -132,6 +135,8 @@ RKernelSession <- R6Class("RKernelSession",
       return(res)
     },
     process_output = function(resp, drop_echo=TRUE){
+        log_out("process_output")
+        log_out(resp, use.print=TRUE)
         if (!is.null(resp$msg) && is.function(self$callbacks$msg)) {
           self$callbacks$msg(resp$msp)
         }
@@ -139,19 +144,32 @@ RKernelSession <- R6Class("RKernelSession",
           self$callbacks$stderr(resp$stderr)
         }
         if (!is.null(resp$stdout)) {
-          if (drop_echo) 
+          if (drop_echo) {
             resp <- drop_echo(resp)
-          sout <- resp$stdout
-          if (endsWith(sout, self$co_prompt)){
-            sout <- gsub(self$co_prompt_regex, "", sout)
           }
-          if (endsWith(sout, self$prompt)) {
+          if (endsWith(resp$stdout, self$prompt)) 
             self$prompt_found <- TRUE
-            sout <- gsub(self$prompt_regex, "", sout)
-          }
+          resp <- self$drop_co_prompt(resp)
+          resp <- self$drop_prompt(resp)
           if (is.function(self$callbacks$stdout))
-             self$callbacks$stdout(sout)
+             self$callbacks$stdout(resp$stdout)
         }
+    },
+    drop_prompt = function(resp){
+      if (length(resp$stdout) && nzchar(resp$stdout)) {
+        if (endsWith(resp$stdout, self$prompt)) {
+          resp$stdout <- gsub(self$prompt_regex, "", resp$stdout)
+        }
+      }
+      resp
+    },
+    drop_co_prompt = function(resp) {
+      if (length(resp$stdout) && nzchar(resp$stdout)) {
+        if (endsWith(resp$stdout, self$co_prompt)) {
+          resp$stdout <- gsub(self$co_prompt_regex, "", resp$stdout)
+        }
+      }
+      resp
     }
   )
 )
@@ -162,8 +180,11 @@ split_lines1 <- function(x) {
 }
 
 drop_echo <- function(resp) {
-  out_lines <- split_lines1(resp$stdout)
-  out_lines <- out_lines[-1]
-  resp$stdout <- paste(out_lines, collapse = "\n")
+  if(length(resp) && ("stdout" %in% names(resp))){
+      out_lines <- split_lines1(resp$stdout)
+      out_lines <- out_lines[-1]
+      resp$stdout <- paste(out_lines, collapse = "\n")
+      log_out(resp, use.print = TRUE)
+  }
   resp
 }
