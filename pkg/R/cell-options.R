@@ -33,7 +33,7 @@ restore_saved_opts <- function(){
     # log_out("restore_saved_opts")
     op <- cell_saved$options
     cell_saved$options <- NULL
-    log_out(names(op),use.print=TRUE)
+    # log_out(names(op),use.print=TRUE)
     if(length(op) > 0)
         do.call("options",op)
 }
@@ -42,7 +42,7 @@ restore_saved_pars <- function(){
     # log_out("restore_saved_pars")
     op <- cell_saved$pars
     cell_saved$pars <- NULL
-    log_out(names(op),use.print=TRUE)
+    # log_out(names(op),use.print=TRUE)
     if(length(op) > 0)
         do.call("par",op)
 }

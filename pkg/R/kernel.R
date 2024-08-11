@@ -60,7 +60,7 @@ Kernel <- R6Class("Kernel",
         stderr = private$handle_r_stderr,
         msg = self$session_msg
       ))
-      log_out(self$r_session, use.print = TRUE)
+      # log_out(self$r_session, use.print = TRUE)
     },
     start = function(){
       self$start_session()
@@ -77,7 +77,7 @@ Kernel <- R6Class("Kernel",
     #' Run the kernel.
     run = function(){
       self$start()
-      log_out("*** RKernel started ***")
+      # log_out("*** RKernel started ***")
       continue <- TRUE
       while(continue) {
         continue <- self$poll_and_respond()
@@ -881,8 +881,8 @@ Kernel <- R6Class("Kernel",
     },
     handle_r_json = function(json_msg){
       log_out("handle_r_json")
-      log_out(json_msg, echo=TRUE)
       msg <- fromJSON(json_msg)
+      log_out(msg, print=TRUE)
       msg_type <- msg$type
       msg_handler <- r_msg_handlers[[msg_type]]
       if(is.function(msg_handler)){
@@ -912,7 +912,7 @@ check_page_payload <- function(payload) {
 get_current_kernel <- function() kernel$current
 
 split_string1 <- function(text, pat){
-  log_out("split_string1")
+  # log_out("split_string1")
   unlist(strsplit(text, pat, fixed))
 }
 
