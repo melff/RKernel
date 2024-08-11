@@ -50,35 +50,33 @@ RKernelSession <- R6Class("RKernelSession",
         self$prompt_found <- FALSE
         line <- lines[i]
         self$send_input(line)
-        log_out(paste("Line:", line))
-        log_out(paste("R session state: ", self$get_state()))
+        # log_out(paste("Line:", line))
+        # log_out(paste("R session state: ", self$get_state()))
         if (i < n_lines) {
               resp <- self$receive_output(timeout = -1)
-              log_out(paste("Response:", resp$stdout))
+              # log_out(paste("Response:", resp$stdout))
               self$process_output(resp, drop_echo = TRUE)
         }
         else {
             drop_echo <- TRUE
             while(self$is_alive() && !self$prompt_found) {
-              log_out(paste("R session state: ",self$get_state()))
+              # log_out(paste("R session state: ",self$get_state()))
               resp <- self$receive_output(timeout = -1)
-              log_out(paste("Response:", resp$stdout))
+              # log_out(paste("Response:", resp$stdout))
               self$process_output(resp, drop_echo = drop_echo)
               drop_echo <- FALSE
             }
         }
       }
     },
-    send_cmd = function(cmd, timeout = 1, drop_echo = TRUE){
-      log_out("Send cmd",cmd)
+    run_cmd = function(cmd, timeout = 1, drop_echo = TRUE){
+      # log_out("Send cmd",cmd)
       self$send_input(cmd)
-      resp <- self$receive_all_output(timeout = timeout)
-      log_out("Response:")
-      log_out(resp, use.print=TRUE)
+      self$prompt_found <- FALSE
+      resp <- self$receive_to_prompt(timeout = timeout)
       if (drop_echo) {
-        resp <- drop_echo(resp)
+        resp$stdout <- drop_echo(resp$stdout)
       }
-      resp <- self$drop_prompt(resp)
       return(resp)
     },
     send_input = function(text) {
@@ -94,7 +92,7 @@ RKernelSession <- R6Class("RKernelSession",
     last_stderr = "",
     last_msg = list(),
     callbacks = list(),
-    receive_output = function(timeout = 0){
+    receive_output = function(timeout = 1){
       poll_res <- self$poll_io(timeout)
       res <- list()
       if (poll_res[1] == "ready") {
@@ -111,7 +109,7 @@ RKernelSession <- R6Class("RKernelSession",
       }
       return(res)
     },
-    receive_all_output = function(timeout = 0){
+    receive_all_output = function(timeout = 1){
       poll_res <- self$poll_io(timeout)
       res <- list()
       while(any(poll_res == "ready")){
@@ -128,15 +126,42 @@ RKernelSession <- R6Class("RKernelSession",
             res$msg <- msg
             res$stdout <- paste0(res$stdout, msg$stdout)
             res$stderr <- paste0(res$stderr, msg$stderr)
-            break
           }
           poll_res <- self$poll_io(timeout)
       }
       return(res)
     },
+    receive_to_prompt = function(timeout = 1){
+      # log_out("receive_to_prompt")
+      resp <- list()
+      prompt_found <- FALSE
+      while (!self$prompt_found) {
+        poll_res <- self$poll_io(timeout)
+        if (poll_res[1] == "ready") {
+          sout <- self$read_output()
+          # log_out(paste("sout", sout))
+          if (endsWith(sout, self$prompt)) {
+            self$prompt_found <- TRUE
+            sout <- self$drop_prompt(sout)
+          }
+          resp$stdout <- paste0(resp$stdout, sout)
+        }
+        if (poll_res[2] == "ready") {
+          serr <- self$read_error()
+          resp$stderr <- paste0(resp$stderr, serr)
+        }
+        if (poll_res[3] == "ready") {
+          msg <- self$read()
+          resp$msg <- msg
+          resp$stdout <- paste0(resp$stdout, msg$stdout)
+          resp$stderr <- paste0(resp$stderr, msg$stderr)
+        }
+      }
+      return(resp)
+    },
     process_output = function(resp, drop_echo=TRUE){
-        log_out("process_output")
-        log_out(resp, use.print=TRUE)
+        # log_out("process_output")
+        # log_out(resp, use.print=TRUE)
         if (!is.null(resp$msg) && is.function(self$callbacks$msg)) {
           self$callbacks$msg(resp$msp)
         }
@@ -145,31 +170,31 @@ RKernelSession <- R6Class("RKernelSession",
         }
         if (!is.null(resp$stdout)) {
           if (drop_echo) {
-            resp <- drop_echo(resp)
+            resp$stdout <- drop_echo(resp$stdout)
           }
           if (endsWith(resp$stdout, self$prompt)) 
             self$prompt_found <- TRUE
-          resp <- self$drop_co_prompt(resp)
-          resp <- self$drop_prompt(resp)
+          resp$stdout <- self$drop_co_prompt(resp$stdout)
+          resp$stdout <- self$drop_prompt(resp$stdout)
           if (is.function(self$callbacks$stdout))
              self$callbacks$stdout(resp$stdout)
         }
     },
-    drop_prompt = function(resp){
-      if (length(resp$stdout) && nzchar(resp$stdout)) {
-        if (endsWith(resp$stdout, self$prompt)) {
-          resp$stdout <- gsub(self$prompt_regex, "", resp$stdout)
+    drop_prompt = function(txt){
+      if (length(txt) && nzchar(txt)) {
+        if (endsWith(txt, self$prompt)) {
+          txt <- gsub(self$prompt_regex, "", txt)
         }
       }
-      resp
+      txt
     },
-    drop_co_prompt = function(resp) {
-      if (length(resp$stdout) && nzchar(resp$stdout)) {
-        if (endsWith(resp$stdout, self$co_prompt)) {
-          resp$stdout <- gsub(self$co_prompt_regex, "", resp$stdout)
+    drop_co_prompt = function(txt) {
+      if (length(txt) && nzchar(txt)) {
+        if (endsWith(txt, self$co_prompt)) {
+          txt <- gsub(self$co_prompt_regex, "", txt)
         }
       }
-      resp
+      txt
     }
   )
 )
@@ -179,12 +204,12 @@ split_lines1 <- function(x) {
   unlist(y)
 }
 
-drop_echo <- function(resp) {
-  if(length(resp) && ("stdout" %in% names(resp))){
-      out_lines <- split_lines1(resp$stdout)
+drop_echo <- function(txt) {
+  if(length(txt) && nzchar(txt)){
+      out_lines <- split_lines1(txt)
       out_lines <- out_lines[-1]
-      resp$stdout <- paste(out_lines, collapse = "\n")
-      log_out(resp, use.print = TRUE)
+      txt <- paste(out_lines, collapse = "\n")
+      # log_out(resp, use.print = TRUE)
   }
-  resp
+  txt
 }

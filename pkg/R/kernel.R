@@ -822,23 +822,23 @@ Kernel <- R6Class("Kernel",
 
     r_install_hooks = function(){
       # log_out("Installing hooks ...")
-      self$r_session$send_cmd("RKernel::install_output_hooks()")
-      self$r_session$send_cmd("RKernel::install_cell_hooks()")
-      self$r_session$send_cmd("RKernel::install_save_q()")
-      self$r_session$send_cmd("RKernel::install_readline()")
-      self$r_session$send_cmd("options(error = function()print(traceback()))")
+      self$r_session$run_cmd("RKernel::install_output_hooks()")
+      self$r_session$run_cmd("RKernel::install_cell_hooks()")
+      self$r_session$run_cmd("RKernel::install_save_q()")
+      self$r_session$run_cmd("RKernel::install_readline()")
+      self$r_session$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")
     },
     r_start_graphics = function(){
       # log_out("Starting graphics ...")
-      self$r_session$send_cmd("RKernel::start_graphics()")
+      self$r_session$run_cmd("RKernel::start_graphics()")
       # log_out("done.")
     },
     r_run_cell_begin_hooks = function(){
-      self$r_session$send_cmd("RKernel::runHooks('cell-begin')")
+      self$r_session$run_cmd("RKernel::runHooks('cell-begin')")
     },
     r_run_cell_end_hooks = function(){
-      self$r_session$send_cmd("RKernel::runHooks('cell-end')")
+      self$r_session$run_cmd("RKernel::runHooks('cell-end')")
     },
     json_incomplete = FALSE,
     json_frag = "",
