@@ -11,6 +11,12 @@
 PROTOCOL_VERSION <- '5.3'
 WIRE_DELIM <- charToRaw("<IDS|MSG>")
 
+EOT <- "\x04"
+DLE <- "\x10"
+ETB <- "\x17"
+ZMQ_PUSH <- "[!ZMQ_PUSH]"
+JSON_MSG <- "[!JSON]"
+
 kernel <- new.env()
 
 fn_kernel_logfile <- file.path(dirname(tempdir()),"RKernel.log")
@@ -47,20 +53,20 @@ Kernel <- R6Class("Kernel",
       private$conn_info <- conn_info
       private$pid <- Sys.getpid()
       kernel$current <- self
-      private$logfile <- file(fn_kernel_logfile,"a")
-      # private$logfile <- stderr()
-      # private$logfile <- socketConnection(port=6111)
-      self$start_session()
     },
     start_session = function(){
       self$r_session <- RKernelSession$new(callbacks = list(
-        stdout = self$stdout,
-        stderr = self$stderr,
+        stdout = private$handle_r_stdout,
+        stderr = private$handle_r_stderr,
         msg = self$session_msg
       ))
       log_out(self$r_session, use.print = TRUE)
     },
-
+    start = function(){
+      self$start_session()
+      private$r_install_hooks()
+      private$r_start_graphics()
+    },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
     #' @field comm_manager See \code{\link{CommManagerClass}}.
@@ -70,6 +76,7 @@ Kernel <- R6Class("Kernel",
     #' @description
     #' Run the kernel.
     run = function(){
+      self$start()
       log_out("*** RKernel started ***")
       continue <- TRUE
       while(continue) {
@@ -347,7 +354,8 @@ Kernel <- R6Class("Kernel",
                            parent=private$parent$control,
                            socket="iopub",
                            content=content)
-    }
+    },
+    errored = FALSE
     
   ),
 
@@ -364,56 +372,69 @@ Kernel <- R6Class("Kernel",
         }
       }
       execution_count <- private$execution_count
-      private$send_message(type="execute_input",
-                           parent=private$parent$shell,
-                           socket_name="iopub",
-                           content=list(
-                             code=msg$content$code,
-                             execution_count=execution_count))
+      private$send_message(
+        type = "execute_input",
+        parent = private$parent$shell,
+        socket_name = "iopub",
+        content = list(
+          code = msg$content$code,
+          execution_count = execution_count
+        )
+      )
+      self$errored <- FALSE
+      private$r_run_cell_begin_hooks()
       r <- tryCatch(self$r_session$run_code(msg$content$code),
         error = function(e) structure("errored", message = conditionMessage(e)), # ,traceback=.traceback()),
         interrupt = function(e) "interrupted"
       )
-      # log_out(r,use.print=TRUE)
-      status <- "ok"
+      # log_out(r, use.print = TRUE)
+      private$r_run_cell_end_hooks()
       payload <- NULL
       aborted <- FALSE
       if (is.character(r) && (identical(r[1], "errored") || identical(r[1], "interrupted"))) {
         aborted <- TRUE
       }
       if (is.character(r)) {
+        self$errored <- TRUE
         log_error(r)
         r_msg <- attr(r, "message")
         if (length(r_msg)) log_error(r_msg)
         tb <- attr(r, "traceback")
         if (length(tb)) {
           tb <- unlist(tb)
-          log_error(paste(tb, sep = "\n"))
-          # log_error(tb,use.print=TRUE)
+          #log_error(paste(tb, sep = "\n"))
+          log_error(tb,use.print=TRUE)
         }
       }
-      if(!self$r_session$is_alive()){
+      if (!self$r_session$is_alive()) {
         aborted <- TRUE
         self$stderr("\nR session ended - restarting ... ")
         self$start_session()
         self$stderr("done.\n")
       }
-      content <- list(status = status,
-                      execution_count = execution_count)
-      if(length(payload))
-        content$payload <- payload
+      if (self$errored) {
+          content <- list(
+            status = "error",
+            ename = r,
+            evalue = r_msg,
+            traceback = tb
+          )
+      }
+      else {
+          content <- list(status = "ok",
+                          execution_count = execution_count)
+          if(length(payload))
+            content$payload <- payload
+      }
       if(!isTRUE(msg$content$silent))
         private$send_message(type="execute_reply",
-                             parent=private$parent$shell,
-                             socket="shell",
-                             content=content)
-      #cat("Sent a execute_reply ...\n")
-      # message("Code:", msg$content$code)
-      #message("Store history:", msg$content$store_history)
-      # message("Kernel execution count:", private$execution_count)
+                              parent=private$parent$shell,
+                              socket="shell",
+                              content=content)
       if(msg$content$store_history)
         private$execution_count <- private$execution_count + 1
-      if(aborted) private$clear_shell_queue()
+      if (aborted) private$clear_shell_queue()
+      # log_out("handle_execute_request done")
     },
 
     display_id = character(0),
@@ -800,42 +821,122 @@ Kernel <- R6Class("Kernel",
     logfile = NULL,
 
     r_install_hooks = function(){
+      # log_out("Installing hooks ...")
       self$r_session$send_cmd("RKernel::install_output_hooks()")
       self$r_session$send_cmd("RKernel::install_cell_hooks()")
       self$r_session$send_cmd("RKernel::install_save_q()")
       self$r_session$send_cmd("RKernel::install_readline()")
+      self$r_session$send_cmd("options(error = function()print(traceback()))")
+      # log_out("done.")
     },
     r_start_graphics = function(){
+      # log_out("Starting graphics ...")
       self$r_session$send_cmd("RKernel::start_graphics()")
+      # log_out("done.")
     },
     r_run_cell_begin_hooks = function(){
       self$r_session$send_cmd("RKernel::runHooks('cell-begin')")
     },
     r_run_cell_end_hooks = function(){
       self$r_session$send_cmd("RKernel::runHooks('cell-end')")
-    }
+    },
+    json_incomplete = FALSE,
+    json_frag = "",
+    handle_r_stdout = function(text){
+      # log_out("handle_r_stdout")
+      if (grepl(DLE, text)) {
+        text <- split_char1(text, DLE)
+      }
+      for(chunk in text){
+        if (startsWith(chunk, JSON_MSG)) {
+          if (endsWith(chunk, ETB)) {
+            msg <- remove_prefix(chunk, JSON_MSG) |> remove_suffix(ETB)
+            private$handle_r_json(msg)
+          } else {
+            private$json_incomplete <- TRUE
+            private$json_frag <- remove_prefix(chunk, JSON_MSG)
+          }
+        }
+        else if(endsWith(chunk, ETB)){
+          msg <- paste0(private$json_frag, remove_suffix(chunk, ETB))
+          private$json_incomplete <- FALSE
+          private$json_frag <- ""
+          private$r_handle_json(msg)
+        }
+        else {
+          if(private$json_incomplete) {
+            private$json_frag <- paste0(private$json_frag, chunk)
+          }
+          else if(nzchar(chunk)) {
+            self$stdout(chunk)
+          }
+        }
+      }
+      # log_out("handle_r_stdout done")
+    },
+    handle_r_stderr = function(text){
+      if(startsWith(text, "Error"))
+        self$errored <- TRUE
+      self$stderr(text)
+    },
+    handle_r_json = function(json_msg){
+      log_out("handle_r_json")
+      log_out(json_msg, echo=TRUE)
+      msg <- fromJSON(json_msg)
+      msg_type <- msg$type
+      msg_handler <- r_msg_handlers[[msg_type]]
+      if(is.function(msg_handler)){
+        msg_handler(msg)
+      } else {
+        self$stderr(sprintf("R session sent message of unknown type '%s'", msg_type))
+      }
+    },
+    r_msg_handlers = list()
   )
 )
 
-check_page_payload <- function(payload){
-  for(i in seq_along(payload)){
+check_page_payload <- function(payload) {
+  for (i in seq_along(payload)) {
     payload_item <- payload[[i]]
-    if(payload_item$source=="page"){
+    if (payload_item$source == "page") {
       data <- payload_item$data
-      if(!("text/plain" %in% names(data))){
+      if (!("text/plain" %in% names(data))) {
         payload_item$data[["text/plain"]] <- "[No plain text data for paging]"
         payload[[i]] <- payload_item
       }
-    }      
+    }
   }
   payload
 }
 
 get_current_kernel <- function() kernel$current
 
+split_string1 <- function(text, pat){
+  log_out("split_string1")
+  unlist(strsplit(text, pat, fixed))
+}
 
+remove_prefix <- function(text, prefix){
+  if (!startsWith(text, prefix)) {
+    # Maybe issue a warning or throw an error
+    return(text)
+  } else {
+    n <- nchar(text)
+    m <- nchar(prefix)
+    substr(text, start = m + 1, stop = n)
+  }
+}
 
-
+remove_suffix <- function(text, prefix) {
+  if (!endsWith(text, prefix)) {
+    # Maybe issue a warning or throw an error
+    return(text)
+  } else {
+    n <- nchar(text)
+    m <- nchar(prefix)
+    substr(text, start = 1, stop = n - m)
+  }
+}
 
 
 # Local Variables:
