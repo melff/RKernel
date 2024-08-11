@@ -938,6 +938,8 @@ remove_suffix <- function(text, prefix) {
   }
 }
 
+prefix <- function(x, n) substr(x, start = 1, stop = n)
+suffix <- function(x, n) substr(x, start=nchar(x) - n, nchar(x))
 
 # Local Variables:
 # ess-indent-offset: 2
