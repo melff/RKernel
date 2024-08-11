@@ -363,11 +363,11 @@ Kernel <- R6Class("Kernel",
     pid = 0,
     execution_count = 1,
     handle_execute_request = function(msg){
-      # self$log_out("handle_execute_request")
-      # self$log_out(msg,use.print=TRUE)
+      # log_out("handle_execute_request")
+      # log_out(msg,use.print=TRUE)
       if(msg$content$silent){
         if(msg$content$store_history){
-          self$log_warning("store_history forced to FALSE")
+          log_warning("store_history forced to FALSE")
           msg$content$store_history <- FALSE
         }
       }
@@ -602,7 +602,7 @@ Kernel <- R6Class("Kernel",
       else return(TRUE)
     },
 
-    respond_shell = function(req,debug=TRUE){
+    respond_shell = function(req,debug=FALSE){
       if(debug)
         log_out("respond_shell")
       msg <- private$get_message("shell")
@@ -612,7 +612,7 @@ Kernel <- R6Class("Kernel",
       if(!length(msg)) return(TRUE)
       private$send_busy(private$parent$shell)
       if(debug)
-        self$log_out(paste("Got a", msg$header$msg_type, "request ..."))
+        log_out(paste("Got a", msg$header$msg_type, "request ..."))
       # cat("Got a", msg$header$msg_type, "request ...\n")
       # do_stuff ...
       switch(msg$header$msg_type,
@@ -685,8 +685,8 @@ Kernel <- R6Class("Kernel",
       if(debug) {
          msg_body <- msg[c("header","parent_header","metadata","content")]
          msg_body <- to_json(msg_body,auto_unbox=TRUE)
-         self$log_out(prettify(msg_body))
-         # self$log_out(buffers,use.print=TRUE)
+         log_out(prettify(msg_body))
+         # log_out(buffers,use.print=TRUE)
        }
       socket <- private$sockets[[socket_name]]
       wire_out <- private$wire_pack(msg)
@@ -726,7 +726,7 @@ Kernel <- R6Class("Kernel",
         return(NULL)
       }
       signature <- rawToChar(wire_in[[i+1]])
-      # log_out(signature)
+      # log_out(signature)json
       msg <- wire_in[i + 2:5]
       # log_out(private$get_signature(msg))
       if(signature != private$get_signature(msg)) {

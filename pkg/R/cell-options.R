@@ -5,13 +5,13 @@ cell_saved <- new.env()
 #' @param ... Options, see \code{\link{options}}.
 #' @export
 cell.options <- function(...){
-    log_out("cell.options")
+    # log_out("cell.options")
     args <- list(...)
     nms <- names(args)
     op <- lapply(nms,getOption)
     names(op) <- nms
-    log_out(args,use.print=TRUE)
-    log_out(op,use.print=TRUE)
+    # log_out(args,use.print=TRUE)
+    # log_out(op,use.print=TRUE)
     cell_saved$options <- op
     do.call("options",args)
 }
@@ -20,7 +20,7 @@ cell.options <- function(...){
 #' @param ... Graphics parameters, see \code{\link{par}}.
 #' @export
 cell.par <- function(...){
-    log_out("cell.par")
+    # log_out("cell.par")
     args <- list(...)
     nms <- names(args)
     op <- lapply(nms,par)
@@ -30,7 +30,7 @@ cell.par <- function(...){
 }
 
 restore_saved_opts <- function(){
-    log_out("restore_saved_opts")
+    # log_out("restore_saved_opts")
     op <- cell_saved$options
     cell_saved$options <- NULL
     log_out(names(op),use.print=TRUE)
@@ -39,7 +39,7 @@ restore_saved_opts <- function(){
 }
 
 restore_saved_pars <- function(){
-    log_out("restore_saved_pars")
+    # log_out("restore_saved_pars")
     op <- cell_saved$pars
     cell_saved$pars <- NULL
     log_out(names(op),use.print=TRUE)
