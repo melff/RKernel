@@ -67,6 +67,8 @@ Kernel <- R6Class("Kernel",
       private$r_install_hooks()
       private$r_start_graphics()
       private$install_r_handlers()
+      private$r_init_help()
+      private$r_set_help_displayed()
     },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
@@ -889,6 +891,12 @@ Kernel <- R6Class("Kernel",
     install_r_handlers = function(){
       private$r_msg_handlers$display_data <- self$display_send
       private$r_msg_handlers$update_display_data <- self$display_send
+    },
+    r_init_help = function(){
+      self$r_session$run_cmd("RKernel::init_help()")
+    },
+    r_set_help_displayed = function(){
+      self$r_session$run_cmd("RKernel::set_help_displayed(TRUE)")
     }
   )
 )
