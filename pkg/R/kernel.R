@@ -165,6 +165,7 @@ Kernel <- R6Class("Kernel",
     #' Send rich format data to the frontend
     #' @param msg A list with the appropriate structure. [TODO]
     display_send = function(msg){
+      log_out("display_send")
       private$send_message(type=msg$type,
                            parent=private$parent$shell,
                            socket_name="iopub",
@@ -854,7 +855,7 @@ Kernel <- R6Class("Kernel",
           msg <- paste0(private$json_frag, remove_suffix(chunk, ETB))
           private$json_incomplete <- FALSE
           private$json_frag <- ""
-          private$r_handle_json(msg)
+          private$handle_r_json(msg)
         }
         else {
           if(private$json_incomplete) {
@@ -887,6 +888,7 @@ Kernel <- R6Class("Kernel",
     r_msg_handlers = list(),
     install_r_handlers = function(){
       private$r_msg_handlers$display_data <- self$display_send
+      private$r_msg_handlers$update_display_data <- self$display_send
     }
   )
 )
