@@ -53,15 +53,26 @@ RKernelSession <- R6Class("RKernelSession",
         self$prompt_found <- FALSE
         line <- lines[i]
         self$send_input(line)
-        self$process_output()
+        tryCatch(self$process_output(),
+          interrupt = function(e) {
+            self$interrupt()
+            self$receive_to_prompt()
+          }
+        )
       }
     },
     run_cmd = function(cmd, timeout = 1, drop_echo = TRUE){
       # log_out("Send cmd",cmd)
       self$send_input(cmd)
       self$prompt_found <- FALSE
-      resp <- self$receive_to_prompt(timeout = timeout)
-      if (drop_echo) {
+      interrupted <- FALSE
+      resp <- tryCatch(self$receive_to_prompt(timeout = timeout),
+        interrupt = function(e) {
+          self$interrupt()
+          self$receive_to_prompt()
+        }
+      )
+      if (drop_echo && !interrupted) {
         resp$stdout <- drop_echo(resp$stdout)
       }
       return(resp)
