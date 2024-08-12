@@ -22,7 +22,8 @@ RKernelSession <- R6Class("RKernelSession",
                               "--no-readline",
                               "--no-save",
                               "--no-restore"
-                            )),
+                            ),
+                            env = c(R_CLI_NUM_COLORS="16777216")),
                             callbacks = list(
                               stdout = cat,
                               stderr = function(x){
