@@ -50,19 +50,19 @@ RKernelSession <- R6Class("RKernelSession",
         self$prompt_found <- FALSE
         line <- lines[i]
         self$send_input(line)
-        # log_out(paste("Line:", line))
+        log_out(paste("Line:", line))
         # log_out(paste("R session state: ", self$get_state()))
         if (i < n_lines) {
-              resp <- self$receive_output(timeout = -1)
-              # log_out(paste("Response:", resp$stdout))
+              resp <- self$receive_output(timeout = 1)
+              log_out(paste("Response:", prefix(resp$stdout, 80)))
               self$process_output(resp, drop_echo = TRUE)
         }
         else {
             drop_echo <- TRUE
             while(self$is_alive() && !self$prompt_found) {
-              # log_out(paste("R session state: ",self$get_state()))
+              log_out(paste("R process status: ",self$get_status()))
               resp <- self$receive_output(timeout = -1)
-              # log_out(paste("Response:", resp$stdout))
+              log_out(paste("Response:", prefix(resp$stdout, 80)))
               self$process_output(resp, drop_echo = drop_echo)
               drop_echo <- FALSE
             }
@@ -111,25 +111,25 @@ RKernelSession <- R6Class("RKernelSession",
     },
     receive_all_output = function(timeout = 1){
       poll_res <- self$poll_io(timeout)
-      res <- list()
-      while(any(poll_res == "ready")){
-          if (poll_res[1] == "ready") {
-            sout <- self$read_output()
-            res$stdout <- paste0(res$stdout, sout)
-          }
-          if (poll_res[2] == "ready") {
-            serr <- self$read_error()
-            res$stderr <- paste0(res$stderr, serr)
-          }
-          if (poll_res[3] == "ready") {
-            msg <- self$read()
-            res$msg <- msg
-            res$stdout <- paste0(res$stdout, msg$stdout)
-            res$stderr <- paste0(res$stderr, msg$stderr)
-          }
-          poll_res <- self$poll_io(timeout)
+      resp <- list()
+      while (any(poll_res == "ready")) {
+        if (poll_res[1] == "ready") {
+          sout <- self$read_output()
+          resp$stdout <- paste0(resp$stdout, sout)
+        }
+        if (poll_res[2] == "ready") {
+          serr <- self$read_error()
+          resp$stderr <- paste0(resp$stderr, serr)
+        }
+        if (poll_res[3] == "ready") {
+          msg <- self$read()
+          resp$msg <- msg
+          resp$stdout <- paste0(resp$stdout, msg$stdout)
+          resp$stderr <- paste0(resp$stderr, msg$stderr)
+        }
+        poll_res <- self$poll_io(timeout)
       }
-      return(res)
+      return(resp)
     },
     receive_to_prompt = function(timeout = 1){
       # log_out("receive_to_prompt")
@@ -160,7 +160,7 @@ RKernelSession <- R6Class("RKernelSession",
       return(resp)
     },
     process_output = function(resp, drop_echo=TRUE){
-        # log_out("process_output")
+        log_out("process_output")
         # log_out(resp, use.print=TRUE)
         if (!is.null(resp$msg) && is.function(self$callbacks$msg)) {
           self$callbacks$msg(resp$msp)
@@ -179,6 +179,12 @@ RKernelSession <- R6Class("RKernelSession",
           if (is.function(self$callbacks$stdout))
              self$callbacks$stdout(resp$stdout)
         }
+    },
+    receive_and_process_output = function(timeout = 1){
+        log_out("receive_and_process_output")
+        resp <- self$receive_all_output(timeout)
+        log_out(resp, use.str = TRUE)
+        self$process_output(resp, drop_echo = FALSE)
     },
     drop_prompt = function(txt){
       if (length(txt) && nzchar(txt)) {

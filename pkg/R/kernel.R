@@ -66,6 +66,7 @@ Kernel <- R6Class("Kernel",
       self$start_session()
       private$r_install_hooks()
       private$r_start_graphics()
+      private$install_r_handlers()
     },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
@@ -162,24 +163,14 @@ Kernel <- R6Class("Kernel",
     },
     #' @description
     #' Send rich format data to the frontend
-    #' @param d A list that is either a member of class "display_data" or
-    #'          "update_display_data".
-    display_send = function(d){
-      if(class(d)%in%c("display_data","update_display_data"))
-        msg_type <- class(d)
-      else stop("'display_data' or 'update_display_data' object required")
-
-      # log_out("kernel$display_send")
-      # log_out(sprintf("msg_type = %s",msg_type))
-      
-      private$send_message(type=msg_type,
+    #' @param msg A list with the appropriate structure. [TODO]
+    display_send = function(msg){
+      private$send_message(type=msg$type,
                            parent=private$parent$shell,
                            socket_name="iopub",
-                           content=list(
-                             data=d$data,
-                             metadata=d$metadata,
-                             transient=d$transient))
-      private$display_id <- d$transient$display_id
+                           content=msg$content)
+      private$display_id <- msg$content$transient$display_id
+      log_out("display_send succeeded")
     },
     #' @description
     #' Send rich format data to the frontend
@@ -356,7 +347,6 @@ Kernel <- R6Class("Kernel",
                            content=content)
     },
     errored = FALSE
-    
   ),
 
   private = list(
@@ -411,8 +401,7 @@ Kernel <- R6Class("Kernel",
         self$stderr("\nR session ended - restarting ... ")
         self$start_session()
         self$stderr("done.\n")
-      }
-      if (self$errored) {
+      } else if (self$errored) {
           content <- list(
             status = "error",
             ename = r,
@@ -422,6 +411,7 @@ Kernel <- R6Class("Kernel",
           )
       }
       else {
+          # Collect output created by cell-end hooks etc.
           content <- list(status = "ok",
                           execution_count = execution_count)
           if(length(payload))
@@ -836,10 +826,10 @@ Kernel <- R6Class("Kernel",
       # log_out("done.")
     },
     r_run_cell_begin_hooks = function(){
-      self$r_session$run_cmd("RKernel::runHooks('cell-begin')")
+      self$r_session$run_code("RKernel::runHooks('cell-begin')")
     },
     r_run_cell_end_hooks = function(){
-      self$r_session$run_cmd("RKernel::runHooks('cell-end')")
+      self$r_session$run_code("RKernel::runHooks('cell-end')")
     },
     json_incomplete = FALSE,
     json_frag = "",
@@ -851,6 +841,7 @@ Kernel <- R6Class("Kernel",
       }
       for(chunk in text){
         if (startsWith(chunk, JSON_MSG)) {
+          log_out("JSON_MSG found")
           if (endsWith(chunk, ETB)) {
             msg <- remove_prefix(chunk, JSON_MSG) |> remove_suffix(ETB)
             private$handle_r_json(msg)
@@ -884,7 +875,7 @@ Kernel <- R6Class("Kernel",
     handle_r_json = function(json_msg){
       log_out("handle_r_json")
       msg <- fromJSON(json_msg)
-      log_out(msg, print=TRUE)
+      log_out(msg, use.str=TRUE)
       msg_type <- msg$type
       msg_handler <- private$r_msg_handlers[[msg_type]]
       if(is.function(msg_handler)){
@@ -893,7 +884,10 @@ Kernel <- R6Class("Kernel",
         self$stderr(sprintf("R session sent message of unknown type '%s'", msg_type))
       }
     },
-    r_msg_handlers = list()
+    r_msg_handlers = list(),
+    install_r_handlers = function(){
+      private$r_msg_handlers$display_data <- self$display_send
+    }
   )
 )
 
