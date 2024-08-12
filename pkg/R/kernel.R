@@ -58,7 +58,8 @@ Kernel <- R6Class("Kernel",
       self$r_session <- RKernelSession$new(callbacks = list(
         stdout = private$handle_r_stdout,
         stderr = private$handle_r_stderr,
-        msg = self$session_msg
+        msg = self$session_msg,
+        readline = private$r_get_input
       ))
       # log_out(self$r_session, use.print = TRUE)
     },
@@ -322,10 +323,7 @@ Kernel <- R6Class("Kernel",
       input <- ""
       while(continue){
         rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
-        if(length(private$services) > 0) 
-          poll_timeout <- rkernel_poll_timeout 
-        else 
-          poll_timeout <- -1L
+        poll_timeout <- -1L
         # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request("stdin",timeout=poll_timeout)
         # log_out("req")
@@ -356,8 +354,8 @@ Kernel <- R6Class("Kernel",
     pid = 0,
     execution_count = 1,
     handle_execute_request = function(msg){
-      # log_out("handle_execute_request")
-      # log_out(msg,use.print=TRUE)
+      log_out("handle_execute_request")
+      log_out(msg,use.print=TRUE)
       if(msg$content$silent){
         if(msg$content$store_history){
           log_warning("store_history forced to FALSE")
@@ -428,7 +426,7 @@ Kernel <- R6Class("Kernel",
       if(msg$content$store_history)
         private$execution_count <- private$execution_count + 1
       if (aborted) private$clear_shell_queue()
-      # log_out("handle_execute_request done")
+      log_out("handle_execute_request done")
     },
 
     display_id = character(0),
@@ -897,6 +895,10 @@ Kernel <- R6Class("Kernel",
     },
     r_set_help_displayed = function(){
       self$r_session$run_cmd("RKernel::set_help_displayed(TRUE)")
+    },
+    r_get_input = function(prompt = ""){
+      self$input_request(prompt = prompt)
+      self$read_stdin()
     }
   )
 )

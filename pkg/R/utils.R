@@ -144,9 +144,14 @@ install_save_q <- function(){
 #' @export
 readline_orig <- getFromNamespace("readline","base")
 
-readline_ <- function(prompt = "") zmq_input_request(prompt=prompt)
+READLINE_prompt <- "[$$READLINE$$]"
+
+readline_ <- function(prompt = "") {
+  prompt <- paste0(prompt, READLINE_prompt)
+  readline_orig(prompt = prompt)
+}
 
 #' @export
 install_readline <- function(){
-    replace_in_package("base","readline",readline_)
+    replace_in_package("base", "readline", readline_)
 }

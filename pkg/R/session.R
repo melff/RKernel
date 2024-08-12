@@ -12,6 +12,7 @@ RKernelSession <- R6Class("RKernelSession",
     co_prompt_regex = "[+] $",
     menu_prompt = ": ",
     browse_prompt = "^Browse\\[([0-9]+)\\]> $",
+    readline_prompt = "",
     prompt_found = FALSE,
     banner = "",
     initialize = function(options = r_session_options(
@@ -29,7 +30,8 @@ RKernelSession <- R6Class("RKernelSession",
                               stderr = function(x){
                                 cat(crayon::red(x))
                               },
-                              msg = print
+                              msg = print,
+                              readline = readline
                             )
                           ) {
       super$initialize(
@@ -45,6 +47,7 @@ RKernelSession <- R6Class("RKernelSession",
       resp <- self$receive_all_output(timeout = 1000)
       banner <- resp$stdout
       self$banner <- unlist(strsplit(banner, self$prompt))[1]
+      self$readline_prompt <- READLINE_prompt
     },
     run_code = function(code){
       lines <- split_lines1(code)
@@ -161,6 +164,7 @@ RKernelSession <- R6Class("RKernelSession",
         # log_out("process_output")
         next_line <- FALSE
         cnt <- 0
+        force_drop_echo <- FALSE
         while(!next_line){
           cnt <- cnt + 1
           resp <- self$receive_output(timeout = 1)
@@ -171,8 +175,9 @@ RKernelSession <- R6Class("RKernelSession",
             self$callbacks$stderr(resp$stderr)
           }
           if (!is.null(resp$stdout)) {
-            if (drop_echo && cnt == 1) {
+            if (drop_echo && cnt == 1 || force_drop_echo) {
               resp$stdout <- drop_echo(resp$stdout)
+              force_drop_echo <- FALSE
             }
             if (endsWith(resp$stdout, self$co_prompt)) {
               # log_out("Found continuation prompt")
@@ -197,6 +202,14 @@ RKernelSession <- R6Class("RKernelSession",
               if (is.function(self$callbacks$browse)) {
                 self$callbacks$browse(resp$stdout)
               }
+            } else if (endsWith(resp$stdout, self$readline_prompt)) {
+              resp$stdout <- remove_suffix(resp$stdout, self$readline_prompt)
+              if (is.function(self$callbacks$readline)) {
+                inp <- self$callbacks$readline(prompt = resp$stdout)
+                force_drop_echo <- TRUE
+                self$send_input(inp)
+              }
+              else self$send_input("")
             } else {
               if (is.function(self$callbacks$stdout)) {
                 self$callbacks$stdout(resp$stdout)
