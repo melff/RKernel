@@ -50,11 +50,10 @@ Kernel <- R6Class("Kernel",
         url_with_port <- paste0(url,url_sep,conn_info[[port_name]])
         zmq.bind(private$sockets[[s]],url_with_port)
       }
-      private$conn_info <- conn_info
       private$pid <- Sys.getpid()
       kernel$current <- self
     },
-    start_session = function(){
+    start_r_session = function(){
       self$r_session <- RKernelSession$new(callbacks = list(
         stdout = private$handle_r_stdout,
         stderr = private$handle_r_stderr,
@@ -64,12 +63,15 @@ Kernel <- R6Class("Kernel",
       # log_out(self$r_session, use.print = TRUE)
     },
     start = function(){
-      self$start_session()
+      self$start_r_session()
       private$r_install_hooks()
       private$r_start_graphics()
       private$install_r_handlers()
       private$r_init_help()
       private$r_set_help_displayed()
+      private$r_zmq_init()
+      private$r_zmq_setup_sender()
+      private$r_zmq_setup_receiver()
     },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
@@ -841,7 +843,11 @@ Kernel <- R6Class("Kernel",
         text <- split_string1(text, DLE)
       }
       for(chunk in text){
-        if (startsWith(chunk, JSON_MSG)) {
+        if (startsWith(chunk, ZMQ_PUSH)) {
+          msq <- zmq_receive()
+          private$handle_r_zmq(msg)
+        }
+        else if (startsWith(chunk, JSON_MSG)) {
           log_out("JSON_MSG found")
           if (endsWith(chunk, ETB)) {
             msg <- remove_prefix(chunk, JSON_MSG) |> remove_suffix(ETB)
@@ -900,6 +906,44 @@ Kernel <- R6Class("Kernel",
     r_get_input = function(prompt = ""){
       self$input_request(prompt = prompt)
       self$read_stdin()
+    },
+    r_zmq_env = NULL,
+    r_zmq_init = function(){
+      self$r_session$run_cmd("RKernel::zmq_zmq_envinit()")
+      zmq_init()
+      private$r_zmq_env <- zmq_env
+    }, 
+    r_zmq_setup_sender = function(){
+      port <- random_open_port()
+      self$r_session$run_cmd(sprintf("RKernel::zmq_new_receiver(%d)", port))
+      zmq_new_sender(port, bind = TRUE)
+    }, 
+    r_zmq_setup_receiver = function(){
+      port <- random_open_port()
+      self$r_session$run_cmd(sprintf("RKernel::zmq_new_sender(%d)", port))
+      zmq_new_receiver(port, bind = TRUE)
+    },
+    r_zmq_request = function(req){
+      private$r_session$send_input("RKernel::zmq_request()")
+      zmq_send(req)
+      resp <- zmq_receive()
+      self$r_session$receive_to_prompt()
+      return(resp)
+    },
+    r_zmq_request_norepy = function(req) {
+      private$r_session$send_input("RKernel::zmq_request_noreply()")
+      zmq_send(req)
+      self$r_session$receive_to_prompt()
+    },
+    handle_r_zmq = function(msg){
+      log_out("handle_r_zmq")
+      msg_type <- msg$type
+      msg_handler <- private$r_msg_handlers[[msg_type]]
+      if(is.function(msg_handler)){
+        msg_handler(msg)
+      } else {
+        self$stderr(sprintf("R session sent message of unknown type '%s'", msg_type))
+      }
     }
   )
 )

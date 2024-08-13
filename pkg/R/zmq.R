@@ -15,23 +15,29 @@ zmq_init <- function(){
 }
 
 #' @export
-zmq_new_receiver <- function(port){
+zmq_new_receiver <- function(port, bind = FALSE){
     socket <- zmq.socket(zmq_env$context, ZMQ.ST()$PULL)
-    addr <- sprintf("tcp://localhost:%d",port)
+    port <- as.integer(port)
+    addr <- if (bind) sprintf("tcp://*:%d", port) 
+            else sprintf("tcp://localhost:%d", port)
     index <- as.character(port)
-    zmq.connect(socket,addr)
-    zmq_env$sockets[[index]] <- socket
-    zmq_env$ports["receiver"] <- as.integer(port)
+    if (bind) zmq.bind(socket, addr)
+    else zmq.connect(socket,addr)
+    zmq_env$sockets[["receiver"]] <- socket
+    zmq_env$ports["receiver"] <- port
 }
 
 #' @export
-zmq_new_sender <- function(port){
+zmq_new_sender <- function(port, bind = FALSE){
     socket <- zmq.socket(zmq_env$context, ZMQ.ST()$PUSH)
-    addr <- sprintf("tcp://localhost:%d",port)
+    port <- as.integer(port)
+    addr <- if (bind) sprintf("tcp://*:%d", port) 
+            else sprintf("tcp://localhost:%d", port)
     index <- as.character(port)
-    zmq.connect(socket,addr)
-    zmq_env$sockets[[index]] <- socket
-    zmq_env$ports["sender"] <- as.integer(port)
+    if (bind) zmq.bind(socket, addr)
+    else zmq.connect(socket,addr)
+    zmq_env$sockets[["sender"]] <- socket
+    zmq_env$ports["sender"] <- port
 }
 
 
@@ -39,9 +45,7 @@ zmq_new_sender <- function(port){
 #' @export
 zmq_receive <- function(){
     log_out("zmq_receive")
-    port <- zmq_env$ports["receiver"]
-    index <- as.character(port)
-    socket <- zmq_env$sockets[[index]]
+    socket <- zmq_env$sockets[["receiver"]]
     # log_out(socket,use.str=TRUE)
     msg <- zmq.recv.multipart(socket,unserialize=FALSE)
     msg <- fromRawJSON(msg[[1]])
@@ -54,9 +58,7 @@ zmq_receive <- function(){
 zmq_send <- function(msg){
     log_out("zmq_send")
     log_out(msg,use.str=TRUE)
-    port <- zmq_env$ports["sender"]
-    index <- as.character(port)
-    socket <- zmq_env$sockets[[index]]
+    socket <- zmq_env$sockets[["sender"]]
     msg <- toRawJSON(msg)
     msg <- append(list(msg),list(raw(0)))
     zmq.send.multipart(socket,msg,serialize=FALSE)
