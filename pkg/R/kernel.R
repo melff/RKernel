@@ -495,6 +495,20 @@ Kernel <- R6Class("Kernel",
                              metadata=emptyNamedList))
     },
 
+    inspect_reply = function(msg){
+      # return(NULL)
+      reply <- private$r_zmq_request(list(
+        type = "inspect_request",
+        content = msg$content
+      ))
+      private$send_message(
+        type = "inspect_reply",
+        parent = private$parent$shell,
+        socket_name = "shell",
+        content = reply$content
+      )
+    },
+
     comm_info_reply = function(msg){
       # return(NULL)
       reply <- private$r_zmq_request(list(
@@ -606,14 +620,15 @@ Kernel <- R6Class("Kernel",
       # cat("Got a", msg$header$msg_type, "request ...\n")
       # do_stuff ...
       switch(msg$header$msg_type,
-             comm_open = private$handle_comm_open(msg),
-             comm_msg = private$handle_comm_msg(msg),
-             comm_close = private$handle_comm_close(msg),
              execute_request = private$handle_execute_request(msg),
              is_complete_request = private$is_complete_reply(msg),
              kernel_info_request = private$kernel_info_reply(msg),
              complete_request = private$complete_reply(msg),
-             comm_info_request = private$comm_info_reply(msg)
+             inspect_request = private$inspect_reply(msg),
+             comm_info_request = private$comm_info_reply(msg),
+             comm_open = private$handle_comm_open(msg),
+             comm_msg = private$handle_comm_msg(msg),
+             comm_close = private$handle_comm_close(msg)
              )
       private$send_idle(private$parent$shell)
       return(TRUE)
