@@ -75,8 +75,6 @@ Kernel <- R6Class("Kernel",
     },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
-    #' @field comm_manager See \code{\link{CommManagerClass}}.
-    comm_manager = list(),
     #' @field DAPServer The current DAP server
     DAPServer = NULL,
     #' @description
@@ -498,43 +496,41 @@ Kernel <- R6Class("Kernel",
     },
 
     comm_info_reply = function(msg){
-      return(NULL)
-      target_name <- NULL
-      if("target_name" %in% names(msg$content))
-        target_name <- msg$content$target_name
-      comms <- self$comm_manager$get_comms(target_name)
-      comms <- list()
-      private$send_message(type="comm_info_reply",
-                           parent=private$parent$shell,
-                           socket_name="shell",
-                           content=list(
-                             status="ok",
-                             comms=comms))
+      # return(NULL)
+      reply <- private$r_zmq_request(list(
+        type = "comm_info_request",
+        content = msg$content
+      ))
+      private$send_message(
+        type = "comm_info_reply",
+        parent = private$parent$shell,
+        socket_name = "shell",
+        content = reply$content
+      )
     },
 
     handle_comm_open = function(msg){
-      return(NULL)
-      target_name <- msg$content$target_name
-      id <- msg$content$comm_id
-      data <- msg$content$data
-      self$comm_manager$handle_open(target_name,id,data)
+      # return(NULL)
+      private$r_zmq_request_noreply(list(
+        type = "comm_open",
+        content = msg$content
+      ))
     },
 
     handle_comm_msg = function(msg){
-      return(NULL)
-      # log_out("kernel$handle_comm_msg")
-      # log_out(msg,use.str=TRUE)
-      id <- msg$content$comm_id
-      data <- msg$content$data
-      data$buffers <- msg$buffers
-      self$comm_manager$handle_msg(id,data)
+      # return(NULL)
+      private$r_zmq_request_noreply(list(
+        type = "comm_msg",
+        content = msg$content
+      ))
     },
 
     handle_comm_close = function(msg){
       return(NULL)
-      id <- msg$content$comm_id
-      data <- msg$content$data
-      self$comm_manager$handle_close(id,data)
+      private$r_zmq_request_noreply(list(
+        type = "comm_close",
+        content = msg$content
+      ))
     },
 
     .pbd_env = new.env(),
