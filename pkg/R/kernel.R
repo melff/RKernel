@@ -2,7 +2,7 @@
 #' @importFrom pbdZMQ zmq.socket zmq.bind zmq.ctx.new zmq.getsockopt zmq.setsockopt
 #' @importFrom pbdZMQ zmq.poll zmq.poll.get.revents zmq.msg.recv zmq.msg.send
 #' @importFrom pbdZMQ zmq.recv.multipart zmq.send.multipart .zmqopt_init
-#' @importFrom pbdZMQ ZMQ.MC
+#' @importFrom pbdZMQ ZMQ.MC random_open_port
 #' @importFrom digest hmac
 #' @importFrom uuid UUIDgenerate
 #' @importFrom jsonlite prettify
@@ -891,7 +891,8 @@ Kernel <- R6Class("Kernel",
       private$r_msg_handlers$update_display_data <- self$display_send
     },
     r_init_help = function(){
-      self$r_session$run_cmd("RKernel::init_help()")
+      port <- random_open_port()
+      self$r_session$run_cmd(sprintf("RKernel::set_help_port(%d)",port))
     },
     r_set_help_displayed = function(){
       self$r_session$run_cmd("RKernel::set_help_displayed(TRUE)")

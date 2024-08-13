@@ -1,5 +1,8 @@
 HelpServer <- R6Class("HelpServer",
     public = list(
+        initialize = function(port = getOption("help.ports")[0]){
+            private$http_port <- port # Provided by the frontend
+        },
         get_url = function(){
             if(!length(private$http_url))
                 self$start()
@@ -9,8 +12,17 @@ HelpServer <- R6Class("HelpServer",
             return(private$http_port)
         },
         start = function(){
+            options(help.ports = private$http_port)
             suppressMessages(port <- tools::startDynamicHelp(NA))
-            private$http_port <- port
+            if (private$http_port != port) {
+                warning(sprintf(
+                    "Changed help port from %d to %d",
+                    private$http_port,
+                    port
+                ))
+                options(http.port = port)
+                private$http_port <- port
+            }
             if(private$use_proxy){
                 http_url <- sprintf("/proxy/%d",port)
                 if(nzchar(Sys.getenv("JUPYTERHUB_SERVICE_PREFIX"))){
@@ -35,9 +47,9 @@ HelpServer <- R6Class("HelpServer",
 help_server <- new.env()
 
 #' @export
-init_help <- function(){
-    help_server$current <- HelpServer$new()
-    #help_server$current$start()
+set_help_port <- function(port){
+    help_server$current <- HelpServer$new(port)
+    options(help.ports=port)
     replace_in_package("utils","help.start",help_start)
     replace_in_package("tools","example2html",example_html)
     replace_in_package("tools","demo2html",demo_html)
