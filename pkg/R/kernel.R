@@ -594,6 +594,7 @@ Kernel <- R6Class("Kernel",
       private$parent$control <- msg
       if(msg$header$msg_type=="shutdown_request"){
         # cat("shutdown_request received")
+        self$r_session$close()
         return(FALSE)
       }
       else if(msg$header$msg_type=="debug_request"){
