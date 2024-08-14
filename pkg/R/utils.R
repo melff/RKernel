@@ -27,7 +27,7 @@ emptyNamedList <- structure(list(),names=character(0))
 
 log_fn <- "/tmp/RKernel.log"
 
-
+is_kernel <- function() !is.null(kernel$current)
 
 log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
   dcl <- deparse1(match.call())
@@ -42,7 +42,11 @@ log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
     }
     else message <- paste(message,...,collapse="")
     message <- paste(crayon::green(format(Sys.time()),"\t",message,"\n"))
-    message <- paste("R INFO:",message)
+    message <- paste("R INFO:", message)
+    if (is_kernel()) 
+      message <- paste("KERNEL -", message)
+    else 
+      message <- paste("SESSION -", message)
         # self$cat(message,file=stderr())
     cat_(message,file=log_fn,append=TRUE)
   },error=function(e){
