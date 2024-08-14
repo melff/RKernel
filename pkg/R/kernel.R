@@ -541,7 +541,7 @@ Kernel <- R6Class("Kernel",
     },
 
     handle_comm_close = function(msg){
-      return(NULL)
+      # return(NULL)
       private$r_zmq_request_noreply(list(
         type = "comm_close",
         content = msg$content
@@ -619,7 +619,7 @@ Kernel <- R6Class("Kernel",
       private$send_busy(private$parent$shell)
       if(debug)
         log_out(paste("Got a", msg$header$msg_type, "request ..."))
-      # cat("Got a", msg$header$msg_type, "request ...\n")
+      cat("Got a", msg$header$msg_type, "request ...\n")
       # do_stuff ...
       switch(msg$header$msg_type,
              execute_request = private$handle_execute_request(msg),
@@ -733,9 +733,9 @@ Kernel <- R6Class("Kernel",
         return(NULL)
       }
       signature <- rawToChar(wire_in[[i+1]])
-      # log_out(signature)json
+      log_out(signature)
       msg <- wire_in[i + 2:5]
-      # log_out(private$get_signature(msg))
+      log_out(private$get_signature(msg))
       if(signature != private$get_signature(msg)) {
         log_error("Incorrect signature")
         log_out(msg, use.print = TRUE)
