@@ -355,8 +355,8 @@ Kernel <- R6Class("Kernel",
     pid = 0,
     execution_count = 1,
     handle_execute_request = function(msg){
-      log_out("handle_execute_request")
-      log_out(msg,use.print=TRUE)
+      # log_out("handle_execute_request")
+      # log_out(msg,use.print=TRUE)
       if(msg$content$silent){
         if(msg$content$store_history){
           log_warning("store_history forced to FALSE")
@@ -427,7 +427,7 @@ Kernel <- R6Class("Kernel",
       if(msg$content$store_history)
         private$execution_count <- private$execution_count + 1
       if (aborted) private$clear_shell_queue()
-      log_out("handle_execute_request done")
+      # log_out("handle_execute_request done")
     },
 
     display_id = character(0),
@@ -619,7 +619,7 @@ Kernel <- R6Class("Kernel",
       private$send_busy(private$parent$shell)
       if(debug)
         log_out(paste("Got a", msg$header$msg_type, "request ..."))
-      cat("Got a", msg$header$msg_type, "request ...\n")
+      # cat("Got a", msg$header$msg_type, "request ...\n")
       # do_stuff ...
       switch(msg$header$msg_type,
              execute_request = private$handle_execute_request(msg),
@@ -733,9 +733,9 @@ Kernel <- R6Class("Kernel",
         return(NULL)
       }
       signature <- rawToChar(wire_in[[i+1]])
-      log_out(signature)
+      # log_out(signature)
       msg <- wire_in[i + 2:5]
-      log_out(private$get_signature(msg))
+      # log_out(private$get_signature(msg))
       if(signature != private$get_signature(msg)) {
         log_error("Incorrect signature")
         log_out(msg, use.print = TRUE)
