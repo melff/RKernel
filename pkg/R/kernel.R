@@ -178,48 +178,6 @@ Kernel <- R6Class("Kernel",
       # log_out("display_send succeeded")
     },
     #' @description
-    #' Send rich format data to the frontend
-    #' @param data A list with mime-type members.
-    #' @param metadata A named list with metadata.
-    #' @param transient An optional list with the current display id.
-    display_data = function(data,metadata=emptyNamedList,transient=NULL){
-      #content <- list(data=data,transient=transient)
-      #if(length(metadata))
-      #  content$metadata <- metadata
-      #else
-      #  content$metadata <- emptyNamedList
-      # log_out("== display_data ===========")
-      # for(n in names(data)){
-      #   log_out("--",n,"--")
-      #   log_out(data[[n]])
-      # }
-      if(!length(transient))
-        transient <- emptyNamedList
-      private$send_message(type="display_data",
-                           parent=private$parent$shell,
-                           socket_name="iopub",
-                           content=list(
-                             data=data,
-                             metadata=metadata,
-                             transient=transient
-                           ))
-    },
-    #' @description
-    #' Update rich format data to the frontend
-    #' @param data A list with mime-type members.
-    #' @param metadata A named list with metadata.
-    #' @param transient An list with the current display id.
-    update_display_data = function(data,metadata=emptyNamedList,transient){
-      private$send_message(type="update_display_data",
-                           parent=private$parent$shell,
-                           socket_name="iopub",
-                           content=list(
-                             data=data,
-                             metadata=metadata,
-                             transient=transient
-                           ))
-    },
-    #' @description
     #' Send an error message and traceback to the frontend.
     #' @param name A string, the error name.
     #' @param value A string, the value of the error message.
@@ -245,60 +203,6 @@ Kernel <- R6Class("Kernel",
                    content=msg$content,
                    metadata=msg$metadata,
                    buffers=msg$buffers)
-    },
-    #' @description
-    #' Send a message via a comm.
-    #' @param id A string that identifies the comm.
-    #' @param data A list with data.
-    #' @param metadata An optional list with metadata.
-    #' @param buffers An optional list of raw vectors.
-    send_comm_msg = function(id,data,metadata=emptyNamedList,buffers=NULL){
-      # log_out("kernel$send_comm_msg")
-      private$send_message(type="comm_msg",debug=FALSE,
-                   parent=private$parent$shell,
-                   socket_name="iopub",
-                   content=list(
-                     comm_id=id,
-                     data=data),
-                   metadata=metadata,
-                   buffers=buffers)
-    },
-    #' @description
-    #' Open a comm in the frontend.
-    #' @param id A string that identifies the comm.
-    #' @param target_name A string that identifies a group of related comms.
-    #' @param data A list with data.
-    #' @param metadata An optional list with metadata.
-    #' @param buffers An optional list of raw vectors.
-    send_comm_open = function(id,target_name,data,metadata=emptyNamedList,buffers=NULL){
-      # log_out("kernel$send_comm_open")
-      private$send_message(type="comm_open",debug=FALSE,
-                   parent=private$parent$shell,
-                   socket_name="iopub",
-                   content=list(
-                     comm_id=id,
-                     target_name=target_name,
-                     target_module=NULL,
-                     data=data),
-                   metadata=metadata,
-                   buffers=buffers)
-    },
-    #' @description
-    #' Close a comm in the frontend.
-    #' @param id A string that identifies the comm.
-    #' @param data A list with data.
-    #' @param metadata An optional list with metadata.
-    #' @param buffers An optional list of raw vectors.
-    send_comm_close = function(id,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
-      # log_out("kernel$send_comm_close")
-      private$send_message(type="comm_close",debug=FALSE,
-                   parent=private$parent$shell,
-                   socket_name="iopub",
-                   content=list(
-                     comm_id=id,
-                     data=data),
-                   metadata=metadata,
-                   buffers=buffers)
     },
     #' @description
     #' The parent of the message currently sent.
@@ -839,13 +743,6 @@ Kernel <- R6Class("Kernel",
         }
         else break
       }
-    },
-
-    save_io_handlers = function(){
-      self$print <- .BaseNamespaceEnv$print
-      self$cat <- .BaseNamespaceEnv$cat
-      self$str <- utils::str
-      self$httpd <- tools:::httpd
     },
     
     logfile = NULL,
