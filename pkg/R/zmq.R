@@ -109,7 +109,7 @@ zmq_request <- function(){
         log_out("Empty response ...")
     }
     else {
-        log_out(paste("Response:",response$type))
+        # log_out(paste("Response:",response$type))
         zmq_send(response)
     }
     # log_out("done")
@@ -117,12 +117,12 @@ zmq_request <- function(){
 
 #' @export
 zmq_request_noreply <- function(){
-    log_out("zmq_request_noreply")
+    # log_out("zmq_request_noreply")
     msg <- zmq_receive()
     # log_out(msg,use.str=TRUE)
     envir <- parent.frame()
     type <- msg$type
-    log_out(paste("Type:", type))
+    # log_out(paste("Type:", type))
     handler <- zmq_handlers[[type]]
     if(length(handler)){
         tryCatch(handler(msg,envir),
@@ -131,7 +131,7 @@ zmq_request_noreply <- function(){
                      #log_error(msg,use.str=TRUE)
                  })
     }
-    log_out("done")
+    # log_out("done")
 }
 
 DLE <- '\x10'

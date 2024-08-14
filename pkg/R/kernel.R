@@ -169,13 +169,13 @@ Kernel <- R6Class("Kernel",
     #' Send rich format data to the frontend
     #' @param msg A list with the appropriate structure. [TODO]
     display_send = function(msg){
-      log_out("display_send")
+      # log_out("display_send")
       private$send_message(type=msg$type,
                            parent=private$parent$shell,
                            socket_name="iopub",
                            content=msg$content)
       private$display_id <- msg$content$transient$display_id
-      log_out("display_send succeeded")
+      # log_out("display_send succeeded")
     },
     #' @description
     #' Send rich format data to the frontend
@@ -510,12 +510,12 @@ Kernel <- R6Class("Kernel",
 
     inspect_reply = function(msg){
       # return(NULL)
-      log_out("inspect_reply")
+      # log_out("inspect_reply")
       reply <- private$r_zmq_request(list(
         type = "inspect_request",
         content = msg$content
       ))
-      log_out(reply, use.print=TRUE)
+      # log_out(reply, use.print=TRUE)
       private$send_message(
         type = "inspect_reply",
         parent = private$parent$shell,
@@ -526,7 +526,7 @@ Kernel <- R6Class("Kernel",
 
     comm_info_reply = function(msg){
       # return(NULL)
-      log_out("comm_info_reply")
+      # log_out("comm_info_reply")
       reply <- private$r_zmq_request(list(
         type = "comm_info_request",
         content = msg$content
@@ -617,7 +617,7 @@ Kernel <- R6Class("Kernel",
         return(FALSE)
       }
       else if(msg$header$msg_type=="debug_request"){
-        log_out("debug_request received")
+        # log_out("debug_request received")
         private$send_busy(private$parent$control)
         private$handle_debug_request(msg)
         private$send_idle(private$parent$control)
@@ -963,7 +963,7 @@ Kernel <- R6Class("Kernel",
       zmq_new_receiver(port, bind = TRUE)
     },
     r_zmq_request = function(req){
-      log_out("r_zmq_request")
+      # log_out("r_zmq_request")
       # log_out(req, use.print = TRUE)
       self$r_session$send_input("RKernel::zmq_request()")
       zmq_send(req)
@@ -974,14 +974,14 @@ Kernel <- R6Class("Kernel",
       return(resp)
     },
     r_zmq_request_noreply = function(req) {
-      log_out("r_zmq_request_noreply")
+      # log_out("r_zmq_request_noreply")
       # log_out(req, use.print = TRUE)
       self$r_session$send_input("RKernel::zmq_request_noreply()")
       zmq_send(req)
       self$r_session$process_output()
     },
     handle_r_zmq = function(msg){
-      log_out("handle_r_zmq")
+      # log_out("handle_r_zmq")
       msg_type <- msg$type
       msg_handler <- private$r_msg_handlers[[msg_type]]
       if(is.function(msg_handler)){
