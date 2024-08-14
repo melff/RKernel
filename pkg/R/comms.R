@@ -167,7 +167,7 @@ CommManagerClass <- R6Class("CommManager",
                         content = content,
                         metadata = metadata,
                         buffers = buffers)
-            zmq_send(msg)
+            zmq_push(msg)
         }
     )
 )
@@ -277,7 +277,7 @@ CommClass <- R6Class("Comm",
                         content = content,
                         metadata = metadata,
                         buffers = buffers)
-            zmq_send(msg)
+            zmq_push(msg)
         }
     )
 )

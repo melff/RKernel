@@ -236,6 +236,18 @@ Kernel <- R6Class("Kernel",
     },
     #' @description
     #' Send a message via a comm.
+    #' @param msg A list containing a comm message.
+    send_comm = function(msg){
+      # log_out("kernel$send_comm")
+      private$send_message(type=msg$type,debug=FALSE,
+                   parent=private$parent$shell,
+                   socket_name="iopub",
+                   content=msg$content,
+                   metadata=msg$metadata,
+                   buffers=msg$buffers)
+    },
+    #' @description
+    #' Send a message via a comm.
     #' @param id A string that identifies the comm.
     #' @param data A list with data.
     #' @param metadata An optional list with metadata.
@@ -464,7 +476,7 @@ Kernel <- R6Class("Kernel",
                            parent=private$parent$shell,
                            socket_name="shell",
                            content=response)
-      #cat("Sent a kernel_info_reply ...\n")
+      # log_out("Sent a kernel_info_reply ...\n")
     },
 
     is_complete_reply = function(msg){
@@ -498,10 +510,12 @@ Kernel <- R6Class("Kernel",
 
     inspect_reply = function(msg){
       # return(NULL)
+      log_out("inspect_reply")
       reply <- private$r_zmq_request(list(
         type = "inspect_request",
         content = msg$content
       ))
+      log_out(reply, use.print=TRUE)
       private$send_message(
         type = "inspect_reply",
         parent = private$parent$shell,
@@ -512,10 +526,14 @@ Kernel <- R6Class("Kernel",
 
     comm_info_reply = function(msg){
       # return(NULL)
+      log_out("comm_info_reply")
       reply <- private$r_zmq_request(list(
         type = "comm_info_request",
         content = msg$content
       ))
+      if(reply$type != "comm_info_reply"){
+        log_error(sprintf("Expected a 'comm_info_reply', got a '%s' message.", reply$type))
+      }
       private$send_message(
         type = "comm_info_reply",
         parent = private$parent$shell,
@@ -619,8 +637,8 @@ Kernel <- R6Class("Kernel",
       private$send_busy(private$parent$shell)
       if(debug)
         log_out(paste("Got a", msg$header$msg_type, "request ..."))
-      # cat("Got a", msg$header$msg_type, "request ...\n")
       # do_stuff ...
+      r <- tryCatch(
       switch(msg$header$msg_type,
              execute_request = private$handle_execute_request(msg),
              is_complete_request = private$is_complete_reply(msg),
@@ -631,8 +649,12 @@ Kernel <- R6Class("Kernel",
              comm_open = private$handle_comm_open(msg),
              comm_msg = private$handle_comm_msg(msg),
              comm_close = private$handle_comm_close(msg)
-             )
+             ),
+             error = function(e) conditionMessage(e)
+      )
+      if(is.character(r)) log_error(r)
       private$send_idle(private$parent$shell)
+      if (debug)  log_out("done")
       return(TRUE)
     },
 
@@ -858,7 +880,7 @@ Kernel <- R6Class("Kernel",
       }
       for(chunk in text){
         if (startsWith(chunk, ZMQ_PUSH)) {
-          msq <- zmq_receive()
+          msg <- zmq_receive()
           private$handle_r_zmq(msg)
         }
         else if (startsWith(chunk, JSON_MSG)) {
@@ -909,6 +931,9 @@ Kernel <- R6Class("Kernel",
     install_r_handlers = function(){
       private$r_msg_handlers$display_data <- self$display_send
       private$r_msg_handlers$update_display_data <- self$display_send
+      private$r_msg_handlers$test <- function(msg) self$stdout(msg$content)
+      for(msg_type in c("comm_msg", "comm_open", "comm_close"))
+        private$r_msg_handlers[[msg_type]] <- self$send_comm
     },
     r_init_help = function(){
       port <- random_open_port()
@@ -923,7 +948,7 @@ Kernel <- R6Class("Kernel",
     },
     r_zmq_env = NULL,
     r_zmq_init = function(){
-      self$r_session$run_cmd("RKernel::zmq_zmq_envinit()")
+      self$r_session$run_cmd("RKernel::zmq_init()")
       zmq_init()
       private$r_zmq_env <- zmq_env
     }, 
@@ -938,16 +963,22 @@ Kernel <- R6Class("Kernel",
       zmq_new_receiver(port, bind = TRUE)
     },
     r_zmq_request = function(req){
-      private$r_session$send_input("RKernel::zmq_request()")
+      log_out("r_zmq_request")
+      # log_out(req, use.print = TRUE)
+      self$r_session$send_input("RKernel::zmq_request()")
       zmq_send(req)
       resp <- zmq_receive()
       self$r_session$receive_to_prompt()
+      # log_out(" - response:")
+      # log_out(resp, use.print = TRUE)
       return(resp)
     },
-    r_zmq_request_norepy = function(req) {
-      private$r_session$send_input("RKernel::zmq_request_noreply()")
+    r_zmq_request_noreply = function(req) {
+      log_out("r_zmq_request_noreply")
+      # log_out(req, use.print = TRUE)
+      self$r_session$send_input("RKernel::zmq_request_noreply()")
       zmq_send(req)
-      self$r_session$receive_to_prompt()
+      self$r_session$process_output()
     },
     handle_r_zmq = function(msg){
       log_out("handle_r_zmq")
@@ -956,7 +987,10 @@ Kernel <- R6Class("Kernel",
       if(is.function(msg_handler)){
         msg_handler(msg)
       } else {
-        self$stderr(sprintf("R session sent message of unknown type '%s'", msg_type))
+        rsp <- sprintf("R session sent message of unknown type '%s'", msg_type)
+        self$stderr(rsp)
+        log_error(rsp)
+        log_out(msg, use.print = TRUE)
       }
     }
   )

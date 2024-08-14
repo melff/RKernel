@@ -9,6 +9,7 @@ zmq_env <- new.env()
 
 #' @export
 zmq_init <- function(){
+     # log_out("zmq_init")
     zmq_env$context <- zmq.ctx.new()
     zmq_env$sockets <- list()
     zmq_env$ports <- integer()
@@ -16,6 +17,7 @@ zmq_init <- function(){
 
 #' @export
 zmq_new_receiver <- function(port, bind = FALSE){
+    # log_out("zmq_new_receiver")
     socket <- zmq.socket(zmq_env$context, ZMQ.ST()$PULL)
     port <- as.integer(port)
     addr <- if (bind) sprintf("tcp://*:%d", port) 
@@ -29,6 +31,7 @@ zmq_new_receiver <- function(port, bind = FALSE){
 
 #' @export
 zmq_new_sender <- function(port, bind = FALSE){
+    # log_out("zmq_new_sender")
     socket <- zmq.socket(zmq_env$context, ZMQ.ST()$PUSH)
     port <- as.integer(port)
     addr <- if (bind) sprintf("tcp://*:%d", port) 
@@ -49,25 +52,28 @@ zmq_receive <- function(){
     # log_out(socket,use.str=TRUE)
     msg <- zmq.recv.multipart(socket,unserialize=FALSE)
     msg <- fromRawJSON(msg[[1]])
+    # log_out("message received")
     # log_out(msg,use.str=TRUE)
-    log_out("done")
+    log_out(msg$type)
     return(msg)
 }
 
 #' @export
 zmq_send <- function(msg){
     log_out("zmq_send")
-    log_out(msg,use.str=TRUE)
+    log_out(msg$type)
+    # log_out(msg,use.str=TRUE)
     socket <- zmq_env$sockets[["sender"]]
     msg <- toRawJSON(msg)
     msg <- append(list(msg),list(raw(0)))
     zmq.send.multipart(socket,msg,serialize=FALSE)
-    log_out("message sent")
+    # log_out("message sent")
     # log_out(msg,use.str=TRUE)
 }
 
 #' @export
 zmq_shutdown <- function(){
+    # log_out("zmq_shutdown")
     for(socket in zmq_env$sockets)
         zmq.close(socket)
     zmq.ctx.destroy(zmq_env$context)
@@ -77,32 +83,46 @@ zmq_handlers <- list()
 
 #' @export
 zmq_request <- function(){
-    # log_out("zmq_request")
+    log_out("zmq_request")
     msg <- zmq_receive()
     # log_out("message recieved")
     # log_out(msg,use.str=TRUE)
     envir <- parent.frame()
     type <- msg$type
+    log_out(paste("Type:",type))
     handler <- zmq_handlers[[type]]
     if(length(handler)){
         # log_out(sprintf("Found handler for '%s'", type))
-        response <- handler(msg,envir)
+        response <- tryCatch(handler(msg, envir),
+            error = function(e) {
+                log_error(conditionMessage(e))
+                # log_error(msg,use.str=TRUE)
+                return(NULL)
+            }
+        )
     }
     else {
         response <- zmq_default_handler(msq,env)
     }
     # log_out("handler success")
-    zmq_send(response)
+    if (is.null(response)) {
+        log_out("Empty response ...")
+    }
+    else {
+        log_out(paste("Response:",response$type))
+        zmq_send(response)
+    }
     # log_out("done")
 }
 
 #' @export
 zmq_request_noreply <- function(){
-    # log_out("zmq_request_noreply")
+    log_out("zmq_request_noreply")
     msg <- zmq_receive()
     # log_out(msg,use.str=TRUE)
     envir <- parent.frame()
     type <- msg$type
+    log_out(paste("Type:", type))
     handler <- zmq_handlers[[type]]
     if(length(handler)){
         tryCatch(handler(msg,envir),
@@ -111,7 +131,7 @@ zmq_request_noreply <- function(){
                      #log_error(msg,use.str=TRUE)
                  })
     }
-    # log_out("done")
+    log_out("done")
 }
 
 DLE <- '\x10'
