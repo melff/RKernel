@@ -50,6 +50,7 @@ Kernel <- R6Class("Kernel",
         url_with_port <- paste0(url,url_sep,conn_info[[port_name]])
         zmq.bind(private$sockets[[s]],url_with_port)
       }
+      private$conn_info <- conn_info
       private$pid <- Sys.getpid()
       kernel$current <- self
     },
@@ -737,6 +738,7 @@ Kernel <- R6Class("Kernel",
       # log_out(private$get_signature(msg))
       if(signature != private$get_signature(msg)) {
         log_error("Incorrect signature")
+        log_out(msg, use.print = TRUE)
         return(NULL)
       }
       msg <- lapply(msg,fromRawJSON,simplifyDataFrame=FALSE,simplifyMatrix=FALSE)
