@@ -58,7 +58,7 @@ Kernel <- R6Class("Kernel",
       self$r_session <- RKernelSession$new(callbacks = list(
         stdout = private$handle_r_stdout,
         stderr = private$handle_r_stderr,
-        msg = self$session_msg,
+        msg = self$r_session_msg,
         readline = private$r_get_input
       ))
       # log_out(self$r_session, use.print = TRUE)
@@ -144,9 +144,9 @@ Kernel <- R6Class("Kernel",
       self$stream(text,stream="stderr")
     },
     #' @description
-    #' Stream message creatd from R session process to the frontend via 'stderr' stream.
+    #' Stream message created from R session process to the frontend via 'stderr' stream.
     #' @param msg The message created by the 'RKernelSession' object.
-    session_msg = function(msg) {
+    r_session_msg = function(msg) {
       text <- capture.output(print(msg))
       self$stream(text,stream="stderr")
     },
