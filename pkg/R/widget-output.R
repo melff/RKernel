@@ -70,13 +70,9 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                     msg <- substring(chunk,nchar(JSON_MSG)+1,nchar(chunk))
                     msg <- gsub(ETB,"",msg)
                     msg <- jsonlite::fromJSON(msg)
-                    str_out <- capture.output(str(msg))
+                    #str_out <- capture.output(str(msg))
                     if(msg$type %in% c("display_data","update_display_data")){
-                        d <- structure(list(
-                            data = msg$content$data,
-                            metadata = msg$content$metadata,
-                            transient = list(display_id = UUIDgenerate())
-                        ),class=msg$type)
+                        d <- structure(msg$content,class=msg$type)
                         private$display_send(d)
                     }
                 }
@@ -131,10 +127,11 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             id <- d$transient$display_id
             update <- inherits(d,"update_display_data")
             l <- length(private$display_index)
-                # log_out(id,use.print=TRUE)
-                # log_out("OutputWidget$display_send")
-                # log_out(" -- id = ",id)
-                # log_out(private$display_index,use.print=TRUE)
+            # log_out(id,use.print=TRUE)
+            # log_out("OutputWidget$display_send")
+            # log_out(" -- id = ", id)
+            # log_out(class(d))
+            # log_out(private$display_index,use.print=TRUE)
             if(private$append_output){
                 if(update){
                     if(id == "last" && l > 0){
@@ -144,6 +141,9 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                     if(id %in% names(private$display_index)){
                         i <- private$display_index[id]
                         self$outputs[[i]] <- out_data
+                    } else {
+                        # log_out(private$display_index, use.print = TRUE)
+                        log_error(paste("Display with id", id, "not found."))
                     }
                 } else {
                     i <- length(self$outputs) + 1L
