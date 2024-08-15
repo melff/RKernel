@@ -83,13 +83,13 @@ zmq_handlers <- list()
 
 #' @export
 zmq_request <- function(){
-    log_out("zmq_request")
+    # log_out("zmq_request")
     msg <- zmq_receive()
     # log_out("message recieved")
     # log_out(msg,use.str=TRUE)
     envir <- parent.frame()
     type <- msg$type
-    log_out(paste("Type:",type))
+    # log_out(paste("Type:",type))
     handler <- zmq_handlers[[type]]
     if(length(handler)){
         # log_out(sprintf("Found handler for '%s'", type))
@@ -142,9 +142,8 @@ zmq_push <- function(msg){
     # log_out(msg,use.str=TRUE)
     cat_(DLE)
     cat_(ZMQ_PUSH)
-    zmq_send(msg)
     cat_(DLE)
-    cat_("")
+    zmq_send(msg)
     # log_out("zmq_push done")
 }
 
