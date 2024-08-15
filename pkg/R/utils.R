@@ -42,11 +42,11 @@ log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
     }
     else message <- paste(message,...,collapse="")
     message <- paste(crayon::green(format(Sys.time()),"\t",message,"\n"))
-    message <- paste("R INFO:", message)
+    message <- paste("INFO:", message)
     if (is_kernel()) 
-      message <- paste("KERNEL -", message)
+      message <- paste("R KERNEL -", message)
     else 
-      message <- paste("SESSION -", message)
+      message <- paste("          R SESSION -", message)
         # self$cat(message,file=stderr())
     cat_(message,file=log_fn,append=TRUE)
   },error=function(e){
@@ -62,7 +62,10 @@ log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
 log_warning = function(message){
   message <- paste(crayon::yellow(format(Sys.time()),"\t",message,"\n"))
   message <- paste("R WARNING:",message)
-      # self$cat(message,file=stderr())
+  if (is_kernel()) 
+    message <- paste("R KERNEL -", message)
+  else 
+    message <- paste("          R SESSION -", message)
   cat_(message,file=log_fn,append=TRUE)
 }
 #' @description
@@ -71,7 +74,10 @@ log_warning = function(message){
 log_error = function(message){
   message <- crayon::red(format(Sys.time()),"\t",message,"\n")
   message <- paste("R ERROR:",message)
-      # self$cat(message,file=stderr())
+  if (is_kernel()) 
+    message <- paste("R KERNEL -", message)
+  else 
+    message <- paste("          R SESSION -", message)
   cat_(message,file=log_fn,append=TRUE)
 }
 
