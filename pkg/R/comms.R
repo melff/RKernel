@@ -78,9 +78,6 @@ CommManagerClass <- R6Class("CommManager",
                     handlers$open(comm,data)
                 self$comms[[id]] <- comm
             }
-            else {
-                self$send_close(id,target_name)
-            }
         },
         #' @description
         #' Handle a 'comm close' request from the frontend
