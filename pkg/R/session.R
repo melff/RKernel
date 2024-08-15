@@ -171,7 +171,9 @@ RKernelSession <- R6Class("RKernelSession",
           if (!is.null(resp$msg) && is.function(self$callbacks$msg)) {
             self$callbacks$msg(resp$msp)
           }
-          if (!is.null(resp$stderr) && is.function(self$callbacks$stderr)) {
+          if (!is.null(resp$stderr) 
+              && nzchar(resp$stderr)
+              && is.function(self$callbacks$stderr)) {
             self$callbacks$stderr(resp$stderr)
           }
           if (!is.null(resp$stdout)) {
@@ -187,7 +189,8 @@ RKernelSession <- R6Class("RKernelSession",
               # log_out("Found main prompt")
               self$prompt_found <- TRUE
               resp$stdout <- remove_suffix(resp$stdout, self$prompt)
-              if (is.function(self$callbacks$stdout)) {
+              if (is.function(self$callbacks$stdout) 
+                  && nzchar(resp$stdout)) {
                 self$callbacks$stdout(resp$stdout)
               }
               next_line <- TRUE
@@ -211,7 +214,8 @@ RKernelSession <- R6Class("RKernelSession",
               }
               else self$send_input("")
             } else {
-              if (is.function(self$callbacks$stdout)) {
+              if (is.function(self$callbacks$stdout) 
+                  && nzchar(resp$stdout)) {
                 self$callbacks$stdout(resp$stdout)
               }
             }
