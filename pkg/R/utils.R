@@ -73,7 +73,7 @@ log_warning = function(message){
 #' @param message A string to be shown in the log
 log_error = function(message){
   message <- crayon::red(format(Sys.time()),"\t",message,"\n")
-  message <- paste("R ERROR:",message)
+  message <- paste("ERROR:",message)
   if (is_kernel()) 
     message <- paste("R KERNEL -", message)
   else 

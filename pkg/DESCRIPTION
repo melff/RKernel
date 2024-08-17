@@ -57,6 +57,7 @@ Collate:
     'magic-codes.R'
     'main.R'
     'output.R'
+    'proto.R'
     'scrolling-table.R'
     'session.R'
     'sharedHelp.R'
@@ -103,4 +104,3 @@ Collate:
     'widget-upload.R'
     'widget-virtual-table.R'
     'widget_link.R'
-    'zmq.R'

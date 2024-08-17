@@ -37,7 +37,7 @@ DAPServer <- R6Class("DAPServer",
               event = event,
               body = body
           )
-          zmq_push(list(
+          msg_send(list(
               type = "debug_event",
               content = content
           ))

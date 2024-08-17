@@ -10,9 +10,9 @@ display <- function(...){
     # log_out(paste("Class:",class(d)))
     # log_out(paste("ID:",display_id(d)))
     # log_out(d,use.str=TRUE)
-    d <- list(type=class(d),
+    msg <- list(type=class(d),
               content=unclass(d))
-    json_send(d)
+    msg_send(msg)
 }
 
 #' @export
