@@ -35,7 +35,6 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                               ...){
             super$initialize(...)
             private$append_output <- append_output
-
         },
         #' @description A variant of \code{\link{display}} for output within a display widget.
         #' @param ... Further arguments, passed on to the 'evaluate' method of the \code{\link{Context}}
@@ -62,28 +61,44 @@ OutputWidgetClass <- R6Class_("OutputWidget",
 
         append_output = FALSE,
         current_output = NULL,
+        r_msg_incomplete = FALSE,
+        r_msg_frag = "",
 
         stream = function(text,stream_name){
-            chunks <- unlist(strsplit(text,DLE))
-            for(chunk in chunks){
-                if(startsWith(chunk,JSON_MSG) && stream_name == "stdout"){
-                    msg <- substring(chunk,nchar(JSON_MSG)+1,nchar(chunk))
-                    msg <- gsub(ETB,"",msg)
-                    msg <- jsonlite::fromJSON(msg)
-                    #str_out <- capture.output(str(msg))
-                    if(msg$type %in% c("display_data","update_display_data")){
-                        d <- structure(msg$content,class=msg$type)
-                        private$display_send(d)
+            log_out("Widget-context: stream")
+            text <- split_string1(text, DLE)
+            for(chunk in text){
+                if (!length(chunk) || !nzchar(chunk)) next
+                if (startsWith(chunk, MSG_BEGIN)) {
+                    if (endsWith(chunk, MSG_END)) {
+                        msg <- remove_prefix(chunk, MSG_BEGIN) |> remove_suffix(MSG_END)
+                        msg <- msg_unwrap(msg)
+                        private$handle_r_msg(msg)
+                    } else {
+                        private$r_msg_incomplete <- TRUE
+                        private$r_msg_frag <- remove_prefix(chunk, MSG_BEGIN)
                     }
                 }
+                else if(endsWith(chunk, MSG_END)){
+                    msg <- paste0(private$r_msg_frag, remove_suffix(chunk, MSG_END))
+                    private$r_msg_incomplete <- FALSE
+                    private$r_msg_frag <- ""
+                    msg <- msg_unwrap(msg)
+                    private$handle_r_msg(msg)
+                }
                 else {
-                    private$stream1(chunk,stream_name)
+                    if(private$r_msg_incomplete) {
+                        private$r_msg_frag <- paste0(private$r_msg_frag, chunk)
+                    }
+                    else if(nzchar(chunk)) {
+                        self$stream1(chunk, stream_name)
+                    }
                 }
             }
         },
         stream1 = function(text,stream_name) {
             if(!nzchar(text)) return()
-            # log_out("Widget-context: stream")
+            # log_out("Widget-context: stream1")
             private$sync_suspended <- TRUE
             l <- length(self$outputs)
             if(private$append_output){
@@ -115,6 +130,16 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             }
             private$sync_suspended <- FALSE
             self$send_state("outputs")
+        },
+        handle_r_msg = function(msg) {
+            if(!is.list(msg)) return(NULL)
+            if (msg$type %in% c("display_data", "update_display_data")) {
+                d <- structure(msg$content, class = msg$type)
+                private$display_send(d)
+            }
+            else {
+                msg_send(msg) # Pass message on to frontend
+            }
         },
         display_index = integer(0),
         display_send = function(d){
@@ -198,7 +223,7 @@ with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear
     sink(serr_con,type="message")
     sink(sout_con,type="output")
     r <- eval(substitute(withVisible(expr)),envir=envir,enclos=enclos)
-    cat("")
+    # cat("")
     if(r$visible)
         print(r$value)
     sink(type="message")
@@ -209,5 +234,9 @@ with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear
     if(length(sout)){
         sout <- paste(sout,collapse="\n")
         data$stdout(sout)
+    }
+    if (length(serr)) {
+        serr <- paste(serr, collapse = "\n")
+        data$stdout(serr)
     }
 }

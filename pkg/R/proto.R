@@ -8,9 +8,9 @@ request_handlers <- new.env()
 
 #'@export 
 handle_request <- function(msg){
-  log_out("handle_request")
+  # log_out("handle_request")
   msg_type <- msg$type
-  log_out("msg_type")
+  # log_out("msg_type")
   envir <- parent.frame()
   handler <- request_handlers[[msg_type]]
   if (is.function(handler)) {
