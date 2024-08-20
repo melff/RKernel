@@ -68,6 +68,12 @@ Kernel <- R6Class("Kernel",
       private$install_r_handlers()
       private$r_init_help()
       private$r_set_help_displayed()
+      self$DAPServer <- DAPServer$new(
+        r_session = self$r_session,
+        send_debug_event = self$send_debug_event,
+        r_send_request = private$r_send_request,
+        r_send_cmd = private$r_send_cmd
+      )
       self$r_session$run_cmd("RKernel::startup()")
     },
     #' @field r_session See \code{\link{RKernelSession}}.
@@ -78,7 +84,7 @@ Kernel <- R6Class("Kernel",
     #' Run the kernel.
     run = function(){
       self$start()
-      # log_out("*** RKernel started ***")
+      log_out("*** RKernel started ***")
       continue <- TRUE
       while(continue) {
         continue <- self$poll_and_respond()
@@ -346,6 +352,7 @@ Kernel <- R6Class("Kernel",
     last_display = function() private$display_id,
 
     handle_debug_request = function(msg){
+      # log_out("handle_debug_request")
       request <- msg$content
       reply <- try(self$DAPServer$handle(request))
       if(inherits(reply,"try-error")){
@@ -371,7 +378,7 @@ Kernel <- R6Class("Kernel",
                          file_extension = ".R",
                          version = rversion),
                        banner = self$r_session$banner,
-                       debugger = FALSE)
+                       debugger = TRUE)
       private$send_message(type="kernel_info_reply",
                            parent=private$parent$shell,
                            socket_name="shell",
@@ -508,9 +515,13 @@ Kernel <- R6Class("Kernel",
       return(TRUE)
     },
 
-    respond_control = function(req){
+    respond_control = function(req, debug = FALSE){
+      # log_out("respond_control")
       msg <- private$get_message("control")
       if(!length(msg)) return(TRUE)
+      if (debug) {
+        log_out(paste("Got a", msg$header$msg_type, "request ..."))
+      }
       private$parent$control <- msg
       if(msg$header$msg_type=="shutdown_request"){
         # cat("shutdown_request received")
@@ -750,7 +761,7 @@ Kernel <- R6Class("Kernel",
       self$r_session$run_cmd("RKernel::install_cell_hooks()")
       self$r_session$run_cmd("RKernel::install_save_q()")
       self$r_session$run_cmd("RKernel::install_readline()")
-      self$r_session$run_cmd("options(error = function()print(traceback()))")
+      # self$r_session$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")
     },
     r_start_graphics = function(){
@@ -866,6 +877,12 @@ Kernel <- R6Class("Kernel",
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
       self$r_session$run_code(cmd)
+    },
+    r_send_cmd = function(cmd) {
+      resp <- self$r_session$run_cmd(cmd)
+      resp <- remove_prefix(resp$stdout, DLE) |> remove_suffix(DLE)
+      resp <- remove_prefix(resp, MSG_BEGIN) |> remove_suffix(MSG_END)
+      msg_unwrap(resp)
     }
   )
 )
