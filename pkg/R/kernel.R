@@ -68,6 +68,7 @@ Kernel <- R6Class("Kernel",
       private$install_r_handlers()
       private$r_init_help()
       private$r_set_help_displayed()
+      self$r_session$run_cmd("RKernel::startup()")
     },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
