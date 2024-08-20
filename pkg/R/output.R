@@ -1,20 +1,21 @@
 ## From R base
-cat_ <- function (..., file = "", sep = " ", fill = FALSE, labels = NULL, 
-    append = FALSE) 
-{
-    if (is.character(file)) 
-        if (file == "") 
-            file <- stdout()
-        else if (startsWith(file, "|")) {
-            file <- pipe(substring(file, 2L), "w")
-            on.exit(close(file))
-        }
-        else {
-            file <- file(file, ifelse(append, "a", "w"))
-            on.exit(close(file))
-        }
-    .Internal(cat(list(...), file, sep, fill, labels, append))
-}
+# cat_ <- function (..., file = "", sep = " ", fill = FALSE, labels = NULL, 
+#     append = FALSE) 
+# {
+#     if (is.character(file)) 
+#         if (file == "") 
+#             file <- stdout()
+#         else if (startsWith(file, "|")) {
+#             file <- pipe(substring(file, 2L), "w")
+#             on.exit(close(file))
+#         }
+#         else {
+#             file <- file(file, ifelse(append, "a", "w"))
+#             on.exit(close(file))
+#         }
+#     .Internal(cat(list(...), file, sep, fill, labels, append))
+# }
+cat_ <- getFromNamespace("cat", "base")
 
 cat_with_hooks  <- function (..., file = "", sep = " ", fill = FALSE, labels = NULL, 
     append = FALSE) 
