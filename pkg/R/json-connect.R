@@ -28,5 +28,16 @@ json_send <- function(msg){
 }
 msg_send <- json_send
 
-json_unwrap <- fromJSON
+json_unwrap <- function(x) {
+    fromJSON(x,
+        simplifyVector = FALSE,
+        simplifyDataFrame = FALSE,
+        simplifyMatrix = FALSE
+    )
+}
 msg_unwrap <- json_unwrap  
+
+msg_extract <- function(msg) {
+    msg <- remove_prefix(msg, DLE) |> remove_suffix(DLE)
+    remove_prefix(msg, MSG_BEGIN) |> remove_suffix(MSG_END)
+}

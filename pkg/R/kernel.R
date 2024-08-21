@@ -880,9 +880,8 @@ Kernel <- R6Class("Kernel",
     },
     r_send_cmd = function(cmd) {
       resp <- self$r_session$run_cmd(cmd)
-      resp <- remove_prefix(resp$stdout, DLE) |> remove_suffix(DLE)
-      resp <- remove_prefix(resp, MSG_BEGIN) |> remove_suffix(MSG_END)
-      msg_unwrap(resp)
+      msg <- msg_extract(resp$stdout)
+      msg_unwrap(msg)
     }
   )
 )
