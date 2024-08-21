@@ -11,12 +11,12 @@ DAPServer <- R6Class("DAPServer",
             self$r_send_cmd <- r_send_cmd
         },
         handle = function(request, ...) {
-            log_out("DAPServer$handle")
+            # log_out("DAPServer$handle")
             # if(request$command != "debugInfo"){
             #     log_out(sprintf("DAPServer: got command '%s",request$command))
             #     log_out(request$arguments,use.print=TRUE)
             # }
-            log_out(request$command)
+            # log_out(request$command)
             body <- switch(request$command,
                 debugInfo = self$debugInfo(request, ...),
                 initialize = self$debug_init(request, ...),
@@ -37,8 +37,8 @@ DAPServer <- R6Class("DAPServer",
                 body = body
             )
             self$response_seq <- self$response_seq + 1L
-            log_out("response:")
-            log_out(response, use.print = TRUE)
+            # log_out("response:")
+            # log_out(response, use.print = TRUE)
             return(response)
         },
         response_seq = 1L,
@@ -54,8 +54,7 @@ DAPServer <- R6Class("DAPServer",
         },
         event_seq = 1L,
         debugInfo = function(request){
-            log_out("debugInfo")
-            log_out(self$is_started)
+            # log_out("debugInfo")
             list(
                 isStarted = self$is_started,
                 hashMethod = "Murmur2",
@@ -100,21 +99,31 @@ DAPServer <- R6Class("DAPServer",
             )
         },
         is_started = FALSE,
-        debug_attach = function(request, ...) {
+        debug_attach = function(request) {
             self$is_started <- TRUE
             return(NULL)
         },
-        debug_disconnect = function(request, ...) {
+        debug_disconnect = function(request) {
             self$is_started <- TRUE
             return(NULL)
         },
-        inspect_variables = function(request, envir, ...) {
+        inspect_variables = function(request) {
             variables <- self$r_send_cmd("RKernel::inspect_variables()")
-            log_out(variables, use.str = TRUE)
             body <- list(variables = variables)
             return(body)
         },
-        dumpCell = function(request, ...) {
+        reply_variables = function(request) {
+            # log_out("reply_variables")
+            # log_out(request, use.str = TRUE)
+            arguments <- request$arguments
+            vref <- arguments$variablesReference
+            cmd <- sprintf("RKernel:::ref2children(%d)", vref)
+            variables <- self$r_send_cmd(cmd)
+            body <- list(variables = variables)
+            # log_out(body, use.str = TRUE)
+            return(body)
+        },
+        dumpCell = function(request) {
             code <- request$arguments$code
             src_filename <- tempfile("codecell", fileext = ".R")
             writeLines(code, con = src_filename)
@@ -123,8 +132,9 @@ DAPServer <- R6Class("DAPServer",
                 sourcePath = src_filename
             )
         },
-        rich_inspect_variable = function(request, envir, ...) {
+        rich_inspect_variable = function(request) {
             varname <- request$arguments$variableName
+            return(NULL)
             thing <- self$get_thing(varname, envir)
             # log_out(thing,use.str=TRUE)
             if (!length(thing$value)) {
