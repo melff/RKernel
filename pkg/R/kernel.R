@@ -57,7 +57,9 @@ Kernel <- R6Class("Kernel",
         stdout = private$handle_r_stdout,
         stderr = private$handle_r_stderr,
         msg = self$r_session_msg,
-        readline = private$r_get_input
+        readline = private$r_get_input,
+        menu = private$r_get_input,
+        browser = private$r_get_input
       ))
       # log_out(self$r_session, use.print = TRUE)
     },

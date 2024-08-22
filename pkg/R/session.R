@@ -11,7 +11,7 @@ RKernelSession <- R6Class("RKernelSession",
     co_prompt = "+ ",
     co_prompt_regex = "[+] $",
     menu_prompt = ": ",
-    browse_prompt = "^Browse\\[([0-9]+)\\]> $",
+    browse_prompt = "Browse\\[([0-9]+)\\]> $",
     readline_prompt = "",
     prompt_found = FALSE,
     banner = "",
@@ -31,7 +31,9 @@ RKernelSession <- R6Class("RKernelSession",
                                 cat(crayon::red(x))
                               },
                               msg = print,
-                              readline = readline
+                              readline = readline,
+                              menu = menu_callback,
+                              browser = browser_callback
                             )
                           ) {
       super$initialize(
@@ -161,7 +163,6 @@ RKernelSession <- R6Class("RKernelSession",
       return(resp)
     },
     process_output = function(drop_echo=TRUE){
-        # log_out("process_output")
         next_line <- FALSE
         cnt <- 0
         force_drop_echo <- FALSE
@@ -181,7 +182,14 @@ RKernelSession <- R6Class("RKernelSession",
               resp$stdout <- drop_echo(resp$stdout)
               force_drop_echo <- FALSE
             }
-            if (endsWith(resp$stdout, self$co_prompt)) {
+            if (grepl(self$browse_prompt, resp$stdout)) {
+              # log_out("Found browser prompt")
+              if (is.function(self$callbacks$browser)) {
+                inp <- self$callbacks$browser(resp$stdout)
+                force_drop_echo <- TRUE
+                self$send_input(inp)
+              } else self$send_input("Q")
+            } else if (endsWith(resp$stdout, self$co_prompt)) {
               # log_out("Found continuation prompt")
               resp$stdout <- NULL
               next_line <- TRUE
@@ -198,22 +206,23 @@ RKernelSession <- R6Class("RKernelSession",
               # log_out("Found menu prompt")
               # resp$stdout <- remove_suffix(resp$stdout, self$menu_prompt)
               if (is.function(self$callbacks$menu)) {
-                self$callbacks$menu(resp$stdout)
-              }
-            } else if (grepl(self$browse_prompt, resp$stdout)) {
-              # log_out("Found browser prompt")
-              if (is.function(self$callbacks$browse)) {
-                self$callbacks$browse(resp$stdout)
-              }
+                inp <- self$callbacks$menu(resp$stdout)
+                force_drop_echo <- TRUE
+                self$send_input(inp)
+              } else self$send_input("")
             } else if (endsWith(resp$stdout, self$readline_prompt)) {
+              # log_out("Found readline prompt")
               resp$stdout <- remove_suffix(resp$stdout, self$readline_prompt)
               if (is.function(self$callbacks$readline)) {
+                # log_out("Calling readline callback")
                 inp <- self$callbacks$readline(prompt = resp$stdout)
                 force_drop_echo <- TRUE
+                # log_out("Sending", inp)
                 self$send_input(inp)
               }
               else self$send_input("")
             } else {
+              # log_out("stdout callback")
               if (is.function(self$callbacks$stdout) 
                   && nzchar(resp$stdout)) {
                 self$callbacks$stdout(resp$stdout)
@@ -261,4 +270,12 @@ drop_echo <- function(txt) {
       # log_out(resp, use.print = TRUE)
   }
   txt
+}
+
+menu_callback <- function(prompt) {
+  readline(prompt = prompt)
+}
+
+browser_callback <- function(prompt) {
+  readline(prompt = prompt)
 }
