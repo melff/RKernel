@@ -210,31 +210,52 @@ get_children <- function(obj, ename, envir) {
     children <- lapply(enames, get_variable, envir = envir)
   } 
   else if (is.environment(obj)) {
-    nms <- ls(obj)
-    n <- length(nms)
-    i <- seq_len(n)
-    cpl <- ifelse(nzchar(nms), "$", "")
-    enames <- ifelse(safe_names(nms), nms, paste0("`", nms, "`"))
-    enames <- paste0(ename,cpl,enames)
-    m <- max(variables_helper$refs)
-    new_refs <- structure(
-      seq.int(from = m + 1, to = m + n),
-      names = enames
-    )
-    variables_helper$refs <- c(variables_helper$refs, new_refs)
+    e_ename <- paste0("format(", ename, ")")
+    e_ref <- max(variables_helper$refs) + 1
+    names(e_ref) <- e_ename
+    variables_helper$refs <- c(variables_helper$refs, e_ref)
     variables_helper$enames <- c(
       variables_helper$enames,
-      structure(enames,
-        names = as.character(new_refs)
+      structure(e_ename,
+        names = as.character(e_ref)
       )
     )
     variables_helper$names <- c(
       variables_helper$names,
-      structure(nms,
-        names = as.character(new_refs)
+      structure("",
+        names = as.character(e_ref)
       )
     )
-    children <- lapply(enames, get_variable, envir = envir)
+    ee <- get_variable(e_ename, envir = envir)
+    children <- list(ee)
+    if(!identical(obj,.GlobalEnv)) {
+      nms <- ls(obj)
+      n <- length(nms)
+      i <- seq_len(n)
+      cpl <- ifelse(nzchar(nms), "$", "")
+      enames <- ifelse(safe_names(nms), nms, paste0("`", nms, "`"))
+      enames <- paste0(ename,cpl,enames)
+      m <- max(variables_helper$refs)
+      new_refs <- structure(
+        seq.int(from = m + 1, to = m + n),
+        names = enames
+      )
+      variables_helper$refs <- c(variables_helper$refs, new_refs)
+      variables_helper$enames <- c(
+        variables_helper$enames,
+        structure(enames,
+          names = as.character(new_refs)
+        )
+      )
+      variables_helper$names <- c(
+        variables_helper$names,
+        structure(nms,
+          names = as.character(new_refs)
+        )
+      )
+      ov <- lapply(enames, get_variable, envir = envir)
+      children <- c(children, ov)
+    }
   } 
   else if (is.function(obj)) {
     args_ename <- paste0("RKernel:::get_args(", ename, ")")
@@ -255,7 +276,47 @@ get_children <- function(obj, ename, envir) {
     )
     arv <- get_variable(args_ename, envir = envir)
     children <- c(children, list(arv))
+
+    e_ename <- paste0("environment(", ename, ")")
+    e_ref <- max(variables_helper$refs) + 1
+    names(e_ref) <- e_ename
+    variables_helper$refs <- c(variables_helper$refs, e_ref)
+    variables_helper$enames <- c(
+      variables_helper$enames,
+      structure(e_ename,
+        names = as.character(e_ref)
+      )
+    )
+    variables_helper$names <- c(
+      variables_helper$names,
+      structure("environment()",
+        names = as.character(e_ref)
+      )
+    )
+    ee <- get_variable(e_ename, envir = envir)
+    children <- c(children, list(ee))
   }
+  else if (is.language(obj)) {
+    lang_ename <- paste0("paste(deparse(", ename, "), collapse=' ')")
+    lang_ref <- max(variables_helper$refs) + 1
+    names(lang_ref) <- lang_ename
+    variables_helper$refs <- c(variables_helper$refs, lang_ref)
+    variables_helper$enames <- c(
+      variables_helper$enames,
+      structure(lang_ename,
+        names = as.character(lang_ref)
+      )
+    )
+    variables_helper$names <- c(
+      variables_helper$names,
+      structure("",
+        names = as.character(lang_ref)
+      )
+    )
+    lv <- get_variable(lang_ename, envir = envir)
+    children <- list(lv)
+  }
+  
   if(isS4(obj)) {
     nms <- setdiff(slotNames(obj), c(".Data", "names"))
     n <- length(nms)
