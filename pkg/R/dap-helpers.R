@@ -122,7 +122,8 @@ get_function_val <- function(x) {
 get_structured_val <- function(x) UseMethod("get_structured_val")
 
 get_structured_val.default <- function(x){
-      capture.output(str_(x, give.attr = FALSE, list.len = 0))[1]
+  if(is.language(x)) paste(deparse(x), collapse=" ")
+  else capture.output(str_(x, give.attr = FALSE, list.len = 0))[1]
 }
 
 get_structured_val.list <- function(x) {
