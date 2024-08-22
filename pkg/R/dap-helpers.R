@@ -49,6 +49,11 @@ inspect_value <- function(x) {
     value <- get_function_val(x)
     structured <- TRUE  
   }
+  else if(isS4(x)) {
+    type <- paste("S4 class",sQuote(class(x)))
+    value <- get_structured_val(x)
+    structured <- TRUE
+  }
   else {
     type <- paste(class(x), collapse=", ")
     value <- get_structured_val(x)
@@ -176,10 +181,13 @@ get_children <- function(obj, ename, envir) {
       nms <- rep("", n)
     }
     i <- seq_len(n)
-    idx <- ifelse(nzchar(nms), paste0("`", nms, "`"), paste0("[[", i, "]]"))
+    char_idx <- ifelse(safe_names(nms), nms, paste0("`", nms, "`"))
+    num_idx <- paste0("[[", i, "]]")
+    idx <- ifelse(nzchar(nms), char_idx, num_idx)
     inames <- ifelse(nzchar(nms),nms,i)
     cpl <- ifelse(nzchar(nms), "$", "")
-    enames <- paste0(ename,cpl,idx)
+    # inames <- paste0(cpl, idx)
+    enames <- paste0(ename, cpl, idx)
     m <- max(variables_helper$refs)
     new_refs <- structure(
       seq.int(from = m + 1, to = m + n),
@@ -205,7 +213,8 @@ get_children <- function(obj, ename, envir) {
     n <- length(nms)
     i <- seq_len(n)
     cpl <- ifelse(nzchar(nms), "$", "")
-    enames <- paste0(ename,cpl,"`",nms,"`")
+    enames <- ifelse(safe_names(nms), nms, paste0("`", nms, "`"))
+    enames <- paste0(ename,cpl,enames)
     m <- max(variables_helper$refs)
     new_refs <- structure(
       seq.int(from = m + 1, to = m + n),
@@ -246,7 +255,34 @@ get_children <- function(obj, ename, envir) {
     arv <- get_variable(args_ename, envir = envir)
     children <- c(children, list(arv))
   }
-  if(has_nontriv_attribs(obj)){
+  if(isS4(obj)) {
+    nms <- setdiff(slotNames(obj), c(".Data", "names"))
+    n <- length(nms)
+    nms <- ifelse(safe_names(nms), nms, paste0("`", nms, "`"))
+    nms <- paste0("@", nms)
+    enames <- paste0(ename, nms)
+    m <- max(variables_helper$refs)
+    slot_refs <- structure(
+      seq.int(from = m + 1, to = m + n),
+      names = enames
+    )
+    variables_helper$refs <- c(variables_helper$refs, slot_refs)
+    variables_helper$enames <- c(
+      variables_helper$enames,
+      structure(enames,
+        names = as.character(slot_refs)
+      )
+    )
+    variables_helper$names <- c(
+      variables_helper$names,
+      structure(nms,
+        names = as.character(slot_refs)
+      )
+    )
+    slots <- lapply(enames, get_variable, envir = envir)
+    children <- c(children, slots)
+  }
+  else if(has_nontriv_attribs(obj)){
     attr_ename <- paste0("RKernel:::nontriv_attribs(", ename, ")")
     attr_ref <- max(variables_helper$refs) + 1
     names(attr_ref) <- attr_ename
@@ -294,3 +330,5 @@ get_args <- function(x) {
   a <- a[-length(a)]
   lapply(a, deparse)
 }
+
+safe_names <- function(x) grepl("^[a-zA-Z.][a-zA-Z0-9._]*$", x)
