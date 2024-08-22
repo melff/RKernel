@@ -134,19 +134,10 @@ DAPServer <- R6Class("DAPServer",
         },
         rich_inspect_variable = function(request) {
             varname <- request$arguments$variableName
-            return(NULL)
-            thing <- self$get_thing(varname, envir)
-            # log_out(thing,use.str=TRUE)
-            if (!length(thing$value)) {
-                body <- display_data(
-                    data = list("text/html" = sprintf(
-                        "Information from frontend: \"%s\"", request$arguments
-                    ))
-                )
-            } else {
-                body <- display_data(thing$value)
-            }
-            return(unclass(body))
+            cmd <- sprintf("RKernel::display(get0('%s'))", varname)
+            response <- self$r_send_cmd(cmd)
+            body <- response$content[c("data","metadata")]
+            return(body)
         }
     )
 )
