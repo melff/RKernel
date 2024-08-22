@@ -42,7 +42,7 @@ inspect_value <- function(x) {
   if (is.atomic(x)) {
     value <- get_atomic_val(x)
     type <- get_atomic_type(x)
-    structured <- FALSE
+    structured <- (length(x) > 1)
   }
   else if(is.function(x)){
     type <- "function"
@@ -52,6 +52,9 @@ inspect_value <- function(x) {
   else {
     type <- paste(class(x), collapse=", ")
     value <- get_structured_val(x)
+    structured <- TRUE
+  }
+  if(has_nontriv_attribs(x)){
     structured <- TRUE
   }
   return(list(
@@ -146,7 +149,29 @@ ref2children <- function(ref, envir = parent.frame()) {
 
 get_children <- function(obj, ename, envir) {
   if (is.atomic(obj)) {
-    return(list(NULL))
+    if (length(obj) > 1) {
+      elts_ename <- paste0("RKernel:::str_minimal(", ename, ")")
+      elts_ref <- max(variables_helper$refs) + 1
+      names(elts_ref) <- elts_ename
+      variables_helper$refs <- c(variables_helper$refs, elts_ref)
+      variables_helper$enames <- c(
+        variables_helper$enames,
+        structure(elts_ename,
+          names = as.character(elts_ref)
+        )
+      )
+      variables_helper$names <- c(
+        variables_helper$names,
+        structure("[ ]",
+          names = as.character(elts_ref)
+        )
+      )
+      ev <- get_variable(elts_ename, envir = envir)
+      children <- list(ev)
+    }
+    else {
+      children <- NULL
+    }
   }
   else if (is.list(obj)) {
     nms <- names(obj)
@@ -177,6 +202,47 @@ get_children <- function(obj, ename, envir) {
         names = as.character(new_refs)
       )
     )
-    lapply(enames, get_variable, envir = envir)
+    children <- lapply(enames, get_variable, envir = envir)
   }
+  if(has_nontriv_attribs(obj)){
+    attr_ename <- paste0("RKernel:::nontriv_attribs(", ename, ")")
+    attr_ref <- max(variables_helper$refs) + 1
+    names(attr_ref) <- attr_ename
+    variables_helper$refs <- c(variables_helper$refs, attr_ref)
+    variables_helper$enames <- c(
+      variables_helper$enames,
+      structure(attr_ename,
+        names = as.character(attr_ref)
+      )
+    )
+    variables_helper$names <- c(
+      variables_helper$names,
+      structure("attributes()",
+        names = as.character(attr_ref)
+      )
+    )
+    av <- get_variable(attr_ename, envir = envir)
+    children <- c(children, list(av))
+  }
+  return(children)
+}
+
+nontriv_attribs <- function(x) {
+  a <- attributes(x)
+  triv <- names(a) %in% c("class", "dim", "names")
+  a[!triv]
+}
+
+has_nontriv_attribs <- function(x) {
+  length(nontriv_attribs(x)) > 0
+}
+
+str_minimal <- function(x){
+  capture.output(
+    str_(
+      x,
+      give.head = FALSE, 
+      give.length = FALSE, 
+      give.attr = FALSE
+  ))
 }
