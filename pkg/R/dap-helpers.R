@@ -47,7 +47,7 @@ inspect_value <- function(x) {
   else if(is.function(x)){
     type <- "function"
     value <- get_function_val(x)
-    structured <- FALSE  
+    structured <- TRUE  
   }
   else {
     type <- paste(class(x), collapse=", ")
@@ -148,30 +148,26 @@ ref2children <- function(ref, envir = parent.frame()) {
 }
 
 get_children <- function(obj, ename, envir) {
-  if (is.atomic(obj)) {
-    if (length(obj) > 1) {
-      elts_ename <- paste0("RKernel:::str_minimal(", ename, ")")
-      elts_ref <- max(variables_helper$refs) + 1
-      names(elts_ref) <- elts_ename
-      variables_helper$refs <- c(variables_helper$refs, elts_ref)
-      variables_helper$enames <- c(
-        variables_helper$enames,
-        structure(elts_ename,
-          names = as.character(elts_ref)
-        )
+  children <- list()
+  if (is.atomic(obj) && length(obj) > 1) {
+    elts_ename <- paste0("RKernel:::str_minimal(", ename, ")")
+    elts_ref <- max(variables_helper$refs) + 1
+    names(elts_ref) <- elts_ename
+    variables_helper$refs <- c(variables_helper$refs, elts_ref)
+    variables_helper$enames <- c(
+      variables_helper$enames,
+      structure(elts_ename,
+        names = as.character(elts_ref)
       )
-      variables_helper$names <- c(
-        variables_helper$names,
-        structure("[ ]",
-          names = as.character(elts_ref)
-        )
+    )
+    variables_helper$names <- c(
+      variables_helper$names,
+      structure("[ ]",
+        names = as.character(elts_ref)
       )
-      ev <- get_variable(elts_ename, envir = envir)
-      children <- list(ev)
-    }
-    else {
-      children <- NULL
-    }
+    )
+    ev <- get_variable(elts_ename, envir = envir)
+    children <- list(ev)
   }
   else if (is.list(obj)) {
     nms <- names(obj)
@@ -180,7 +176,7 @@ get_children <- function(obj, ename, envir) {
       nms <- rep("", n)
     }
     i <- seq_len(n)
-    idx <- ifelse(nzchar(nms), nms, paste0("[[", i, "]]"))
+    idx <- ifelse(nzchar(nms), paste0("`", nms, "`"), paste0("[[", i, "]]"))
     inames <- ifelse(nzchar(nms),nms,i)
     cpl <- ifelse(nzchar(nms), "$", "")
     enames <- paste0(ename,cpl,idx)
@@ -203,6 +199,52 @@ get_children <- function(obj, ename, envir) {
       )
     )
     children <- lapply(enames, get_variable, envir = envir)
+  } 
+  else if (is.environment(obj)) {
+    nms <- ls(obj)
+    n <- length(nms)
+    i <- seq_len(n)
+    cpl <- ifelse(nzchar(nms), "$", "")
+    enames <- paste0(ename,cpl,"`",nms,"`")
+    m <- max(variables_helper$refs)
+    new_refs <- structure(
+      seq.int(from = m + 1, to = m + n),
+      names = enames
+    )
+    variables_helper$refs <- c(variables_helper$refs, new_refs)
+    variables_helper$enames <- c(
+      variables_helper$enames,
+      structure(enames,
+        names = as.character(new_refs)
+      )
+    )
+    variables_helper$names <- c(
+      variables_helper$names,
+      structure(nms,
+        names = as.character(new_refs)
+      )
+    )
+    children <- lapply(enames, get_variable, envir = envir)
+  } 
+  else if (is.function(obj)) {
+    args_ename <- paste0("RKernel:::get_args(", ename, ")")
+    args_ref <- max(variables_helper$refs) + 1
+    names(args_ref) <- args_ename
+    variables_helper$refs <- c(variables_helper$refs, args_ref)
+    variables_helper$enames <- c(
+      variables_helper$enames,
+      structure(args_ename,
+        names = as.character(args_ref)
+      )
+    )
+    variables_helper$names <- c(
+      variables_helper$names,
+      structure("args()",
+        names = as.character(args_ref)
+      )
+    )
+    arv <- get_variable(args_ename, envir = envir)
+    children <- c(children, list(arv))
   }
   if(has_nontriv_attribs(obj)){
     attr_ename <- paste0("RKernel:::nontriv_attribs(", ename, ")")
@@ -245,4 +287,10 @@ str_minimal <- function(x){
       give.length = FALSE, 
       give.attr = FALSE
   ))
+}
+
+get_args <- function(x) {
+  a <- as.list(args(x))
+  a <- a[-length(a)]
+  lapply(a, deparse)
 }
