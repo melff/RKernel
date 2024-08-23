@@ -17,24 +17,10 @@ CommManagerClass <- R6Class("CommManager",
         comms   = list(),
 
         #' @description
-        #' Set up internal fields
-        #' @param kernel Reference to the relevant kernel
-        #' @param evaluator Reference to the relevant evaluator
-        initialize = function(kernel,evaluator){
-            private$kernel <- kernel
-            private$evaluator <- evaluator
-        },
-
-        #' @description
         #' Add a handler for a comm target
         #' @param target_name A string, the name of the target.
         #' @param handlers A named list of handlers
         add_handlers = function(target_name,handlers){
-            for(n in names(handlers)){
-                environment(handlers[[n]]) <- new.env(parent=environment(handlers[[n]]))
-                assign("print",base::print,envir=environment(handlers[[n]]))
-                assign("cat",base::cat,envir=environment(handlers[[n]]))
-            }
             private$handlers[[target_name]] <- handlers
         },
         #' @description
@@ -72,7 +58,6 @@ CommManagerClass <- R6Class("CommManager",
                 handlers <- private$handlers[[target_name]]
                 comm <- Comm(target_name,
                              id,
-                             private$kernel,
                              handlers)
                 self$comms[[id]] <- comm
                 return(comm)
@@ -85,30 +70,13 @@ CommManagerClass <- R6Class("CommManager",
         #' @param id A string, the comm id
         #' @param data Data sent by the frontend
         handle_open = function(target_name,id,data){
-            # private$kernel$log_out("handle_open")
-            # private$kernel$log_out(data,use.print=TRUE)
             if(target_name %in% names(private$handlers)){
                 handlers <- private$handlers[[target_name]]
-                comm <- Comm(target_name,id,self,handlers)
+                comm <- Comm(target_name,id,handlers)
                 comm$data <- data
-                if("open" %in% names(handlers)){
-                    text <- tryCatch(capture.output(handlers$open(comm,data)),
-                                     error=function(e) {
-                                         emsg <- conditionMessage(e)
-                                         private$evaluator$stream(
-                                                               paste("Error in handle_open:",
-                                                                     emsg),
-                                                           stream="stderr")
-                                         return("")
-                                     })
-                    text <- paste(text,collapse="\n")
-                    private$evaluator$stream(text,stream="stdout")
-                }
+                if("open" %in% names(handlers))
+                    handlers$open(comm,data)
                 self$comms[[id]] <- comm
-            }
-            else {
-                # private$kernel$log_out("send_close")
-                self$send_close(id,target_name)
             }
         },
         #' @description
@@ -116,24 +84,11 @@ CommManagerClass <- R6Class("CommManager",
         #' @param id A string, the comm id
         #' @param data Data sent by the frontend
         handle_close = function(id,data){
-            # private$kernel$log_out("handle_close")
-            # private$kernel$log_out(data,use.print=TRUE)
             comm <- self$comms[[id]]
             handlers <- comm$handlers
             comm$data <- data
-            if("close" %in% names(handlers)){
-                text <- tryCatch(capture.output(handlers$close(comm,data)),
-                                 error=function(e) {
-                                     emsg <- conditionMessage(e)
-                                     private$evaluator$stream(
-                                                           paste("Error in handle_close:",
-                                                                 emsg),
-                                                           stream="stderr")
-                                     return("")
-                                 })
-                text <- paste(text,collapse="\n")
-                private$evaluator$stream(text,stream="stdout")
-            }
+            if("close" %in% names(handlers))
+                handlers$close(comm,data)
         },
         #' @description
         #' Handle a comm message from the frontend
@@ -143,20 +98,8 @@ CommManagerClass <- R6Class("CommManager",
             comm <- self$comms[[id]]
             handlers <- comm$handlers
             comm$data <- data
-            if("msg" %in% names(handlers)){
-                # handlers$msg(comm,data)
-                text <- tryCatch(capture.output(handlers$msg(comm,data)),
-                                 error=function(e) {
-                                     emsg <- conditionMessage(e)
-                                     private$evaluator$stream(
-                                                           paste("Error in handle_msg:",
-                                                                 emsg),
-                                                           stream="stderr")
-                                     return("")
-                                 })
-                text <- paste(text,collapse="\n")
-                private$evaluator$stream(text,stream="stdout")
-            }
+            if("msg" %in% names(handlers))
+                handlers$msg(comm,data)
         },
         #' @description
         #' Send data to the frontend
@@ -168,7 +111,8 @@ CommManagerClass <- R6Class("CommManager",
             # log_out("comm_manager$send")
             # log_out(data,use.print=TRUE)
             # log_out(buffers,use.print=TRUE)
-            private$kernel$send_comm_msg(id,data,metadata,buffers=buffers)  
+            comm <- self$comms[[id]]
+            comm$send(data,metadata,buffers)
         },
         #' @description
         #' Send an 'open' request to the frontend
@@ -181,7 +125,8 @@ CommManagerClass <- R6Class("CommManager",
             # log_out("comm_manager$send_open")
             # log_out(data,use.print=TRUE)
             # log_out(buffers,use.print=TRUE)
-            private$kernel$send_comm_open(id,target_name,data,metadata,buffers=buffers)  
+            comm <- self$comms[[id]]
+            comm$open(data,metadata,buffers)
         },
         #' @description
         #' Send an 'close' request to the frontend
@@ -190,7 +135,11 @@ CommManagerClass <- R6Class("CommManager",
         #' @param metadata A named list
         #' @param buffers A list of raw vectors or NULL
         send_close = function(id,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
-            private$kernel$send_comm_close(id,data,metadata,buffers=buffers)  
+            private$send_comm_(type="comm_close",
+                               id = id,
+                               data = data,
+                               metadata = metadata,
+                               buffers=buffers)  
         },
         #' @description
         #' Return a list of targets
@@ -198,9 +147,25 @@ CommManagerClass <- R6Class("CommManager",
     ),
     
     private = list(
-        kernel  = list(),
-        evaluator = list(),
-        handlers = list()
+        handlers = list(),
+        send_comm_ = function(type,id,target_name=NULL,data,metadata,buffers){
+            content <- if(is.null(target_name)) 
+                           list(
+                               comm_id = id,
+                               data = data
+                           )
+                       else list(
+                               comm_id = id,
+                               target_name=target_name,
+                               target_module=NULL,
+                               data = data
+                            )
+            msg <- list(type = type,
+                        content = content,
+                        metadata = metadata,
+                        buffers = buffers)
+            msg_send(msg)
+        }
     )
 )
 
@@ -208,7 +173,6 @@ CommManagerClass <- R6Class("CommManager",
 #' @param ... Arguments passed to the inializer
 #' @export
 CommManager <- function(...) CommManagerClass$new(...)
-
 
 #' Comms - connections between the kernel and the frontend
 #'
@@ -241,11 +205,9 @@ CommClass <- R6Class("Comm",
         #' @param handlers A list of handler functions
         initialize = function(target_name,
                               id = uuid(),
-                              kernel = get_current_kernel(),
                               handlers = list()){
             self$target_name <- target_name
             self$id <- id
-            private$kernel <- kernel
             self$handlers <- handlers
         },
 
@@ -255,11 +217,15 @@ CommClass <- R6Class("Comm",
         #' @param buffers A list of raw vectors or NULL
         open = function(data,metadata=emptyNamedList,buffers=NULL){
             # log_out("comm$open")
-            # log_out(data,use.print=TRUE)
-            # log_out(buffers,use.print=TRUE)
-            id <- self$id
-            target_name <- self$target_name
-            private$kernel$send_comm_open(id,target_name,data,metadata,buffers=buffers)  
+            # log_out(data,use.str=TRUE)
+            # log_out(buffers,use.str=TRUE)
+            # log_out(metadata,use.str=TRUE)
+            private$send_comm_(type = "comm_open",
+                               id = self$id,
+                               target_name = self$target_name,
+                               data = data,
+                               metadata = metadata,
+                               buffers=buffers)  
         },
         #' @description Send data through a comm
         #' @param data A named list
@@ -269,8 +235,11 @@ CommClass <- R6Class("Comm",
             # log_out("comm$send")
             # log_out(data,use.print=TRUE)
             # log_out(buffers,use.print=TRUE)
-            id <- self$id
-            private$kernel$send_comm_msg(id,data,metadata,buffers=buffers)  
+            private$send_comm_(type="comm_msg",
+                               id = self$id,
+                               data = data,
+                               metadata = metadata,
+                               buffers=buffers)  
         },
         #' @description Close a comm
         #' @param data A named list
@@ -280,12 +249,33 @@ CommClass <- R6Class("Comm",
             # log_out("comm$close")
             # log_out(data,use.print=TRUE)
             id <- self$id
-            private$kernel$send_comm_close(id,data,metadata,buffers=buffers)  
+            private$send_comm_(type="comm_close",
+                               id = self$id,
+                               data = data,
+                               metadata = metadata,
+                               buffers=buffers)  
         }
     ),
     
     private = list(
-        kernel = list()
+        send_comm_ = function(type,id,target_name=NULL,data,metadata,buffers){
+            content <- if(is.null(target_name)) 
+                           list(
+                               comm_id = id,
+                               data = data
+                           )
+                       else list(
+                               comm_id = id,
+                               target_name=target_name,
+                               target_module=NULL,
+                               data = data
+                            )
+            msg <- list(type = type,
+                        content = content,
+                        metadata = metadata,
+                        buffers = buffers)
+            msg_send(msg)
+        }
     )
 )
 
@@ -294,8 +284,11 @@ CommClass <- R6Class("Comm",
 #' @export
 Comm <- function(...) CommClass$new(...)
 
-# Get the comm manager of the current kernel
-get_comm_manager <- function() {
-    kernel <- get_current_kernel()
-    kernel$comm_manager
+comm_manager <- new.env()
+comm_manager$current <- NULL
+
+get_comm_manager <- function(){
+    if(is.null(comm_manager$current))
+        comm_manager$current <- CommManager()
+    comm_manager$current
 }

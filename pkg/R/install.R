@@ -8,7 +8,7 @@ install <- function(){
 
 #' @describeIn install Install the R Kernel spec
 #'
-#' @importFrom jsonlite fromJSON toJSON
+#' @importFrom jsonlite fromJSON toJSON read_json write_json
 #' @param user Logical, whether to install the kernel in the user's home directory
 #' @param prefix NULL or a character string with a path prefix
 #' @export
@@ -21,11 +21,11 @@ installspec <- function(user=TRUE,prefix=NULL,single_blas=FALSE){
    
    json_infile <- file.path(tmp_dir,"kernelspec","RKernel.json")
    json_outfile <- file.path(tmp_dir,"kernelspec","kernel.json")
-   kernelspec <- fromJSON(json_infile)
+   kernelspec <- read_json(json_infile)
    # Put the absolute path of the current interpreter
    kernelspec$argv[[1]] <- file.path(R.home("bin"),"R")
-   write(toJSON(kernelspec,pretty=TRUE,auto_unbox=TRUE),
-         file=json_outfile)
+   write_json(kernelspec,pretty=TRUE,auto_unbox=TRUE,
+         path=json_outfile)
    unlink(json_infile)
    jupyter_call <- c(
        "jupyter",

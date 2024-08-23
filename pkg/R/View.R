@@ -13,8 +13,6 @@ View <- function(x,
                  title=deparse(substitute(x)),
                  ...) UseMethod("View")
 
-#' @include evaluator.R
-register_export(View)
 
 #' @rdname View
 #' @param ... Other arguments, ignored.

@@ -2,7 +2,7 @@
 #' @importFrom pbdZMQ zmq.socket zmq.bind zmq.ctx.new zmq.getsockopt zmq.setsockopt
 #' @importFrom pbdZMQ zmq.poll zmq.poll.get.revents zmq.msg.recv zmq.msg.send
 #' @importFrom pbdZMQ zmq.recv.multipart zmq.send.multipart .zmqopt_init
-#' @importFrom pbdZMQ ZMQ.MC
+#' @importFrom pbdZMQ ZMQ.MC random_open_port
 #' @importFrom digest hmac
 #' @importFrom uuid UUIDgenerate
 #' @importFrom jsonlite prettify
@@ -10,6 +10,10 @@
 
 PROTOCOL_VERSION <- '5.3'
 WIRE_DELIM <- charToRaw("<IDS|MSG>")
+
+EOT <- "\x04"
+DLE <- "\x10"
+ETB <- "\x17"
 
 kernel <- new.env()
 
@@ -46,48 +50,54 @@ Kernel <- R6Class("Kernel",
       }
       private$conn_info <- conn_info
       private$pid <- Sys.getpid()
-      evaluator <- Evaluator$new(self)
-      comm_manager <- CommManager(self,evaluator)
-      self$comm_manager <- comm_manager
-      self$evaluator <- evaluator
-      self$DAPServer <- DAPServer$new(self)
       kernel$current <- self
-      private$save_io_handlers()
-      replace_in_package("base","print",evaluator$print)
-      replace_in_package("base","cat",evaluator$cat)
-      replace_in_package("tools","httpd",evaluator$httpd)
-      private$logfile <- file(fn_kernel_logfile,"a")
-      # private$logfile <- stderr()
-      # private$logfile <- socketConnection(port=6111)
     },
-
-    #' @field evaluator See \code{\link{Evaluator}}.
-    evaluator = list(),
-    #' @field comm_manager See \code{\link{CommManagerClass}}.
-    comm_manager = list(),
+    start_r_session = function(){
+      self$r_session <- RKernelSession$new(callbacks = list(
+        stdout = private$handle_r_stdout,
+        stderr = private$handle_r_stderr,
+        msg = self$r_session_msg,
+        readline = private$r_get_input,
+        menu = private$r_get_input,
+        browser = private$r_get_input
+      ))
+      # log_out(self$r_session, use.print = TRUE)
+    },
+    start = function(){
+      self$start_r_session()
+      private$r_install_hooks()
+      private$r_start_graphics()
+      private$install_r_handlers()
+      private$r_init_help()
+      private$r_set_help_displayed()
+      self$DAPServer <- DAPServer$new(
+        r_session = self$r_session,
+        send_debug_event = self$send_debug_event,
+        r_send_request = private$r_send_request,
+        r_send_cmd = private$r_send_cmd
+      )
+      self$r_session$run_cmd("RKernel::startup()")
+    },
+    #' @field r_session See \code{\link{RKernelSession}}.
+    r_session = list(),
     #' @field DAPServer The current DAP server
     DAPServer = NULL,
     #' @description
     #' Run the kernel.
     run = function(){
+      self$start()
       log_out("*** RKernel started ***")
-      self$evaluator$startup()
       continue <- TRUE
       while(continue) {
-        # log_out("kernel loop")
         continue <- self$poll_and_respond()
       }
-      self$evaluator$shutdown()
+      self$r_session$close()
     },
     #' @description
     #' A single iteration of the kernel loop
     poll_and_respond = function(){
-        private$run_services()
         rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
-        if(length(private$services) > 0) 
-          poll_timeout <- rkernel_poll_timeout 
-        else 
-          poll_timeout <- -1L
+        poll_timeout <- rkernel_poll_timeout 
         # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
         # log_out("kernel$poll_request")
@@ -126,6 +136,25 @@ Kernel <- R6Class("Kernel",
                              text=text))
     },
     #' @description
+    #' Stream text to the frontend via 'stdout' stream.
+    #' @param text Text to be sent to the frontend
+    stdout = function(text) {
+      self$stream(text,stream="stdout")
+    },
+    #' @description
+    #' Stream text to the frontend via 'stderr' stream.
+    #' @param text Text to be sent to the frontend
+    stderr = function(text) {
+      self$stream(text,stream="stderr")
+    },
+    #' @description
+    #' Stream message created from R session process to the frontend via 'stderr' stream.
+    #' @param msg The message created by the 'RKernelSession' object.
+    r_session_msg = function(msg) {
+      text <- capture.output(print(msg))
+      self$stream(text,stream="stderr")
+    },
+    #' @description
     #' Send execution results to the frontend
     #' @param data Execution result in rich format
     #' @param metadata A list with metadata
@@ -142,66 +171,15 @@ Kernel <- R6Class("Kernel",
     },
     #' @description
     #' Send rich format data to the frontend
-    #' @param d A list that is either a member of class "display_data" or
-    #'          "update_display_data".
-    display_send = function(d){
-      if(class(d)%in%c("display_data","update_display_data"))
-        msg_type <- class(d)
-      else stop("'display_data' or 'update_display_data' object required")
-
-      # log_out("kernel$display_send")
-      # log_out(sprintf("msg_type = %s",msg_type))
-      
-      private$send_message(type=msg_type,
+    #' @param msg A list with the appropriate structure. [TODO]
+    display_send = function(msg){
+      # log_out("display_send")
+      private$send_message(type=msg$type,
                            parent=private$parent$shell,
                            socket_name="iopub",
-                           content=list(
-                             data=d$data,
-                             metadata=d$metadata,
-                             transient=d$transient))
-      private$display_id <- d$transient$display_id
-    },
-    #' @description
-    #' Send rich format data to the frontend
-    #' @param data A list with mime-type members.
-    #' @param metadata A named list with metadata.
-    #' @param transient An optional list with the current display id.
-    display_data = function(data,metadata=emptyNamedList,transient=NULL){
-      #content <- list(data=data,transient=transient)
-      #if(length(metadata))
-      #  content$metadata <- metadata
-      #else
-      #  content$metadata <- emptyNamedList
-      # log_out("== display_data ===========")
-      # for(n in names(data)){
-      #   log_out("--",n,"--")
-      #   log_out(data[[n]])
-      # }
-      if(!length(transient))
-        transient <- emptyNamedList
-      private$send_message(type="display_data",
-                           parent=private$parent$shell,
-                           socket_name="iopub",
-                           content=list(
-                             data=data,
-                             metadata=metadata,
-                             transient=transient
-                           ))
-    },
-    #' @description
-    #' Update rich format data to the frontend
-    #' @param data A list with mime-type members.
-    #' @param metadata A named list with metadata.
-    #' @param transient An list with the current display id.
-    update_display_data = function(data,metadata=emptyNamedList,transient){
-      private$send_message(type="update_display_data",
-                           parent=private$parent$shell,
-                           socket_name="iopub",
-                           content=list(
-                             data=data,
-                             metadata=metadata,
-                             transient=transient
-                           ))
+                           content=msg$content)
+      private$display_id <- msg$content$transient$display_id
+      # log_out("display_send succeeded")
     },
     #' @description
     #' Send an error message and traceback to the frontend.
@@ -220,122 +198,15 @@ Kernel <- R6Class("Kernel",
     },
     #' @description
     #' Send a message via a comm.
-    #' @param id A string that identifies the comm.
-    #' @param data A list with data.
-    #' @param metadata An optional list with metadata.
-    #' @param buffers An optional list of raw vectors.
-    send_comm_msg = function(id,data,metadata=emptyNamedList,buffers=NULL){
-      # log_out("kernel$send_comm_msg")
-      private$send_message(type="comm_msg",debug=FALSE,
+    #' @param msg A list containing a comm message.
+    send_comm = function(msg){
+      # log_out("kernel$send_comm")
+      private$send_message(type=msg$type,debug=FALSE,
                    parent=private$parent$shell,
                    socket_name="iopub",
-                   content=list(
-                     comm_id=id,
-                     data=data),
-                   metadata=metadata,
-                   buffers=buffers)
-    },
-    #' @description
-    #' Open a comm in the frontend.
-    #' @param id A string that identifies the comm.
-    #' @param target_name A string that identifies a group of related comms.
-    #' @param data A list with data.
-    #' @param metadata An optional list with metadata.
-    #' @param buffers An optional list of raw vectors.
-    send_comm_open = function(id,target_name,data,metadata=emptyNamedList,buffers=NULL){
-      # log_out("kernel$send_comm_open")
-      private$send_message(type="comm_open",debug=FALSE,
-                   parent=private$parent$shell,
-                   socket_name="iopub",
-                   content=list(
-                     comm_id=id,
-                     target_name=target_name,
-                     target_module=NULL,
-                     data=data),
-                   metadata=metadata,
-                   buffers=buffers)
-    },
-    #' @description
-    #' Close a comm in the frontend.
-    #' @param id A string that identifies the comm.
-    #' @param data A list with data.
-    #' @param metadata An optional list with metadata.
-    #' @param buffers An optional list of raw vectors.
-    send_comm_close = function(id,data=emptyNamedList,metadata=emptyNamedList,buffers=NULL){
-      # log_out("kernel$send_comm_close")
-      private$send_message(type="comm_close",debug=FALSE,
-                   parent=private$parent$shell,
-                   socket_name="iopub",
-                   content=list(
-                     comm_id=id,
-                     data=data),
-                   metadata=metadata,
-                   buffers=buffers)
-    },
-    #' @description
-    #' Show a message in the Jupyter server log
-    #' @param message A string or object to be shown in the log.
-    #' @param ... More character strings, pasted to the message.
-    #' @param use.print Logical value, whether the function 'print()' should applied
-    #'        to the message.
-    #' @param use.str Logical value, whether 'str()' should be called and its output
-    #'        shown
-    log_out = function(message,...,use.print=FALSE,use.str=FALSE){
-      dcl <- deparse1(match.call())
-      tryCatch({
-        if(use.print)
-          message <- paste0("\n",paste0(capture.output(self$print(message)),collapse="\n"))
-        else if(use.str)
-          message <- paste(capture.output(self$str(message)),collapse="\n")
-        else message <- paste(message,...,collapse="")
-        message <- paste(crayon::green(format(Sys.time()),"\t",message,"\n"))
-        message <- paste("INFO:",message)
-        # self$cat(message,file=stderr())
-        self$cat(message,file=private$logfile)
-      },error=function(e){
-        self$log_error(sprintf("Error in %s",dcl))
-        msg <- conditionMessage(e)
-        self$log_error(msg)
-      })
-    },
-    #' @description
-    #' Show a warning in the Jupyter server log
-    #' @param message A string to be shown in the log
-    log_warning = function(message){
-      message <- paste(crayon::yellow(format(Sys.time()),"\t",message,"\n"))
-      message <- paste("WARNING:",message)
-      # self$cat(message,file=stderr())
-      self$cat(message,file=private$logfile)
-    },
-    #' @description
-    #' Show an error message in the Jupyter server log
-    #' @param message A string to be shown in the log
-    log_error = function(message){
-      message <- crayon::red(format(Sys.time()),"\t",message,"\n")
-      message <- paste("ERROR:",message)
-      # self$cat(message,file=stderr())
-      self$cat(message,file=private$logfile)
-    },
-    #' @description
-    #' Add a service to the kernel, i.e. a function that is called in each
-    #' iteration of the kernel event loop.
-    #' @param run A function to be run in each loop iteration.
-    #' @param init A function to be run once in the first iteration.
-    add_service = function(run,init=NULL){
-      if(is.function(init)) init()
-      if(is.function(run))
-        private$services <- append(private$services,run)
-    },
-    #' @description
-    #' Remove a service from the kernel.
-    #' @param run The function to be removed.
-    remove_service = function(run){
-      services_to_keep <- list()
-      for(i in seq_along(private$services)){
-        if(!identical(run,private$services[[i]])) 
-          services_to_keep[[i]] <- private$services[[i]]
-      }
-      private$services <- services_to_keep
+                   content=msg$content,
+                   metadata=msg$metadata,
+                   buffers=msg$buffers)
     },
     #' @description
     #' The parent of the message currently sent.
@@ -353,18 +224,6 @@ Kernel <- R6Class("Kernel",
     is_child = function(){
       return(Sys.getpid()!=private$pid)
     },
-    #' @field print This field is intended to hold the original \'print\' function from
-    #'  package "base"
-    print = NULL,
-    #' @field cat This field is intended to hold the original \'cat\' function from
-    #'  package "base"
-    cat = NULL,
-    #' @field str This field is intended to hold the original \'str\' function from
-    #'  package "utils"
-    str = NULL,
-    #' @field httpd This field is intended to hold the original \'httpd\' function from
-    #'  package "tools"
-    httpd = NULL,
     #' @description
     #' Send an input request to the frontend
     #' @param prompt A prompt string
@@ -384,12 +243,8 @@ Kernel <- R6Class("Kernel",
       continue <- TRUE
       input <- ""
       while(continue){
-        private$run_services()
         rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
-        if(length(private$services) > 0) 
-          poll_timeout <- rkernel_poll_timeout 
-        else 
-          poll_timeout <- -1L
+        poll_timeout <- -1L
         # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request("stdin",timeout=poll_timeout)
         # log_out("req")
@@ -412,79 +267,94 @@ Kernel <- R6Class("Kernel",
                            parent=private$parent$control,
                            socket="iopub",
                            content=content)
-    }
-    
+    },
+    errored = FALSE
   ),
 
   private = list(
-
     pid = 0,
-
     execution_count = 1,
-
     handle_execute_request = function(msg){
-      # self$log_out("handle_execute_request")
-      # self$log_out(msg,use.print=TRUE)
+      # log_out("handle_execute_request")
+      # log_out(msg,use.print=TRUE)
       if(msg$content$silent){
         if(msg$content$store_history){
-          self$log_warning("store_history forced to FALSE")
+          log_warning("store_history forced to FALSE")
           msg$content$store_history <- FALSE
         }
       }
       execution_count <- private$execution_count
-      private$send_message(type="execute_input",
-                           parent=private$parent$shell,
-                           socket_name="iopub",
-                           content=list(
-                             code=msg$content$code,
-                             execution_count=execution_count))
-      r <- tryCatch(self$evaluator$eval_cell(msg$content$code,
-                                             msg$content$allow_stdin,
-                                             msg$content$silent,
-                                             msg$content$store_history),
-                    error=function(e)structure("errored",message=conditionMessage(e)),#,traceback=.traceback()),
-                    interrupt=function(e)"interrupted"
-                    )
-      # r <- self$evaluator$eval_cell(msg$content$code)
-      payload <- self$evaluator$get_payload(clear=TRUE)
-      payload <- check_page_payload(payload)
-      status <- self$evaluator$get_status(reset=TRUE)
-      aborted <- self$evaluator$is_aborted(reset=TRUE)
-      if(is.character(r) && (identical(r[1],"errored") || identical(r[1],"interrupted")))
+      private$send_message(
+        type = "execute_input",
+        parent = private$parent$shell,
+        socket_name = "iopub",
+        content = list(
+          code = msg$content$code,
+          execution_count = execution_count
+        )
+      )
+      self$errored <- FALSE
+      private$r_run_cell_begin_hooks()
+      r <- tryCatch(self$r_session$run_code(msg$content$code),
+        error = function(e) structure("errored", message = conditionMessage(e)), # ,traceback=.traceback()),
+        interrupt = function(e) "interrupted"
+      )
+      # log_out(r, use.print = TRUE)
+      private$r_run_cell_end_hooks()
+      payload <- NULL
+      aborted <- FALSE
+      if (is.character(r) && (identical(r[1], "errored") || identical(r[1], "interrupted"))) {
         aborted <- TRUE
-      if(is.character(r)) {
+      }
+      if (is.character(r)) {
+        self$errored <- TRUE
         log_error(r)
-        r_msg <- attr(r,"message")
-        if(length(r_msg)) log_error(r_msg)
-        tb <- attr(r,"traceback")
-        if(length(tb)){
+        r_msg <- attr(r, "message")
+        if (length(r_msg)) log_error(r_msg)
+        tb <- attr(r, "traceback")
+        if (length(tb)) {
           tb <- unlist(tb)
-          log_error(paste(tb,sep="\n"))
-          # log_error(tb,use.print=TRUE)
+          #log_error(paste(tb, sep = "\n"))
+          log_error(tb,use.print=TRUE)
         }
       }
-      content <- list(status = status,
-                      execution_count = execution_count)
-      if(length(payload))
-        content$payload <- payload
+      if (!self$r_session$is_alive()) {
+        aborted <- TRUE
+        self$stderr("\nR session ended - restarting ... ")
+        self$start_session()
+        self$stderr("done.\n")
+      } else if (self$errored) {
+          content <- list(
+            status = "error",
+            ename = r,
+            evalue = r_msg,
+            traceback = tb,
+            execution_count = execution_count 
+          )
+      }
+      else {
+          # Collect output created by cell-end hooks etc.
+          content <- list(status = "ok",
+                          execution_count = execution_count)
+          if(length(payload))
+            content$payload <- payload
+      }
       if(!isTRUE(msg$content$silent))
         private$send_message(type="execute_reply",
-                             parent=private$parent$shell,
-                             socket="shell",
-                             content=content)
-      #cat("Sent a execute_reply ...\n")
-      # message("Code:", msg$content$code)
-      #message("Store history:", msg$content$store_history)
-      # message("Kernel execution count:", private$execution_count)
+                              parent=private$parent$shell,
+                              socket="shell",
+                              content=content)
       if(msg$content$store_history)
         private$execution_count <- private$execution_count + 1
-      if(aborted) private$clear_shell_queue()
+      if (aborted) private$clear_shell_queue()
+      # log_out("handle_execute_request done")
     },
 
     display_id = character(0),
     last_display = function() private$display_id,
 
     handle_debug_request = function(msg){
+      # log_out("handle_debug_request")
       request <- msg$content
       reply <- try(self$DAPServer$handle(request))
       if(inherits(reply,"try-error")){
@@ -509,20 +379,20 @@ Kernel <- R6Class("Kernel",
                          mimetype = "text/x-r-source",
                          file_extension = ".R",
                          version = rversion),
-                       banner = version$version.string,
+                       banner = self$r_session$banner,
                        debugger = TRUE)
       private$send_message(type="kernel_info_reply",
                            parent=private$parent$shell,
                            socket_name="shell",
                            content=response)
-      #cat("Sent a kernel_info_reply ...\n")
+      # log_out("Sent a kernel_info_reply ...\n")
     },
 
     is_complete_reply = function(msg){
       #cat("is_complete_reply\n")
       #str(msg)
       code <- msg$content$code
-      status <- self$evaluator$code_is_complete(code)
+      status <- code_is_complete(code)
       private$send_message(type="is_complete_reply",
                            parent=private$parent$shell,
                            socket_name="shell",
@@ -535,7 +405,7 @@ Kernel <- R6Class("Kernel",
     complete_reply = function(msg){
       code <- msg$content$code
       cursor_pos <- msg$content$cursor_pos
-      result <- self$evaluator$get_completions(code,cursor_pos)
+      result <- get_completions(code,cursor_pos)
       private$send_message(type="complete_reply",
                            parent=private$parent$shell,
                            socket_name="shell",
@@ -547,48 +417,64 @@ Kernel <- R6Class("Kernel",
                              metadata=emptyNamedList))
     },
 
+    inspect_reply = function(msg){
+      # return(NULL)
+      # log_out("inspect_reply")
+      reply <- private$r_send_request(list(
+        type = "inspect_request",
+        content = msg$content
+      ))
+      # log_out(reply, use.print=TRUE)
+      private$send_message(
+        type = "inspect_reply",
+        parent = private$parent$shell,
+        socket_name = "shell",
+        content = reply$content
+      )
+    },
+
     comm_info_reply = function(msg){
-      target_name <- NULL
-      if("target_name" %in% names(msg$content))
-        target_name <- msg$content$target_name
-      comms <- self$comm_manager$get_comms(target_name)
-      private$send_message(type="comm_info_reply",
-                           parent=private$parent$shell,
-                           socket_name="shell",
-                           content=list(
-                             status="ok",
-                             comms=comms))
+      # return(NULL)
+      # log_out("comm_info_reply")
+      reply <- private$r_send_request(list(
+        type = "comm_info_request",
+        content = msg$content
+      ))
+      # log_out(reply, use.print = TRUE)
+      if(reply$type != "comm_info_reply"){
+        log_error(sprintf("Expected a 'comm_info_reply', got a '%s' message.", reply$type))
+      }
+      private$send_message(
+        type = "comm_info_reply",
+        parent = private$parent$shell,
+        socket_name = "shell",
+        content = reply$content
+      )
     },
 
     handle_comm_open = function(msg){
-      target_name <- msg$content$target_name
-      id <- msg$content$comm_id
-      data <- msg$content$data
-      self$comm_manager$handle_open(target_name,id,data)
+      # return(NULL)
+      private$r_send_request_noreply(list(
+        type = "comm_open",
+        content = msg$content
+      ))
     },
 
     handle_comm_msg = function(msg){
-      # log_out("kernel$handle_comm_msg")
-      # log_out(msg,use.str=TRUE)
-      id <- msg$content$comm_id
-      data <- msg$content$data
-      data$buffers <- msg$buffers
-      self$comm_manager$handle_msg(id,data)
+      # return(NULL)
+      private$r_send_request_noreply(list(
+        type = "comm_msg",
+        content = msg$content
+      ))
     },
 
     handle_comm_close = function(msg){
-      id <- msg$content$comm_id
-      data <- msg$content$data
-      self$comm_manager$handle_close(id,data)
+      # return(NULL)
+      private$r_send_request_noreply(list(
+        type = "comm_close",
+        content = msg$content
+      ))
     },
-
-    services = list(),
-
-    run_services = function(){
-      for(service in private$services)
-        service()
-    },
-
 
     .pbd_env = new.env(),
     sockets = list(),
@@ -631,15 +517,21 @@ Kernel <- R6Class("Kernel",
       return(TRUE)
     },
 
-    respond_control = function(req){
+    respond_control = function(req, debug = FALSE){
+      # log_out("respond_control")
       msg <- private$get_message("control")
       if(!length(msg)) return(TRUE)
+      if (debug) {
+        log_out(paste("Got a", msg$header$msg_type, "request ..."))
+      }
       private$parent$control <- msg
       if(msg$header$msg_type=="shutdown_request"){
         # cat("shutdown_request received")
+        self$r_session$close()
         return(FALSE)
       }
       else if(msg$header$msg_type=="debug_request"){
+        # log_out("debug_request received")
         private$send_busy(private$parent$control)
         private$handle_debug_request(msg)
         private$send_idle(private$parent$control)
@@ -658,20 +550,25 @@ Kernel <- R6Class("Kernel",
       if(!length(msg)) return(TRUE)
       private$send_busy(private$parent$shell)
       if(debug)
-        self$log_out(paste("Got a", msg$header$msg_type, "request ..."))
-      # cat("Got a", msg$header$msg_type, "request ...\n")
+        log_out(paste("Got a", msg$header$msg_type, "request ..."))
       # do_stuff ...
+      r <- tryCatch(
       switch(msg$header$msg_type,
-             comm_open = private$handle_comm_open(msg),
-             comm_msg = private$handle_comm_msg(msg),
-             comm_close = private$handle_comm_close(msg),
              execute_request = private$handle_execute_request(msg),
              is_complete_request = private$is_complete_reply(msg),
              kernel_info_request = private$kernel_info_reply(msg),
              complete_request = private$complete_reply(msg),
-             comm_info_request = private$comm_info_reply(msg)
-             )
+             inspect_request = private$inspect_reply(msg),
+             comm_info_request = private$comm_info_reply(msg),
+             comm_open = private$handle_comm_open(msg),
+             comm_msg = private$handle_comm_msg(msg),
+             comm_close = private$handle_comm_close(msg)
+             ),
+             error = function(e) conditionMessage(e)
+      )
+      if(is.character(r)) log_error(r)
       private$send_idle(private$parent$shell)
+      if (debug)  log_out("done")
       return(TRUE)
     },
 
@@ -731,8 +628,8 @@ Kernel <- R6Class("Kernel",
       if(debug) {
          msg_body <- msg[c("header","parent_header","metadata","content")]
          msg_body <- to_json(msg_body,auto_unbox=TRUE)
-         self$log_out(prettify(msg_body))
-         # self$log_out(buffers,use.print=TRUE)
+         log_out(prettify(msg_body))
+         # log_out(buffers,use.print=TRUE)
        }
       socket <- private$sockets[[socket_name]]
       wire_out <- private$wire_pack(msg)
@@ -777,6 +674,7 @@ Kernel <- R6Class("Kernel",
       # log_out(private$get_signature(msg))
       if(signature != private$get_signature(msg)) {
         log_error("Incorrect signature")
+        log_out(msg, use.print = TRUE)
         return(NULL)
       }
       msg <- lapply(msg,fromRawJSON,simplifyDataFrame=FALSE,simplifyMatrix=FALSE)
@@ -856,109 +754,185 @@ Kernel <- R6Class("Kernel",
         else break
       }
     },
-
-    save_io_handlers = function(){
-      self$print <- .BaseNamespaceEnv$print
-      self$cat <- .BaseNamespaceEnv$cat
-      self$str <- utils::str
-      self$httpd <- tools:::httpd
-    },
     
-    logfile = NULL
+    logfile = NULL,
+
+    r_install_hooks = function(){
+      # log_out("Installing hooks ...")
+      self$r_session$run_cmd("RKernel::install_output_hooks()")
+      self$r_session$run_cmd("RKernel::install_cell_hooks()")
+      self$r_session$run_cmd("RKernel::install_save_q()")
+      self$r_session$run_cmd("RKernel::install_readline()")
+      # self$r_session$run_cmd("options(error = function()print(traceback()))")
+      # log_out("done.")
+    },
+    r_start_graphics = function(){
+      # log_out("Starting graphics ...")
+      self$r_session$run_cmd("RKernel::start_graphics()")
+      # log_out("done.")
+    },
+    r_run_cell_begin_hooks = function(){
+      self$r_session$run_code("RKernel::runHooks('cell-begin')")
+    },
+    r_run_cell_end_hooks = function(){
+      self$r_session$run_code("RKernel::runHooks('cell-end')")
+    },
+    r_msg_incomplete = FALSE,
+    r_msg_frag = "",
+    handle_r_stdout = function(text){
+      # log_out("handle_r_stdout")
+      if (grepl(DLE, text)) {
+        # log_out("DLE found")
+        text <- split_string1(text, DLE)
+      }
+      for(chunk in text){
+        if(!length(chunk) || !nzchar(chunk)) next
+        # log_out(chunk, use.str = TRUE)
+        if (startsWith(chunk, MSG_BEGIN)) {
+          # log_out("MSG_BEGIN found")
+          # log_out(chunk, use.print = TRUE)
+          if (endsWith(chunk, MSG_END)) {
+            msg <- remove_prefix(chunk, MSG_BEGIN) |> remove_suffix(MSG_END)
+            msg <- msg_unwrap(msg)
+            # log_out(msg, use.print = FALSE)
+            private$handle_r_msg(msg)
+          } else {
+            private$r_msg_incomplete <- TRUE
+            private$r_msg_frag <- remove_prefix(chunk, MSG_BEGIN)
+          }
+        }
+        else if(endsWith(chunk, MSG_END)){
+          msg <- paste0(private$r_msg_frag, remove_suffix(chunk, MSG_END))
+          private$r_msg_incomplete <- FALSE
+          private$r_msg_frag <- ""
+          msg <- msg_unwrap(msg)
+          private$handle_r_msg(msg)
+        }
+        else {
+          if(private$r_msg_incomplete) {
+            private$r_msg_frag <- paste0(private$r_msg_frag, chunk)
+          }
+          else if(nzchar(chunk)) {
+            self$stdout(chunk)
+          }
+        }
+      }
+      # log_out("handle_r_stdout done")
+    },
+    handle_r_stderr = function(text){
+      # log_out("handle_r_stderr")
+      # log_out(text)
+      if(startsWith(text, "Error"))
+        self$errored <- TRUE
+      self$stderr(text)
+    },
+    handle_r_msg = function(msg){
+      # log_out("handle_r_msg")
+      # log_out(msg, use.print = TRUE)
+      if(!is.list(msg)) {
+        # log_out("Non-list message")
+        return(NULL)
+      }
+      msg_type <- msg$type
+      # log_out(msg_type)
+      msg_handler <- private$r_msg_handlers[[msg_type]]
+      if(is.function(msg_handler)){
+        msg_handler(msg)
+      } else {
+        self$stderr(sprintf("R session sent message of unknown type '%s'", msg_type))
+      }
+    },
+    r_msg_handlers = list(),
+    install_r_handlers = function(){
+      private$r_msg_handlers$display_data <- self$display_send
+      private$r_msg_handlers$update_display_data <- self$display_send
+      private$r_msg_handlers$test <- function(msg) self$stdout(msg$content)
+      for(msg_type in c("comm_msg", "comm_open", "comm_close"))
+        private$r_msg_handlers[[msg_type]] <- self$send_comm
+    },
+    r_init_help = function(){
+      port <- random_open_port()
+      self$r_session$run_cmd(sprintf("RKernel::set_help_port(%d)",port))
+    },
+    r_set_help_displayed = function(){
+      self$r_session$run_cmd("RKernel::set_help_displayed(TRUE)")
+    },
+    r_get_input = function(prompt = ""){
+      self$input_request(prompt = prompt)
+      self$read_stdin()
+    },
+    r_send_request = function(msg){
+      # log_out("r_send_request")
+      msg_dput <- wrap_dput(msg)
+      cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
+      resp <- self$r_session$run_cmd(cmd)
+      # log_out("Response:")
+      # log_out(resp, use.print = TRUE)
+      resp <- remove_prefix(resp$stdout, DLE) |> remove_suffix(DLE)
+      # log_out(resp)
+      resp <- remove_prefix(resp, MSG_BEGIN) |> remove_suffix(MSG_END)
+      # log_out(resp)
+      msg_unwrap(resp)
+    },
+    r_send_request_noreply = function(msg){
+      # log_out("r_send_request_noreply")
+      msg_dput <- wrap_dput(msg)
+      cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
+      self$r_session$run_code(cmd)
+    },
+    r_send_cmd = function(cmd) {
+      resp <- self$r_session$run_cmd(cmd)
+      msg <- msg_extract(resp$stdout)
+      msg_unwrap(msg)
+    }
   )
 )
 
-#' @include json.R
-
-fromRawJSON <- function(raw_json,...) {
-    json <- rawToChar(raw_json)
-    Encoding(json) <- "UTF-8"
-    fromJSON(json,...)
-}
-
-toRawJSON <- function(x,...){
-  json <- to_json(x,...)
-  charToRaw(json)
-}
-
-namedList <- function() structure(list(),names=character(0))
-emptyNamedList <- structure(list(),names=character(0))
-
-check_page_payload <- function(payload){
-  for(i in seq_along(payload)){
+check_page_payload <- function(payload) {
+  for (i in seq_along(payload)) {
     payload_item <- payload[[i]]
-    if(payload_item$source=="page"){
+    if (payload_item$source == "page") {
       data <- payload_item$data
-      if(!("text/plain" %in% names(data))){
+      if (!("text/plain" %in% names(data))) {
         payload_item$data[["text/plain"]] <- "[No plain text data for paging]"
         payload[[i]] <- payload_item
       }
-    }      
+    }
   }
   payload
 }
 
 get_current_kernel <- function() kernel$current
 
-log_out <- function(...) {
-  if(inherits(kernel$current,"Kernel")) kernel$current$log_out(...)
-  else message(...)
-}
-log_error <- function(...) {
-  if(inherits(kernel$current,"Kernel")) kernel$current$log_error(...)
-  else stop(...)
-}
-log_warning <- function(...) {
-  if(inherits(kernel$current,"Kernel")) kernel$current$log_warning(...)
-  else warning(...)
+split_string1 <- function(text, pat){
+  # log_out("split_string1")
+  unlist(strsplit(text, pat, fixed = TRUE))
 }
 
-replace_in_package <- function(pkg_name,name,value){
-  env_name <- paste0("package:",pkg_name)
-  if(env_name %in% search())
-    env <- as.environment(env_name)
-  else
-    env <- getNamespace(pkg_name)
-  .BaseNamespaceEnv$unlockBinding(name, env)
-  assign(name, value, env)
-  .BaseNamespaceEnv$lockBinding(name, env)
+remove_prefix <- function(text, prefix){
+  if (!startsWith(text, prefix)) {
+    # Maybe issue a warning or throw an error
+    return(text)
+  } else {
+    n <- nchar(text)
+    m <- nchar(prefix)
+    substr(text, start = m + 1, stop = n)
+  }
 }
 
-
-#' @title Add or remove services
-#' @description
-#' Add or a service to the kernel, i.e. a function that is called in each
-#' iteration of the kernel event loop.
-#' @param run A function to be run in each loop iteration.
-#' @param init A function to be run once in the first iteration.
-#' @name services
-NULL
-
-#' @rdname services
-#' @export
-add_service <- function(run,init=NULL){
-  k <- get_current_kernel()
-  if(length(k)) k$add_service(run,init)
+remove_suffix <- function(text, prefix) {
+  if (!endsWith(text, prefix)) {
+    # Maybe issue a warning or throw an error
+    return(text)
+  } else {
+    n <- nchar(text)
+    m <- nchar(prefix)
+    substr(text, start = 1, stop = n - m)
+  }
 }
 
-
-#' @rdname services
-#' @export
-remove_service <- function(run){
-  k <- get_current_kernel()
-  if(length(k)) k$remove_service(run)
-}
-
-
-#' @title Do a step of the kernel loop
-#' This function should be called in long-running loops to allow the kernel to react to
-#' UI events
-#' @export
-step <- function(){
-  k <- get_current_kernel()
-  if(length(k)) k$poll_and_respond()
-}
-
+prefix <- function(x, n) substr(x, start = 1, stop = n)
+suffix <- function(x, n) substr(x, start=nchar(x) - n, nchar(x))
 
 # Local Variables:
 # ess-indent-offset: 2

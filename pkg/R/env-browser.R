@@ -8,19 +8,19 @@ get2 <- function(nm,env,parent=NULL){
 
 #' @importFrom utils str
 
-str_ <- function(nm,envir,parent=NULL){
-    res <- tryCatch(capture.output(str(get2(nm,envir,parent))),
-                    error=function(e)e)
-    if(inherits(res,"error")){
-        res <- "<missing>"
-    }
-    res <- gsub("\\t","",res)
-    htmlEscape(trimws(res))
-}
+# str_ <- function(nm,envir,parent=NULL){
+#     res <- tryCatch(capture.output(str(get2(nm,envir,parent))),
+#                     error=function(e)e)
+#     if(inherits(res,"error")){
+#         res <- "<missing>"
+#     }
+#     res <- gsub("\\t","",res)
+#     htmlEscape(trimws(res))
+# }
 
-#' A HTML version of 'ls.str()'
+#' @title A HTML version of 'ls.str()'
 #'
-#' This function is deprecated. Use \code{\link{envBrowser}} instead.
+#' @description This function is deprecated. Use \code{\link{envBrowser}} instead.
 #'
 #' @param pos integer indicating \code{\link[base]{search}} path position, or -1 for the current environment.
 #' @param name an optional name indicating search path position, see \code{\link[base]{ls}}.

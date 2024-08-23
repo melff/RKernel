@@ -50,12 +50,8 @@ WidgetClass <- R6Class_("Widget",
           self$observe(tn,handler)
         }
       }
-      kernel <- get_current_kernel()
-      #browser()
-      if(length(kernel)){
-        add_displayed_classes(class(self)[1])
-        if(open) self$open()
-      }
+      add_displayed_classes(class(self)[1])
+      if(open) self$open()
     },
     #' @description Open a connection to the frontend
     open = function(){
@@ -190,8 +186,10 @@ WidgetClass <- R6Class_("Widget",
         # cat("------------------\n")
         msg <- self$handle_buffers(msg)
         state <- msg$state
-        # print(state)
+        # print(state
+        self$sync_suspended <- TRUE
         self$set_state(state)
+        self$sync_suspended <- FALSE
       }
       else if(method=="request_state")
         self$send_state()

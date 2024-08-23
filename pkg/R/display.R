@@ -1,21 +1,22 @@
-get_help_url <- function(){
-    evaluator$current$get_help_url()
-}
-get_help_port <- function(){
-    evaluator$current$get_help_port()
-}
+#' @include json.R
 
 #' Display an R Object
 #'
 #' @param ... Arguments passed to 'display_data' methods
 #' @export
 display <- function(...){
-    # log_out("display")
+    # log_out("=== DISPLAY ===")
     d <- display_data(...)
-    kernel <- get_current_kernel()
-    kernel$display_data(data=d$data,
-                        metadata=d$metadata)
+    # log_out(paste("Class:",class(d)))
+    # log_out(paste("ID:",display_id(d)))
+    # log_out(d,use.str=TRUE)
+    msg <- list(type=class(d),
+              content=unclass(d))
+    msg_send(msg)
 }
+
+#' @export
+print.display_data <- function(x,...) display(x,...)
 
 #' Prepare an R Object for Being Displayed
 #'
@@ -183,42 +184,47 @@ display_data.htmlwidget <- function(x,...,
 #' @importFrom uuid UUIDgenerate
 #' @export
 display_data.recordedplot <- function(x,
-                                      width=getOption("jupyter.plot.width",6),
-                                      height=getOption("jupyter.plot.height",6),
-                                      pointsize=getOption("jupyter.plot.pointsize",12),
-                                      resolution=getOption("jupyter.plot.res",150),
-                                      scale=getOption("jupyter.plot.scale",.5),
-                                      units=getOption("jupyter.plot.units","in"),
-                                      metadata=emptyNamedList,
-                                      id=UUIDgenerate(),
-                                      update=FALSE,
-                                      ...){
+                                  width=getOption("jupyter.plot.width",7),
+                                  height=getOption("jupyter.plot.height",7),
+                                  resolution=getOption("jupyter.plot.res",144),
+                                  id=UUIDgenerate(),
+                                  update=FALSE,
+                                  ...){
 
     rkernel_graphics_types <- getOption("jupyter.graphics.types",
-                                        c("image/png","application/pdf"))
+                                        c("image/svg+xml",
+                                          "image/png","application/pdf"))
+    
+    formats <- sapply(rkernel_graphics_types,x$mime2format)
+    mime_types <- sapply(rkernel_graphics_types,x$format2mime)
 
+    g <- Graphics()
+    replayPlot(x)
+    
     mime_data <- list()
     mime_metadata <- list()
 
-    for(mime in rkernel_graphics_types){
-        mime_data[[mime]] <- mime_graphics(x,
-                                           mime=mime,
-                                           width=width,
-                                           height=height,
-                                           pointsize=pointsize,
-                                           scale=scale,
-                                           res=resolution,
-                                           units=units)
-        mime_metadata[[mime]] <- list(
-            width=width*resolution*scale,
-            height=height*resolution*scale)
-        if(mime=="image/svg+xml")
-            mime_metadata[[mime]]$isolated <-TRUE
+    for(i in seq_along(formats)){
+        mime_i <- mime_types[i]
+        format_i <- formats[i]
+        mime_data_i <- g$render(type=format_i,
+                                dpi=resolution)
+        mime_data[[mime_i]] <- mime_data_i
+        width_i <- width * g$dpi
+        height_i <- height * g$dpi
+        mime_metadata[[mime_i]] <- list(
+            width = width_i,
+            height = height_i
+        )
+        if(mime_i == "image/svg+xml")
+            mime_metadata[[mime_i]]$isolated <- TRUE
     }
-
-    d <- list(data=mime_data)
-    d$metadata <- mime_metadata
-    d$transient <- list(display_id=id)
+    g$close()
+    rm(g)
+    
+    d <- list(data = mime_data,
+              metadata = mime_metadata)
+              transient = list(display_id = id)
     if(update) cl <- "update_display_data"
     else cl <- "display_data"
     structure(d,class=cl)
@@ -358,258 +364,7 @@ remove_paged_classes <- function(x){
 }
 
 
-popout_button_style <- '<style>
-form.help-popout-button button {
-     border-style:solid;
-     border-width:1px;
-     border-radius:0;
-     border-color:#cfcfcf;
-}
-#pager-container form.help-popout-button {
-     display:none;
-}
-iframe.manpage {
-   border-style:solid;
-   border-width:1px;
-   border-color:#cfcfcf;
-   border-radius:2px;
-}
-#pager-container iframe.manpage {
-     height: 5000em;
-}
-</style>
-'
-popout_button <- '<form class="help-popout-button" action="%s" method="get" target="_blank">
-             <button type="submit">Open in new tab</button>
-</form>'
 
-
-#' @describeIn display_data S3 method for help pages
-#' @importFrom uuid UUIDgenerate
-#' @importFrom utils URLencode
-#' @importFrom tools Rd2HTML Rd2txt Rd2latex
-#' @export 
-display_data.help_files_with_topic <- function(x,...,
-                                          id=UUIDgenerate(),
-                                          update=FALSE){
-
-    paths <- as.character(x)
-    topic <- attr(x,"topic")
-
-    utils_ns <- asNamespace("utils")
-    getHelpFile <- get(".getHelpFile",utils_ns)
-
-    if(length(paths)>=1){
-        text_plain <- character(0)
-        text_latex <- character(0)
-        help_urls <- character(0)
-        help_labels <- character(0)
-        
-        help_page_height <- getOption("help_page_height","60ex")
-
-        for(file in paths){
-            pkgname <- basename(dirname(dirname(file)))
-            Rd <- getHelpFile(file)
-            text_plain1 <- capture.output(Rd2txt(Rd, package = pkgname, outputEncoding = 'UTF-8'))
-            # text_latex1 <- capture.output(Rd2latex(Rd, package = pkgname, outputEncoding = 'UTF-8'))
-            text_plain <- c(text_plain,text_plain1)
-            # text_latex <- c(text_latex,text_latex1)
-            help_label1 <- paste0(pkgname,"::",topic)
-            help_labels <- c(help_labels,help_label1)
-            help_url1 <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(file),".html")
-            help_urls <- c(help_urls,help_url1)
-        }
-
-        if(length(paths) == 1){
-            help_url <- paste0(get_help_url(),"/library/",pkgname,"/html/",basename(paths),".html")
-            text_html <- paste(paste0(
-                "<iframe src='",help_url,"'"),
-                "style='width:100%;height:",help_page_height,";'",
-                "class='manpage'>",
-                # "frameborder='0' onload=window.parent.scrollTo(0,0)>",
-                "</iframe>",
-                sep="\n")
-        } 
-        else {
-            help_url <- paste0(get_help_url(),"/library/NULL/help/",URLencode(topic,reserved=TRUE))
-            text_html <- paste(paste0("<iframe src='",help_url,"'"),
-                "style='width:100%;height:",help_page_height,"'",
-                "class='manpage'>",
-                # "frameborder='0' onload=window.parent.scrollTo(0,0)>",
-                "</iframe>",
-                sep="\n")
-        }
-
-        popout_button <- sprintf(popout_button,help_url)
-        text_html <- paste(text_html,popout_button_style,popout_button,sep="\n")
-
-    } 
-    else {
-        text_plain <- paste(gettextf('No documentation for %s in specified packages and libraries:', sQuote(topic)),
-                            gettextf('you could try %s', sQuote(paste0('??', topic))),
-                            sep = '\n')
-        text_html <- text_plain
-        # text_latex <- text_plain
-    }
-
-    mime_data <- list(
-        "text/plain"=paste(text_plain,collapse="\n"),
-        "text/html"=paste(text_html,collapse="\n"),
-        "text/latex"="" # paste(text_latex,collapse="\n")
-    )
-
-
-    d <- list(data=mime_data)
-    d$metadata <- emptyNamedList
-    d$transient <- list(display_id=id)
-    if(update) cl <- "update_display_data"
-    else cl <- "display_data"
-    structure(d,class=cl)
-}
-
-
-#' Start interactive help system
-#'
-#' @description A variant of \code{\link[utils]{help.start}} that works when called from inside a
-#'     Jupyter notebook.
-#'
-#' @param update A logical value. This formal argument exists for compatibility
-#'     reasons only.
-#' @param gui A character string. This formal argument exists for compatibility
-#'     reasons only.
-#' @param browser A character string. This formal argument exists for compatibility
-#'     reasons only.
-#' @param remote A character string. This formal argument exists for compatibility
-#'     reasons only.
-#' @include evaluator.R
-#' @export
-help.start <- function(update = FALSE, 
-                       gui = "irrelevant", 
-                       browser = getOption("browser"), 
-                       remote = NULL){
-    help_url <- paste0(get_help_url(),"/doc/html/index.html")
-    text_html <- paste(paste0("<iframe src='",help_url,"'"),
-        "style='width:100%;height:70ex;'",
-        "class='manpage'>",
-        # "onload=window.parent.scrollTo(0,0)>",
-        "</iframe>",
-        sep="\n")
-    popout_button <- sprintf(popout_button,help_url)
-    text_html <- paste(text_html,popout_button_style,popout_button,sep="\n")
-    mime_data <- list(
-        "text/plain"=character(0),
-        "text/html"=paste(text_html,collapse="\n"),
-        "text/latex"=""
-    )
-
-    d <- list(data=mime_data)
-    d$metadata <- emptyNamedList
-    d$transient <- list(display_id=UUIDgenerate())
-    if(update) cl <- "update_display_data"
-    else cl <- "display_data"
-    structure(d,class=cl)
-}
-register_export(help.start)
-
-help_start <- help.start
-
-
-
-
-
-#' @describeIn display_data S3 method for results of 'help.search()'
-#' @export
-display_data.hsearch <- function(x,..., 
-    id=UUIDgenerate(), 
-    update=FALSE){
-    
-    matches <- x$matches
-    matches <- unique(matches[c("Topic","Title","Package","Type")])
-    matches$Name <- paste0(matches$Package,"::",matches$Topic)
-    
-    matches <- split(matches,matches$Type)
-    text_out_grp <- lapply(matches,tformat_mgroup)
-    text_plain <- character(0)
-    if("help" %in% names(text_out_grp)){
-        text_plain <- c(text_plain,"Help pages:","",text_out_grp$help,"")
-    }
-    if("vignette" %in% names(text_out_grp)){
-        text_plain <- c(text_plain,"Vignettes:","",text_out_grp$vignette,"")
-    }
-    if("demo" %in% names(text_out_grp)){
-        text_plain <- c(text_plain,"Demos:","",text_out_grp$demo,"")
-    }
-
-    # http://127.0.0.1:10006/doc/html/Search?pattern=regression&
-    #fields.alias=1&fields.title=1&fields.concept=1&ignore.case=1&types.help=1&types.vignette=1&types.demo=1
-
-    help_search_url <- paste0(get_help_url(),
-                  "/doc/html/Search?pattern=",
-                  gsub(" ","+",x$pattern,fixed=TRUE))
-    for(field in x$fields){
-        help_search_url <- paste0(help_search_url,paste0("&fields.",field,"=1"))
-    }
-    if(x$ignore.case)
-        help_search_url <- paste0(help_search_url,"&ignore.cases=1")
-    if(x$type=="fuzzy")
-        help_search_url <- paste0(help_search_url,"&agrep=1")
-    else if(is.numeric(x$agrep))
-        help_search_url <- paste0(help_search_url,"&agrep=",x$agrep)
-    for(type in c("help","vignette","demo")){
-        if(type %in% x$types)
-            help_search_url <- paste0(help_search_url,paste0("&types.",type,"=1"))
-    }
-    if(length(x$package)){
-        help_search_url <- paste0(help_search_url,paste0("&package",type,"=",x$package))
-    }
-    text_html <- paste(paste0("<iframe src='",help_search_url,"'"),
-                        "style='width: 100%;'",
-                        "class='manpage'",
-                        "frameborder='0' seamless onload=window.parent.scrollTo(0,0)>",
-                        "</iframe>",
-                        sep="\n")
-    style <- '<style>
-    form.help-popout-button {
-         border-style:revert;
-    }
-    #pager-container form.help-popout-button {
-         display:none;
-    }
-    iframe.manpage {
-         height: 30rem;
-    }
-    #pager-container iframe.manpage {
-         height: 5000em;
-    }
-    </style>
-    '
-    popout_button <- '<form class="help-popout-button" action="%s" method="get" target="_blank">
-         <button type="submit">Open in new tab</button>
-    </form>'
-    popout_button <- sprintf(popout_button,help_search_url)
-    text_html <- paste(style,popout_button,text_html,sep="\n")
-
-    mime_data <- list("text/plain"=paste(text_plain,collapse="\n"),
-                      "text/html"=paste(text_html,collapse="\n"))
-    d <- list(data=mime_data)
-    #d$metadata <- emptyNamedList
-    d$transient <- list(display_id=id)
-    if(update) cl <- "update_display_data"
-    else cl <- "display_data"
-    structure(d,class=cl)
-}
-
-tformat_mgroup <- function(matches){
-    text_out <- matches[c("Topic","Title")]
-    apply(text_out,1,format_item)
-}
-
-format_item <- function(x){
-    x2 <- x[2]
-    x2 <- strwrap(x2,120-7)
-    x2 <- paste0("      ",x2)
-    paste0(c(x[1],x2,""),collapse="\n")
-}
 
 
 #' Send Javascript to the frontend
@@ -696,43 +451,6 @@ IFrame <- function(url,width="100%",height="70ex",class=NULL,srcdoc=FALSE){
         text_html <- sprintf(tmpl,url,width,height)
     display_data("text/plain"="",
                  "text/html"=text_html)
-}
-
-#' Send a graphics file to the frontend
-#'
-#' @description Send embed the contents of an png, jpeg, pdf, or svg file in
-#'      the frontend or add a link to it
-#'      (sending raw data and urls soon to be added)
-#' 
-#' @param jpeg The path to a jpeg file
-#' @param pdf The path to a pdf file
-#' @param png The path to a png file
-#' @param svg The path to a svg file
-#' @export
-Graphics <- function(jpeg,pdf,png,svg){
-    data <- list()
-    metadata <- list()
-    if(!missing(jpeg)){
-        data[["image/jpeg"]] <- readBin(jpeg, raw(), file.info(jpeg)$size)
-        metadata[["image/jpeg"]] <- list(width=attr(jpeg,"width"),
-                                         height=attr(jpeg,"height"))
-    }
-    if(!missing(pdf)){
-        data[["application/pdf"]] <- readBin(pdf, raw(), file.info(pdf)$size)
-        metadata[["application/pdf"]] <- list(width=attr(pdf,"width"),
-                                              height=attr(pdf,"height"))
-    }
-    if(!missing(png)){
-        data[["image/png"]] <- readBin(png, raw(), file.info(png)$size)
-        metadata[["image/png"]] <- list(width=attr(png,"width"),
-                                        height=attr(png,"height"))
-    }
-    if(!missing(svg)){
-        data[["image/svg+xml"]] <- readChar(svg, file.info(svg)$size,useBytes=TRUE)
-        metadata[["image/svg+xml"]] <- list(width=attr(svg,"width"),
-                                            height=attr(svg,"height"))
-    }
-    display_data(data=data,metadata=metadata)
 }
 
 #' Send raw HTML code to the frontend
@@ -848,11 +566,3 @@ alert <- function(text){
     kernel$display_data(data=d$data,
                         metadata=d$metadata)
 }
-
-print_ <- function (x, ...) {
-    if(any(class(x) %in% getOption("rkernel_displayed_classes"))){
-        display(x)
-    }
-    else UseMethod("print")
-}
-

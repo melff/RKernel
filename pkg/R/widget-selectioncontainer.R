@@ -73,7 +73,7 @@ SelectionContainerClass <- R6Class_("Box",
                    titles <- list()
                    for(i in seq_along(nms)){
                        index <- sprintf("%d",as.integer(i - 1))
-                       log_out(index)
+                       # log_out(index)
                        titles[[index]] <- nms[i]
                    }
                    self$traits[["_titles"]]$set(titles)

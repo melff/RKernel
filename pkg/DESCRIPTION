@@ -1,7 +1,7 @@
 Package: RKernel
 Title: Yet another R kernel for Jupyter
-Version: 0.6
-Date: 2023-12-22
+Version: 1.0
+Date: 2024-08-03
 Authors@R: c(
     person('Martin', 'Elff', 
            email = 'martin@elff.eu',
@@ -29,30 +29,40 @@ Suggests:
     roxygen2
 SystemRequirements:
     jupyter
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Collate: 
-    'dictionary.R'
-    'evaluator.R'
+    'json.R'
+    'display.R'
+    'GraphicsClass.R'
     'View.R'
     'aa-versions.R'
     'callbacks.R'
+    'cell-options.R'
+    'check-options.R'
     'comms.R'
     'compare-plots.R'
-    'context.R'
+    'completions.R'
+    'dap-helpers.R'
     'dap-server.R'
     'dataTable.R'
-    'debugging.R'
-    'display.R'
+    'dictionary.R'
     'env-browser.R'
     'events.R'
-    'graphics.R'
+    'help.R'
+    'hooks.R'
+    'inspect-reply.R'
     'install.R'
-    'json.R'
+    'is-complete.R'
+    'json-connect.R'
     'kernel.R'
     'magic-codes.R'
     'main.R'
+    'output.R'
+    'proto.R'
     'scrolling-table.R'
+    'session.R'
     'sharedHelp.R'
+    'startup.R'
     'traitlets.R'
     'traitlets-R6instance.R'
     'traitlets-boolean.R'
