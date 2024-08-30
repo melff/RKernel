@@ -74,7 +74,8 @@ Kernel <- R6Class("Kernel",
         r_session = self$r_session,
         send_debug_event = self$send_debug_event,
         r_send_request = private$r_send_request,
-        r_send_cmd = private$r_send_cmd
+        r_send_cmd = private$r_send_cmd,
+        r_send_input = self$r_session$send_input
       )
       self$r_session$run_cmd("RKernel::startup()")
     },

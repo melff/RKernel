@@ -4,11 +4,18 @@ DAPServer <- R6Class("DAPServer",
         r_send_request = NULL,
         send_debug_event = NULL,
         r_send_cmd = NULL,
-        initialize = function(r_session, r_send_request, send_debug_event, r_send_cmd) {
+        r_send_input = NULL,
+        initialize = function(
+                        r_session, 
+                        r_send_request, 
+                        send_debug_event, 
+                        r_send_cmd,
+                        r_send_input) {
             self$r_session <- r_session
             self$r_send_request <- r_send_request
             self$send_debug_event <- send_debug_event
             self$r_send_cmd <- r_send_cmd
+            self$r_send_input <- r_send_input
         },
         handle = function(request, ...) {
             # log_out("DAPServer$handle")
@@ -89,7 +96,10 @@ DAPServer <- R6Class("DAPServer",
             )
             list(
                 supportsSetVariable = TRUE,
+                supportsConditionalBreakpoints = TRUE,
                 supportsConfigurationDoneRequest = TRUE,
+                supportsFunctionBreakpoints = TRUE,
+                supportsLogPoints = TRUE,
                 exceptionBreakpointFilters = list(
                     filter = "stop",
                     label = "Runtime error",
