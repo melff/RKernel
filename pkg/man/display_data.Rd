@@ -158,7 +158,7 @@ A generic function that prepares R objects for display using \code{display()}
 
 \item \code{display_data(html_elem)}: S3 method for "html_elem" objects (see \code{\link[memisc]{html}})
 
-\item \code{display_data(shiny.tag)}: S3 methods for \code{\link[shiny]{shiny}} objects
+\item \code{display_data(shiny.tag)}: S3 methods for "shiny" objects
 
 \item \code{display_data(iframe)}: S3 methods for "iframe" objects
 

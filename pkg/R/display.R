@@ -529,7 +529,7 @@ display_data.html_elem <- function(x,...,
             update=update)
 }
 
-#' @describeIn display_data S3 methods for \code{\link[shiny]{shiny}} objects
+#' @describeIn display_data S3 methods for "shiny" objects
 #' @export
 display_data.shiny.tag <- function(x,...,
                               metadata=emptyNamedList,

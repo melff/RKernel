@@ -28,6 +28,8 @@ Depends:
     R (>= 3.0.1)
 Suggests:
     roxygen2
+Enhances:
+    memisc, shiny
 SystemRequirements:
     jupyter
 RoxygenNote: 7.3.1
