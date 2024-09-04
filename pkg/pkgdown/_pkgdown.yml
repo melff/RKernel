@@ -85,25 +85,19 @@ reference:
   - dataTable
 - title: "Interactions"
   contents: 
-  - BreakPoint
-  - Trace
   - interaction
   - mkWidget
 - title: "Utilities"
   contents: 
   - cell.options
-  - dump.frames
+  - cell.par
   - dictionary
-  - with.Context
 - title: "Internal functions"
   contents:
   - CallbackDispatcher
   - Comm
   - CommManager
-  - Context
-  - Evaluator
   - EventManager
-  - Graphics
   - HasTraits
   - Kernel
   - R6Class_
@@ -113,8 +107,6 @@ reference:
   - install
   - main
   - register_magic_handler
-  - services
   - sharedHelpServer
   - to_json
-  - tracing_source
   - virtable_widget
