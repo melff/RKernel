@@ -3,5 +3,4 @@
 /.Rhistory
 /.jupyter
 /**/__pycache__
-/pkg/man/*.Rd
 /test/*
