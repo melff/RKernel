@@ -86,3 +86,5 @@ install-deps:
 # install-basic-deps:
 # 	Rscript --vanilla -e 'install.packages(c("devtools","roxygen2"),repos="https://cloud.r-project.org")'
 
+pkgdown:
+	Rscript --vanilla -e 'pkgdown::build_site(pkg="${SRCDIR}")'
