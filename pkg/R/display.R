@@ -1,8 +1,13 @@
 #' @include json.R
 
-#' Display an R Object
+#' @name display
+#' @title Display an R Object
+#'
+#' @description Sends a 'display_data' message to the frontend. 
+#'  Allows users to create rich display of R objects.
 #'
 #' @param ... Arguments passed to 'display_data' methods
+#' 
 #' @export
 display <- function(...){
     # log_out("=== DISPLAY ===")

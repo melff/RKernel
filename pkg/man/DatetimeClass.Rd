@@ -17,7 +17,7 @@ Time(...)
 A class and constructor of datetime traitlets.
 }
 \section{Super class}{
-\code{RKernel::Trait} -> \code{DatetimeClass}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{DatetimeClass}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

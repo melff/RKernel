@@ -7,7 +7,7 @@
 This is a base class for widgets that use the 'controls' module.
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{CoreWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{CoreWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

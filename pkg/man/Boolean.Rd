@@ -14,7 +14,7 @@ Boolean(...)
 A class and a constructor function to create boolean trait(let)s.
 }
 \section{Super class}{
-\code{RKernel::Trait} -> \code{Boolean}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{Boolean}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

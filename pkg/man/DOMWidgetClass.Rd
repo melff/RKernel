@@ -20,7 +20,7 @@ This is a base class for all widgets that are supposed to be
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{DOMWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{DOMWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

@@ -21,7 +21,7 @@ The function \code{FloatWidget} creates objects of the R6 Class
     "FloatWidgetClass", which in turn have the S3 class attribute "FloatWidget"
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{FloatWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{FloatWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

@@ -33,7 +33,7 @@ Classes and constructor functions for tab and accordion widgets
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::Box} -> \code{Box}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:Box]{RKernel::Box}} -> \code{Box}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -179,7 +179,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::Box} -> \code{Accordion}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:Box]{RKernel::Box}} -> \code{Accordion}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -251,7 +251,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::Box} -> \code{Tab}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:Box]{RKernel::Box}} -> \code{Tab}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -323,7 +323,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::Box} -> \code{Stack}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:Box]{RKernel::Box}} -> \code{Stack}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

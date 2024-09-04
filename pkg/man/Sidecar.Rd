@@ -19,7 +19,7 @@ Sidecar widgets - work only with Jupyter Lab
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::OutputWidget} -> \code{Sidecar}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:OutputWidget]{RKernel::OutputWidget}} -> \code{Sidecar}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

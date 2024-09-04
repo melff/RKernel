@@ -9,7 +9,7 @@ A Base Class for Traits that are R6 Objects
 A Base Class for Traits that are R6 Objects
 }
 \section{Super class}{
-\code{RKernel::Trait} -> \code{R6Trait}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{R6Trait}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

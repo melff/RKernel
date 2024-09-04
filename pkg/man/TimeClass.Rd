@@ -7,7 +7,7 @@
 A class and constructor of time traitlets.
 }
 \section{Super class}{
-\code{RKernel::Trait} -> \code{TimeClass}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{TimeClass}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

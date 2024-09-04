@@ -26,7 +26,7 @@ Classes and constructor functions for boxes and box styles
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{Button}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{Button}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -145,7 +145,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DescriptionStyle} -> \code{ButtonStyle}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DescriptionStyle]{RKernel::DescriptionStyle}} -> \code{ButtonStyle}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

@@ -19,7 +19,7 @@ Objects of this class have an optional description and a description tooltip fie
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{DescriptionWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{DescriptionWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

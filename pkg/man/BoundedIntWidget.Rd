@@ -29,7 +29,7 @@ The function \code{BoundedIntWidget} creates objects of the R6 Class
     "BoundedIntWidgetClass", which in turn have the S3 class attribute "BoundedIntWidget".
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{BoundedIntWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{BoundedIntWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -170,7 +170,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{BoundedIntRangeWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{BoundedIntRangeWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

@@ -25,7 +25,7 @@ The function \code{Layout} creates objects of the R6 Class
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{Layout}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{Layout}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

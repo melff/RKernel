@@ -27,7 +27,7 @@ The function \code{BoundedFloatRangeWidget} creates objects of the R6
     attribute "BoundedFloatRangeWidget"
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{BoundedFloatRangeWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{BoundedFloatRangeWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

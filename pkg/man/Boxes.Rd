@@ -46,7 +46,7 @@ Classes and constructor functions to create box container widgets
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{Box}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{Box}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -156,7 +156,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::Box} -> \code{HBox}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:Box]{RKernel::Box}} -> \code{HBox}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -225,7 +225,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::Box} -> \code{VBox}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:Box]{RKernel::Box}} -> \code{VBox}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -294,7 +294,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::Box} -> \code{GridBox}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:Box]{RKernel::Box}} -> \code{GridBox}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

@@ -19,7 +19,7 @@ Date(...)
 A class and constructor of date traitlets.
 }
 \section{Super class}{
-\code{RKernel::Trait} -> \code{DateClass}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{DateClass}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

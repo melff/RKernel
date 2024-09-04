@@ -38,7 +38,7 @@ Classes and constructor functions for progress bars and styling of them
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DescriptionStyle} -> \code{ProgrssStyle}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DescriptionStyle]{RKernel::DescriptionStyle}} -> \code{ProgrssStyle}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -103,7 +103,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::BoundedIntWidget} -> \code{IntProgress}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{\link[RKernel:BoundedIntWidget]{RKernel::BoundedIntWidget}} -> \code{IntProgress}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -181,7 +181,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::BoundedFloatWidget} -> \code{FloatProgress}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{\link[RKernel:BoundedFloatWidget]{RKernel::BoundedFloatWidget}} -> \code{FloatProgress}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

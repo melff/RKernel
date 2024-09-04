@@ -22,7 +22,7 @@ Float(...)
 A class and a constructor function to create floating point vector trait(let)s.
 }
 \section{Super class}{
-\code{RKernel::Trait} -> \code{Float}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{Float}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

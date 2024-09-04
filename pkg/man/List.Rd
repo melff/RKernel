@@ -14,7 +14,7 @@ List(...)
 A class and a constructor function to create list trait(let)s.
 }
 \section{Super class}{
-\code{RKernel::Trait} -> \code{List}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{List}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

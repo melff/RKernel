@@ -40,7 +40,7 @@ TwoByTwoLayout(...)
 R6 classes and constructor functions for widget layout templates
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::Box} -> \code{RKernel::GridBox} -> \code{TemplateBase}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:Box]{RKernel::Box}} -> \code{\link[RKernel:GridBox]{RKernel::GridBox}} -> \code{TemplateBase}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -132,7 +132,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::Box} -> \code{RKernel::GridBox} -> \code{RKernel::TemplateBase} -> \code{AppLayout}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:Box]{RKernel::Box}} -> \code{\link[RKernel:GridBox]{RKernel::GridBox}} -> \code{RKernel::TemplateBase} -> \code{AppLayout}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -230,7 +230,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::Box} -> \code{RKernel::GridBox} -> \code{RKernel::TemplateBase} -> \code{GridspecLayout}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:Box]{RKernel::Box}} -> \code{\link[RKernel:GridBox]{RKernel::GridBox}} -> \code{RKernel::TemplateBase} -> \code{GridspecLayout}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -353,7 +353,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::Box} -> \code{RKernel::GridBox} -> \code{RKernel::TemplateBase} -> \code{TwoByTwoLayout}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:Box]{RKernel::Box}} -> \code{\link[RKernel:GridBox]{RKernel::GridBox}} -> \code{RKernel::TemplateBase} -> \code{TwoByTwoLayout}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

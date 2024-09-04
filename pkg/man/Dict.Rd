@@ -15,7 +15,7 @@ A class and a constructor of dictionary trait(let)s.
    These are lists with unique element names.
 }
 \section{Super classes}{
-\code{RKernel::Trait} -> \code{RKernel::List} -> \code{Dict}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{\link[RKernel:List]{RKernel::List}} -> \code{Dict}
 }
 \section{Methods}{
 \subsection{Public methods}{

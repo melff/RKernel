@@ -25,7 +25,7 @@ An R6 class and constructor function for datetime picker widgets
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{DatetimePicker}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{DatetimePicker}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -190,7 +190,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::DatetimePicker} -> \code{NaiveDatetimePicker}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{\link[RKernel:DatetimePicker]{RKernel::DatetimePicker}} -> \code{NaiveDatetimePicker}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

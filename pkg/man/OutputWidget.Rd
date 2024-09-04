@@ -27,7 +27,7 @@ encapsulated by curly braces.}
 Classes and constructors to wrap output created by code
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{OutputWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{OutputWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

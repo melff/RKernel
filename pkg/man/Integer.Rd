@@ -25,7 +25,7 @@ Integer(...)
 A class and a constructor function to create integer vector trait(let)s.
 }
 \section{Super class}{
-\code{RKernel::Trait} -> \code{Integer}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{Integer}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

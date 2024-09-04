@@ -39,7 +39,7 @@ Classes and constructors to great tag input widgets
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{TagsInputBase}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{TagsInputBase}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -152,7 +152,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::TagsInputBase} -> \code{TagsInput}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{RKernel::TagsInputBase} -> \code{TagsInput}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -226,7 +226,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::TagsInputBase} -> \code{ColorsInput}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{RKernel::TagsInputBase} -> \code{ColorsInput}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -298,7 +298,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::TagsInputBase} -> \code{RKernel::TagsInput} -> \code{ColorsInput}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{RKernel::TagsInputBase} -> \code{\link[RKernel:TagsInput]{RKernel::TagsInput}} -> \code{ColorsInput}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -408,7 +408,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::TagsInputBase} -> \code{RKernel::TagsInput} -> \code{RKernel::ColorsInput} -> \code{FloatsInput}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{RKernel::TagsInputBase} -> \code{\link[RKernel:TagsInput]{RKernel::TagsInput}} -> \code{\link[RKernel:ColorsInput]{RKernel::ColorsInput}} -> \code{FloatsInput}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -482,7 +482,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::TagsInputBase} -> \code{RKernel::TagsInput} -> \code{RKernel::ColorsInput} -> \code{IntsInput}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{RKernel::TagsInputBase} -> \code{\link[RKernel:TagsInput]{RKernel::TagsInput}} -> \code{\link[RKernel:ColorsInput]{RKernel::ColorsInput}} -> \code{IntsInput}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

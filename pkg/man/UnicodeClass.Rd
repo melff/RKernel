@@ -23,7 +23,7 @@ A Unicode String Vector Trait
 
 }}
 \section{Super class}{
-\code{RKernel::Trait} -> \code{Unicode}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{Unicode}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

@@ -19,7 +19,7 @@ Objects of this class contain the CSS styling of description widgets
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{DescriptionStyle}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{DescriptionStyle}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

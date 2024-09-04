@@ -53,7 +53,7 @@ Classes and constructor functions for sliders (integer and floating-point ones)
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DescriptionStyle} -> \code{SliderStyle}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DescriptionStyle]{RKernel::DescriptionStyle}} -> \code{SliderStyle}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -118,7 +118,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::BoundedIntWidget} -> \code{IntSlider}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{\link[RKernel:BoundedIntWidget]{RKernel::BoundedIntWidget}} -> \code{IntSlider}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -206,7 +206,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::BoundedIntRangeWidget} -> \code{IntRangeSlider}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{\link[RKernel:BoundedIntRangeWidget]{RKernel::BoundedIntRangeWidget}} -> \code{IntRangeSlider}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -294,7 +294,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::BoundedFloatWidget} -> \code{FloatSlider}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{\link[RKernel:BoundedFloatWidget]{RKernel::BoundedFloatWidget}} -> \code{FloatSlider}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -382,7 +382,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::BoundedFloatRangeWidget} -> \code{FloatRangeSlider}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{\link[RKernel:BoundedFloatRangeWidget]{RKernel::BoundedFloatRangeWidget}} -> \code{FloatRangeSlider}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -470,7 +470,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::BoundedLogFloatWidget} -> \code{FloatLogSlider}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{\link[RKernel:BoundedLogFloatWidget]{RKernel::BoundedLogFloatWidget}} -> \code{FloatLogSlider}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

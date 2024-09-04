@@ -26,7 +26,7 @@ A class and a constructor function to create checkbox widgets
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DescriptionStyle} -> \code{CheckboxStyle}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DescriptionStyle]{RKernel::DescriptionStyle}} -> \code{CheckboxStyle}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -94,7 +94,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{Checkbox}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{Checkbox}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

@@ -17,7 +17,7 @@ A Color String Trait
 A Color String Trait
 }
 \section{Super classes}{
-\code{RKernel::Trait} -> \code{RKernel::Unicode} -> \code{Color}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{\link[RKernel:Unicode]{RKernel::Unicode}} -> \code{Color}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

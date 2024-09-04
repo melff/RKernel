@@ -35,7 +35,7 @@ The function \code{WidgetLink} creates objects of the R6 Class
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::CoreWidget} -> \code{WidgetLink}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{RKernel::CoreWidget} -> \code{WidgetLink}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -125,7 +125,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::CoreWidget} -> \code{RKernel::WidgetLink} -> \code{DirectionalLink}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{RKernel::CoreWidget} -> \code{\link[RKernel:WidgetLink]{RKernel::WidgetLink}} -> \code{DirectionalLink}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

@@ -72,7 +72,7 @@ Classes and constructors for selection widgets, i.e. dropdowns, listboxes etc.
 
 }}
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{SelectionWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{SelectionWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -186,7 +186,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::SelectionWidget} -> \code{Dropdown}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{\link[RKernel:SelectionWidget]{RKernel::SelectionWidget}} -> \code{Dropdown}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -255,7 +255,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::SelectionWidget} -> \code{RadioButtons}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{\link[RKernel:SelectionWidget]{RKernel::SelectionWidget}} -> \code{RadioButtons}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -324,7 +324,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::SelectionWidget} -> \code{ListboxSelect}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{\link[RKernel:SelectionWidget]{RKernel::SelectionWidget}} -> \code{ListboxSelect}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -395,7 +395,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DescriptionStyle} -> \code{ToggleButtonsStyle}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DescriptionStyle]{RKernel::DescriptionStyle}} -> \code{ToggleButtonsStyle}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -462,7 +462,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::SelectionWidget} -> \code{ToggleButtons}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{\link[RKernel:SelectionWidget]{RKernel::SelectionWidget}} -> \code{ToggleButtons}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -540,7 +540,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::SelectionWidget} -> \code{SelectionSlider}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{\link[RKernel:SelectionWidget]{RKernel::SelectionWidget}} -> \code{SelectionSlider}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -619,7 +619,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{MultipleSelectionWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{MultipleSelectionWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -733,7 +733,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::MultipleSelectionWidget} -> \code{ListboxSelectMultiple}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{\link[RKernel:MultipleSelectionWidget]{RKernel::MultipleSelectionWidget}} -> \code{ListboxSelectMultiple}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -804,7 +804,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::MultipleSelectionWidget} -> \code{SelectionRangeSlider}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{\link[RKernel:MultipleSelectionWidget]{RKernel::MultipleSelectionWidget}} -> \code{SelectionRangeSlider}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

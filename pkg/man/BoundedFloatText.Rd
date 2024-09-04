@@ -28,7 +28,7 @@ The function \code{BoundedFloatText} creates objects of the R6 Class
     "BoundedFloatTextClass", which in turn have the S3 class attribute "BoundedFloatText".
 }
 \section{Super classes}{
-\code{RKernel::HasTraits} -> \code{RKernel::Widget} -> \code{RKernel::DOMWidget} -> \code{RKernel::DescriptionWidget} -> \code{RKernel::ValueWidget} -> \code{RKernel::BoundedFloatWidget} -> \code{BoundedFloatText}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{\link[RKernel:BoundedFloatWidget]{RKernel::BoundedFloatWidget}} -> \code{BoundedFloatText}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

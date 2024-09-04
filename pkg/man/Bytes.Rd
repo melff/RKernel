@@ -14,7 +14,7 @@ Bytes(...)
 A class and a constructor function to create (raw) bytes trait(let)s.
 }
 \section{Super class}{
-\code{RKernel::Trait} -> \code{Bytes}
+\code{\link[RKernel:Trait]{RKernel::Trait}} -> \code{Bytes}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
