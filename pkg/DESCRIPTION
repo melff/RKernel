@@ -22,7 +22,8 @@ Imports:
     repr,
     htmltools,
     htmlwidgets,
-    base64enc
+    base64enc,
+    httpgd
 Depends:
     R (>= 3.0.1)
 Suggests:
