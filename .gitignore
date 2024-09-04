@@ -4,3 +4,4 @@
 /.jupyter
 /**/__pycache__
 /test/*
+/pkg/docs
