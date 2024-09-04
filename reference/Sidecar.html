@@ -15,7 +15,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--><!-- Flatly Theme - Light  --><link id="css-light" rel="stylesheet" href="https://bootswatch.com/3/flatly/bootstrap.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"><!-- Darkly Theme - Dark --><link id="css-dark" rel="stylesheet" href="https://bootswatch.com/3/darkly/bootstrap.css" media="(prefers-color-scheme: dark)"><!-- preferably CSS --><link rel="stylesheet" href="../preferably.css"><link id="css-code-light" rel="stylesheet" href="../code-color-scheme-light.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"><link id="css-code-dark" rel="stylesheet" href="../code-color-scheme-dark.css" media="(prefers-color-scheme: dark)"></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -29,7 +29,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RKernel</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0</span>
       </span>
     </div>
 
@@ -41,13 +41,13 @@
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Sidecar widgets</h1>
-    
+
     <div class="hidden name"><code>Sidecar.Rd</code></div>
     </div>
 
@@ -61,13 +61,15 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>...</dt>
+
+
+<dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Arguments passed to the inializer</p></dd>
 
 </dl></div>
     <div id="functions">
     <h2>Functions</h2>
-    
+
 <ul><li><p><code>Sidecar()</code>: A constructor for sidebar widgets</p></li>
 </ul></div>
     <div id="super-classes">
@@ -105,7 +107,7 @@
 
 
 <dt><code>anchor</code></dt>
-<dd><p>A string that specifies where the widget s to appear: 
+<dd><p>A string that specifies where the widget s to appear:
 one of "split-right", "split-left", "split-top", "split-bottom",
 "tab-before", "tab-after", or "right".</p></dd>
 
@@ -114,7 +116,7 @@ one of "split-right", "split-left", "split-top", "split-bottom",
     </div>
     <div id="methods">
     <h2>Methods</h2>
-    
+
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
@@ -144,14 +146,11 @@ one of "split-right", "split-left", "split-top", "split-bottom",
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="add_class"><a href="DOMWidget.html#method-add_class"><code>RKernel::DOMWidget$add_class()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="has_class"><a href="DOMWidget.html#method-has_class"><code>RKernel::DOMWidget$has_class()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>RKernel::DOMWidget$remove_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="OutputWidget" data-id="cat"><a href="OutputWidget.html#method-cat"><code>RKernel::OutputWidget$cat()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="OutputWidget" data-id="clear_output"><a href="OutputWidget.html#method-clear_output"><code>RKernel::OutputWidget$clear_output()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="RKernel" data-topic="OutputWidget" data-id="clear"><a href="OutputWidget.html#method-clear"><code>RKernel::OutputWidget$clear()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="OutputWidget" data-id="display"><a href="OutputWidget.html#method-display"><code>RKernel::OutputWidget$display()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="OutputWidget" data-id="do"><a href="OutputWidget.html#method-do"><code>RKernel::OutputWidget$do()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="OutputWidget" data-id="eval"><a href="OutputWidget.html#method-eval"><code>RKernel::OutputWidget$eval()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="OutputWidget" data-id="evaluate"><a href="OutputWidget.html#method-evaluate"><code>RKernel::OutputWidget$evaluate()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="OutputWidget" data-id="initialize"><a href="OutputWidget.html#method-initialize"><code>RKernel::OutputWidget$initialize()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="OutputWidget" data-id="print"><a href="OutputWidget.html#method-print"><code>RKernel::OutputWidget$print()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="RKernel" data-topic="OutputWidget" data-id="stderr"><a href="OutputWidget.html#method-stderr"><code>RKernel::OutputWidget$stderr()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="RKernel" data-topic="OutputWidget" data-id="stdout"><a href="OutputWidget.html#method-stdout"><code>RKernel::OutputWidget$stdout()</code></a></span></li>
 </ul></details></p><hr><a id="method-Sidecar-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
@@ -184,16 +183,16 @@ one of "split-right", "split-left", "split-top", "split-bottom",
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
   <p class="preferably">Using <a href="https://preferably.amirmasoudabdol.name/?source=footer" class="external-link">preferably</a> template.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

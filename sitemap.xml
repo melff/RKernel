@@ -1,327 +1,103 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://melff.github.io/RKernel/404.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/index.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Boolean.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/BoundedFloatRangeWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/BoundedFloatText.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/BoundedFloatWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/BoundedIntText.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/BoundedIntWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/BoundedLogFloatWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Boxes.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/BreakPoint.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Buttons.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Bytes.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/CSS.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/CallbackDispatcher.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Checkboxes.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/ColorPicker.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/ColorTrait.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Comm.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/CommManager.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Context.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/CoreWidgetClass.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/DOMWidgetClass.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/DateClass.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/DatePicker.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/DatetimeClass.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/DatetimePicker.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Debugger.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/DescriptionStyle.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/DescriptionWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Dict.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Evaluator.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/EventManager.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/FileUpload.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Fixed.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Float.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/FloatText.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/FloatWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Graphics.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/HasTraits.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/IFrame.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/IntText.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/IntWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Integer.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Javascript.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Kernel.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/LaTeXMath.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Layout.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/LayoutTemplates.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/List.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/MediaWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/OutputWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Page.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Play.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/PlotWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Progress.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/R6Class_.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/R6Instance.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/R6TraitClass.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/SelectionContainer.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/SelectionWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Sidecar.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Slider.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/StrEnum.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/StrEnumClass.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/StringWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/TagsInput.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/TimeClass.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/TimePicker.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Togglebuttons.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Trace.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Traitlets.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Unicode.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/UnicodeClass.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Valid.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/ValueWidgetClass.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Vector.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/View.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/WidgetLink.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/Widgets.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/add_displayed_classes.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/add_paged_classes.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/alert.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/cell.options.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/dataTable.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/dictionary.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/display.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/display_data.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/display_id.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/envBrowser.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/help.start.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/install.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/interaction.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/ls_str.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/main.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/mkWidget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/raw_html.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/register_magic_handler.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/remove_displayed_classes.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/remove_paged_classes.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/services.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/sharedHelpServer.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/to_json.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/tracing_source.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/virtable_widget.html</loc>
-  </url>
-  <url>
-    <loc>https://melff.github.io/RKernel/reference/with.Context.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://melff.github.io/RKernel/404.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/authors.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/index.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Boolean.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/BoundedFloatRangeWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/BoundedFloatText.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/BoundedFloatWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/BoundedIntText.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/BoundedIntWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/BoundedLogFloatWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Boxes.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Buttons.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Bytes.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/CSS.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/CallbackDispatcher.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Checkboxes.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/ColorPicker.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/ColorTrait.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Comm.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/CommManager.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/CoreWidgetClass.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/DOMWidgetClass.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/DateClass.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/DatePicker.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/DatetimeClass.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/DatetimePicker.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/DescriptionStyle.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/DescriptionWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Dict.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/EventManager.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/FileUpload.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Fixed.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Float.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/FloatText.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/FloatWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/HasTraits.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/IFrame.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/IntText.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/IntWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Integer.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Javascript.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Kernel.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/LaTeXMath.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Layout.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/LayoutTemplates.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/List.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/MediaWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/OutputWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Page.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Play.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/PlotWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Progress.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/R6Class_.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/R6Instance.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/R6TraitClass.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/SelectionContainer.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/SelectionWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Sidecar.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Slider.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/StrEnum.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/StrEnumClass.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/StringWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/TagsInput.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/TimeClass.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/TimePicker.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Togglebuttons.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Traitlets.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Unicode.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/UnicodeClass.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Valid.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/ValueWidgetClass.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Vector.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/View.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/WidgetLink.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/Widgets.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/add_displayed_classes.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/add_paged_classes.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/alert.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/cell.options.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/cell.par.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/dataTable.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/dictionary.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/display.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/display_data.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/display_id.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/envBrowser.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/help.start.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/index.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/install.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/interaction.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/ls_str.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/main.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/mkWidget.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/raw_html.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/register_magic_handler.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/remove_displayed_classes.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/remove_paged_classes.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/sharedHelpServer.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/to_json.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/virtable_widget.html</loc></url>
 </urlset>
+

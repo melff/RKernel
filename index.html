@@ -35,7 +35,7 @@
 <link id="css-code-dark" rel="stylesheet" href="code-color-scheme-dark.css" media="(prefers-color-scheme: dark)">
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -49,7 +49,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">RKernel</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0</span>
       </span>
     </div>
 
@@ -67,7 +67,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="contents col-md-9">
@@ -75,13 +75,11 @@
 <div class="page-header"><h1 id="rkernel">RKernel<a class="anchor" aria-label="anchor" href="#rkernel"></a>
 </h1></div>
 <p>This is a re-creation from scratch of an <a href="http://www.r-project.org" class="external-link"><em>R</em></a> kernel for <a href="http://juypter.org" class="external-link"><em>Jupyter</em></a>.</p>
-<div class="figure">
-<img src="https://raw.githubusercontent.com/melff/RKernel/main/gifs/Display-demo.gif" alt=""><p class="caption">A demonstration of interactive distribution plots</p>
+<div class="float">
+<img src="https://raw.githubusercontent.com/melff/RKernel/main/gifs/Display-demo.gif" alt="A demonstration of interactive distribution plots"><div class="figcaption">A demonstration of interactive distribution plots</div>
 </div>
 <p>To install run the following lines in <em>R</em>:</p>
-<pre class="{r}"><code><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"melff/RKernel/pkg"</span><span class="op">)</span></span>
-<span><span class="fu">RKernel</span><span class="fu">::</span><span class="fu"><a href="reference/install.html">installspec</a></span><span class="op">(</span><span class="op">)</span></span></code></pre>
-<p>For dynamic help you also need to install the python package <a href="https://pypi.org/project/jupyter-server-proxy/" class="external-link">jupyter-server-proxy</a>.</p>
+<p><code>{r} devtools::install_github("melff/RKernel/pkg") RKernel::installspec()</code> For dynamic help you also need to install the python package <a href="https://pypi.org/project/jupyter-server-proxy/" class="external-link">jupyter-server-proxy</a>.</p>
 <p>This kernel differs from the already existing <a href="http://irkernel.github.io" class="external-link"><em>IRKernel</em></a> by:</p>
 <ul>
 <li><p>Users can decide whether objects of certain classes are output via the “stdout” stream - which allows using any dedicated <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>-methods or via rich HTML/LaTeX output. By default the “stdout” stream is used for most classes of objects. Classes can be designated for rich output by calling <code>add_displayed_classes("some class")</code>. For individual objects, rich output can be requested using <code>display(some.object)</code>.</p></li>
@@ -95,21 +93,17 @@
 <li><p><a href="https://cran.r-project.org/package=htmlwidgets" class="external-link">HTML widgets</a> generally work. However, <em>some</em> htmlwidgets (notably those created with <a href="https://plotly.com/r/" class="external-link"><em>plotly</em></a>) displayed with the setting <code>options(htmlwidgets_embed=TRUE)</code> however to not appear if the notebook is opened in Google Chrome.</p></li>
 <li><p>There is also a support for virtual table display (based on the ipywidget infrastructure).</p></li>
 </ul>
-<div class="figure">
-<img src="https://raw.githubusercontent.com/melff/RKernel/main/gifs/Display-demo.gif" alt=""><p class="caption">A demonstration of some display facilities</p>
+<div class="float">
+<img src="https://raw.githubusercontent.com/melff/RKernel/main/gifs/Display-demo.gif" alt="A demonstration of some display facilities"><div class="figcaption">A demonstration of some display facilities</div>
 </div>
 <p>Some demonstration notebooks can be found <a href="https://tmphub.elff.eu/user-redirect/" class="external-link">here</a>.</p>
 <p>A widget demonstration can be found <a href="https://tmphub.elff.eu/user-redirect/voila/render/RKernel-demo-interact-linear-regression.ipynb" class="external-link">here</a>.</p>
 <p>TODO:</p>
 <ul class="task-list">
-<li>
-<input type="checkbox" disabled checked>Add documentation</li>
-<li>
-<input type="checkbox" disabled checked>Make HTML help work on servers</li>
-<li>
-<input type="checkbox" disabled>Add example notebooks</li>
-<li>
-<input type="checkbox" disabled checked>Make HTML widgets work more generally</li>
+<li><label><input type="checkbox" checked>Add documentation</label></li>
+<li><label><input type="checkbox" checked>Make HTML help work on servers</label></li>
+<li><label><input type="checkbox">Add example notebooks</label></li>
+<li><label><input type="checkbox" checked>Make HTML widgets work more generally</label></li>
 </ul>
 </div>
   </div>
@@ -150,17 +144,17 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
   <p class="preferably">Using <a href="https://preferably.amirmasoudabdol.name/?source=footer" class="external-link">preferably</a> template.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>
