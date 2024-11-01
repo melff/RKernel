@@ -27,6 +27,12 @@ emptyNamedList <- structure(list(),names=character(0))
 
 log_fn <- "/tmp/RKernel.log"
 
+truncate_log <- function(){
+  log_con <- file(log_fn,open="wr")
+  truncate(log_con)
+  close(log_con)
+}
+
 is_kernel <- function() !is.null(kernel$current)
 
 log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){

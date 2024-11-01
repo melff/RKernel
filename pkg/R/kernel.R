@@ -51,6 +51,7 @@ Kernel <- R6Class("Kernel",
       private$conn_info <- conn_info
       private$pid <- Sys.getpid()
       kernel$current <- self
+      truncate_log()
     },
     start_r_session = function(){
       self$r_session <- RKernelSession$new(callbacks = list(
@@ -767,10 +768,26 @@ Kernel <- R6Class("Kernel",
       # self$r_session$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")
     },
+    graphics_client = NULL,
     r_start_graphics = function(){
       # log_out("Starting graphics ...")
-      self$r_session$run_cmd("RKernel::start_graphics()")
+      # self$r_session$run_cmd("RKernel::start_graphics()")
       # log_out("done.")
+      private$graphics_client <- GraphicsClient$new(self$r_session)
+      private$graphics_client$start()
+    },
+    r_display_changed_graphics = function() {
+      log_out("r_display_changed_graphics")
+      log_out(private$graphics_client, use.print = TRUE)
+      log_out(private$graphics_client$changed(), use.print = TRUE)
+      if(private$graphics_client$changed()) {
+        d <- display_data(private$graphics_client)
+        #log_out(d, use.str = TRUE)
+        msg <- list(type = class(d),
+                    content = unclass(d))
+        log_out(msg, use.str = TRUE)
+        self$display_send(msg)
+      }
     },
     r_run_cell_begin_hooks = function(){
       self$r_session$run_code("RKernel::runHooks('cell-begin')")
@@ -781,18 +798,19 @@ Kernel <- R6Class("Kernel",
     r_msg_incomplete = FALSE,
     r_msg_frag = "",
     handle_r_stdout = function(text){
-      # log_out("handle_r_stdout")
+      log_out("handle_r_stdout")
       if (grepl(DLE, text)) {
-        # log_out("DLE found")
+        log_out("DLE found")
         text <- split_string1(text, DLE)
       }
       for(chunk in text){
         if(!length(chunk) || !nzchar(chunk)) next
         # log_out(chunk, use.str = TRUE)
         if (startsWith(chunk, MSG_BEGIN)) {
-          # log_out("MSG_BEGIN found")
+          log_out("MSG_BEGIN found")
           # log_out(chunk, use.print = TRUE)
           if (endsWith(chunk, MSG_END)) {
+            log_out("MSG_END found")
             msg <- remove_prefix(chunk, MSG_BEGIN) |> remove_suffix(MSG_END)
             msg <- msg_unwrap(msg)
             # log_out(msg, use.print = FALSE)
@@ -803,6 +821,8 @@ Kernel <- R6Class("Kernel",
           }
         }
         else if(endsWith(chunk, MSG_END)){
+          log_out("MSG_END found")
+          # log_out(chunk, use.print = TRUE)
           msg <- paste0(private$r_msg_frag, remove_suffix(chunk, MSG_END))
           private$r_msg_incomplete <- FALSE
           private$r_msg_frag <- ""
@@ -811,12 +831,15 @@ Kernel <- R6Class("Kernel",
         }
         else {
           if(private$r_msg_incomplete) {
+            log_out("incomplete chunk ...")
             private$r_msg_frag <- paste0(private$r_msg_frag, chunk)
           }
           else if(nzchar(chunk)) {
+            # log_out(chunk, use.print = TRUE)
             self$stdout(chunk)
           }
         }
+        private$r_display_changed_graphics()
       }
       # log_out("handle_r_stdout done")
     },

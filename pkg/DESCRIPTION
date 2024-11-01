@@ -53,6 +53,7 @@ Collate:
     'dictionary.R'
     'env-browser.R'
     'events.R'
+    'graphics-client.R'
     'help.R'
     'hooks.R'
     'inspect-reply.R'
