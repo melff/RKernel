@@ -235,7 +235,7 @@ RKernelSession <- R6Class("RKernelSession",
     receive_and_process_output = function(timeout = 1){
         # log_out("receive_and_process_output")
         resp <- self$receive_all_output(timeout)
-        log_out(resp, use.str = TRUE)
+        # log_out(resp, use.str = TRUE)
         self$process_output(resp, drop_echo = FALSE)
     },
     drop_prompt = function(txt){

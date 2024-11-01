@@ -87,7 +87,7 @@ Kernel <- R6Class("Kernel",
     #' Run the kernel.
     run = function(){
       self$start()
-      log_out("*** RKernel started ***")
+      # log_out("*** RKernel started ***")
       continue <- TRUE
       while(continue) {
         continue <- self$poll_and_respond()

@@ -65,7 +65,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         r_msg_frag = "",
 
         stream = function(text,stream_name){
-            log_out("Widget-context: stream")
+            # log_out("Widget-context: stream")
             text <- split_string1(text, DLE)
             for(chunk in text){
                 if (!length(chunk) || !nzchar(chunk)) next

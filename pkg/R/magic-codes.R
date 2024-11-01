@@ -3,7 +3,7 @@
 magic_handlers <- new.env()
 
 dispatch_magic_handler <- function(magic,code,args) {
-    log_out("dispatch_magic_handler")
+    # log_out("dispatch_magic_handler")
     magic <- tolower(magic)
     handler <- get0(magic,envir=magic_handlers,inherits=FALSE)
     if(is.null(handler)) stop("Unsupported cell magic")

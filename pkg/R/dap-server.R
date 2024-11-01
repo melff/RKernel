@@ -137,7 +137,7 @@ DAPServer <- R6Class("DAPServer",
             code <- request$arguments$code
             src_filename <- tempfile("codecell", fileext = ".R")
             writeLines(code, con = src_filename)
-            log_out(sprintf("dumped cell to '%s'", src_filename))
+            # log_out(sprintf("dumped cell to '%s'", src_filename))
             list(
                 sourcePath = src_filename
             )
