@@ -36,9 +36,6 @@ SystemRequirements:
     jupyter
 RoxygenNote: 7.3.1
 Collate: 
-    'json.R'
-    'display.R'
-    'GraphicsClass.R'
     'View.R'
     'aa-versions.R'
     'callbacks.R'
@@ -51,6 +48,8 @@ Collate:
     'dap-server.R'
     'dataTable.R'
     'dictionary.R'
+    'json.R'
+    'display.R'
     'env-browser.R'
     'events.R'
     'graphics-client.R'
@@ -63,6 +62,7 @@ Collate:
     'kernel.R'
     'magic-codes.R'
     'main.R'
+    'options.R'
     'output.R'
     'proto.R'
     'scrolling-table.R'

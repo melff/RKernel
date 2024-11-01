@@ -352,9 +352,7 @@ my_example2html <- function(topic, package, Rhome = "", env = NULL){
 }
 
 example_html <- function(topic,package = NULL,...) {
-    g <- graphics$current
-    graphics$delivery_mode <- "id"
-    on.exit(graphics$delivery_mode <- "display")
+    log_out("====== example_html ======")
     e <- capture.output(example(topic,package,local=TRUE,
                                 character.only=TRUE))
     
@@ -362,15 +360,8 @@ example_html <- function(topic,package = NULL,...) {
     e <- strsplit(e,DLE,fixed=TRUE)[[1]]
     
     r <- character()
-    n <- nchar(HGD_ID)
     for(i in seq_along(e)){
-        if(startsWith(e[i],HGD_ID)){
-            hgd_page <- substr(e[i],n+1,nchar(e[i]))
-            data <- g$svg(page=as.integer(hgd_page))
-            r[i] <- paste0("<div class= 'figure'>",data,"</div>")
-        } else {
-            r[i] <- paste0("<pre>",e[i],"\n</pre>")
-        }
+        r[i] <- paste0("<pre>",e[i],"\n</pre>")
     }
     head <- c("<!DOCTYPE html>","<html>")
     style <- "<style>
@@ -401,23 +392,13 @@ example_html <- function(topic,package = NULL,...) {
 }
 
 demo_html <- function(topic,package = NULL,...) {
-    g <- graphics$current
-    graphics$delivery_mode <- "id"
-    on.exit(graphics$delivery_mode <- "display")
     e <- capture.output(demo(topic=topic,package,ask=FALSE,character.only=TRUE))
     e <- paste(e,collapse="\n")
     e <- strsplit(e,DLE,fixed=TRUE)[[1]]
 
     r <- character()
-    n <- nchar(HGD_ID)
     for(i in seq_along(e)){
-        if(startsWith(e[i],HGD_ID)){
-            hgd_page <- substr(e[i],n+1,nchar(e[i]))
-            data <- g$svg(page=as.integer(hgd_page))
-            r[i] <- paste0("<div class= 'figure'>",data,"</div>")
-        } else {
-            r[i] <- paste0("<pre>",e[i],"\n</pre>")
-        }
+        r[i] <- paste0("<pre>",e[i],"\n</pre>")
     }
     head <- c("<!DOCTYPE html>","<html>")
     style<- "<style>

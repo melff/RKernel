@@ -19,7 +19,7 @@ MSG_BEGIN <- JSON_BEGIN
 MSG_END <- JSON_END
 
 json_send <- function(msg){
-    # log_out("send_msg\n")
+    # log_out("msg_send\n")
     # log_out(msg,use.print=TRUE)
     msg <- to_json(msg)
     # log_out(msg)

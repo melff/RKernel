@@ -79,6 +79,7 @@ Kernel <- R6Class("Kernel",
         r_send_input = self$r_session$send_input
       )
       self$r_session$run_cmd("RKernel::startup()")
+      self$r_session$run_cmd("RKernel::inject_send_options()")
     },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
@@ -297,11 +298,13 @@ Kernel <- R6Class("Kernel",
       )
       self$errored <- FALSE
       private$r_run_cell_begin_hooks()
+      private$graphics_client$new_cell <- TRUE
       r <- tryCatch(self$r_session$run_code(msg$content$code),
         error = function(e) structure("errored", message = conditionMessage(e)), # ,traceback=.traceback()),
         interrupt = function(e) "interrupted"
       )
       # log_out(r, use.print = TRUE)
+      private$r_display_changed_graphics()
       private$r_run_cell_end_hooks()
       payload <- NULL
       aborted <- FALSE
@@ -777,15 +780,15 @@ Kernel <- R6Class("Kernel",
       private$graphics_client$start()
     },
     r_display_changed_graphics = function() {
-      log_out("r_display_changed_graphics")
-      log_out(private$graphics_client, use.print = TRUE)
-      log_out(private$graphics_client$changed(), use.print = TRUE)
+      # log_out("r_display_changed_graphics")
+      # log_out(private$graphics_client$changed(), use.print = TRUE)
       if(private$graphics_client$changed()) {
         d <- display_data(private$graphics_client)
+        private$graphics_client$update_done()
         #log_out(d, use.str = TRUE)
         msg <- list(type = class(d),
                     content = unclass(d))
-        log_out(msg, use.str = TRUE)
+        # log_out(msg, use.str = TRUE)
         self$display_send(msg)
       }
     },
@@ -863,6 +866,8 @@ Kernel <- R6Class("Kernel",
       if(is.function(msg_handler)){
         msg_handler(msg)
       } else {
+        log_error(sprintf("R session sent message of unknown type '%s'", msg_type))
+        log_out(msg_handler, use.str = TRUE)
         self$stderr(sprintf("R session sent message of unknown type '%s'", msg_type))
       }
     },
@@ -871,6 +876,9 @@ Kernel <- R6Class("Kernel",
       private$r_msg_handlers$display_data <- self$display_send
       private$r_msg_handlers$update_display_data <- self$display_send
       private$r_msg_handlers$test <- function(msg) self$stdout(msg$content)
+      private$r_msg_handlers$new_plot <- private$graphics_client$new_plot
+      private$r_msg_handlers$before_new_plot <- private$graphics_client$before_new_plot
+      private$r_msg_handlers$options <- private$handle_options_msg
       for(msg_type in c("comm_msg", "comm_open", "comm_close"))
         private$r_msg_handlers[[msg_type]] <- self$send_comm
     },
@@ -908,6 +916,14 @@ Kernel <- R6Class("Kernel",
       resp <- self$r_session$run_cmd(cmd)
       msg <- msg_extract(resp$stdout)
       msg_unwrap(msg)
+    },
+    handle_options_msg = function(msg){
+      log_out("handle_options_msg")
+      #log_out(msg, use.str = TRUE)
+      opts <- msg$content
+      res <- do.call("options",opts)
+      #log_out(res, use.str = TRUE)
+      log_out(.Options[names(res)], use.str = TRUE)
     }
   )
 )
