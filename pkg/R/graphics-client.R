@@ -132,9 +132,9 @@ display_data.GraphicsClient <- function(x,
                                   height=getOption("jupyter.plot.height",7),
                                   resolution=getOption("jupyter.plot.res",144),
                                   id=NULL,
-                                  update=!x$new_page() && 
+                                  update=!x$new_page() && (
                                          getOption("jupyter.update.graphics", FALSE) ||
-                                         !x$new_cell,
+                                         !x$new_cell),
                                   ...)
 {
     log_out("display_data.GraphicsClient")
