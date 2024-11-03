@@ -16,6 +16,12 @@ GraphicsClient <- R6Class("GraphicsClient",
       self$port <- self$get_port()
       self$token <- self$get_token()
       self$last_state <- self$get_state()
+          add_sync_options(c(
+          "jupyter.plot.width",
+          "jupyter.plot.height",
+          "jupyter.plot.res",
+          "jupyter.graphics.types",
+          "jupyter.update.graphics"))
     },
     get_host = function(){
       private$session$run_cmd("RKernel:::get_hgd_host()")$stdout
@@ -88,19 +94,6 @@ GraphicsClient <- R6Class("GraphicsClient",
     },
     before_new_plot = function(msg) {
       log_out("before_new_plot")
-    },
-    importOptions = function() {
-      log_out("GraphicsClient$importOptions()")
-        graphics_options <- c(
-          "jupyter.plot.width",
-          "jupyter.plot.height",
-          "jupyter.plot.res",
-          "jupyter.graphics.types",
-          "jupyter.update.graphics"
-        )
-        for(go in graphics_options){
-          private$session$importOption(go)
-        }
     }
   ),
   private = list(

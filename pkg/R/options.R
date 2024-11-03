@@ -11,29 +11,20 @@ send_options <- function(){
   # Do not use 'log_out' here as it may lead to a recursion
   # log_out("send_options")
   n <- ls(snc_opts)
-  # log_out(n, use.print = TRUE)
   n <- intersect(n, names(.Options))
-  # log_out(n, use.print = TRUE)
   opts <- .Options[n]
-  # log_out(opts, use.str = TRUE)
-  # sent <- ls(sent_opts)
-  # new <- setdiff(n, sent)
-  # opts <- .Options[new]
-  # n <- intersect(n,sent)
-  # changed <- rep(FALSE, length(n))
-  # names(changed) <- n
-  # for(i in n){
-  #   changed[i] <- !identical(snc_opts[i], sent_opts[i])
-  # }
-  # opts <- c(opts,.Options[changed])
-  # for(i in names(opts))
-  #  sent_opts[i] <- opts[i]
   if(length(opts)){
     msg_send(list(
       type = "options",
       content = opts
     ))
   }
+}
+
+import_options <- function(opts){
+    # log_out("import_opts")
+    n <- intersect(ls(snc_opts),names(opts))
+    do.call("options",opts[n])
 }
 
 options_orig <- getFromNamespace("options", "base")

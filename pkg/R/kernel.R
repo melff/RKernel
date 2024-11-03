@@ -918,12 +918,13 @@ Kernel <- R6Class("Kernel",
       msg_unwrap(msg)
     },
     handle_options_msg = function(msg){
-      log_out("handle_options_msg")
+      # log_out("handle_options_msg")
       #log_out(msg, use.str = TRUE)
       opts <- msg$content
-      res <- do.call("options",opts)
+      import_options(opts)
+      #res <- do.call("options",opts)
       #log_out(res, use.str = TRUE)
-      log_out(.Options[names(res)], use.str = TRUE)
+      #log_out(.Options[names(res)], use.str = TRUE)
     }
   )
 )
