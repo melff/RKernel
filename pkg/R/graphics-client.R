@@ -102,18 +102,18 @@ GraphicsClient <- R6Class("GraphicsClient",
 )
 
 get_hgd_host <- function() {
-  state <- httpgd::hgd_state()
-  cat(state$host)
+  info <- httpgd::hgd_details()
+  cat(info$host)
 }
 
 get_hgd_port <- function() {
-  state <- httpgd::hgd_state()
-  cat(state$port)
+  info <- httpgd::hgd_details()
+  cat(info$port)
 }
 
 get_hgd_token <- function() {
-  state <- httpgd::hgd_state()
-  cat(state$token)
+  info <- httpgd::hgd_details()
+  cat(info$token)
 }
 
 #' @include display.R
