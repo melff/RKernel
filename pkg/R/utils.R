@@ -25,7 +25,7 @@ namedList <- function() structure(list(),names=character(0))
 emptyNamedList <- structure(list(),names=character(0))
 
 
-#log_fn <- "/tmp/RKernel.log"
+# log_fn <- "/tmp/RKernel.log"
 log_fn <- file.path(tempdir(),"RKernel.log")
 
 is_kernel <- function() !is.null(kernel$current)

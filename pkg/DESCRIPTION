@@ -23,11 +23,12 @@ Imports:
     htmltools,
     htmlwidgets,
     base64enc,
-    httpgd (< 2.0),
+    httpgd (>= 2.0),
+    unigd,
     callr,
     processx
 Depends:
-    R (>= 3.0.1)
+    R (>= 4.4)
 Suggests:
     roxygen2
 Enhances:
