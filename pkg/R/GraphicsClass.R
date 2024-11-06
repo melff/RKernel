@@ -1,11 +1,13 @@
 #' @importFrom base64enc dataURI
 #' @import httpgd
+#' @import unigd
 #' @export
 GraphicsClass <- R6Class("Graphics",
     public = list(
         initialize = function(...) self$open(...),
         open = function(width = 7,
                         height = 7){
+            # log_out("Graphics$open()")
             private$width <- width
             private$height <- height
             stopifnot(width > 0)
@@ -13,14 +15,14 @@ GraphicsClass <- R6Class("Graphics",
             hgd(width = width*self$dpi,
                 height = height*self$dpi,
                 silent = TRUE)
-            private$renderers <- hgd_renderers()
+            private$renderers <- try(ugd_renderers())
             private$dev_num <- dev.cur() 
             private$mime <- private$renderers$mime
             private$formats <- private$renderers$id
             names(private$mime)  <- private$formats
-            private$binary_format <- private$renderers$bin
+            private$binary_format <- !(private$renderers$text)
             names(private$binary_format)  <- private$renderers$id
-            state <- hgd_state()
+            state <- hgd_details()
             private$port <- state$port
             private$host <- state$host
             private$port <- state$port
@@ -39,7 +41,7 @@ GraphicsClass <- R6Class("Graphics",
         },
         checkpoint = function(){
             if(self$active()){
-                state <- hgd_state()
+                state <- ugd_state()
                 private$hsize <- state$hsize
                 private$upid <- state$upid
             }
@@ -47,16 +49,16 @@ GraphicsClass <- R6Class("Graphics",
         new_cell = TRUE,
         new_page_called = FALSE,
         new_page = function(){
-            state <- hgd_state()
+            state <- ugd_state()
             state$hsize > private$hsize
         },
         incomplete_layout = FALSE,
         updated = function(){
-            state <- hgd_state()
+            state <- ugd_state()
             state$upid > private$upid
         },
         size = function(){
-            state <- hgd_state()
+            state <- ugd_state()
             state$hsize
         },
         render = function(type,
@@ -85,15 +87,15 @@ GraphicsClass <- R6Class("Graphics",
             }
             else zoom <- 1L
             dev.set(private$dev_num)
-            data <- hgd_plot(page     = page,
-                             width    = width,
-                             height   = height,
-                             zoom     = zoom,
-                             renderer = type,
-                             which    = private$dev_num)
+            data <- ugd_render(page   = page,
+                                width    = width,
+                                height   = height,
+                                zoom     = zoom,
+                                as       = type,
+                                which    = private$dev_num)
             mime <- private$mime[type]
             binary <- private$binary_format[type]
-            # log_out(sprintf("Rendered graphics at port %d",private$port))
+            log_out(sprintf("Rendered graphics at port %d",private$port))
             return(data)
         },
         svg = function(page = 0){
@@ -103,7 +105,7 @@ GraphicsClass <- R6Class("Graphics",
             self$render("png", page = page)
         },
         last_plot = function(){
-            state <- hgd_state()
+            state <- ugd_state()
             state$hsize
         },
         url = function(type,
@@ -129,7 +131,7 @@ GraphicsClass <- R6Class("Graphics",
             height <- as.integer(height * dpi)
             host <- private$host
             port <- private$port
-            state <- hgd_state()
+            state <- ugd_state()
             renderer <- type
             token <- private$token
             index <- private$hsize - 1L
@@ -154,9 +156,9 @@ GraphicsClass <- R6Class("Graphics",
             else private$height <- height
             dev.set(private$dev_num)
             dpi <- self$dpi
-            hgd_plot(renderer="meta", 
-                     width = width * dpi, 
-                     height = height * dpi)
+            ugd_render(as="meta", 
+                       width = width * dpi, 
+                       height = height * dpi)
         },
         mime2format = function(mime){
             mime <- mime[1]
@@ -208,7 +210,9 @@ graphics <- new.env()
 
 #' @export
 start_graphics <- function(){
+    log_out("start_graphics ============================")
     graphics$current <- Graphics()
+    # log_out(graphics$current, use.print=TRUE)
     add_output_hook(send_changed_graphics,"graphics")
     setHook('cell-end',send_changed_graphics)
     setHook('cell-begin',graphics_new_cell)
@@ -220,12 +224,13 @@ start_graphics <- function(){
     setHook('grid.newpage',send_new_plot)
     graphics$delivery_mode <- "display"
     graphics$last_display <- ""
+    log_out("done =============================")
 }
 
 #' @importFrom uuid UUIDgenerate
 #' @export
 send_changed_graphics <- function(...){
-    # log_out("======= send_changed_graphics ================")
+    log_out("======= send_changed_graphics ================")
     g <- graphics$current
     dm <- graphics$delivery_mode
     use_update <- getOption("jupyter.update.graphics",TRUE)
@@ -318,6 +323,7 @@ display_data.Graphics <- function(x,
                                   id=UUIDgenerate(),
                                   update=FALSE,
                                   ...){
+    log_out("display_data.Graphics")
     rkernel_graphics_types <- getOption("jupyter.graphics.types",
                                         c("image/svg+xml",
                                           "image/png","application/pdf"))
@@ -331,6 +337,7 @@ display_data.Graphics <- function(x,
     for(i in seq_along(formats)){
         mime_i <- mime_types[i]
         format_i <- formats[i]
+        log_out(format_i)
         mime_data_i <- x$render(type=format_i,
                                 dpi=resolution)
         mime_data[[mime_i]] <- mime_data_i

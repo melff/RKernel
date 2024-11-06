@@ -87,7 +87,7 @@ Kernel <- R6Class("Kernel",
     #' Run the kernel.
     run = function(){
       self$start()
-      # log_out("*** RKernel started ***")
+      log_out("*** RKernel started ***")
       continue <- TRUE
       while(continue) {
         continue <- self$poll_and_respond()
@@ -300,7 +300,7 @@ Kernel <- R6Class("Kernel",
         error = function(e) structure("errored", message = conditionMessage(e)), # ,traceback=.traceback()),
         interrupt = function(e) "interrupted"
       )
-      # log_out(r, use.print = TRUE)
+      r_msg <- ""
       private$r_run_cell_end_hooks()
       payload <- NULL
       aborted <- FALSE
@@ -318,13 +318,14 @@ Kernel <- R6Class("Kernel",
           #log_error(paste(tb, sep = "\n"))
           log_error(tb,use.print=TRUE)
         }
-      }
+      } else self$errored <- FALSE
       if (!self$r_session$is_alive()) {
         aborted <- TRUE
         self$stderr("\nR session ended - restarting ... ")
         self$start_session()
         self$stderr("done.\n")
       } else if (self$errored) {
+          log_out(r, use.str = TRUE)
           content <- list(
             status = "error",
             ename = r,
@@ -829,9 +830,9 @@ Kernel <- R6Class("Kernel",
     },
     handle_r_msg = function(msg){
       # log_out("handle_r_msg")
-      # log_out(msg, use.print = TRUE)
+      # log_out(msg, use.str = TRUE)
       if(!is.list(msg)) {
-        # log_out("Non-list message")
+        log_out("Non-list message")
         return(NULL)
       }
       msg_type <- msg$type

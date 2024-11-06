@@ -100,6 +100,8 @@ remove_output_hook <- function(name){
 }
 
 run_output_hooks <- function(...){
+    # log_out("run_output_hooks")
+    # log_out(output_hooks, use.str = TRUE)
     nms <- sort(names(output_hooks))
     if(!isTRUE(attr(output_hooks,"suspended"))){
         for(n in nms){
