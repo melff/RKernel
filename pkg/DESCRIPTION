@@ -23,7 +23,7 @@ Imports:
     htmltools,
     htmlwidgets,
     base64enc,
-    httpgd,
+    httpgd (< 2.0),
     callr,
     processx
 Depends:
