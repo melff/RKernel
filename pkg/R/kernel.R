@@ -325,7 +325,7 @@ Kernel <- R6Class("Kernel",
         self$start_session()
         self$stderr("done.\n")
       } else if (self$errored) {
-          log_out(r, use.str = TRUE)
+          # log_out(r, use.str = TRUE)
           content <- list(
             status = "error",
             ename = r,

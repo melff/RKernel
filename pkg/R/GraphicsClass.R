@@ -95,7 +95,7 @@ GraphicsClass <- R6Class("Graphics",
                                 which    = private$dev_num)
             mime <- private$mime[type]
             binary <- private$binary_format[type]
-            log_out(sprintf("Rendered graphics at port %d",private$port))
+            # log_out(sprintf("Rendered graphics at port %d",private$port))
             return(data)
         },
         svg = function(page = 0){
@@ -150,13 +150,16 @@ GraphicsClass <- R6Class("Graphics",
               height = private$height)
         },
         set_dims = function(width = -1, height = -1){
+            # log_out("set_dims")
             if(width < 0) width <- private$width
             else private$width <- width
             if(height < 0) height <- private$height
             else private$height <- height
             dev.set(private$dev_num)
             dpi <- self$dpi
-            ugd_render(as="meta", 
+            uid <- ugd_id()
+            if(length(uid))
+                ugd_render(as="meta", 
                        width = width * dpi, 
                        height = height * dpi)
         },
@@ -210,7 +213,7 @@ graphics <- new.env()
 
 #' @export
 start_graphics <- function(){
-    log_out("start_graphics ============================")
+    # log_out("start_graphics")
     graphics$current <- Graphics()
     # log_out(graphics$current, use.print=TRUE)
     add_output_hook(send_changed_graphics,"graphics")
@@ -224,13 +227,12 @@ start_graphics <- function(){
     setHook('grid.newpage',send_new_plot)
     graphics$delivery_mode <- "display"
     graphics$last_display <- ""
-    log_out("done =============================")
 }
 
 #' @importFrom uuid UUIDgenerate
 #' @export
 send_changed_graphics <- function(...){
-    log_out("======= send_changed_graphics ================")
+    # log_out("======= send_changed_graphics ================")
     g <- graphics$current
     dm <- graphics$delivery_mode
     use_update <- getOption("jupyter.update.graphics",TRUE)
@@ -323,7 +325,7 @@ display_data.Graphics <- function(x,
                                   id=UUIDgenerate(),
                                   update=FALSE,
                                   ...){
-    log_out("display_data.Graphics")
+    # log_out("display_data.Graphics")
     rkernel_graphics_types <- getOption("jupyter.graphics.types",
                                         c("image/svg+xml",
                                           "image/png","application/pdf"))
@@ -337,7 +339,6 @@ display_data.Graphics <- function(x,
     for(i in seq_along(formats)){
         mime_i <- mime_types[i]
         format_i <- formats[i]
-        log_out(format_i)
         mime_data_i <- x$render(type=format_i,
                                 dpi=resolution)
         mime_data[[mime_i]] <- mime_data_i

@@ -8,7 +8,7 @@ dispatch_magic_handler <- function(magic,code,args) {
     handler <- get0(magic,envir=magic_handlers,inherits=FALSE)
     if(is.null(handler)) stop("Unsupported cell magic")
     d <- handler(code,args)
-    log_out(d,use.str=TRUE)
+    # log_out(d,use.str=TRUE)
     if(!is.null(d))
         display(d)
 }
