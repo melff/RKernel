@@ -177,64 +177,6 @@ display_data.htmlwidget <- function(x,...,
     structure(d,class=cl)
 }
 
-#' @describeIn display_data S3 method for plots saved with 'recordPlot()'
-#'
-#' @param width Width of the diplayed plot 
-#' @param height Height of the displayed plot
-#' @param pointsize Point size, see \code{\link[grDevices]{png}}
-#' @param resolution Resolution in ppi, see \code{\link[grDevices]{png}}
-#' @param scale The amount by which the plots are scaled in the frontend
-#' @param units Units of width and height, see \code{\link[grDevices]{png}}
-#' 
-#' @importFrom uuid UUIDgenerate
-#' @export
-display_data.recordedplot <- function(x,
-                                  width=getOption("jupyter.plot.width",7),
-                                  height=getOption("jupyter.plot.height",7),
-                                  resolution=getOption("jupyter.plot.res",144),
-                                  id=UUIDgenerate(),
-                                  update=FALSE,
-                                  ...){
-
-    rkernel_graphics_types <- getOption("jupyter.graphics.types",
-                                        c("image/svg+xml",
-                                          "image/png","application/pdf"))
-    
-    formats <- sapply(rkernel_graphics_types,x$mime2format)
-    mime_types <- sapply(rkernel_graphics_types,x$format2mime)
-
-    g <- Graphics()
-    replayPlot(x)
-    
-    mime_data <- list()
-    mime_metadata <- list()
-
-    for(i in seq_along(formats)){
-        mime_i <- mime_types[i]
-        format_i <- formats[i]
-        mime_data_i <- g$render(type=format_i,
-                                dpi=resolution)
-        mime_data[[mime_i]] <- mime_data_i
-        width_i <- width * g$dpi
-        height_i <- height * g$dpi
-        mime_metadata[[mime_i]] <- list(
-            width = width_i,
-            height = height_i
-        )
-        if(mime_i == "image/svg+xml")
-            mime_metadata[[mime_i]]$isolated <- TRUE
-    }
-    g$close()
-    rm(g)
-    
-    d <- list(data = mime_data,
-              metadata = mime_metadata)
-              transient = list(display_id = id)
-    if(update) cl <- "update_display_data"
-    else cl <- "display_data"
-    structure(d,class=cl)
-}
-
 #' @describeIn display_data S3 method for "display_data" objects
 #' @export
 display_data.display_data <- function(x,...) x

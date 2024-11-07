@@ -4,7 +4,6 @@
 \alias{display_data}
 \alias{display_data.default}
 \alias{display_data.htmlwidget}
-\alias{display_data.recordedplot}
 \alias{display_data.display_data}
 \alias{display_data.update_display_data}
 \alias{update.display_data}
@@ -35,16 +34,6 @@ display_data(x, ...)
   metadata = emptyNamedList,
   id = UUIDgenerate(),
   update = FALSE
-)
-
-\method{display_data}{recordedplot}(
-  x,
-  width = getOption("jupyter.plot.width", 7),
-  height = getOption("jupyter.plot.height", 7),
-  resolution = getOption("jupyter.plot.res", 144),
-  id = UUIDgenerate(),
-  update = FALSE,
-  ...
 )
 
 \method{display_data}{display_data}(x, ...)
@@ -120,19 +109,7 @@ display_data(x, ...)
 \item{update}{A logical value, whether a new display item should be created
 or an existing one should be updated}
 
-\item{width}{Width of the diplayed plot}
-
-\item{height}{Height of the displayed plot}
-
-\item{resolution}{Resolution in ppi, see \code{\link[grDevices]{png}}}
-
 \item{object}{An object of class "display_data"}
-
-\item{pointsize}{Point size, see \code{\link[grDevices]{png}}}
-
-\item{scale}{The amount by which the plots are scaled in the frontend}
-
-\item{units}{Units of width and height, see \code{\link[grDevices]{png}}}
 }
 \value{
 An object of class "display_data"
@@ -145,8 +122,6 @@ A generic function that prepares R objects for display using \code{display()}
 \item \code{display_data(default)}: Default method
 
 \item \code{display_data(htmlwidget)}: S3 method for html widgets
-
-\item \code{display_data(recordedplot)}: S3 method for plots saved with 'recordPlot()'
 
 \item \code{display_data(display_data)}: S3 method for "display_data" objects
 

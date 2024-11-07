@@ -43,7 +43,6 @@ Collate:
     'cell-options.R'
     'check-options.R'
     'comms.R'
-    'compare-plots.R'
     'completions.R'
     'dap-helpers.R'
     'dap-server.R'
