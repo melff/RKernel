@@ -319,8 +319,7 @@ Kernel <- R6Class("Kernel",
         tb <- attr(r, "traceback")
         if (length(tb)) {
           tb <- unlist(tb)
-          #log_error(paste(tb, sep = "\n"))
-          log_error(tb,use.print=TRUE)
+          log_error(paste(tb, sep = "\n"))
         }
       }
       if (!self$r_session$is_alive()) {
@@ -780,12 +779,9 @@ Kernel <- R6Class("Kernel",
       private$graphics_client$start()
     },
     r_display_changed_graphics = function() {
-      # log_out("r_display_changed_graphics")
-      # log_out(private$graphics_client$changed(), use.print = TRUE)
-      if(private$graphics_client$changed()) {
-        d <- display_data(private$graphics_client)
-        private$graphics_client$update_done()
-        #log_out(d, use.str = TRUE)
+      log_out("r_display_changed_graphics")
+      d <- private$graphics_client$display_changed()
+      if(length(d)) {
         msg <- list(type = class(d),
                     content = unclass(d))
         # log_out(msg, use.str = TRUE)
@@ -801,6 +797,7 @@ Kernel <- R6Class("Kernel",
     r_msg_incomplete = FALSE,
     r_msg_frag = "",
     handle_r_stdout = function(text){
+      log_out("=========================================================")
       log_out("handle_r_stdout")
       if (grepl(DLE, text)) {
         log_out("DLE found")
@@ -808,7 +805,7 @@ Kernel <- R6Class("Kernel",
       }
       for(chunk in text){
         if(!length(chunk) || !nzchar(chunk)) next
-        # log_out(chunk, use.str = TRUE)
+        log_out(chunk, use.str = TRUE)
         if (startsWith(chunk, MSG_BEGIN)) {
           log_out("MSG_BEGIN found")
           # log_out(chunk, use.print = TRUE)
@@ -843,6 +840,7 @@ Kernel <- R6Class("Kernel",
           }
         }
         private$r_display_changed_graphics()
+        log_out("----------------------------------------------")
       }
       # log_out("handle_r_stdout done")
     },

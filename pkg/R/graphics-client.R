@@ -1,6 +1,8 @@
 #' @import httpgd
 #' @importFrom jsonlite fromJSON
 #' @importFrom curl curl_fetch_memory
+#' @importFrom jsonlite base64_enc
+#' @importFrom unigd ugd_id
 #' @export
 GraphicsClient <- R6Class("GraphicsClient",
   public = list(
@@ -32,22 +34,46 @@ GraphicsClient <- R6Class("GraphicsClient",
     get_token = function(){
       private$session$run_cmd("RKernel:::get_hgd_token()")$stdout
     },
+    last_state = NULL,
     get_state = function(){
       gurl <- paste0(
                 "http://",
                 self$host,":",
                 self$port,"/",
-                "state",
-                "?token=",self$token)
+                "state","?",
+                "token=",self$token)
       con <- url(gurl)
       res <- readLines(con, warn = FALSE)
       close(con)
       res <- fromJSON(res)
       res
     },
-    last_state = NULL,
+    get_plots = function(){
+      gurl <- paste0(
+                "http://",
+                self$host,":",
+                self$port,"/",
+                "plots","?",
+                "token=",self$token)
+      con <- url(gurl)
+      res <- readLines(con, warn = FALSE)
+      close(con)
+      res <- fromJSON(res)
+      res$plots
+    },
+    # send display data if plot has changed
+    display_changed = function() {
+      log_out("display_changed")
+      if(self$changed()){
+        d <- self$display_data()
+        self$update_done()
+        return(d)
+      } else return(NULL)
+    },
     changed = function() {
       cur_state <- self$get_state()
+      log_out(self$last_state,use.print=TRUE)
+      log_out(cur_state,use.print=TRUE)
       cur_state$upid != self$last_state$upid
     },
     new_cell = TRUE,
@@ -62,12 +88,16 @@ GraphicsClient <- R6Class("GraphicsClient",
       cur_state$hsize != self$last_state$hsize
     },
     update_done = function() {
+      log_out("update_done")
       self$last_state <- self$get_state()
       self$new_cell <- FALSE
     },
     display_id = NULL,
+    plot_id = character(0),
     dpi = 72,
-    render = function(format, width=7,height=7,res=72) {
+    render = function(format, 
+        id = character(0), 
+        width=7,height=7,res=72) {
         zoom <- 1L
         width <- width * self$dpi
         height <- height * self$dpi
@@ -80,21 +110,77 @@ GraphicsClient <- R6Class("GraphicsClient",
                 "http://",
                 self$host,":",
                 self$port,"/",
-                "plot?",
-                "token=", self$token,
-                "&renderer=", format,
-                "&width=", width,
-                "&height=", height,
-                "&zoom=",zoom)
+                "plot","?",
+                if(length(id)) "id=",id,"&",
+                "token=", self$token,"&",
+                "renderer=", format,"&",
+                "width=", width,"&",
+                "height=", height,"&",
+                "zoom=",zoom)
         log_out(gurl)
         curl_fetch_memory(gurl)
     },
     new_plot = function(msg) {
       log_out("new_plot")
+      log_out(msg, use.print = TRUE)
+      self$plot_id <- msg$plot_id
     },
     before_new_plot = function(msg) {
       log_out("before_new_plot")
-    }
+    },
+    display_data = function(width=getOption("jupyter.plot.width",7),
+                            height=getOption("jupyter.plot.height",7),
+                            resolution=getOption("jupyter.plot.res",144),
+                            id=NULL,
+                            update=!self$new_page() && (
+                            getOption("jupyter.update.graphics", FALSE) ||
+                            !self$new_cell),
+                            ...)
+        {
+        log_out("GraphicsClient$display_data")
+        update <- force(update)
+        rkernel_graphics_types <- getOption("jupyter.graphics.types",
+                                            c("image/svg+xml",
+                                              #"image/png",
+                                              "application/pdf"))
+        mime_binary <- c("image/svg+xml" = FALSE,
+                        "image/png" = TRUE,
+                        "application/pdf" = TRUE)
+        mime_data <- list()
+        mime_metadata <- list()
+        for(mime_type in rkernel_graphics_types) {
+          g_fmt <- graphics_formats[mime_type]
+          rendered <- self$render(format=g_fmt,width=width,height=height,
+                                  res=resolution)
+          if(mime_binary[mime_type]) {
+            content <- base64_enc(rendered$content)
+          }
+          else {
+            content <- rawToChar(rendered$content)
+          }
+          mime_data[[mime_type]] <- content
+          mime_metadata[[mime_type]] <- list(
+            width = width * resolution,
+            height = height * resolution
+          )
+        }
+        if(update) {
+          cl <- "update_display_data"
+          if(is.null(id))
+            id <- self$display_id
+          }
+        else {
+          cl <- "display_data"
+          if(is.null(id))
+            id <- UUIDgenerate()
+          self$display_id <- id
+        }
+        d <- list(data = mime_data,
+                  metadata = mime_metadata,
+                  transient = list(display_id = id))
+        # log_out(structure(d,class=cl), use.str = TRUE)
+        structure(d,class=cl)
+      }
   ),
   private = list(
     session = NULL
@@ -116,65 +202,6 @@ get_hgd_token <- function() {
   cat(info$token)
 }
 
-#' @include display.R
-#' @importFrom uuid UUIDgenerate
-#' @importFrom jsonlite base64_enc
-#' @export
-display_data.GraphicsClient <- function(x,
-                                  width=getOption("jupyter.plot.width",7),
-                                  height=getOption("jupyter.plot.height",7),
-                                  resolution=getOption("jupyter.plot.res",144),
-                                  id=NULL,
-                                  update=!x$new_page() && (
-                                         getOption("jupyter.update.graphics", FALSE) ||
-                                         !x$new_cell),
-                                  ...)
-{
-    log_out("display_data.GraphicsClient")
-    update <- force(update)
-    rkernel_graphics_types <- getOption("jupyter.graphics.types",
-                                        c("image/svg+xml",
-                                          #"image/png",
-                                          "application/pdf"))
-    mime_binary <- c("image/svg+xml" = FALSE,
-                     "image/png" = TRUE,
-                     "application/pdf" = TRUE)
-    mime_data <- list()
-    mime_metadata <- list()
-    for(mime_type in rkernel_graphics_types) {
-      g_fmt <- graphics_formats[mime_type]
-      rendered <- x$render(format=g_fmt,width=width,height=height,
-                            res=resolution)
-      if(mime_binary[mime_type]) {
-        content <- base64_enc(rendered$content)
-      }
-      else {
-        content <- rawToChar(rendered$content)
-      }
-      mime_data[[mime_type]] <- content
-      mime_metadata[[mime_type]] <- list(
-        width = width * resolution,
-        height = height * resolution
-      )
-    }
-    # log_out(x, use.print = TRUE)
-    if(update) {
-      cl <- "update_display_data"
-      if(is.null(id))
-        id <- x$display_id
-      }
-    else {
-      cl <- "display_data"
-      if(is.null(id))
-        id <- UUIDgenerate()
-      x$display_id <- id
-    }
-    d <- list(data = mime_data,
-              metadata = mime_metadata,
-              transient = list(display_id = id))
-    # log_out(structure(d,class=cl), use.str = TRUE)
-    structure(d,class=cl)
-}
 
 graphics_formats <- c(
   "image/svg+xml"   = "svgp",
@@ -199,7 +226,9 @@ start_graphics <- function(){
 }
 
 send_new_plot <- function() {
-  msg <- list(type = "new_plot")
+  log_out("send_new_plot")
+  id <- ugd_id()$id
+  msg <- list(type = "new_plot", plot_id = id)
   msg_send(msg)
 }
 
