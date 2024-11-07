@@ -51,6 +51,7 @@ Kernel <- R6Class("Kernel",
       private$conn_info <- conn_info
       private$pid <- Sys.getpid()
       kernel$current <- self
+      truncate_log()
     },
     start_r_session = function(){
       self$r_session <- RKernelSession$new(callbacks = list(
@@ -78,6 +79,7 @@ Kernel <- R6Class("Kernel",
         r_send_input = self$r_session$send_input
       )
       self$r_session$run_cmd("RKernel::startup()")
+      self$r_session$run_cmd("RKernel::inject_send_options()")
     },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
@@ -296,11 +298,13 @@ Kernel <- R6Class("Kernel",
       )
       self$errored <- FALSE
       private$r_run_cell_begin_hooks()
+      private$graphics_client$new_cell <- TRUE
       r <- tryCatch(self$r_session$run_code(msg$content$code),
         error = function(e) structure("errored", message = conditionMessage(e)), # ,traceback=.traceback()),
         interrupt = function(e) "interrupted"
       )
-      r_msg <- ""
+      # log_out(r, use.print = TRUE)
+      private$r_display_changed_graphics()
       private$r_run_cell_end_hooks()
       payload <- NULL
       aborted <- FALSE
@@ -315,8 +319,7 @@ Kernel <- R6Class("Kernel",
         tb <- attr(r, "traceback")
         if (length(tb)) {
           tb <- unlist(tb)
-          #log_error(paste(tb, sep = "\n"))
-          log_error(tb,use.print=TRUE)
+          log_error(paste(tb, sep = "\n"))
         }
       } else self$errored <- FALSE
       if (!self$r_session$is_alive()) {
@@ -768,10 +771,23 @@ Kernel <- R6Class("Kernel",
       # self$r_session$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")
     },
+    graphics_client = NULL,
     r_start_graphics = function(){
       # log_out("Starting graphics ...")
-      self$r_session$run_cmd("RKernel::start_graphics()")
+      # self$r_session$run_cmd("RKernel::start_graphics()")
       # log_out("done.")
+      private$graphics_client <- GraphicsClient$new(self$r_session)
+      private$graphics_client$start()
+    },
+    r_display_changed_graphics = function() {
+      log_out("r_display_changed_graphics")
+      d <- private$graphics_client$display_changed()
+      if(length(d)) {
+        msg <- list(type = class(d),
+                    content = unclass(d))
+        # log_out(msg, use.str = TRUE)
+        self$display_send(msg)
+      }
     },
     r_run_cell_begin_hooks = function(){
       self$r_session$run_code("RKernel::runHooks('cell-begin')")
@@ -782,18 +798,20 @@ Kernel <- R6Class("Kernel",
     r_msg_incomplete = FALSE,
     r_msg_frag = "",
     handle_r_stdout = function(text){
-      # log_out("handle_r_stdout")
+      log_out("=========================================================")
+      log_out("handle_r_stdout")
       if (grepl(DLE, text)) {
-        # log_out("DLE found")
+        log_out("DLE found")
         text <- split_string1(text, DLE)
       }
       for(chunk in text){
         if(!length(chunk) || !nzchar(chunk)) next
-        # log_out(chunk, use.str = TRUE)
+        log_out(chunk, use.str = TRUE)
         if (startsWith(chunk, MSG_BEGIN)) {
-          # log_out("MSG_BEGIN found")
+          log_out("MSG_BEGIN found")
           # log_out(chunk, use.print = TRUE)
           if (endsWith(chunk, MSG_END)) {
+            log_out("MSG_END found")
             msg <- remove_prefix(chunk, MSG_BEGIN) |> remove_suffix(MSG_END)
             msg <- msg_unwrap(msg)
             # log_out(msg, use.print = FALSE)
@@ -804,6 +822,8 @@ Kernel <- R6Class("Kernel",
           }
         }
         else if(endsWith(chunk, MSG_END)){
+          log_out("MSG_END found")
+          # log_out(chunk, use.print = TRUE)
           msg <- paste0(private$r_msg_frag, remove_suffix(chunk, MSG_END))
           private$r_msg_incomplete <- FALSE
           private$r_msg_frag <- ""
@@ -812,12 +832,16 @@ Kernel <- R6Class("Kernel",
         }
         else {
           if(private$r_msg_incomplete) {
+            log_out("incomplete chunk ...")
             private$r_msg_frag <- paste0(private$r_msg_frag, chunk)
           }
           else if(nzchar(chunk)) {
+            # log_out(chunk, use.print = TRUE)
             self$stdout(chunk)
           }
         }
+        private$r_display_changed_graphics()
+        log_out("----------------------------------------------")
       }
       # log_out("handle_r_stdout done")
     },
@@ -841,6 +865,8 @@ Kernel <- R6Class("Kernel",
       if(is.function(msg_handler)){
         msg_handler(msg)
       } else {
+        log_error(sprintf("R session sent message of unknown type '%s'", msg_type))
+        log_out(msg_handler, use.str = TRUE)
         self$stderr(sprintf("R session sent message of unknown type '%s'", msg_type))
       }
     },
@@ -849,6 +875,9 @@ Kernel <- R6Class("Kernel",
       private$r_msg_handlers$display_data <- self$display_send
       private$r_msg_handlers$update_display_data <- self$display_send
       private$r_msg_handlers$test <- function(msg) self$stdout(msg$content)
+      private$r_msg_handlers$new_plot <- private$graphics_client$new_plot
+      private$r_msg_handlers$before_new_plot <- private$graphics_client$before_new_plot
+      private$r_msg_handlers$options <- private$handle_options_msg
       for(msg_type in c("comm_msg", "comm_open", "comm_close"))
         private$r_msg_handlers[[msg_type]] <- self$send_comm
     },
@@ -886,6 +915,15 @@ Kernel <- R6Class("Kernel",
       resp <- self$r_session$run_cmd(cmd)
       msg <- msg_extract(resp$stdout)
       msg_unwrap(msg)
+    },
+    handle_options_msg = function(msg){
+      # log_out("handle_options_msg")
+      #log_out(msg, use.str = TRUE)
+      opts <- msg$content
+      import_options(opts)
+      #res <- do.call("options",opts)
+      #log_out(res, use.str = TRUE)
+      #log_out(.Options[names(res)], use.str = TRUE)
     }
   )
 )

@@ -1,5 +1,6 @@
 #' @importFrom callr r_session_options r_session
 #' @importFrom processx poll conn_read_chars
+#' @importFrom crayon red
 
 #' @export
 RKernelSession <- R6Class("RKernelSession",
@@ -81,6 +82,35 @@ RKernelSession <- R6Class("RKernelSession",
         resp$stdout <- drop_echo(resp$stdout)
       }
       return(resp)
+    },
+    getOption = function(n, default = NULL) {
+      cmd <- sprintf("dput(getOption(\"%s\",NULL))",n)
+      res <- self$run_cmd(cmd)
+      res <- eval(str2expression(res$stdout))
+      if(is.null(res)) res <- default
+      res
+    },
+    get = function(n) {
+      cmd <- sprintf("dput(get0(\"%s\"))",n)
+      res <- self$run_cmd(cmd)
+      eval(str2expression(res$stdout))
+    },
+    assign = function(n, value) {
+      val <- paste(deparse(value), collapse = "\n")
+      cmd <- paste(n,"<-",val)
+      self$run_cmd(cmd)
+      invisible(NULL)
+    },
+    setOption = function(n, value) {
+      val <- paste(deparse(value), collapse = "\n")
+      cmd <- sprintf("options(%s = %s)", n, val)
+      self$run_cmd(cmd)
+      invisible(NULL)
+    },
+    importOption = function(n) {
+      opt <- list(self$getOption(n))
+      names(opt) <- n
+      do.call("options", opt)
     },
     send_input = function(text) {
       if (!endsWith(text, "\n")) text <- paste0(text, "\n")

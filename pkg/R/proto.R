@@ -29,7 +29,6 @@ handle_request <- function(msg){
       msg_send(response),
       error = function(e) {
         log_error(conditionMessage(e))
-        log_error(response,use.str=TRUE)
         return(NULL)
       }
     )

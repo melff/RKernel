@@ -38,11 +38,13 @@ cat_with_hooks  <- function (..., file = "", sep = " ", fill = FALSE, labels = N
 print_ <- getFromNamespace("print","base")
 
 print_with_hooks <- function(x,...){
+    log_out("print_with_hooks")
     run_output_hooks()
     if(any(class(x) %in% getOption("rkernel_displayed_classes")))
         display(x)
     else
         print_(x,...)
+    log_out(x, use.print = TRUE)
 }
 
 str_ <- getFromNamespace("str","utils")
@@ -79,9 +81,9 @@ message_stdout <- function (..., domain = NULL, appendLF = TRUE)
 
 #' @export
 install_output_hooks <- function() {
-    replace_in_package("base","cat",cat_with_hooks)
-    replace_in_package("base","print",print_with_hooks)
-    replace_in_package("utils","str",str_with_hooks)
+    # replace_in_package("base","cat",cat_with_hooks)
+    # replace_in_package("base","print",print_with_hooks)
+    # replace_in_package("utils","str",str_with_hooks)
     replace_in_package("base","message",message_stdout)
     add_displayed_classes("iframe")
 }
