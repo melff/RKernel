@@ -321,7 +321,7 @@ Kernel <- R6Class("Kernel",
           tb <- unlist(tb)
           log_error(paste(tb, sep = "\n"))
         }
-      }
+      } else self$errored <- FALSE
       if (!self$r_session$is_alive()) {
         aborted <- TRUE
         self$stderr("\nR session ended - restarting ... ")
