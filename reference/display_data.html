@@ -119,6 +119,24 @@
 <span>  update <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'htmlTable'</span></span>
+<span><span class="fu">display_data</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  metadata <span class="op">=</span> <span class="va">emptyNamedList</span>,</span>
+<span>  id <span class="op">=</span> <span class="fu">UUIDgenerate</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  update <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'tableHTML'</span></span>
+<span><span class="fu">display_data</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  metadata <span class="op">=</span> <span class="va">emptyNamedList</span>,</span>
+<span>  id <span class="op">=</span> <span class="fu">UUIDgenerate</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  update <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for class 'help_files_with_topic'</span></span>
 <span><span class="fu">display_data</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
@@ -185,6 +203,8 @@ or an existing one should be updated</p></dd>
 <li><p><code>display_data(html_elem)</code>: S3 method for "html_elem" objects (see <code><a href="https://melff.github.io/memisc/reference/html.html" class="external-link">html</a></code>)</p></li>
 <li><p><code>display_data(shiny.tag)</code>: S3 methods for "shiny" objects</p></li>
 <li><p><code>display_data(iframe)</code>: S3 methods for "iframe" objects</p></li>
+<li><p><code>display_data(htmlTable)</code>: S3 methods for "htmlTable" objects</p></li>
+<li><p><code>display_data(tableHTML)</code>: S3 methods for "tableHTML" objects</p></li>
 <li><p><code>display_data(help_files_with_topic)</code>: S3 method for help pages</p></li>
 <li><p><code>display_data(hsearch)</code>: S3 method for results of 'help.search()'</p></li>
 <li><p><code>display_data(Widget)</code>: Method for jupyter widgets</p></li>
