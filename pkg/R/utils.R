@@ -24,12 +24,16 @@ toRawJSON <- function(x,...){
 namedList <- function() structure(list(),names=character(0))
 emptyNamedList <- structure(list(),names=character(0))
 
+R.unsername <- function() {
+  Sys.info()["user"]
+}
 
 # log_fn <- "/tmp/RKernel.log"
-log_fn <- file.path(tempdir(),"RKernel.log")
+log_fn <- function() file.path(dirname(tempdir()),
+                               paste(R.unsername(),"RKernel.log",sep="-"))
 
 truncate_log <- function(){
-  log_con <- file(log_fn,open="wr")
+  log_con <- file(log_fn(),open="wr")
   truncate(log_con)
   close(log_con)
 }
@@ -55,7 +59,7 @@ log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
     else 
       message <- paste("          R SESSION -", message)
         # self$cat(message,file=stderr())
-    cat_(message,file=log_fn,append=TRUE)
+    cat_(message,file=log_fn(),append=TRUE)
   },error=function(e){
     log_error(sprintf("Error in %s",dcl))
     msg <- conditionMessage(e)
@@ -73,7 +77,7 @@ log_warning = function(message){
     message <- paste("R KERNEL -", message)
   else 
     message <- paste("          R SESSION -", message)
-  cat_(message,file=log_fn,append=TRUE)
+  cat_(message,file=log_fn(),append=TRUE)
 }
 #' @description
 #' Show an error message in the Jupyter server log
@@ -85,7 +89,7 @@ log_error = function(message){
     message <- paste("R KERNEL -", message)
   else 
     message <- paste("          R SESSION -", message)
-  cat_(message,file=log_fn,append=TRUE)
+  cat_(message,file=log_fn(),append=TRUE)
 }
 
 
