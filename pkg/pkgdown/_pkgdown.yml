@@ -1,15 +1,8 @@
 url: https://melff.github.io/RKernel
 
 template:
-  package: preferably
   bootstrap: 5
-  params:
-    toggle: manual
-
-navbar:
-  structure:
-    left:  [home, reference, articles]
-    right: [search, github, lightswitch]
+  bootswatch: sandstone
 
 reference:  
 - title: "Display facilities"
