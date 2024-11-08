@@ -8,6 +8,8 @@ Authors@R: c(
            role = c('aut', 'cre'), comment = c(ORCID = "0000-0001-9032-9739")))
 Maintainer: Martin Elff <martin@elff.eu>
 Description: Provides a kernel for Jupyter.
+URL: https://melff.github.io/RKernel/,https://github.com/melff/RKernel
+BugReports: https://github.com/melff/RKernel/issues
 Encoding: UTF-8
 License: GPL-2
 Imports:
