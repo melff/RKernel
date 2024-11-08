@@ -35,7 +35,10 @@ jobs:
           working-directory: pkg
 
       - name: Install dependencies
-        run: install.packages("preferably")
+        run: | 
+          remotes::install_deps(dependencies = TRUE)
+          install.packages("pkgdown", type = "binary")
+          install.packages("preferably")
         shell: Rscript {0}
       
       - name: Copy Readme
