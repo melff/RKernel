@@ -768,6 +768,7 @@ Kernel <- R6Class("Kernel",
       self$r_session$run_cmd("RKernel::install_cell_hooks()")
       self$r_session$run_cmd("RKernel::install_save_q()")
       self$r_session$run_cmd("RKernel::install_readline()")
+      self$r_session$run_cmd("RKernel::set_help_displayed")
       # self$r_session$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")
     },
