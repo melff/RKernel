@@ -2,7 +2,8 @@ url: https://melff.github.io/RKernel
 
 template:
   bootstrap: 5
-  bootswatch: sandstone
+  bootswatch: zephyr
+  light-switch: true
 
 reference:  
 - title: "Display facilities"
