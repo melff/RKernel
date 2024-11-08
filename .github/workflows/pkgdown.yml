@@ -36,9 +36,10 @@ jobs:
 
       - name: Install dependencies
         run: | 
+          install.packages("remotes", type = "binary")
           remotes::install_deps(dependencies = TRUE)
           install.packages("pkgdown", type = "binary")
-          install.packages("preferably")
+          remotes::install_github("amirmasoudabdol/preferably")
         shell: Rscript {0}
       
       - name: Copy Readme
