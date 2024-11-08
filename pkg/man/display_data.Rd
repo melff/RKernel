@@ -11,7 +11,10 @@
 \alias{display_data.matrix}
 \alias{display_data.html_elem}
 \alias{display_data.shiny.tag}
+\alias{display_data.shiny.tag.list}
 \alias{display_data.iframe}
+\alias{display_data.htmlTable}
+\alias{display_data.tableHTML}
 \alias{display_data.help_files_with_topic}
 \alias{display_data.hsearch}
 \alias{display_data.Widget}
@@ -74,11 +77,35 @@ display_data(x, ...)
   update = FALSE
 )
 
+\method{display_data}{shiny.tag.list}(
+  x,
+  ...,
+  metadata = emptyNamedList,
+  id = UUIDgenerate(),
+  update = FALSE
+)
+
 \method{display_data}{iframe}(
   x,
   ...,
   metadata = emptyNamedList,
   id = attr(x, "id"),
+  update = FALSE
+)
+
+\method{display_data}{htmlTable}(
+  x,
+  ...,
+  metadata = emptyNamedList,
+  id = UUIDgenerate(),
+  update = FALSE
+)
+
+\method{display_data}{tableHTML}(
+  x,
+  ...,
+  metadata = emptyNamedList,
+  id = UUIDgenerate(),
   update = FALSE
 )
 
@@ -133,9 +160,15 @@ A generic function that prepares R objects for display using \code{display()}
 
 \item \code{display_data(html_elem)}: S3 method for "html_elem" objects (see \code{\link[memisc]{html}})
 
-\item \code{display_data(shiny.tag)}: S3 methods for "shiny" objects
+\item \code{display_data(shiny.tag)}: S3 methods for "shiny.tab" objects
+
+\item \code{display_data(shiny.tag.list)}: S3 methods for "shiny.tab.list" objects
 
 \item \code{display_data(iframe)}: S3 methods for "iframe" objects
+
+\item \code{display_data(htmlTable)}: S3 methods for "htmlTable" objects
+
+\item \code{display_data(tableHTML)}: S3 methods for "tableHTML" objects
 
 \item \code{display_data(help_files_with_topic)}: S3 method for help pages
 

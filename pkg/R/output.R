@@ -94,6 +94,11 @@ install_output_hooks <- function() {
     # replace_in_package("utils","str",str_with_hooks)
     replace_in_package("base","message",message_stdout)
     add_displayed_classes("iframe")
+    add_displayed_classes("html_elem")
+    add_displayed_classes("shiny.tag")
+    add_displayed_classes("shiny.tag.list")
+    add_displayed_classes("htmlTable")
+    add_displayed_classes("tableHTML")
 }
 
 output_hooks <- new.env()

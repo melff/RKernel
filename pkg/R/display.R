@@ -471,9 +471,24 @@ display_data.html_elem <- function(x,...,
             update=update)
 }
 
-#' @describeIn display_data S3 methods for "shiny" objects
+#' @describeIn display_data S3 methods for "shiny.tab" objects
 #' @export
 display_data.shiny.tag <- function(x,...,
+                              metadata=emptyNamedList,
+                              id=UUIDgenerate(),
+                              update=FALSE){
+    text <- as.character(x)
+    text <- paste(text,collapse="\n")
+    display_data("text/plain"="",
+            "text/html"=text,
+            metadata=metadata,
+            id=id,
+            update=update)
+}
+
+#' @describeIn display_data S3 methods for "shiny.tab.list" objects
+#' @export
+display_data.shiny.tag.list <- function(x,...,
                               metadata=emptyNamedList,
                               id=UUIDgenerate(),
                               update=FALSE){
@@ -498,6 +513,43 @@ display_data.iframe <- function(x,...,
             id=id,
             update=update)
 }
+
+#' @describeIn display_data S3 methods for "htmlTable" objects
+#' @export
+display_data.htmlTable <- function(x,...,
+                              metadata=emptyNamedList,
+                              id=UUIDgenerate(),
+                              update=FALSE){
+    text <- as.character(x)
+    text <- c("<div style=\"margin: 0 auto; display: table; margin-top: 1em;\">",
+              text,
+              "</div>")
+    text <- paste(text,collapse="\n")
+    display_data("text/plain"="",
+            "text/html"=text,
+            metadata=metadata,
+            id=id,
+            update=update)
+}
+
+#' @describeIn display_data S3 methods for "tableHTML" objects
+#' @export
+display_data.tableHTML <- function(x,...,
+                              metadata=emptyNamedList,
+                              id=UUIDgenerate(),
+                              update=FALSE){
+    text <- as.character(x)
+    text <- c("<div style=\"margin: 0 auto; display: table; margin-top: 1em;\">",
+              text,
+              "</div>")
+    text <- paste(text,collapse="\n")
+    display_data("text/plain"="",
+            "text/html"=text,
+            metadata=metadata,
+            id=id,
+            update=update)
+}
+
 
 
 #' Create an alert in the frontend
