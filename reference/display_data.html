@@ -110,6 +110,15 @@
 <span>  update <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'shiny.tag.list'</span></span>
+<span><span class="fu">display_data</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  metadata <span class="op">=</span> <span class="va">emptyNamedList</span>,</span>
+<span>  id <span class="op">=</span> <span class="fu">UUIDgenerate</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  update <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for class 'iframe'</span></span>
 <span><span class="fu">display_data</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
@@ -201,7 +210,8 @@ or an existing one should be updated</p></dd>
 <li><p><code>display_data(data.frame)</code>: S3 method for class 'data.frame'</p></li>
 <li><p><code>display_data(matrix)</code>: S3 method for matrices</p></li>
 <li><p><code>display_data(html_elem)</code>: S3 method for "html_elem" objects (see <code><a href="https://melff.github.io/memisc/reference/html.html" class="external-link">html</a></code>)</p></li>
-<li><p><code>display_data(shiny.tag)</code>: S3 methods for "shiny" objects</p></li>
+<li><p><code>display_data(shiny.tag)</code>: S3 methods for "shiny.tab" objects</p></li>
+<li><p><code>display_data(shiny.tag.list)</code>: S3 methods for "shiny.tab.list" objects</p></li>
 <li><p><code>display_data(iframe)</code>: S3 methods for "iframe" objects</p></li>
 <li><p><code>display_data(htmlTable)</code>: S3 methods for "htmlTable" objects</p></li>
 <li><p><code>display_data(tableHTML)</code>: S3 methods for "tableHTML" objects</p></li>
