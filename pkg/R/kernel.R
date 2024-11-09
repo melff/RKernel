@@ -59,7 +59,6 @@ Kernel <- R6Class("Kernel",
         stderr = private$handle_r_stderr,
         msg = self$r_session_msg,
         readline = private$r_get_input,
-        menu = private$r_get_input,
         browser = private$r_get_input
       ))
       # log_out(self$r_session, use.print = TRUE)
@@ -768,6 +767,7 @@ Kernel <- R6Class("Kernel",
       self$r_session$run_cmd("RKernel::install_cell_hooks()")
       self$r_session$run_cmd("RKernel::install_save_q()")
       self$r_session$run_cmd("RKernel::install_readline()")
+      self$r_session$run_cmd("RKernel::install_menu()")
       self$r_session$run_cmd("RKernel::set_help_displayed")
       # self$r_session$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")

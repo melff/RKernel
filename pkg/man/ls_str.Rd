@@ -4,7 +4,7 @@
 \alias{ls_str}
 \title{A HTML version of 'ls.str()'}
 \usage{
-ls_str(pos = -1, name, envir, all.names = FALSE, pattern, mode = "any")
+ls_str(pos = -1, name, envir, all.names = FALSE, pattern = NULL, mode = "any")
 }
 \arguments{
 \item{pos}{integer indicating \code{\link[base]{search}} path position, or -1 for the current environment.}
