@@ -26,11 +26,12 @@ View.default <- function(x,title=deparse(substitute(x)),...)
     x <- as.data.frame(x)
     if(ncol(x) == 1)
         colnames(x) <- title
-    if(getOption("View.backend","virtable_widget")=="dataTable")
-        dataTable(x)
-    else
-        virtable_widget(x)
-    
+    # switch(getOption("View.backend",""),
+    #     widget=virtable_widget(x),
+    #     dataTable=dataTable(x),
+    #     scrolling_table(x)
+    # )
+    View.data.frame(x,title=title,...)
 }
 
 #' @rdname View
@@ -41,9 +42,10 @@ View.data.frame <- function(x,title=deparse(substitute(x)),...)
 
     # cls <- class(x)
     # title <- paste0(cls,": ",title)
-    if(getOption("View.backend","virtable_widget")=="dataTable")
-        dataTable(x)
-    else
-        virtable_widget(x)
+    switch(getOption("View.backend",""),
+        widget=virtable_widget(x),
+        dataTable=dataTable(x),
+        scrolling_table(x, include_css=TRUE)
+    )
 }
 

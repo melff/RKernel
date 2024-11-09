@@ -1,10 +1,10 @@
 .tableFixHead {
-    overflow: auto;
-    max-height: 300px
+    max-height: 250px;
 }
 
 .tableFixHead td {
     background: white;
+    color: black;
 }
 
 /* .tableFixHead thead {
@@ -22,6 +22,7 @@
 .tableFixHead th {
     background: #f7f7f7;
     background-clip: padding-box;
+    color: black;
 }
 
 .tableFixHead thead th {

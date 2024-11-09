@@ -86,12 +86,14 @@ message_stdout <- function (..., domain = NULL, appendLF = TRUE)
     invisible()
 }
 
+#' @include View.R
 #' @export
 install_output_hooks <- function() {
     # replace_in_package("base","cat",cat_with_hooks)
     # replace_in_package("base","print",print_with_hooks)
     replace_in_package("base","print",RKernel_print)
     # replace_in_package("utils","str",str_with_hooks)
+    replace_in_package("utils","View",View)    
     replace_in_package("base","message",message_stdout)
     add_displayed_classes("iframe")
     add_displayed_classes("html_elem")

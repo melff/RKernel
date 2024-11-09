@@ -65,12 +65,35 @@ scrolling_table <- function(x,id=UUIDgenerate(),
                        expand=FALSE,
                        html_class=NULL,
                        wrap_cells=NULL,
-                       include_css=FALSE){
+                       include_css=FALSE,
+                       max_lines=getOption("view_max_lines", 100),
+                       max_columns=getOption("view_max_columns",20)){
     x <- as.data.frame(x)
+    nr <- nrow(x)
+    nc <- ncol(x)
+    if(nr > max_lines) {
+        lns <- c(seq.int(max_lines - 1), nr)
+        x <- x[lns,]
+    }
+    if(nc > max_columns) {
+        cls <- c(seq.int(max_columns - 1), nc)
+        x <- x[,cls]
+    }
     rn <- row.names(x)
     nms <- names(x)
     x <- format(x)
     x <- as.matrix(x)
+    if(nr > max_lines) {
+        x <- rbind(x[-max_lines,],"\u22EE",x[max_lines,])
+        rn <- c(rn[-max_lines],"\u22EE",rn[max_lines])
+    }
+    if(nc > max_columns) {
+        x <- cbind(x[,-max_columns],"\u22EF",x[,max_columns])
+        nms <- c(nms[-max_columns],"\u22EF",nms[max_columns])
+    }
+    if(nr > max_lines && nc > max_columns) {
+        x[max_lines, max_columns] <- "\u22F1"
+    }
     if(use.rownames){
         x <- cbind(rn,x)
         nms <- c("",nms)
@@ -115,6 +138,12 @@ scrolling_table <- function(x,id=UUIDgenerate(),
         html <- paste(scrolling_table_css,html,sep="\n")
         .scrolling_table$inited <- TRUE
     }
+    html <- paste(
+        "<div style='margin: 1px auto; display: table; padding: 3px;' >",
+        html,
+        "</div>",
+        sep="\n"
+    )
     raw_html(html,id=id)   
 }
 
