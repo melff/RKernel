@@ -8,15 +8,15 @@ get2 <- function(nm,env,parent=NULL){
 
 #' @importFrom utils str
 
-# str_ <- function(nm,envir,parent=NULL){
-#     res <- tryCatch(capture.output(str(get2(nm,envir,parent))),
-#                     error=function(e)e)
-#     if(inherits(res,"error")){
-#         res <- "<missing>"
-#     }
-#     res <- gsub("\\t","",res)
-#     htmlEscape(trimws(res))
-# }
+str_str <- function(nm,envir,parent=NULL){
+    res <- tryCatch(capture.output(str(get2(nm,envir,parent))),
+                    error=function(e)e)
+    if(inherits(res,"error")){
+        res <- "<missing>"
+    }
+    res <- gsub("\\t","",res)
+    htmlEscape(trimws(res))
+}
 
 #' @title A HTML version of 'ls.str()'
 #'
@@ -30,7 +30,7 @@ get2 <- function(nm,env,parent=NULL){
 #' @param mode a character string, the mode of the objects to be shown
 #' @seealso \code{\link{ls.str}}
 #' @export
-ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern, 
+ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern = NULL, 
     mode = "any"){
     if (missing(envir)) 
         envir <- as.environment(pos)
@@ -62,9 +62,8 @@ init_env_browser <- function(){
 .env_browser_table <- new.env()
 .env_browser_table$inited <- FALSE
 
-
 env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FALSE, pattern = NULL, 
-    mode = "any", id=NULL, include_css = FALSE){
+    mode = "any", id=NULL, include_css = TRUE){
     if (missing(envir)) 
         envir <- as.environment(pos)
     if(length(pattern))
@@ -90,7 +89,7 @@ env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FA
         
     n <- length(nms)
     m <- matrix("",ncol=3,nrow=n)
-    str_nms <- lapply(nms,str_,envir=envir,parent=parent)
+    str_nms <- lapply(nms,str_str,envir=envir,parent=parent)
     str_nms1 <- lapply(str_nms,"[[",1)
     str_nms2 <- lapply(str_nms,"[",-1)
     str_nms2 <- lapply(str_nms2,paste0,collapse="\n")
@@ -111,9 +110,13 @@ env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FA
         for(i in 1:n){
             row <- m[i,]
             summary <- c(
-                paste0("<td class='object-name border-left'><code>",row[1],"</code></td>"),
+                paste0("<td class='object-name border-left'><pre>",
+                        row[1],
+                        "</pre></td>"),
                 # if(nzchar(row[3])) paste0("<td class='toggle-container'>","&plus;","</td>"),
-                paste0("<td class='object-summary border-left border-right'><code>",row[2],"</code></td>")
+                paste0("<td class='object-summary border-left border-right'><pre>",
+                        row[2],
+                        "</pre></td>")
             )
             summary <- paste(summary,collapse="")
             summary <- paste0("<tr>",summary,"</tr>")
@@ -121,11 +124,14 @@ env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FA
             summary <- paste(summary,collapse="\n")    
             if(nzchar(row[3])){  
                 details <- unlist(strsplit(row[3],"\n",fixed=TRUE))
-                details <- paste0("<td class='object-details border-left border-right'><code>",
-                                  details,
-                                  "</code></td>")
+                details <- paste0("<td class='object-details border-left border-right'><pre>",
+                             details,
+                             "</pre></td>")
                 details <- sapply(details,paste0,collapse="")
-                details <- paste0("<tr>",details,"</tr>")
+                details <- paste0("<tr>",
+                                #   "<td class='object-name border-left'></td>",
+                                  details,
+                                  "</tr>")
                 details <- paste(details,collapse="\n")
                 details <- c("<table class='env-browser'>",details,"</table>")
                 details <- paste(details,collapse="\n")

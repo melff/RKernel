@@ -49,17 +49,23 @@ table.env-browser,
  * } */
 
 .env-browser .object-name {
-    width: 15%;
+    /* width: 15%; */
+    width: 120px;
 }
 
 
 .env-browser .object-summary {
-    width: 85%;
+    /* width: 85%; */
 }
 
 table.env-browser {
     margin: 0 !important;
 }
+
+details table.env-browser {
+    box-sizing: border-box;
+}
+
 
 .env-browser th {
     text-align: left !important;
@@ -142,20 +148,41 @@ tbody.subtable {
     /* height: 300px */
 }
 
-
+/* 
 .env-browser-wrapper summary::marker {
     content:''; 
 }
-details summary::-webkit-details-marker { display: none; }
+details summary::-webkit-details-marker { display: none; } */
 
-.env-browser-wrapper details .object-summary::before {
-    content: "\2BC8";
-    padding-left: 4px;
+.env-browser-wrapper details[open] > summary {
+    margin-bottom: 0;
 }
 
-.env-browser-wrapper details[open] .object-summary::before {
-    content: "\2BC6";
+.env-browser-wrapper details[open] > .details-body {
+    margin-bottom: 0;
 }
+
+
+/* .env-browser-wrapper details .object-summary pre::after {
+    content: "\0020\2BC8";
+}
+
+.env-browser-wrapper details[open] .object-summary pre::after {
+    content: "\0020\2BC6";
+} */
+
+.env-browser-wrapper details .object-name pre::after {
+    content: "\0020\2BC7";
+}
+
+.env-browser-wrapper details[open] .object-name pre::after {
+    content: "\0020\2BC6";
+} 
+
+.env-browser-wrapper details .object-details pre::before {
+    content: "\0020\0020\0020";
+}
+
 
 .ui-dialog.env-browser-dialog {
     font-size: 11px;
