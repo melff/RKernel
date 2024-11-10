@@ -60,6 +60,12 @@ get_help_url <- function(){
     return(url)
 }
 
+get_help_port <- function(){
+    url <- help_server$current$get_port()
+    return(url)
+}
+
+
 #' @export
 set_help_displayed <- function(on=TRUE){
     if(on){

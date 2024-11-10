@@ -57,6 +57,7 @@ Collate:
     'graphics-client.R'
     'help.R'
     'hooks.R'
+    'httpd.R'
     'inspect-reply.R'
     'install.R'
     'is-complete.R'

@@ -769,6 +769,7 @@ Kernel <- R6Class("Kernel",
       self$r_session$run_cmd("RKernel::install_readline()")
       self$r_session$run_cmd("RKernel::install_menu()")
       self$r_session$run_cmd("RKernel::set_help_displayed")
+      self$r_session$run_cmd("RKernel::install_httpd_handlers()")
       # self$r_session$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")
     },
