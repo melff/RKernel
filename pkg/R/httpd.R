@@ -2,6 +2,10 @@ add_http_handler <- function(name, handler){
   assign(name, handler, tools:::.httpd.handlers.env)
 }
 
+has_http_handler <- function(name) {
+  exists(name, envir = tools:::.httpd.handlers.env)
+}
+
 http_echo <- function(path, query, ...){
   payload <- list(path=path, query=query,...)
   payload[[4]] <- rawToChar(payload[[4]])
@@ -9,6 +13,7 @@ http_echo <- function(path, query, ...){
   list(
     payload = paste0(payload,collapse="\n"),
     "content-type" = "text/plain",
+    headers=NULL,
     "status code" = 200L
   )
 }
@@ -38,7 +43,8 @@ http_eval <- function(path, query, ...){
     list(
       payload = paste0(payload,collapse="\n"),
       "content-type" = content_type,
-      "status code" = 200L
+      headers=NULL,
+     "status code" = 200L
       )
   }
 
@@ -99,6 +105,7 @@ http_data <- function(path, query, ...){
     list(
       payload = paste0(payload,collapse="\n"),
       "content-type" = content_type,
+      headers=NULL,
       "status code" = 200L
       )
   }
@@ -119,7 +126,7 @@ httpd_port <- function() get_help_port()
 #httpd_port <- function() get0("port",httpd_env)
 
 #' @export 
-httpd_url <- function() paste0(get_help_url(),"/")
+httpd_url <- function() paste0(get_help_url(),"/custom/")
 #httpd_url <- function() paste0("http://localhost:",httpd_port(),"/")
 
 #' @export
