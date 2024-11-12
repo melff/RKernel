@@ -64,26 +64,26 @@ virtable_widget <- function(x,
     page_right_button <- Button(icon="angle-double-right")
     page_right_button$add_class("page-right-button")   
     
-    col_plus_button <- Button(icon="plus")
-    col_plus_button$add_class("col-plus-button")
-    col_minus_button <- Button(icon="minus")
-    col_minus_button$add_class("col-minus-button")
+    # col_plus_button <- Button(icon="plus")
+    # col_plus_button$add_class("col-plus-button")
+    # col_minus_button <- Button(icon="minus")
+    # col_minus_button$add_class("col-minus-button")
     
-    row_plus_button <- Button(icon="plus")
-    row_plus_button$add_class("row-plus-button")
-    row_minus_button <- Button(icon="minus")
-    row_minus_button$add_class("row-minus-button")
+    # row_plus_button <- Button(icon="plus")
+    # row_plus_button$add_class("row-plus-button")
+    # row_minus_button <- Button(icon="minus")
+    # row_minus_button$add_class("row-minus-button")
     
-    row_scrollbar <- VBox(row_plus_button,
-                          row_minus_button,
+    row_scrollbar <- VBox(#row_plus_button,
+                          #row_minus_button,
                           page_up_button,
                           scroll_up_button,
                           row_control,
                           scroll_down_button,
                           page_down_button)
     
-    col_scrollbar <- HBox(col_plus_button,
-                          col_minus_button,
+    col_scrollbar <- HBox(#col_plus_button,
+                          #col_minus_button,
                           page_left_button,
                           scroll_left_button,
                           col_control,
@@ -218,18 +218,18 @@ virtable_widget <- function(x,
         row_control$value <- 100*row_prop_new
     }
     
-    col_pagesize_increase <- function(...){
-        col_pagesize_control$value <- min(col_pagesize_control$value + 1L,ncol(x))
-    }
-    col_pagesize_decrease <- function(...){
-        col_pagesize_control$value <- max(col_pagesize_control$value - 1L,1L)
-    }
-    row_pagesize_increase <- function(...){
-        row_pagesize_control$value <- min(row_pagesize_control$value + 1L,nrow(x))
-    }
-    row_pagesize_decrease <- function(...){
-        row_pagesize_control$value <- max(row_pagesize_control$value - 1L,1L)
-    }
+    # col_pagesize_increase <- function(...){
+    #     col_pagesize_control$value <- min(col_pagesize_control$value + 1L,ncol(x))
+    # }
+    # col_pagesize_decrease <- function(...){
+    #     col_pagesize_control$value <- max(col_pagesize_control$value - 1L,1L)
+    # }
+    # row_pagesize_increase <- function(...){
+    #     row_pagesize_control$value <- min(row_pagesize_control$value + 1L,nrow(x))
+    # }
+    # row_pagesize_decrease <- function(...){
+    #     row_pagesize_control$value <- max(row_pagesize_control$value - 1L,1L)
+    # }
     
     update_content <- function(...){
         row_pagesize <- min(row_pagesize_control$value,nrow(x))
@@ -302,11 +302,11 @@ virtable_widget <- function(x,
     page_up_button$on_click(page_up)
     page_down_button$on_click(page_down)    
     
-    col_plus_button$on_click(col_pagesize_increase)
-    col_minus_button$on_click(col_pagesize_decrease)
+    # col_plus_button$on_click(col_pagesize_increase)
+    # col_minus_button$on_click(col_pagesize_decrease)
 
-    row_plus_button$on_click(row_pagesize_increase)
-    row_minus_button$on_click(row_pagesize_decrease)
+    # row_plus_button$on_click(row_pagesize_increase)
+    # row_minus_button$on_click(row_pagesize_decrease)
      
     display(get_grid_table_css())
     display(get_virtable_widget_css())

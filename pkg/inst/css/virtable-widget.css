@@ -5,6 +5,7 @@
 .scrolling-table .widget-vslider {
     width: 20px;
     height: 100%;
+    color: black;
     background-color: #f7f7f7;
     border-style: solid;
     border-left-style: none;
@@ -16,6 +17,7 @@
 .scrolling-table .widget-hslider {
     height: 20px;
     width: 100%;
+    color: black;
     background-color: #f7f7f7;
     border-style: solid;
     border-top-style: none;
@@ -26,11 +28,13 @@
 
 .scrolling-table .widget-vslider .ui-slider-vertical {
     width: 2px;
+    color: black;
     background-color: #f7f7f7;
     border-style: none;
 }
 .scrolling-table .widget-hslider .ui-slider-horizontal {
     height: 2px;
+    color: black;
     background-color: #f7f7f7;
     border-style: none;
 }
@@ -40,6 +44,7 @@
     margin-left: 0;
     margin-right: 0;
     width: 18px;
+    color: black;
     background-color: white;
 }
 
@@ -48,6 +53,7 @@
     margin-top: 0;
     margin-bottom: 0;
     height: 18px;
+    color: black;
     background-color: white;
 }
 
@@ -58,6 +64,7 @@
     margin-left: 0;
     margin-right: 0;
     width: 18px;
+    color: black;
     background-color: white;
     left: -8px;
 }
@@ -79,6 +86,7 @@
     margin-left: 0;
     margin-right: 0;
     height: 18px;
+    color: black;
     background-color: white;
     top: -7px;
 }
@@ -113,6 +121,7 @@ button.scroll-lock.mod-active{
     height: 20px;
     margin: 0;
     padding: 0;
+    color: black;
     background-color: white;
     border-style: none;
     border-right-style: solid;
@@ -149,6 +158,7 @@ button.row-minus-button {
     height: 20px;
     margin: 0;
     padding: 0;
+    color: black;
     background-color: white;
     border-style: none;    
     border-color: #d8d8d8;
