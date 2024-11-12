@@ -1,5 +1,7 @@
 #' @importFrom utils tail file_test
 
+#' @include httpd.R
+
 asset_fetcher <- function(path,...){
     # log_out('asset_fetcher:',path)
     split_path <- strsplit(path,"/",fixed=TRUE)[[1]]
@@ -23,14 +25,14 @@ asset_fetcher <- function(path,...){
       list(payload=payload,
          `content-type`=mime_type,
           headers=NULL,
-          `status code`=200)
+          `status code`=200L)
     }
     else {
         # log_error(sprintf('"%s" not found',filename))
         list(payload=sprintf('"%s" not found',filename),
          `content-type`="text/plain",
           headers=NULL,
-          `status code`=404)
+          `status code`=404L)
     }
 }
 
@@ -67,7 +69,7 @@ dt_data_fetcher <- function(path,query,postBody,headers){
     list(payload=payload,
          `content-type`="application/json",
           headers=NULL,
-          `status code`=200)
+          `status code`=200L)
 }
 
 fill_tmpl <- function(tmpl,...){
@@ -191,11 +193,11 @@ datatable_page <- function(obj,
                          scrollY=400,
                          size=50,
                          page_num=1){
-    url <- evaluator$current$get_url()
-    if(!eventmanagers$http$has("assets"))
-    eventmanagers$http$on("assets",asset_fetcher)
-    if(!eventmanagers$http$has("dt-data"))
-        eventmanagers$http$on("dt-data",dt_data_fetcher)
+    url <- httpd_url()
+    if(!has_http_handler("assets"))
+        add_http_handler("assets",asset_fetcher)
+    if(!has_http_handler("dt-data"))
+        add_http_handler("dt-data",dt_data_fetcher)
     n <- ncol(obj)
     m <- n%/%size
     r <- n%%size

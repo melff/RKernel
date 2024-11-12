@@ -123,16 +123,13 @@ str2iframe <- function(code,
                       style = "border-style:none",...){
             # cl <- match.call()
             # log_out(deparse1(cl))
-    id <- UUIDgenerate()
-    path <- paste0("/iframe/",id,"/")
-    url <- paste0(self$get_url(),path)
-    if(!eventmanagers$http$has("iframe"))
-        eventmanagers$http$on("iframe",private$handle_iframe)
-    private$iframes[[id]] <- code
-    if_tmpl <- "
-                   <iframe src=\"%s\" width=\"%s\" height=\"%s\" class=\"%s\" style=\"%s\">
-                   </iframe>
-                   "
+    # id <- UUIDgenerate()
+    # path <- paste0("/iframe/",id,"/")
+    # url <- paste0(httpd_url(),path)
+    url <- dataURI(charToRaw(code),mime="text/html")
+    if_tmpl <- "<iframe src=\"%s\" width=\"%s\" height=\"%s\" class=\"%s\" style=\"%s\">
+                </iframe>
+                "
     iframe <- sprintf(if_tmpl,url,width,height,class,style)
             # mime_data <- list(
             #     "text/plain" = "",
@@ -143,7 +140,9 @@ str2iframe <- function(code,
             # display_data(data=mime_data,
             #              metadata=metadata,
             #              transient=transient)
-    structure(iframe,class="iframe",id=id)
+    # structure(iframe,class="iframe",id=id)
+    # raw_html(iframe)
+    iframe
 }
 
 #' @export
