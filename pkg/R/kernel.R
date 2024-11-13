@@ -296,52 +296,78 @@ Kernel <- R6Class("Kernel",
         )
       )
       self$errored <- FALSE
-      private$r_run_cell_begin_hooks()
-      private$graphics_client$new_cell <- TRUE
-      r <- tryCatch(self$r_session$run_code(msg$content$code),
-        error = function(e) structure("errored", message = conditionMessage(e)), # ,traceback=.traceback()),
-        interrupt = function(e) "interrupted"
-      )
-      # log_out(r, use.print = TRUE)
-      private$r_display_changed_graphics()
-      private$r_run_cell_end_hooks()
-      payload <- NULL
-      aborted <- FALSE
-      if (is.character(r) && (identical(r[1], "errored") || identical(r[1], "interrupted"))) {
-        aborted <- TRUE
-      }
-      if (is.character(r)) {
-        self$errored <- TRUE
-        log_error(r)
-        r_msg <- attr(r, "message")
-        if (length(r_msg)) log_error(r_msg)
-        tb <- attr(r, "traceback")
-        if (length(tb)) {
-          tb <- unlist(tb)
-          log_error(paste(tb, sep = "\n"))
-        }
-      } else self$errored <- FALSE
-      if (!self$r_session$is_alive()) {
-        aborted <- TRUE
-        self$stderr("\nR session ended - restarting ... ")
-        self$start_session()
-        self$stderr("done.\n")
-      } else if (self$errored) {
-          # log_out(r, use.str = TRUE)
-          content <- list(
-            status = "error",
-            ename = r,
-            evalue = r_msg,
-            traceback = tb,
-            execution_count = execution_count 
-          )
-      }
-      else {
-          # Collect output created by cell-end hooks etc.
+
+      code <- msg$content$code
+
+      mparsed <- parse_magic(code)
+      if(length(mparsed) > 0){
+          magic <- mparsed$magic
+          args <- mparsed$args
+          code <- mparsed$code
+          d <- tryCatch(dispatch_magic_handler(magic,code,args),
+                        error = function(e) structure("errored", 
+                                                       message = conditionMessage(e)), # ,traceback=.traceback()),
+                        interrupt = function(e) "interrupted")
+          log_out(d,use.str=TRUE)
+          if(is.character(d))
+            self$stderr(attr(d,"message"))
+          else if(inherits(d,"display_data")){
+            msg <- list(type = class(d),
+                        content = unclass(d))
+            self$display_send(msg)
+          }
+              
           content <- list(status = "ok",
                           execution_count = execution_count)
-          if(length(payload))
-            content$payload <- payload
+      }
+      else {
+          private$r_run_cell_begin_hooks()
+          private$graphics_client$new_cell <- TRUE
+          r <- tryCatch(self$r_session$run_code(msg$content$code),
+            error = function(e) structure("errored", message = conditionMessage(e)), # ,traceback=.traceback()),
+            interrupt = function(e) "interrupted"
+          )
+          # log_out(r, use.print = TRUE)
+          private$r_display_changed_graphics()
+          private$r_run_cell_end_hooks()
+          payload <- NULL
+          aborted <- FALSE
+          if (is.character(r) && (identical(r[1], "errored") || identical(r[1], "interrupted"))) {
+            aborted <- TRUE
+          }
+          if (is.character(r)) {
+            self$errored <- TRUE
+            log_error(r)
+            r_msg <- attr(r, "message")
+            if (length(r_msg)) log_error(r_msg)
+            tb <- attr(r, "traceback")
+            if (length(tb)) {
+              tb <- unlist(tb)
+              log_error(paste(tb, sep = "\n"))
+            }
+          } else self$errored <- FALSE
+          if (!self$r_session$is_alive()) {
+            aborted <- TRUE
+            self$stderr("\nR session ended - restarting ... ")
+            self$start_session()
+            self$stderr("done.\n")
+          } else if (self$errored) {
+              # log_out(r, use.str = TRUE)
+              content <- list(
+                status = "error",
+                ename = r,
+                evalue = r_msg,
+                traceback = tb,
+                execution_count = execution_count 
+              )
+          }
+          else {
+              # Collect output created by cell-end hooks etc.
+              content <- list(status = "ok",
+                              execution_count = execution_count)
+              if(length(payload))
+                content$payload <- payload
+          }
       }
       if(!isTRUE(msg$content$silent))
         private$send_message(type="execute_reply",
@@ -781,7 +807,7 @@ Kernel <- R6Class("Kernel",
       private$graphics_client <- GraphicsClient$new(self$r_session)
       private$graphics_client$start()
     },
-    r_display_changed_graphics = function() {
+    r_display_changed_graphics = function() {display
       log_out("r_display_changed_graphics")
       d <- private$graphics_client$display_changed()
       if(length(d)) {
