@@ -20,7 +20,7 @@ str_str <- function(nm,envir,parent=NULL){
 
 #' @title A HTML version of 'ls.str()'
 #'
-#' @description This function is deprecated. Use \code{\link{envBrowser}} instead.
+#' @description This function is now just an alias for \code{\link{envBrowser}}.
 #'
 #' @param pos integer indicating \code{\link[base]{search}} path position, or -1 for the current environment.
 #' @param name an optional name indicating search path position, see \code{\link[base]{ls}}.
@@ -30,18 +30,17 @@ str_str <- function(nm,envir,parent=NULL){
 #' @param mode a character string, the mode of the objects to be shown
 #' @seealso \code{\link{ls.str}}
 #' @export
-ls_str <- function(pos = -1, name, envir, all.names = FALSE, pattern = NULL, 
+ls_str <- function(pos = -1, name = NULL, envir, all.names = FALSE, pattern = NULL, 
     mode = "any"){
     if (missing(envir)) 
         envir <- as.environment(pos)
-    table <- env_browser_table(pos=pos,name=name,envir=envir,all.names=all.names,
-                         pattern=pattern,mode=mode)
-    html <- paste(
-        "<div class='ls_str'>",
-        table,
-        "</div>",
-        sep="\n")
-    raw_html(html)
+    parent <- parent.frame()
+    envBrowserClass$new(name=name,
+                        envir=envir,
+                        parent=parent,
+                        all.names=all.names,
+                        if(!missing(pattern))pattern=pattern,
+                        mode=mode)
 }
 
 
