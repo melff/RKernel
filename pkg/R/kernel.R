@@ -88,7 +88,7 @@ Kernel <- R6Class("Kernel",
     #' Run the kernel.
     run = function(){
       self$start()
-      log_out("*** RKernel started ***")
+      # log_out("*** RKernel started ***")
       continue <- TRUE
       while(continue) {
         continue <- self$poll_and_respond()
@@ -308,7 +308,7 @@ Kernel <- R6Class("Kernel",
                         error = function(e) structure("errored", 
                                                        message = conditionMessage(e)), # ,traceback=.traceback()),
                         interrupt = function(e) "interrupted")
-          log_out(d,use.str=TRUE)
+          # log_out(d,use.str=TRUE)
           if(is.character(d))
             self$stderr(attr(d,"message"))
           else if(inherits(d,"display_data")){
@@ -808,7 +808,7 @@ Kernel <- R6Class("Kernel",
       private$graphics_client$start()
     },
     r_display_changed_graphics = function() {display
-      log_out("r_display_changed_graphics")
+      # log_out("r_display_changed_graphics")
       d <- private$graphics_client$display_changed()
       if(length(d)) {
         msg <- list(type = class(d),
@@ -826,20 +826,20 @@ Kernel <- R6Class("Kernel",
     r_msg_incomplete = FALSE,
     r_msg_frag = "",
     handle_r_stdout = function(text){
-      log_out("=========================================================")
-      log_out("handle_r_stdout")
+      # log_out("=========================================================")
+      # log_out("handle_r_stdout")
       if (grepl(DLE, text)) {
-        log_out("DLE found")
+        # log_out("DLE found")
         text <- split_string1(text, DLE)
       }
       for(chunk in text){
         if(!length(chunk) || !nzchar(chunk)) next
-        log_out(chunk, use.str = TRUE)
+        # log_out(chunk, use.str = TRUE)
         if (startsWith(chunk, MSG_BEGIN)) {
-          log_out("MSG_BEGIN found")
+          # log_out("MSG_BEGIN found")
           # log_out(chunk, use.print = TRUE)
           if (endsWith(chunk, MSG_END)) {
-            log_out("MSG_END found")
+            # log_out("MSG_END found")
             msg <- remove_prefix(chunk, MSG_BEGIN) |> remove_suffix(MSG_END)
             msg <- msg_unwrap(msg)
             # log_out(msg, use.print = FALSE)
@@ -850,7 +850,7 @@ Kernel <- R6Class("Kernel",
           }
         }
         else if(endsWith(chunk, MSG_END)){
-          log_out("MSG_END found")
+          # log_out("MSG_END found")
           # log_out(chunk, use.print = TRUE)
           msg <- paste0(private$r_msg_frag, remove_suffix(chunk, MSG_END))
           private$r_msg_incomplete <- FALSE
@@ -860,7 +860,7 @@ Kernel <- R6Class("Kernel",
         }
         else {
           if(private$r_msg_incomplete) {
-            log_out("incomplete chunk ...")
+            # log_out("incomplete chunk ...")
             private$r_msg_frag <- paste0(private$r_msg_frag, chunk)
           }
           else if(nzchar(chunk)) {
@@ -869,7 +869,7 @@ Kernel <- R6Class("Kernel",
           }
         }
         private$r_display_changed_graphics()
-        log_out("----------------------------------------------")
+        # log_out("----------------------------------------------")
       }
       # log_out("handle_r_stdout done")
     },
@@ -894,7 +894,7 @@ Kernel <- R6Class("Kernel",
         msg_handler(msg)
       } else {
         log_error(sprintf("R session sent message of unknown type '%s'", msg_type))
-        log_out(msg_handler, use.str = TRUE)
+        # log_out(msg_handler, use.str = TRUE)
         self$stderr(sprintf("R session sent message of unknown type '%s'", msg_type))
       }
     },

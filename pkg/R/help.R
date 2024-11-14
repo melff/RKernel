@@ -358,7 +358,7 @@ my_example2html <- function(topic, package, Rhome = "", env = NULL){
 }
 
 example_html <- function(topic,package = NULL,...) {
-    log_out("====== example_html ======")
+    # log_out("====== example_html ======")
     e <- capture.output(example(topic,package,local=TRUE,
                                 character.only=TRUE))
     

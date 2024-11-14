@@ -38,7 +38,7 @@ cat_with_hooks  <- function (..., file = "", sep = " ", fill = FALSE, labels = N
 print_orig <- getFromNamespace("print","base")
 
 print_with_hooks <- function(x,...){
-    log_out("print_with_hooks")
+    # log_out("print_with_hooks")
     run_output_hooks()
     if(any(class(x) %in% getOption("rkernel_displayed_classes")))
         display(x)
