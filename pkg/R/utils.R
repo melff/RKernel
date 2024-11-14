@@ -44,7 +44,7 @@ log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
   dcl <- deparse1(match.call())
   tryCatch({
     if(use.print)
-      message <- paste0("\n",paste0(capture.output(print_(message)),collapse="\n"))
+      message <- paste0("\n",paste0(capture.output(print_orig(message)),collapse="\n"))
     else if(serialize){
         message <- to_json(message,pretty=TRUE,force=TRUE)
     }
