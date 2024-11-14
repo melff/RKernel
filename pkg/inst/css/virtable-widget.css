@@ -167,6 +167,27 @@ button.row-minus-button {
     line-height: 16px;
 }
 
+button.scroll-left-button,
+button.scroll-right-button,
+button.page-left-button,
+button.page-right-button,
+button.col-plus-button,
+button.col-minus-button {
+    width: 20px;
+    height: 20px;
+}
+
+button.scroll-up-button,
+button.scroll-down-button,
+button.page-up-button,
+button.page-down-button,
+button.row-plus-button,
+button.row-minus-button {
+    width: 20px;
+    height: 26px;
+}
+
+
 button.scroll-up-button,
 button.page-up-button,
 button.row-plus-button,
@@ -214,3 +235,94 @@ button.page-right-button {
 .scrollbar-inactive .page-down-button {
     display: none;
 }
+
+.widget-slider.col-control {
+    background: whitesmoke;
+    border: 1px solid lightgray;
+}
+
+
+.widget-hslider.col-control {
+    height: 20px;
+}
+
+.widget-slider.col-control .slider-container {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.widget-slider.col-control .slider.noUi-target {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: unset;
+}
+
+.widget-slider.col-control .slider.noUi-horizontal {
+    height: 20px;
+    border-radius:0;
+}
+
+.widget-slider.col-control .slider.noUi-horizontal .slider-container {
+    padding-left: 20px;
+}
+
+.widget-slider.col-control .slider.noUi-horizontal .noUi-handle {
+    height: 20px;
+    width: 20px;
+    border-radius:0;
+    top: 0;
+    right: -10px;
+}
+
+.widget-slider.col-control .noUi-connects {
+    background: transparent;
+}
+
+.widget-slider.col-control .noUi-handle:hover,
+.widget-slider.col-control .noUi-handle-lower:hover,
+.widget-slider.col-control .noUi-touch-area:hover{
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.widget-slider.row-control {
+    background: whitesmoke;
+    border: 1px solid lightgray;
+}
+
+.widget-vslider.row-control {
+    width: 20px;
+}
+
+.widget-slider.row-control .slider-container {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.widget-slider.row-control .slider.noUi-target {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: unset;
+}
+
+.widget-slider.row-control .slider.noUi-vertical {
+    width: 20px;
+    border-radius:0;
+}
+
+.widget-slider.row-control .slider.noUi-vertical .slider-container {
+    padding-left: 0;
+}
+
+.widget-slider.row-control .slider.noUi-vertical .noUi-handle {
+    height: 20px;
+    width: 20px;
+    border-radius:0;
+    top: -10px;
+    right: 0;
+}
+
+.widget-slider.row-control .noUi-connects {
+    background: transparent;
+}
+
