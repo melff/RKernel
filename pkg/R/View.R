@@ -44,8 +44,8 @@ View.data.frame <- function(x,title=deparse(substitute(x)),...)
     # title <- paste0(cls,": ",title)
     switch(getOption("View.backend",""),
         widget=virtable_widget(x),
-        dataTable=dataTable(x),
-        scrolling_table(x, include_css=TRUE)
+        scrolling_table=scrolling_table(x, include_css=TRUE),
+        dataTable=,dataTable(x)
     )
 }
 
