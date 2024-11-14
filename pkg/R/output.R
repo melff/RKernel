@@ -101,6 +101,7 @@ install_output_hooks <- function() {
     add_displayed_classes("shiny.tag.list")
     add_displayed_classes("htmlTable")
     add_displayed_classes("tableHTML")
+    add_displayed_classes("dataTable")
 }
 
 output_hooks <- new.env()

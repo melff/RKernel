@@ -5,11 +5,16 @@
 asset_fetcher <- function(path,...){
     # log_out('asset_fetcher:',path)
     split_path <- strsplit(path,"/",fixed=TRUE)[[1]]
-    pkgname <- split_path[3]
+    # log_out(split_path, use.print = TRUE)
+    pkgname <- split_path[4]
     basename <- tail(split_path,1)
-    file_path <- as.list(tail(split_path,-3))
-    args <- c(file_path,list(package=pkgname))
-    filename <- do.call("system.file",args)
+    # log_out(basename, use.print = TRUE)
+    # log_out(tail(split_path,-4), use.print = TRUE)
+    file_path <- as.list(tail(split_path,-4))
+    args <- c(file_path,list(package=pkgname,mustWork=TRUE))
+    # log_out(args, use.print = TRUE)
+    filename <- try(do.call("system.file",args))
+    # log_out(sprintf("trying %s", filename))
     if(file_test("-f",filename)){
       split_basename <- strsplit(basename,".",fixed=TRUE)[[1]]
       filext <- tail(split_basename,1)
@@ -20,7 +25,7 @@ asset_fetcher <- function(path,...){
         "text/plain"
         )
       payload <- readLines(filename)
-      # log_out(sprintf('"%s" successfully loaded',filename))
+    #   log_out(sprintf('"%s" successfully loaded',filename))
       payload <- paste0(payload,collapse="\n")
       list(payload=payload,
          `content-type`=mime_type,
@@ -50,7 +55,7 @@ dt_data_fetcher <- function(path,query,postBody,headers){
     start <- as.integer(postBody["start"])
     len <- as.integer(postBody["length"])
     split_path <- strsplit(path,"/",fixed=TRUE)[[1]]
-    name <- split_path[3]
+    name <- split_path[4]
     obj <- get(name,envir=dt_data)
     if(len < 0) len <- nrow(obj)
     from <- start + 1
@@ -66,9 +71,10 @@ dt_data_fetcher <- function(path,query,postBody,headers){
                      data=data
                      ),
                      pretty=TRUE)
+    # log_out(payload, use.str=TRUE)
     list(payload=payload,
          `content-type`="application/json",
-          headers=NULL,
+          headers="Access-Control-Allow-Origin: *",
           `status code`=200L)
 }
 
@@ -83,7 +89,7 @@ fill_tmpl <- function(tmpl,...){
     res
 }
 
-dt_head_tmpl <- '<link rel="stylesheet" type="text/css" href="(( url ))/assets/RKernel/css/datatables.min.css">
+dt_head_tmpl <- '<link rel="stylesheet" type="text/css" href="(( url ))assets/RKernel/css/datatables.min.css">
 <style>
 table.dataTable tbody td {
     text-align: right;
@@ -92,7 +98,8 @@ table.dataTable thead th {
     text-align: center;
 }
 .datatable-wrapper {
-    font-size: 12px;
+    font-size: 14px;
+    font-family: sans-serif;
 }
 .rownames {
     font-weight: bold;
@@ -134,9 +141,9 @@ table.dataTable.cell-border tbody tr td:first-child {
 }
 </style>
 <script type="text/javascript" charset="utf8" 
-        src="(( url ))/assets/RKernel/js/jquery-3.6.0.min.js"></script>
+        src="(( url ))assets/RKernel/js/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" charset="utf8" 
-        src="(( url ))/assets/RKernel/js/datatables.min.js"></script>'
+        src="(( url ))assets/RKernel/js/datatables.min.js"></script>'
 
 
 dt_tmpl <- '<script type="text/javascript" charset="utf8">
@@ -153,7 +160,7 @@ dt_tmpl <- '<script type="text/javascript" charset="utf8">
             scroller: true,
             deferRender: true,
             ajax: {
-              url: "(( url ))/dt-data/(( name ))",
+              url: "(( url ))dt-data/(( name ))",
               type: "POST"
             },
             "columnDefs": [
