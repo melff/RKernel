@@ -340,10 +340,10 @@ div.datatable-navigation div.widget-html-content {
                 self$w <- self$iframe
             }
             self$scrollY <- nlines*23
-            self$height <- self$scrollY + 64
+            self$height <- self$scrollY + 64 + 12
             self$dt <- datatable_page(obj,size=size,scrollY=self$scrollY,...)
-            self$iframe$value <- str2iframe(self$dt,height=self$height)
             self$obj <- obj
+            self$draw()
             self$show_columns()
         },
         #' @description
@@ -363,7 +363,7 @@ div.datatable-navigation div.widget-html-content {
             page <- max(1,self$page - 1)
             if(page < self$page){
                 self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
-                self$iframe$value <- str2iframe(self$dt,height=self$height)
+                self$draw()
                 self$page <- page
                 self$show_columns()
             }
@@ -379,7 +379,7 @@ div.datatable-navigation div.widget-html-content {
             }
             if(page > self$page){
                 self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
-                self$iframe$value <- str2iframe(self$dt,height=self$height)
+                self$draw()
                 self$page <- page
                 self$show_columns()
             }
@@ -391,7 +391,7 @@ div.datatable-navigation div.widget-html-content {
             page <- 1
             if(page < self$page){
                 self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
-                self$iframe$value <- str2iframe(self$dt,height=self$height)
+                self$draw()
                 self$page <- page
                 self$show_columns()
             }
@@ -404,11 +404,16 @@ div.datatable-navigation div.widget-html-content {
             else page <- self$m
             if(page > self$page){
                 self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
-                self$iframe$value <- str2iframe(self$dt,height=self$height)
+                self$draw()
                 self$page <- page
                 self$show_columns()
             }
             invisible(NULL)
+        },
+        draw = function() {
+            self$iframe$value <- str2iframe(self$dt,
+                                            #style="width:100%;height:100%;",
+                                            height=self$height)
         }
     )
     
