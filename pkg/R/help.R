@@ -164,23 +164,22 @@ display_data.help_files_with_topic <- function(x,...,
                 text_html <- gsub("../../",help_lib_url,text_html,fixed=TRUE)
                 text_html <- gsub("<tr>","<tr style=\"background-color: unset;\">",text_html,fixed=TRUE)
             } else {
-                text_html <- paste(paste0(
-                    "<iframe src='",help_url,"'"),
-                    "style='width:100%;height:",help_page_height,"'",
-                    "class='manpage'>",
-                # "frameborder='0' onload=window.parent.scrollTo(0,0)>",
-                    "</iframe>",
-                    sep="\n")
+                text_html <- url2iframe(help_url,class="manpage",
+                                        # resize=TRUE,
+                                        style=paste0("width:100%;height:",help_page_height,";)")
+                                        #height=help_page_height
+                                        )
+                # # "frameborder='0' onload=window.parent.scrollTo(0,0)>",
             }
         } 
         else {
             help_url <- paste0(get_help_url(),"/library/NULL/help/",URLencode(topic,reserved=TRUE))
-            text_html <- paste(paste0("<iframe src='",help_url,"'"),
-                "style='width:100%;height:",help_page_height,"'",
-                "class='manpage'>",
-                # "frameborder='0' onload=window.parent.scrollTo(0,0)>",
-                "</iframe>",
-                sep="\n")
+            text_html <- url2iframe(help_url,class="manpage",
+                                        # resize=TRUE,
+                                        style=paste0("width:100%;height:",help_page_height,";)")
+                                        #height=help_page_height
+                                        )
+            #     # "frameborder='0' onload=window.parent.scrollTo(0,0)>",
         }
         if(include_button){
             popout_button <- sprintf(popout_button,help_url)

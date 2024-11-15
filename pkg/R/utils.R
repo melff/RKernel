@@ -111,39 +111,74 @@ replace_in_package <- function(pkg_name,name,value,update.env=FALSE){
 #' @description
 #' Create an HTML iframe tag that refers to some (usually HTML) code
 #' @param code The code to be shown in the iframe
+#' @param resize Logical; should the iframe be resizeable?
 #' @param width The intended width of the iframe, a string or a number
 #' @param height The intended height of the iframe, a string or a number
 #' @param class The DOM class attribute the iframe, a string
 #' @param style The CSS style attribte of the iframe, a string
 #' @param ... Other arguments, ignored.
 str2iframe <- function(code,
+                      resize = TRUE,
                       width = "100%",
                       height = 400L,
                       class = "rkernel-iframe",
-                      style = "border-style:none",...){
+                      style = "border-style:none",
+                      ...){
             # cl <- match.call()
             # log_out(deparse1(cl))
     # id <- UUIDgenerate()
     # path <- paste0("/iframe/",id,"/")
     # url <- paste0(httpd_url(),path)
+
     url <- dataURI(charToRaw(code),mime="text/html")
-    if_tmpl <- "<iframe src=\"%s\" width=\"%s\" height=\"%s\" class=\"%s\" style=\"%s\">
+
+    url2iframe(url,resize,width,height,class,style,...)
+}
+
+#' @description
+#' Create an HTML iframe tag that refers to some (usually HTML) code
+#' @param code The code to be shown in the iframe
+#' @param resize Logical; should the iframe be resizeable?
+#' @param width The intended width of the iframe, a string or a number
+#' @param height The intended height of the iframe, a string or a number
+#' @param class The DOM class attribute the iframe, a string
+#' @param style The CSS style attribte of the iframe, a string
+#' @param ... Other arguments, ignored.
+url2iframe <- function(url,
+                      resize = FALSE,
+                      width = "100%",
+                      height = 400L,
+                      class = "rkernel-iframe",
+                      style = "border-style:none",
+                      ...){
+
+    resize_style <-"<style>
+    .resizer { display:flex; margin:0; padding:0; resize:both; overflow:hidden }
+    .resizer > .resized { flex-grow:1; margin:0; padding:0; border:0 }
+    .ugly { background:red; border:4px dashed black; }
+    </style>
+    "
+
+
+    if(resize) {
+      if_tmpl <- "<div class=\"resizer\">
+                  <iframe src=\"%s\" width=\"%s\" height=\"%s\" class=\"%s resized\" style=\"%s\">
+                  </iframe>
+                  </div>
+                "
+      iframe <- sprintf(if_tmpl,url,width,height,class,style)
+    }
+    else {
+      if_tmpl <- "<iframe src=\"%s\" width=\"%s\" height=\"%s\" class=\"%s\" style=\"%s\">
                 </iframe>
                 "
-    iframe <- sprintf(if_tmpl,url,width,height,class,style)
-            # mime_data <- list(
-            #     "text/plain" = "",
-            #     "text/html"  = iframe
-            # )
-            # metadata <- emptyNamedList
-            # transient <- list(display_id=id)
-            # display_data(data=mime_data,
-            #              metadata=metadata,
-            #              transient=transient)
-    # structure(iframe,class="iframe",id=id)
-    # raw_html(iframe)
+      iframe <- sprintf(if_tmpl,url,width,height,class,style)
+    }
+
     iframe
 }
+
+
 
 #' @export
 q_orig <- getFromNamespace("q","base")
