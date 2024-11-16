@@ -287,9 +287,12 @@ dataTableClass <- R6Class("dataTable",{
         #' Initialize the DataTable
         #' @param obj The object to be displayed
         #' @param size An integer, the number of columns pre-formatted on each page.
-        #' @param nlines An integer, the number of rows of each page
+        #' @param nlines An integer, the approximate number of rows of each page
         #' @param ... Other arguments, ignored
-        initialize = function(obj,size=50,nlines=min(nrow(obj),15),...){
+        initialize = function(obj,
+                              size=50,
+                              nlines=min(nrow(obj),getOption("dataTable_lines",20)),
+                              ...){
             self$size <- size
             self$m <- ncol(obj)%/%size
             self$r <- ncol(obj)%%size
@@ -339,7 +342,7 @@ div.datatable-navigation div.widget-html-content {
             else {
                 self$w <- self$iframe
             }
-            self$scrollY <- nlines*23
+            self$scrollY <- (nlines + 1) * 24 #+ nlines%/%2
             self$height <- self$scrollY + 64 + 12
             self$dt <- datatable_page(obj,size=size,scrollY=self$scrollY,...)
             self$obj <- obj
