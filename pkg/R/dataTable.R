@@ -277,12 +277,16 @@ dataTableClass <- R6Class("dataTable",{
         label = NULL,
         #' @field style A string with CSS styling
         style = NULL,
-        #' @field navigator A container widgets that contains the navigator buttons
+        #' @field navigator A container widget that contains the navigator buttons
         navigator = NULL,
         #' @field scrollY The vertical scroll amount
         scrollY = NULL,
         #' @field height The height of the iframe
         height = NULL,
+        # #' @field nlines_control A widget to control the number of rows being shown
+        # nrows_control = NULL,
+        # #' @field ncols_control A widget to control the number of cols being shown
+        # ncols_control = NULL,
         #' @description
         #' Initialize the DataTable
         #' @param obj The object to be displayed
@@ -301,6 +305,17 @@ dataTableClass <- R6Class("dataTable",{
             self$b_first <- Button(description="<<")
             self$b_last <- Button(description=">>")
             self$iframe <- HTML()
+            # self$nrows_control <- BoundedIntText(value=nlines,
+            #                                       min=1L,max=nrow(obj),
+            #                                       description="Rows",
+            #                                       description_tooltip = 
+            #                                       "Number of rows being shown")
+            # self$nrows_control$on_change(self$update_nlines)
+            # self$ncols_control <- BoundedIntText(value=size,
+            #                                     min=1L,max=ncol(obj),
+            #                                     description="Columns",
+            #                                     description_tooltip = 
+            #                                    "Number of columns shown")
             if(ncol(obj) > size){
                 self$label <- HTML()
                 self$style <- HTML()
@@ -336,11 +351,12 @@ div.datatable-navigation div.widget-html-content {
                                        self$b_last)
                 self$navigator$add_class("datatable-navigation")
                 self$w <- VBox(self$style,
+                               #self$nrows_control,
                                self$navigator,
                                self$iframe)
             }
             else {
-                self$w <- self$iframe
+                self$w <- self$iframe #VBox(self$nrows_control,self$iframe)
             }
             self$scrollY <- (nlines + 1) * 24 #+ nlines%/%2
             self$height <- self$scrollY + 64 + 12
@@ -417,9 +433,18 @@ div.datatable-navigation div.widget-html-content {
             self$iframe$value <- str2iframe(self$dt,
                                             #style="width:100%;height:100%;",
                                             height=self$height)
+        },
+        set_nlines = function(nlines) {
+            self$scrollY <- (nlines + 1) * 24 #+ nlines%/%2
+            self$height <- self$scrollY + 64 + 12
+            self$dt <- datatable_page(self$obj,size=self$size,page_num=self$page,scrollY=self$scrollY)
+            self$draw()
+        },
+        update_nlines = function(...){
+            nlines <- self$nrows_control$value
+            self$set_nlines(nlines)
         }
     )
-    
 })
 
 #' @describeIn dataTable dataTable method for display_data
