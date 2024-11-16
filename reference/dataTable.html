@@ -165,7 +165,7 @@
 
 
 <dt><code>navigator</code></dt>
-<dd><p>A container widgets that contains the navigator buttons</p></dd>
+<dd><p>A container widget that contains the navigator buttons</p></dd>
 
 
 <dt><code>scrollY</code></dt>
@@ -191,12 +191,19 @@
 <li><p><a href="#method-dataTable-page_first"><code>dataTableClass$page_first()</code></a></p></li>
 <li><p><a href="#method-dataTable-page_last"><code>dataTableClass$page_last()</code></a></p></li>
 <li><p><a href="#method-dataTable-draw"><code>dataTableClass$draw()</code></a></p></li>
+<li><p><a href="#method-dataTable-set_nlines"><code>dataTableClass$set_nlines()</code></a></p></li>
+<li><p><a href="#method-dataTable-update_nlines"><code>dataTableClass$update_nlines()</code></a></p></li>
 <li><p><a href="#method-dataTable-clone"><code>dataTableClass$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-dataTable-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Initialize the DataTable</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/dataTable.html">dataTableClass</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">obj</span>, size <span class="op">=</span> <span class="fl">50</span>, nlines <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>, <span class="fl">15</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/dataTable.html">dataTableClass</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  size <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  nlines <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"dataTable_lines"</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -210,7 +217,7 @@
 
 
 <dt><code>nlines</code></dt>
-<dd><p>An integer, the number of rows of each page</p></dd>
+<dd><p>An integer, the approximate number of rows of each page</p></dd>
 
 
 <dt><code>...</code></dt>
@@ -269,10 +276,28 @@
 </div>
 
 
+</div><p></p><hr><a id="method-dataTable-set_nlines"></a><div class="section">
+<h3 id="method-set-nlines-">Method <code>set_nlines()</code><a class="anchor" aria-label="anchor" href="#method-set-nlines-"></a></h3>
+
+<div class="section">
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTableClass</span><span class="op">$</span><span class="fu">set_nlines</span><span class="op">(</span><span class="va">nlines</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
+</div><p></p><hr><a id="method-dataTable-update_nlines"></a><div class="section">
+<h3 id="method-update-nlines-">Method <code>update_nlines()</code><a class="anchor" aria-label="anchor" href="#method-update-nlines-"></a></h3>
+
+<div class="section">
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTableClass</span><span class="op">$</span><span class="fu">update_nlines</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-dataTable-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTableClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
