@@ -118,7 +118,7 @@ replace_in_package <- function(pkg_name,name,value,update.env=FALSE){
 #' @param style The CSS style attribte of the iframe, a string
 #' @param ... Other arguments, ignored.
 str2iframe <- function(code,
-                      resize = TRUE,
+                      resize = FALSE,
                       width = "100%",
                       height = 400L,
                       class = "rkernel-iframe",
