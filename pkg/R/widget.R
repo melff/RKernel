@@ -118,7 +118,11 @@ WidgetClass <- R6Class_("Widget",
       # log_out("widget$set_state")
       keys <- names(state)
       for(k in keys){
-        # cat("Updating",k)
+        if(!length(state[[k]])) {
+          # log_out(paste("Skipping",k))
+          next
+        }
+        # log_out(paste("Updating",k))
         if(k %in% self$traits_to_sync){
           from_json_ <- attr(self$traits[[k]],"from_json")
           if(!is.function(from_json_))
