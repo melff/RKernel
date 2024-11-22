@@ -40,6 +40,6 @@ It is also a potential backend for the \code{\link{View}} function.
 
 \item \code{fmt_tab_section(default)}: Default method
 
-\item \code{fmt_tab_section(tbl_df)}: Dibble method
+\item \code{fmt_tab_section(tbl_df)}: Tibble method
 
 }}

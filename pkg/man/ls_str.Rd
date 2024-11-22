@@ -4,7 +4,14 @@
 \alias{ls_str}
 \title{A HTML version of 'ls.str()'}
 \usage{
-ls_str(pos = -1, name, envir, all.names = FALSE, pattern = NULL, mode = "any")
+ls_str(
+  pos = -1,
+  name = NULL,
+  envir,
+  all.names = FALSE,
+  pattern = NULL,
+  mode = "any"
+)
 }
 \arguments{
 \item{pos}{integer indicating \code{\link[base]{search}} path position, or -1 for the current environment.}
@@ -20,7 +27,7 @@ ls_str(pos = -1, name, envir, all.names = FALSE, pattern = NULL, mode = "any")
 \item{mode}{a character string, the mode of the objects to be shown}
 }
 \description{
-This function is deprecated. Use \code{\link{envBrowser}} instead.
+This function is now just an alias for \code{\link{envBrowser}}.
 }
 \seealso{
 \code{\link{ls.str}}
