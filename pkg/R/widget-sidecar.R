@@ -3,8 +3,9 @@ sidecar_module_version <- "1.1.0"
 
 #' Sidecar widgets
 #'
-#' @description Sidecar widgets - work only with Jupyter Lab
-#'
+#' @description Sidecar widgets - works only with Jupyter Lab
+#' @details Note that these widget need the sidecar extension for Jupyter Lab.
+#'      See \url{https://github.com/jupyter-widgets/jupyterlab-sidecar}
 #' @include widget-output.R
 #' @name Sidecar
 NULL

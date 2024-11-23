@@ -1,7 +1,10 @@
 #' Resizeable Widgets
 #' @description R6 classes of resizeable containers for arbitrary HTML code
+#' @details Support for resizeable widgets, available from 
+#'    \url{https://github.com/melff/resizeable-widget} (and hopefully soon from PyPi.org)
 #' @include widget-dom.R
 #' @name ResizeableWidget
+#' @keywords internal
 #' @export 
 ResizeableWidgetClass <- R6Class_(
   "ResizeableWidget",

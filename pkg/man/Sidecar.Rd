@@ -11,7 +11,11 @@ Sidecar(...)
 \item{...}{Arguments passed to the inializer}
 }
 \description{
-Sidecar widgets - work only with Jupyter Lab
+Sidecar widgets - works only with Jupyter Lab
+}
+\details{
+Note that these widget need the sidecar extension for Jupyter Lab.
+     See \url{https://github.com/jupyter-widgets/jupyterlab-sidecar}
 }
 \section{Functions}{
 \itemize{

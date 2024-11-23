@@ -21,6 +21,11 @@ HResizeableWidget(...)
 \description{
 R6 classes of resizeable containers for arbitrary HTML code
 }
+\details{
+Support for resizeable widgets, available from 
+   \url{https://github.com/melff/resizeable-widget} (and hopefully soon from PyPi.org)
+}
+\keyword{internal}
 \section{Super classes}{
 \code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{ResizeableWidget}
 }
@@ -106,7 +111,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{RKernel::ResizeableWidget} -> \code{VResizeableWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:ResizeableWidget]{RKernel::ResizeableWidget}} -> \code{VResizeableWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -174,7 +179,7 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{RKernel::ResizeableWidget} -> \code{HResizeableWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:ResizeableWidget]{RKernel::ResizeableWidget}} -> \code{HResizeableWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
