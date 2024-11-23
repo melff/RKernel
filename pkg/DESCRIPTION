@@ -28,7 +28,8 @@ Imports:
     httpgd (>= 2.0),
     unigd,
     callr,
-    processx
+    processx,
+    crayon
 Depends:
     R (>= 4.4)
 Suggests:
