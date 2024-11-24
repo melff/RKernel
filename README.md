@@ -8,7 +8,7 @@ for [*Jupyter*](http://juypter.org).
 
 To install run the following lines in *R*:
 
-```{r}
+```r
 install.packages('RKernel', repos = c('https://melff.r-universe.dev', 'https://cloud.r-project.org'))
 RKernel::installspec()
 ```
