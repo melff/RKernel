@@ -115,6 +115,7 @@ GraphicsClient <- R6Class("GraphicsClient",
       current_upid <- pl$state$upid
       self$latest_upid <- current_upid
       self$latest_plot <- self$current_plot
+      self$new_cell <- FALSE
     },
     display_id = NULL,
     dpi = 72,
@@ -162,6 +163,8 @@ GraphicsClient <- R6Class("GraphicsClient",
         {
         # log_out("GraphicsClient$display_data")
         update <- force(update)
+        # log_out("self$new_cell")
+        # log_out(self$new_cell)
         rkernel_graphics_types <- getOption("jupyter.graphics.types",
                                             c("image/svg+xml",
                                               #"image/png",
