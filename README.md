@@ -9,7 +9,7 @@ for [*Jupyter*](http://juypter.org).
 To install run the following lines in *R*:
 
 ```{r}
-devtools::install_github("melff/RKernel/pkg")
+install.packages('RKernel', repos = c('https://melff.r-universe.dev', 'https://cloud.r-project.org'))
 RKernel::installspec()
 ```
 For dynamic help you also need to install the python package [jupyter-server-proxy](https://pypi.org/project/jupyter-server-proxy/).
