@@ -29,7 +29,8 @@ Imports:
     unigd,
     callr,
     processx,
-    crayon
+    crayon,
+    curl
 Depends:
     R (>= 4.4)
 Suggests:
