@@ -61,7 +61,7 @@
 <img src="https://raw.githubusercontent.com/melff/RKernel/main/gifs/Display-demo.gif" alt="A demonstration of interactive distribution plots"><div class="figcaption">A demonstration of interactive distribution plots</div>
 </div>
 <p>To install run the following lines in <em>R</em>:</p>
-<p><code>{r} devtools::install_github("melff/RKernel/pkg") RKernel::installspec()</code> For dynamic help you also need to install the python package <a href="https://pypi.org/project/jupyter-server-proxy/" class="external-link">jupyter-server-proxy</a>.</p>
+<p><code>{r} install.packages('RKernel', repos = c('https://melff.r-universe.dev', 'https://cloud.r-project.org')) RKernel::installspec()</code> For dynamic help you also need to install the python package <a href="https://pypi.org/project/jupyter-server-proxy/" class="external-link">jupyter-server-proxy</a>.</p>
 <p>This kernel differs from the already existing <a href="http://irkernel.github.io" class="external-link"><em>IRKernel</em></a> by:</p>
 <ul>
 <li><p>Users can decide whether objects of certain classes are output via the “stdout” stream - which allows using any dedicated <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>-methods or via rich HTML/LaTeX output. By default the “stdout” stream is used for most classes of objects. Classes can be designated for rich output by calling <code>add_displayed_classes("some class")</code>. For individual objects, rich output can be requested using <code>display(some.object)</code>.</p></li>
