@@ -11,6 +11,8 @@ Objects in class HasTraits have traits as components
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
+\item{\code{call}}{The generating call}
+
 \item{\code{traits}}{A list of traits}
 
 \item{\code{suspended}}{Logical value; whether notifying observers is suspended.}

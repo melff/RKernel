@@ -12,9 +12,14 @@ ValueWidgetClass <- R6Class_("ValueWidget",
       #' @param value A value to initialize instance with
       #' @param ... Any other arguments, ignored.
       initialize = function(value,...){
+          mycall <- match.call()
           super$initialize(...)
-          if(!missing(value))
+          if(!missing(value)){
               self$value <- value
+              mycall$value <- value
+          } else mycall$value <- NULL
+          mycall[[1]] <- as.symbol(class(self)[1])
+          self$call <- paste(deparse(mycall), collapse="\n")
       },
       #' @description Add handler function to be called when value is changed
       #' @param handler A handler function

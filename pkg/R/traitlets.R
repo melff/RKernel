@@ -130,11 +130,16 @@ as_property <- function(self) {
 #' @export
 HasTraits <- R6Class_("HasTraits",
   public=list(
+      #' @field call The generating call
+      call = character(0),
       #' @field traits A list of traits 
       traits=list(),
       #' @description Initialize an object
       #' @param ... Initializsing values
       initialize=function(...){
+          mycall <- match.call()
+          mycall[[1]] <- as.symbol(class(self)[1])
+          self$call <- paste(deparse(mycall), collapse="\n")
           initials <- list(...)
           # print(class(self))
           # print(initials)
