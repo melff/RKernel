@@ -157,7 +157,10 @@ WidgetClass <- R6Class_("Widget",
     },
     #' @description Send display-data of the widget to the frontend
     display_data = function(){
-      data <- list("text/plain" = self$call)
+      data <- list(
+        "text/plain" = self$call,
+        "text/html" = paste("<code>",self$call,"</code>")
+      )
       if(length(self[["_view_name"]]))
         data[["application/vnd.jupyter.widget-view+json"]] <- list(
           version_major = 2,

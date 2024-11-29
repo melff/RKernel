@@ -34,7 +34,7 @@ A Unicode String Vector Trait
 
 \item{\code{value}}{The value of the unicode character vector}
 
-\item{\code{optional}}{A logical value, whethe valuer can be empty.}
+\item{\code{optional}}{A logical value, whether value can be empty.}
 }
 \if{html}{\out{</div>}}
 }
