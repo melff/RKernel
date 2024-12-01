@@ -54,7 +54,10 @@ This kernel differs from the already existing [*IRKernel*](http://irkernel.githu
     
   - There is also a support for virtual table display (based on the ipywidget
     infrastructure).
-    
+
+  - The [AnyWidget](https://anywidget.dev/) infrastructure is supported
+    if the relevant python package is installed.
+
 ![A demonstration of some display facilities](https://raw.githubusercontent.com/melff/RKernel/main/gifs/Display-demo.gif)
    
     
@@ -62,9 +65,3 @@ Some demonstration notebooks can be found [here](https://tmphub.elff.eu/user-red
     
 A widget demonstration can be found [here](https://tmphub.elff.eu/user-redirect/voila/render/RKernel-demo-interact-linear-regression.ipynb).
     
-TODO:
-
-  - [x] Add documentation
-  - [x] Make HTML help work on servers
-  - [ ] Add example notebooks
-  - [x] Make HTML widgets work more generally

@@ -113,5 +113,4 @@ has_iw_ver <- function(test){
     all(test==v[ii])
 }
 
-#' @export
-works_pythonic <- function() TRUE
+anywidget_version <- function(...) "~0.9.*"

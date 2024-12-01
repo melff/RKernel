@@ -85,6 +85,7 @@ Collate:
     'traitlets-numbers.R'
     'traitlets-str_enum.R'
     'utils.R'
+    'widget-anywidget.R'
     'widget.R'
     'widget-layout.R'
     'widget-core.R'
