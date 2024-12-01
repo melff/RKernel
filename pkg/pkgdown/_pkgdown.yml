@@ -45,6 +45,8 @@ reference:
   - Vector
 - title: "Widgets"
   contents:
+  - AnyWidget
+  - AnyWidgetClass 
   - BoundedFloatRangeWidget
   - BoundedFloatText
   - BoundedFloatWidget
