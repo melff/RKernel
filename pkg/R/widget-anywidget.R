@@ -63,7 +63,7 @@ AnyWidgetClass <- R6Class_("AnyWidget",
 #'   CountWidget(value=42)
 #' }
 #' @export
-AnyWidget <- function(`_esm`,`_css`,...){
+AnyWidget <- function(`_esm`,`_css`,`_anywidget_id`,...){
     args <- list(...)
     public <- list()
     for(n in names(args)){
@@ -74,6 +74,8 @@ AnyWidget <- function(`_esm`,`_css`,...){
     }
     `_esm` <- as.character(`_esm`)
     public[["_esm"]] <- structure(Unicode(`_esm`),sync=TRUE)
+    `_anywidget_id` <- as.character(`_anywidget_id`)
+    public[["_anywidget_id"]] <- structure(Unicode(`_anywidget_id`),sync=TRUE)
     if(!missing(`_css`))
         public[["_css"]] <- structure(Unicode(`_css`),sync=TRUE)
     WidgetClass <- R6Class_(
