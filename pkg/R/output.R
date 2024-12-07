@@ -102,6 +102,7 @@ install_output_hooks <- function() {
     add_displayed_classes("htmlTable")
     add_displayed_classes("tableHTML")
     add_displayed_classes("dataTable")
+    add_displayed_classes("htmlwidget")
 }
 
 output_hooks <- new.env()

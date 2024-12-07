@@ -103,8 +103,9 @@ display_data.htmlwidget <- function(x,...,
                             update=FALSE){
 
     path <- getOption("htmlwidgets_path","htmlwidgets")
-    use_tmpdir <- getOption("htmlwidgets_tmpdir",FALSE)
-    embed <- getOption("htmlwidgets_embed",FALSE)
+    embed <- getOption("htmlwidgets_embed",TRUE)
+    embed <- embed && !inherits(x,"plotly")
+    use_tmpdir <- getOption("htmlwidgets_tmpdir",TRUE) && embed
     iframe <- getOption("htmlwidgets_iframe",TRUE) && length(path) || embed
     selfcontained <- getOption("htmlwidgets_selfcontained",TRUE) || embed
     assets <- getOption("htmlwigets_assets",NULL)
@@ -114,8 +115,8 @@ display_data.htmlwidget <- function(x,...,
         htmlfile <- tempfile(pattern = "widget",fileext = ".html")
         url <- htmlfile
         file_url <- paste0("file://",htmlfile)
-        iframe <- FALSE
-        show_button <- FALSE
+        #iframe <- FALSE
+        #show_button <- FALSE
     }
     else { 
         url <- path
@@ -157,8 +158,8 @@ display_data.htmlwidget <- function(x,...,
     if(show_button){
         button_tmpl <- '
         <form class="help-popout-button" action="%s" method="get" target="_blank">
-                                                                      <button type="submit">Open in new tab</button>
-                                                                                                                 </form>'
+        <button type="submit">Open in new tab</button>
+        </form>'
         button <- sprintf(button_tmpl,url)
         res <- c(res,button)
     }
