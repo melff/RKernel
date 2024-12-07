@@ -110,6 +110,7 @@ display_data.htmlwidget <- function(x,...,
     selfcontained <- getOption("htmlwidgets_selfcontained",TRUE) || embed
     assets <- getOption("htmlwigets_assets",NULL)
     show_button <- getOption("htmlwidgets_showbutton",FALSE)
+    resize <- getOption("htmlwidgets_resizeable",FALSE)
 
     if(use_tmpdir) {
         htmlfile <- tempfile(pattern = "widget",fileext = ".html")
@@ -138,15 +139,11 @@ display_data.htmlwidget <- function(x,...,
                libdir=assets
                )
     if(iframe){
-        if_tmpl <- "
-            <iframe src=\"%s\" width=\"%s\" height=\"%s\" class='html-widget-iframe'  style=\"border-style:none\">
-            </iframe>
-            "
         width <- getOption("htmlwidget_iframe_width","100%")
         height <- getOption("htmlwidget_iframe_height",600L)
         if(embed)
             url <- dataURI(mime="text/html",file=htmlfile)
-        iframe <- sprintf(if_tmpl,url,width,height)
+        iframe <- url2iframe(url,resize,width,height,class="htmlwidget-iframe")
         res <- iframe
     }
     else {

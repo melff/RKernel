@@ -154,26 +154,42 @@ url2iframe <- function(url,
 
     resize_style <-"<style>
     .resizer { display:flex; margin:0; padding:0; resize:both; overflow:hidden }
-    .resizer > .resized { flex-grow:1; margin:0; padding:0; border:0 }
-    .ugly { background:red; border:4px dashed black; }
+    .vresizer { display:flex; margin:0; padding:0; resize:vertical; overflow:hidden }
+    .hresizer { display:flex; margin:0; padding:0; resize:horizontal; overflow:hidden }
+    .resizer > .resized,
+    .hresizer > .resized,
+    .vresizer > .resized { flex-grow:1; margin:0; padding:0; border:0 }
     </style>
     "
 
 
-    if(resize) {
+    if(isTRUE(resize) || resize == "both") {
       if_tmpl <- "<div class=\"resizer\">
                   <iframe src=\"%s\" width=\"%s\" height=\"%s\" class=\"%s resized\" style=\"%s\">
                   </iframe>
                   </div>
                 "
-      iframe <- sprintf(if_tmpl,url,width,height,class,style)
+    } 
+    else if(resize == "vertical") {
+      if_tmpl <- "<div class=\"vresizer\">
+                  <iframe src=\"%s\" width=\"%s\" height=\"%s\" class=\"%s resized\" style=\"%s\">
+                  </iframe>
+                  </div>
+                "
+    }
+    else if(resize == "horizontal") {
+      if_tmpl <- "<div class=\"hresizer\">
+                  <iframe src=\"%s\" width=\"%s\" height=\"%s\" class=\"%s resized\" style=\"%s\">
+                  </iframe>
+                  </div>
+                "
     }
     else {
       if_tmpl <- "<iframe src=\"%s\" width=\"%s\" height=\"%s\" class=\"%s\" style=\"%s\">
                 </iframe>
                 "
-      iframe <- sprintf(if_tmpl,url,width,height,class,style)
     }
+    iframe <- sprintf(if_tmpl,url,width,height,class,style)
 
     iframe
 }
