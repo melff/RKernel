@@ -66,32 +66,20 @@
     </div>
     <div class="section level2">
     <h2 id="super-classes">Super classes<a class="anchor" aria-label="anchor" href="#super-classes"></a></h2>
-    <p><code><a href="HasTraits.html">RKernel::HasTraits</a></code> -&gt; <code><a href="Widgets.html">RKernel::Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">RKernel::DOMWidget</a></code> -&gt; <code>ResizeableWidget</code></p>
+    <p><code><a href="HasTraits.html">RKernel::HasTraits</a></code> -&gt; <code><a href="Widgets.html">RKernel::Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">RKernel::DOMWidget</a></code> -&gt; <code><a href="AnyWidget.html">RKernel::AnyWidget</a></code> -&gt; <code>ResizeableWidget</code></p>
     </div>
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
-    <p></p><div class="r6-fields"><dl><dt><code>_view_name</code></dt>
-<dd><p>Name of the Javascript model view in the frontend</p></dd>
+    <p></p><div class="r6-fields"><dl><dt><code>_anywidget_id</code></dt>
+<dd><p>The AnyWidget id</p></dd>
 
 
-<dt><code>_model_name</code></dt>
-<dd><p>Name of the Javascript model in the frontend</p></dd>
+<dt><code>_css</code></dt>
+<dd><p>A Unicode trait with relevant CSS code</p></dd>
 
 
-<dt><code>_view_module</code></dt>
-<dd><p>Name of the module where the view is defined</p></dd>
-
-
-<dt><code>_model_module</code></dt>
-<dd><p>Name of the Javascript module with the model</p></dd>
-
-
-<dt><code>_view_module_version</code></dt>
-<dd><p>Version of the module where the view is defined</p></dd>
-
-
-<dt><code>_model_module_version</code></dt>
-<dd><p>Version of the module where the model is defined</p></dd>
+<dt><code>_esm</code></dt>
+<dd><p>A Unicode trait with relevant Javascript code</p></dd>
 
 
 <dt><code>width</code></dt>
@@ -100,6 +88,10 @@
 
 <dt><code>height</code></dt>
 <dd><p>(Current) height of the widget</p></dd>
+
+
+<dt><code>direction</code></dt>
+<dd><p>Which direction(s) should the widget be resizeable</p></dd>
 
 
 <dt><code>value</code></dt>
@@ -166,16 +158,12 @@
     </div>
     <div class="section level2">
     <h2 id="super-classes-1">Super classes<a class="anchor" aria-label="anchor" href="#super-classes-1"></a></h2>
-    <p><code><a href="HasTraits.html">RKernel::HasTraits</a></code> -&gt; <code><a href="Widgets.html">RKernel::Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">RKernel::DOMWidget</a></code> -&gt; <code>RKernel::ResizeableWidget</code> -&gt; <code>VResizeableWidget</code></p>
+    <p><code><a href="HasTraits.html">RKernel::HasTraits</a></code> -&gt; <code><a href="Widgets.html">RKernel::Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">RKernel::DOMWidget</a></code> -&gt; <code><a href="AnyWidget.html">RKernel::AnyWidget</a></code> -&gt; <code>RKernel::ResizeableWidget</code> -&gt; <code>VResizeableWidget</code></p>
     </div>
     <div class="section level2">
     <h2 id="public-fields-1">Public fields<a class="anchor" aria-label="anchor" href="#public-fields-1"></a></h2>
-    <p></p><div class="r6-fields"><dl><dt><code>_view_name</code></dt>
-<dd><p>Name of the Javascript model view in the frontend</p></dd>
-
-
-<dt><code>_model_name</code></dt>
-<dd><p>Name of the Javascript model in the frontend</p></dd>
+    <p></p><div class="r6-fields"><dl><dt><code>direction</code></dt>
+<dd><p>Which direction(s) should the widget be resizeable</p></dd>
 
 
 </dl><p></p></div>
@@ -234,16 +222,12 @@
     </div>
     <div class="section level2">
     <h2 id="super-classes-2">Super classes<a class="anchor" aria-label="anchor" href="#super-classes-2"></a></h2>
-    <p><code><a href="HasTraits.html">RKernel::HasTraits</a></code> -&gt; <code><a href="Widgets.html">RKernel::Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">RKernel::DOMWidget</a></code> -&gt; <code>RKernel::ResizeableWidget</code> -&gt; <code>HResizeableWidget</code></p>
+    <p><code><a href="HasTraits.html">RKernel::HasTraits</a></code> -&gt; <code><a href="Widgets.html">RKernel::Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">RKernel::DOMWidget</a></code> -&gt; <code><a href="AnyWidget.html">RKernel::AnyWidget</a></code> -&gt; <code>RKernel::ResizeableWidget</code> -&gt; <code>HResizeableWidget</code></p>
     </div>
     <div class="section level2">
     <h2 id="public-fields-2">Public fields<a class="anchor" aria-label="anchor" href="#public-fields-2"></a></h2>
-    <p></p><div class="r6-fields"><dl><dt><code>_view_name</code></dt>
-<dd><p>Name of the Javascript model view in the frontend</p></dd>
-
-
-<dt><code>_model_name</code></dt>
-<dd><p>Name of the Javascript model in the frontend</p></dd>
+    <p></p><div class="r6-fields"><dl><dt><code>direction</code></dt>
+<dd><p>Which direction(s) should the widget be resizeable</p></dd>
 
 
 </dl><p></p></div>
