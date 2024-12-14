@@ -258,3 +258,8 @@ menu_ <- function(choices,title=NULL,...) {
 install_menu <- function(){
     replace_in_package("utils", "menu", menu_)
 }
+
+read_asset <- function(path) {
+  path <- system.file(path,package="RKernel")
+  paste(readLines(path),collapse="\n")
+}

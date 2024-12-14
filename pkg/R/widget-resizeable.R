@@ -1,3 +1,8 @@
+# resizeable_css <- readLines(system.file("css/resizeable.css",
+#                                         package="RKernel"))
+# resizeable_esm <- readLines(system.file("js/resizeable.js",
+#                                         package="RKernel"))
+
 #' Resizeable Widgets
 #' @description R6 classes of resizeable containers for arbitrary HTML code
 #' @details Support for resizeable widgets, available from 
@@ -8,28 +13,24 @@
 #' @export 
 ResizeableWidgetClass <- R6Class_(
   "ResizeableWidget",
-  inherit = DOMWidgetClass,
+  inherit = AnyWidgetClass,
   public = list(
-          #' @field _view_name Name of the Javascript model view in the frontend
-        `_view_name` = structure(Unicode("ResizeableView"),sync=TRUE),
-        #' @field _model_name Name of the Javascript model in the frontend
-        `_model_name` = structure(Unicode("ResizeableModel"),sync=TRUE),
-        #' @field _view_module Name of the module where the view is defined
-        `_view_module` = structure(Unicode("resizeable-widget"),sync=TRUE),
-        #' @field _model_module Name of the Javascript module with the model
-        `_model_module` = structure(Unicode("resizeable-widget"),sync=TRUE),
-        #' @field _view_module_version Version of the module where the view is defined
-        `_view_module_version` = structure(Unicode("^0.1.0"),sync=TRUE),
-        #' @field _model_module_version Version of the module where the model is defined
-        `_model_module_version` = structure(Unicode("^0.1.0"),sync=TRUE),
+        #' @field _anywidget_id The AnyWidget id
+        `_anywidget_id` = structure(Unicode("ResizeableWidget"), sync = TRUE),
+        #' @field _css A Unicode trait with relevant CSS code
+        `_css` = structure(Unicode(read_asset("css/resizeable.css")), sync = TRUE),
+        #' @field _esm A Unicode trait with relevant Javascript code
+        `_esm` = structure(Unicode(read_asset("js/resizeable.js")), sync = TRUE),
         #' @field width (Current) width of the widget
-        width = structure(Integer(-1),sync = TRUE),
+        width = structure(Integer(-1), sync = TRUE),
         #' @field height (Current) height of the widget
-        height = structure(Integer(-1),sync = TRUE),
+        height = structure(Integer(-1), sync = TRUE),
+        #' @field direction Which direction(s) should the widget be resizeable
+        direction = structure(Unicode("both"), sync = TRUE),
         #' @field value (Current) HTML code content of the widget
-        value = structure(Unicode("<em>Hello World!</em>"),sync = TRUE),
+        value = structure(Unicode("<em>Hello World!</em>"), sync = TRUE),
         #' @field debug Whether to show a dashed frame and background color for debugging
-        debug = structure(Boolean(FALSE),sync = TRUE)
+        debug = structure(Boolean(FALSE), sync = TRUE)
   )
 )
 
@@ -38,10 +39,8 @@ VResizeableWidgetClass <- R6Class_(
   "VResizeableWidget",
   inherit = ResizeableWidgetClass,
   public = list(
-          #' @field _view_name Name of the Javascript model view in the frontend
-        `_view_name` = structure(Unicode("VResizeableView"),sync=TRUE),
-        #' @field _model_name Name of the Javascript model in the frontend
-        `_model_name` = structure(Unicode("VResizeableModel"),sync=TRUE)
+        #' @field direction Which direction(s) should the widget be resizeable
+        direction = structure(Unicode("vertical"), sync = TRUE)
   )
 )
 
@@ -50,10 +49,8 @@ HResizeableWidgetClass <- R6Class_(
   "HResizeableWidget",
   inherit = ResizeableWidgetClass,
   public = list(
-          #' @field _view_name Name of the Javascript model view in the frontend
-        `_view_name` = structure(Unicode("HResizeableView"),sync=TRUE),
-        #' @field _model_name Name of the Javascript model in the frontend
-        `_model_name` = structure(Unicode("HResizeableModel"),sync=TRUE)
+        #' @field direction Which direction(s) should the widget be resizeable
+        direction = structure(Unicode("horizontal"), sync = TRUE)
   )
 )
 

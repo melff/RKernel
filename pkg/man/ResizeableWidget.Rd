@@ -27,26 +27,22 @@ Support for resizeable widgets, available from
 }
 \keyword{internal}
 \section{Super classes}{
-\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{ResizeableWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:AnyWidget]{RKernel::AnyWidget}} -> \code{ResizeableWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{_view_name}}{Name of the Javascript model view in the frontend}
+\item{\code{_anywidget_id}}{The AnyWidget id}
 
-\item{\code{_model_name}}{Name of the Javascript model in the frontend}
+\item{\code{_css}}{A Unicode trait with relevant CSS code}
 
-\item{\code{_view_module}}{Name of the module where the view is defined}
-
-\item{\code{_model_module}}{Name of the Javascript module with the model}
-
-\item{\code{_view_module_version}}{Version of the module where the view is defined}
-
-\item{\code{_model_module_version}}{Version of the module where the model is defined}
+\item{\code{_esm}}{A Unicode trait with relevant Javascript code}
 
 \item{\code{width}}{(Current) width of the widget}
 
 \item{\code{height}}{(Current) height of the widget}
+
+\item{\code{direction}}{Which direction(s) should the widget be resizeable}
 
 \item{\code{value}}{(Current) HTML code content of the widget}
 
@@ -111,14 +107,12 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:ResizeableWidget]{RKernel::ResizeableWidget}} -> \code{VResizeableWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:AnyWidget]{RKernel::AnyWidget}} -> \code{\link[RKernel:ResizeableWidget]{RKernel::ResizeableWidget}} -> \code{VResizeableWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{_view_name}}{Name of the Javascript model view in the frontend}
-
-\item{\code{_model_name}}{Name of the Javascript model in the frontend}
+\item{\code{direction}}{Which direction(s) should the widget be resizeable}
 }
 \if{html}{\out{</div>}}
 }
@@ -179,14 +173,12 @@ The objects of this class are cloneable with this method.
 }
 }
 \section{Super classes}{
-\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:ResizeableWidget]{RKernel::ResizeableWidget}} -> \code{HResizeableWidget}
+\code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:AnyWidget]{RKernel::AnyWidget}} -> \code{\link[RKernel:ResizeableWidget]{RKernel::ResizeableWidget}} -> \code{HResizeableWidget}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{_view_name}}{Name of the Javascript model view in the frontend}
-
-\item{\code{_model_name}}{Name of the Javascript model in the frontend}
+\item{\code{direction}}{Which direction(s) should the widget be resizeable}
 }
 \if{html}{\out{</div>}}
 }

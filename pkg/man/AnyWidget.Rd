@@ -5,7 +5,7 @@
 \title{A constructor function for a class that inherits from
     'AnyWidget' (or 'AnyWidgetClass')}
 \usage{
-AnyWidget(`_esm`, `_css`, ...)
+AnyWidget(`_esm`, `_css`, `_anywidget_id`, ...)
 }
 \description{
 A constructor function for a class that inherits from
@@ -43,6 +43,7 @@ A constructor function for a class that inherits from
   CountWidget <- AnyWidget(
               `_esm` = esm,
               `_css` = css,
+              `_anywidget_id` = "CountWidget",
               value = Integer(0)
              )
   CountWidget(value=42)
