@@ -58,6 +58,7 @@ AnyWidgetClass <- R6Class_("AnyWidget",
 #'   CountWidget <- AnyWidget(
 #'               `_esm` = esm,
 #'               `_css` = css,
+#'               `_anywidget_id` = "CountWidget",
 #'               value = Integer(0)
 #'              )
 #'   CountWidget(value=42)
