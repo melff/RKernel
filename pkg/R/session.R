@@ -232,14 +232,19 @@ RKernelSession <- R6Class("RKernelSession",
                 self$callbacks$stdout(resp$stdout)
               }
               next_line <- TRUE
-            # } else if (endsWith(resp$stdout, self$menu_prompt)) {
-            #   # log_out("Found menu prompt")
-            #   # resp$stdout <- remove_suffix(resp$stdout, self$menu_prompt)
-            #   if (is.function(self$callbacks$menu)) {
-            #     inp <- self$callbacks$menu(resp$stdout)
-            #     force_drop_echo <- TRUE
-            #     self$send_input(inp)
-            #   } else self$send_input("")
+            } else if (endsWith(resp$stdout, self$menu_prompt)) {
+              # log_out("Found menu prompt")
+              # log_out(self$callbacks, use.str = TRUE)
+              resp$stdout <- remove_suffix(resp$stdout, self$menu_prompt)
+              if (is.function(self$callbacks$menu)) {
+                # log_out("Calling menu callback")
+                inp <- self$callbacks$menu(resp$stdout)
+                force_drop_echo <- TRUE
+                self$send_input(inp)
+              } else {
+                # log_out("No menu callback available")
+                self$interrupt()
+              }
             } else if (endsWith(resp$stdout, self$readline_prompt)) {
               # log_out("Found readline prompt")
               resp$stdout <- remove_suffix(resp$stdout, self$readline_prompt)
