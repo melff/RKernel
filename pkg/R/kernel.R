@@ -95,6 +95,7 @@ Kernel <- R6Class("Kernel",
         continue <- self$poll_and_respond()
       }
       self$r_session$close()
+      # log_out("*** RKernel shut down ***")
     },
     #' @description
     #' A single iteration of the kernel loop
@@ -551,24 +552,36 @@ Kernel <- R6Class("Kernel",
     respond_control = function(req, debug = FALSE){
       # log_out("respond_control")
       msg <- private$get_message("control")
+      private$send_busy(private$parent$control)
       if(!length(msg)) return(TRUE)
       if (debug) {
+        log_out("respond_control")
         log_out(paste("Got a", msg$header$msg_type, "request ..."))
       }
       private$parent$control <- msg
+      continue <- TRUE
       if(msg$header$msg_type=="shutdown_request"){
-        # cat("shutdown_request received")
+        # log_out("shutdown_request received")
+        # log_out(msg$content)
+        restart <- msg$content$restart
         self$r_session$close()
-        return(FALSE)
+        response <- list(
+          status = "ok",
+          restart = restart
+        )
+        private$send_message(type="shutdown_reply",
+                           parent=private$parent$shell,
+                           socket_name="iopub",
+                           content=response)
+        # log_out("shutdown_reply sent")
+        continue <- FALSE
       }
       else if(msg$header$msg_type=="debug_request"){
         # log_out("debug_request received")
-        private$send_busy(private$parent$control)
         private$handle_debug_request(msg)
-        private$send_idle(private$parent$control)
-        return(TRUE)
       }
-      else return(TRUE)
+      private$send_idle(private$parent$control) 
+      return(continue)
     },
 
     respond_shell = function(req,debug=FALSE){
@@ -604,6 +617,7 @@ Kernel <- R6Class("Kernel",
     },
 
     send_busy = function(parent){
+      # log_out("send_busy")
       private$send_message(type="status",
                            parent=parent,
                            socket_name="iopub",
@@ -612,6 +626,7 @@ Kernel <- R6Class("Kernel",
     },
 
     send_idle = function(parent){
+      # log_out("send_idle")
       private$send_message(type="status",
                            parent=parent,
                            socket_name="iopub",
