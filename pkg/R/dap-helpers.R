@@ -2,6 +2,7 @@ variables_helper <- new.env()
 
 #' @export
 inspect_variables <- function(envir = parent.frame()){
+  # log_out("inspect_variables")
   var_names <- ls(envir = envir)
   var_refs <- structure(
     seq_along(var_names),
@@ -35,10 +36,13 @@ get_variable <- function(ename, envir = parent.frame()) {
 }
 
 get_value <- function(ename, envir = parent.frame()){
+  # log_out("get_value")
+  # log_out(ename)
   eval(str2expression(ename), envir = envir)
 }
 
 inspect_value <- function(x) {
+  # log_out("inspect_value")
   if (is.atomic(x)) {
     value <- get_atomic_val(x)
     type <- get_atomic_type(x)
@@ -143,17 +147,20 @@ ref2children <- function(ref, envir = parent.frame()) {
   # log_out(ref)
   if(ref == 0) return(NULL)
   ename <- variables_helper$enames[ref]
-  # log_out(ename)
-  obj <- get_value(ename, envir = envir)
-  response <- tryCatch(
-    get_children(obj, ename, envir = envir),
-    error = function(e) conditionMessage(e)
-  )
-  if (is.character(response)) log_error(response)
+  if(!length(ename)) return(NULL)
+  obj <- try(get_value(ename, envir = envir),silent=TRUE)
+  if(inherits(obj,"try-error")) {
+    log_error(obj)
+    return(NULL)
+  }
+  response <- try(get_children(obj, ename, envir = envir),silent=TRUE) 
+  if (inherits(response,"try-error")) log_error(response)
   else msg_send(response)
 }
 
 get_children <- function(obj, ename, envir) {
+  # log_out("get_children")
+  # log_out(ename)
   children <- list()
   if (is.atomic(obj) && length(obj) > 1) {
     elts_ename <- paste0("RKernel:::str_minimal(", ename, ")")

@@ -20,10 +20,10 @@ DAPServer <- R6Class("DAPServer",
         handle = function(request, ...) {
             # log_out("DAPServer$handle")
             # if(request$command != "debugInfo"){
-            #     log_out(sprintf("DAPServer: got command '%s",request$command))
+            #     log_out(sprintf("DAPServer: got command '%s'",request$command))
             #     log_out(request$arguments,use.print=TRUE)
             # }
-            # log_out(request$command)
+            # else log_out(request$command)
             body <- switch(request$command,
                 debugInfo = self$debugInfo(request, ...),
                 initialize = self$debug_init(request, ...),
@@ -44,8 +44,10 @@ DAPServer <- R6Class("DAPServer",
                 body = body
             )
             self$response_seq <- self$response_seq + 1L
-            # log_out("response:")
-            # log_out(response, use.print = TRUE)
+            # if(request$command != "debugInfo"){
+            #     log_out("response:")
+            #     log_out(response, use.print = TRUE)
+            # }
             return(response)
         },
         response_seq = 1L,
