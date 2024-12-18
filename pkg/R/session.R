@@ -125,8 +125,10 @@ RKernelSession <- R6Class("RKernelSession",
     last_stderr = "",
     last_msg = list(),
     callbacks = list(),
+    status = "",
     receive_output = function(timeout = 1){
       poll_res <- self$poll_io(timeout)
+      self$status <- self$get_status()
       res <- list()
       if (poll_res[1] == "ready") {
         res$stdout <- self$read_output()
@@ -145,6 +147,7 @@ RKernelSession <- R6Class("RKernelSession",
     receive_all_output = function(timeout = 1){
       # log_out("receive_all_output")
       poll_res <- self$poll_io(timeout)
+      self$status <- self$get_status()
       resp <- list()
       while (any(poll_res == "ready")) {
         if (poll_res[1] == "ready") {
@@ -199,6 +202,8 @@ RKernelSession <- R6Class("RKernelSession",
         while(!next_line){
           cnt <- cnt + 1
           resp <- self$receive_output(timeout = 1)
+          # log_out(sprintf("process_output %d",cnt))
+          # log_out(resp, use.print = TRUE)
           if (!is.null(resp$msg) && is.function(self$callbacks$msg)) {
             self$callbacks$msg(resp$msp)
           }
@@ -214,17 +219,20 @@ RKernelSession <- R6Class("RKernelSession",
             }
             if (grepl(self$browse_prompt, resp$stdout)) {
               # log_out("Found browser prompt")
-              if (is.function(self$callbacks$browser)) {
-                inp <- self$callbacks$browser(resp$stdout)
-                force_drop_echo <- TRUE
-                self$send_input(inp)
-              } else self$send_input("Q")
+              if(self$status == "sleeping") {
+                if (is.function(self$callbacks$browser)) {
+                  inp <- self$callbacks$browser(resp$stdout)
+                  force_drop_echo <- TRUE
+                  self$send_input(inp)
+                } else self$send_input("Q")
+              }
             } else if (endsWith(resp$stdout, self$co_prompt)) {
               # log_out("Found continuation prompt")
               resp$stdout <- NULL
               next_line <- TRUE
             } else if (endsWith(resp$stdout, self$prompt)) {
               # log_out("Found main prompt")
+              # log_out(self$status)
               self$prompt_found <- TRUE
               resp$stdout <- remove_suffix(resp$stdout, self$prompt)
               if (is.function(self$callbacks$stdout) 
@@ -234,28 +242,34 @@ RKernelSession <- R6Class("RKernelSession",
               next_line <- TRUE
             } else if (endsWith(resp$stdout, self$menu_prompt)) {
               # log_out("Found menu prompt")
+              # log_out(sprintf("Status: %s",self$status))
               # log_out(self$callbacks, use.str = TRUE)
-              resp$stdout <- remove_suffix(resp$stdout, self$menu_prompt)
-              if (is.function(self$callbacks$menu)) {
-                # log_out("Calling menu callback")
-                inp <- self$callbacks$menu(resp$stdout)
-                force_drop_echo <- TRUE
-                self$send_input(inp)
-              } else {
-                # log_out("No menu callback available")
-                self$interrupt()
+              if(self$status == "sleeping") {
+                resp$stdout <- remove_suffix(resp$stdout, self$menu_prompt)
+                if (is.function(self$callbacks$menu)) {
+                  # log_out("Calling menu callback")
+                  inp <- self$callbacks$menu(resp$stdout)
+                  force_drop_echo <- TRUE
+                  self$send_input(inp)
+                } else {
+                  # log_out("No menu callback available")
+                  self$interrupt()
+                } 
               }
             } else if (endsWith(resp$stdout, self$readline_prompt)) {
               # log_out("Found readline prompt")
-              resp$stdout <- remove_suffix(resp$stdout, self$readline_prompt)
-              if (is.function(self$callbacks$readline)) {
-                # log_out("Calling readline callback")
-                inp <- self$callbacks$readline(prompt = resp$stdout)
-                force_drop_echo <- TRUE
-                # log_out("Sending", inp)
-                self$send_input(inp)
+              # log_out(self$status)
+              if(self$status == "sleeping") {
+                resp$stdout <- remove_suffix(resp$stdout, self$readline_prompt)
+                if (is.function(self$callbacks$readline)) {
+                  # log_out("Calling readline callback")
+                  inp <- self$callbacks$readline(prompt = resp$stdout)
+                  force_drop_echo <- TRUE
+                  # log_out("Sending", inp)
+                  self$send_input(inp)
+                }
+                else self$send_input("")
               }
-              else self$send_input("")
             } else {
               # log_out("stdout callback")
               if (is.function(self$callbacks$stdout) 
