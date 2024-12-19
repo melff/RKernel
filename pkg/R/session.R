@@ -90,6 +90,10 @@ RKernelSession <- R6Class("RKernelSession",
       if(is.null(res)) res <- default
       res
     },
+    ls = function() {
+      res <- self$run_cmd("dput(ls())")
+      eval(str2expression(res$stdout))
+    },
     get = function(n) {
       cmd <- sprintf("dput(get0(\"%s\"))",n)
       res <- self$run_cmd(cmd)
