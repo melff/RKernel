@@ -237,6 +237,6 @@ with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear
     }
     if (length(serr)) {
         serr <- paste(serr, collapse = "\n")
-        data$stdout(serr)
+        data$stderr(serr)
     }
 }

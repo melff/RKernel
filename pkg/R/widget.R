@@ -2,7 +2,9 @@
 #'
 #' @description The base class from which all widget classes are derived
 #' 
-#' @include json.R utils.R callbacks.R
+#' @include json.R utils.R callbacks.R traitlets.R traitlets-unicode.R 
+#' @include traitlets-str_enum.R traitlets-R6instance.R traitlets-vector.R
+#' @include traitlets-boolean.R traitlets-numbers.R
 #' @name Widgets
 
 #' @rdname Widgets
