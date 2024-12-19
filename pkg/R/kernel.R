@@ -52,6 +52,7 @@ Kernel <- R6Class("Kernel",
       private$pid <- Sys.getpid()
       kernel$current <- self
       truncate_log()
+      private$sandbox <- new.env()
     },
     start_r_session = function(){
       self$r_session <- RKernelSession$new(callbacks = list(
@@ -63,6 +64,7 @@ Kernel <- R6Class("Kernel",
         menu = private$r_get_input
       ))
       # log_out(self$r_session, use.print = TRUE)
+      assign("session",self$r_session,envir=private$sandbox)
     },
     start = function(){
       self$start_r_session()
@@ -298,6 +300,7 @@ Kernel <- R6Class("Kernel",
         )
       )
       self$errored <- FALSE
+      aborted <- FALSE
 
       code <- msg$content$code
 
@@ -306,18 +309,29 @@ Kernel <- R6Class("Kernel",
           magic <- mparsed$magic
           args <- mparsed$args
           code <- mparsed$code
-          d <- tryCatch(dispatch_magic_handler(magic,code,args),
-                        error = function(e) structure("errored", 
-                                                       message = conditionMessage(e)), # ,traceback=.traceback()),
-                        interrupt = function(e) "interrupted")
-          # log_out(d,use.str=TRUE)
-          if(is.character(d))
-            self$stderr(attr(d,"message"))
-          else if(inherits(d,"display_data")){
-            msg <- list(type = class(d),
-                        content = unclass(d))
-            self$display_send(msg)
-          }
+          if(magic == "kernel") {
+              log_out("kernel magic found")
+              log_out(code)
+              expr <- str2expression(code)
+              tryCatch(eval_capture(expr, 
+                                    envir = private$sandbox,
+                                    enclos = private$sandbox,
+                                    stdout = private$handle_r_stdout,
+                                    stderr = private$handle_r_stderr))
+          } else {
+              d <- tryCatch(dispatch_magic_handler(magic,code,args),
+                            error = function(e) structure("errored", 
+                                                          message = conditionMessage(e)), # ,traceback=.traceback()),
+                            interrupt = function(e) "interrupted")
+              # log_out(d,use.str=TRUE)
+              if(is.character(d))
+                self$stderr(attr(d,"message"))
+              else if(inherits(d,"display_data")){
+                msg <- list(type = class(d),
+                            content = unclass(d))
+                self$display_send(msg)
+              }
+          } 
               
           content <- list(status = "ok",
                           execution_count = execution_count)
@@ -968,7 +982,9 @@ Kernel <- R6Class("Kernel",
       #res <- do.call("options",opts)
       #log_out(res, use.str = TRUE)
       #log_out(.Options[names(res)], use.str = TRUE)
-    }
+    },
+
+    sandbox = NULL
   )
 )
 
