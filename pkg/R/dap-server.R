@@ -133,11 +133,6 @@ DAPServer <- R6Class("DAPServer",
                 )
             )
         },
-        is_started = FALSE,
-        debug_attach = function(request) {
-            self$is_started <- TRUE
-            return(NULL)
-        },
         debug_disconnect = function(request) {
             self$is_started <- TRUE
             return(NULL)
