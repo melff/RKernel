@@ -53,6 +53,7 @@ Kernel <- R6Class("Kernel",
       kernel$current <- self
       truncate_log()
       private$sandbox <- new.env()
+      assign("kernel",self,envir=private$sandbox)
     },
     start_r_session = function(){
       self$r_session <- RKernelSession$new(callbacks = list(
