@@ -91,7 +91,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                         private$r_msg_frag <- paste0(private$r_msg_frag, chunk)
                     }
                     else if(nzchar(chunk)) {
-                        self$stream1(chunk, stream_name)
+                        private$stream1(chunk, stream_name)
                     }
                 }
             }
