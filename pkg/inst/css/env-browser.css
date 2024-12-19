@@ -54,10 +54,6 @@ table.env-browser,
 }
 
 
-.env-browser .object-summary {
-    /* width: 85%; */
-}
-
 table.env-browser {
     margin: 0 !important;
 }
@@ -69,6 +65,7 @@ details table.env-browser {
 
 .env-browser th {
     text-align: left !important;
+    color: black;
     background-color:  #f7f7f7;
     border-top: 1px solid #cfcfcf; 
     border-bottom: 1px solid #cfcfcf; 
@@ -76,6 +73,7 @@ details table.env-browser {
 }
 .env-browser td {
     text-align: left !important;
+    color: black;
     background-color: white;
     border-bottom: 1px solid #cfcfcf; 
     padding: 0.5ex 0.5ex;
@@ -107,6 +105,7 @@ td.toggle-container {
 
 td.toggle-container button {
     border: none;
+    color: black;
     background: white;
 }
 
@@ -119,27 +118,9 @@ tbody.subtable {
     padding-left: 2em;
 }
 
-.browse_env {
-    /* position: fixed; */
-    /* bottom: 0; */
-    /* left: 0; */
-    /* z-index: 200;
-     * background-color: white;
-     * max-width: 50%;
-     * box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2); */
-}
-
-/* .browse_env .env-browser-wrapper {
- *     background-color: white;
- *     width: 100%;
- *     border: 1px solid #cfcfcf; 
- *     box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2); 
- *     overflow: auto;
- *     max-height: 300px
- * } */
-
 
 .browse_env {
+    color: black;
     background-color: white;
     /* width: 100%; */
     border: 1px solid #cfcfcf; 
@@ -147,12 +128,6 @@ tbody.subtable {
     overflow: auto;
     /* height: 300px */
 }
-
-/* 
-.env-browser-wrapper summary::marker {
-    content:''; 
-}
-details summary::-webkit-details-marker { display: none; } */
 
 .env-browser-wrapper details[open] > summary {
     margin-bottom: 0;
@@ -162,14 +137,6 @@ details summary::-webkit-details-marker { display: none; } */
     margin-bottom: 0;
 }
 
-
-/* .env-browser-wrapper details .object-summary pre::after {
-    content: "\0020\2BC8";
-}
-
-.env-browser-wrapper details[open] .object-summary pre::after {
-    content: "\0020\2BC6";
-} */
 
 .env-browser-wrapper details .object-name pre::after {
     content: "\0020\2BC7";
@@ -200,16 +167,6 @@ details summary::-webkit-details-marker { display: none; } */
 .env-browser-dialog .ui-dialog-title {
     padding: 0.5ex;
 }
-
-/* .browse_env .env-browser-wrapper {
- *     background-color: white;
- *     width: 100%;
- *     border: 1px solid #cfcfcf; 
- *     box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2); 
- *     overflow: auto;
- *     max-height: 300px
- * } */
-
 
 #output-wrapper .env-browser-wrapper {
     max-height: unset;
