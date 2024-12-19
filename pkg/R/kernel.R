@@ -80,6 +80,7 @@ Kernel <- R6Class("Kernel",
       )
       self$r_session$run_cmd("RKernel::startup()")
       self$r_session$run_cmd("RKernel::inject_send_options()")
+      self$r_session$run_cmd("suppressWarnings(rm(.pbd_env))")
     },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
