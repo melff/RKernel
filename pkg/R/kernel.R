@@ -94,7 +94,6 @@ Kernel <- R6Class("Kernel",
       while(continue) {
         continue <- self$poll_and_respond()
       }
-      self$r_session$close()
       # log_out("*** RKernel shut down ***")
     },
     #' @description

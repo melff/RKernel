@@ -52,12 +52,14 @@ DAPServer <- R6Class("DAPServer",
         },
         response_seq = 1L,
         event = function(event, body = NULL) {
+            # log_out("debug_event")
             content <- list(
                 seq = self$event_seq,
                 type = "event",
                 event = event,
                 body = body
             )
+            # log_out(content, use.str=TRUE)
             self$send_debug_event(content)
             self$event_seq <- self$event_seq + 1L
         },
@@ -79,6 +81,27 @@ DAPServer <- R6Class("DAPServer",
         client_info = NULL,
         debug_init = function(request, ...) {
             self$client_info <- request$arguments
+            list(
+                supportsSetVariable = TRUE,
+                supportsConditionalBreakpoints = TRUE,
+                supportsConfigurationDoneRequest = TRUE,
+                exceptionBreakpointFilters = list(
+                    filter = "stop",
+                    label = "Runtime error",
+                    default = FALSE,
+                    description = "Break when an error occurs that is not caught by a try() or tryCactch() expression"
+                )
+            )
+        },
+        is_started = FALSE,
+        debug_attach = function(request) {
+            # What I see with kernel spy and an ipython kernel
+            # the following potentially relevant responses
+            # debug_reply: type "response"
+            # debug_event: event: "initialized"
+            # debug_event: event: "process" - body: name (path to script), systemProcessId, isLocalProces, startMethod "attach"
+            # debug_event: event: "thread" - body: reason: "started", threadId: (a number)
+            #      6 thread events in total
             self$event(event = "initialized")
             self$event(
                 event = "process",
@@ -150,6 +173,9 @@ DAPServer <- R6Class("DAPServer",
             response <- self$r_send_cmd(cmd)
             body <- response$content[c("data","metadata")]
             return(body)
+        },
+        empty_reply = function(request) {
+            return(NULL)
         }
     )
 )
