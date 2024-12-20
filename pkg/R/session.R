@@ -90,6 +90,19 @@ RKernelSession <- R6Class("RKernelSession",
       if(is.null(res)) res <- default
       res
     },
+    eval = function(expr) {
+      # log_out("session$eval()")
+      code <- deparse(substitute(expr))
+      self$eval_code(code)
+    },
+    eval_code = function(code) {
+      code <- sprintf("dput(%s)",code)
+      res <- self$run_cmd(code)
+      if(length(res$stderr))
+        res$stderr
+      else 
+        eval(str2expression(res$stdout))
+    },
     ls = function() {
       res <- self$run_cmd("dput(ls())")
       eval(str2expression(res$stdout))
