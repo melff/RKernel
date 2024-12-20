@@ -92,6 +92,10 @@ log_error = function(message){
   cat_(message,file=log_fn(),append=TRUE)
 }
 
+log_check <- function(...){
+  tryCatch(...,
+      error = function(e) log_error(conditionMessage(e)))
+}
 
 replace_in_package <- function(pkg_name,name,value,update.env=FALSE){
   env_name <- paste0("package:",pkg_name)
