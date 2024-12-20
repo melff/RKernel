@@ -77,7 +77,7 @@ request_handlers$echo <- function(msg) {
 
 request_handlers$is_complete_request <- function(msg, ...) {
   code <- msg$content$code
-  status <- code_is_complete(code)
+  status <- code_status(code)
   list(
     type = "is_complete_reply",
     content = list(

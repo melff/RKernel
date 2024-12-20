@@ -8,7 +8,7 @@ is_unexpected_string <- function(code)
                    domain = "R"),
           code,fixed = TRUE)
 
-code_is_complete <- function(code){
+code_status <- function(code){
     status <- tryCatch({
         str2expression(code)
         "complete"
@@ -20,3 +20,5 @@ code_is_complete <- function(code){
         return("invalid")
     else return("complete")
 }
+
+code_is_complete <- function(code) code_status(code) == "complete"

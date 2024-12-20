@@ -439,7 +439,7 @@ Kernel <- R6Class("Kernel",
       #cat("is_complete_reply\n")
       #str(msg)
       code <- msg$content$code
-      status <- code_is_complete(code)
+      status <- code_status(code)
       private$send_message(type="is_complete_reply",
                            parent=private$parent$shell,
                            socket_name="shell",
