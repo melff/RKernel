@@ -61,8 +61,9 @@ init_env_browser <- function(){
 .env_browser_table <- new.env()
 .env_browser_table$inited <- FALSE
 
-env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FALSE, pattern = NULL, 
-    mode = "any", id=NULL, include_css = TRUE){
+env_matrix <- function(pos = -1, name, envir, parent=NULL, all.names = FALSE, pattern = NULL, 
+    mode = "any") {
+    log_out("env_matrix")
     if (missing(envir)) 
         envir <- as.environment(pos)
     if(length(pattern))
@@ -73,6 +74,7 @@ env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FA
         inherits = FALSE)
     nms <- nms[r]
     # log_out(nms,use.print=TRUE)
+    # log_out(ls.str(),use.print=TRUE)
     if(is.environment(parent)){
         # log_out("Yes, parent is an environment")
         if(length(pattern))
@@ -95,6 +97,31 @@ env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FA
     m[,1] <- nms
     m[,2] <- unlist(str_nms1)
     m[,3] <- unlist(str_nms2)
+    list(m=m, n=n)
+}
+
+session_env_matrix <- function(session, 
+                               pos = -1L,
+                               envname = NULL) {
+    cmd <- if(!missing(envname)) {
+               sprintf("RKernel:::env_matrix(envir = %s)", envname)
+           } 
+           else {
+               sprintf("RKernel:::env_matrix(pos = %d)", pos)
+           }
+    session$eval_code(cmd)
+}
+
+env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FALSE, pattern = NULL, 
+    mode = "any", id=NULL, include_css = TRUE, session = NULL){
+    if(inherits(session, "RKernelSession")) {
+        em <- session_env_matrix(pos, session)
+    }
+    else {
+        em <- env_matrix(pos, name, envir, parent, all.names, pattern, mode)
+    }
+    m <- em$m
+    n <- em$n
     result <- NULL
     thead <- c("Name","Value")
     thead <- c(paste0("<th class='object-name border-left border-top'>",thead[1],"</th>"),
