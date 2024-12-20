@@ -324,14 +324,14 @@ RKernelSession <- R6Class("RKernelSession",
 )
 
 split_lines1 <- function(x) {
-  y <- strsplit(x, "\n", fixed = TRUE)
-  unlist(y)
+  unlist(strsplit(x, "\n", fixed = TRUE))
 }
 
-drop_echo <- function(txt) {
+drop_echo <- function(txt, n = 1) {
   if(length(txt) && nzchar(txt)){
       out_lines <- split_lines1(txt)
-      out_lines <- out_lines[-1]
+      ii <- 1:n
+      out_lines <- out_lines[-ii]
       txt <- paste(out_lines, collapse = "\n")
       # log_out(resp, use.print = TRUE)
   }
@@ -345,3 +345,118 @@ menu_callback <- function(prompt) {
 browser_callback <- function(prompt) {
   readline(prompt = prompt)
 }
+
+RREPLAdapter <- R6Class("RREPLAdapter",
+ public = list(
+    session = NULL,
+    wait_callback = NULL,
+    stdout_callback = NULL,
+    stderr_callback = NULL,
+    menu_callback = NULL,
+    browse_callback = NULL,
+    readline_callback = NULL,
+    prompt = NULL,
+    menu_prompt = ": ",
+    browse_prompt = "Browse\\[([0-9]+)\\]> $",
+    readline_prompt = READLINE_prompt,
+    co_prompt = NULL,
+    run_timeout = 0,
+    io_timeout = 0,
+    stdout = character(0),
+    stderr = character(0),
+    aggreg_stdout = function(txt, ...) {
+      self$stdout <- paste0(self$stdout,txt)
+    },
+    aggreg_stderr = function(txt, ...) {
+      self$stderr <- paste0(self$stderr,txt)
+    },
+    collect = function(clear = TRUE) {
+      res <- list(stdout = self$stdout,
+                  stderr = self$stderr)
+      if(clear) {
+        self$stdout <- character(0)
+        self$stderr <- character(0)
+      }
+      return(res)
+    },
+    initialize = function(
+      session,
+      wait_callback = function() invisible(),
+      stdout_callback = self$aggreg_stdout,
+      stderr_callback = self$aggreg_stderr,
+      menu_callback = NULL,
+      browse_callback = self$quit_browser,
+      readline_callback = NULL,
+      prompt = "> ",
+      co_prompt = "\n+ ",
+      run_timeout = 10,
+      io_timeout = 10
+    ) {
+      self$session <- session
+      self$wait_callback <- wait_callback
+      self$stdout_callback <- stdout_callback
+      self$stderr_callback <- stderr_callback
+      self$prompt <- prompt
+      self$co_prompt <- co_prompt
+      self$run_timeout <- run_timeout
+      self$io_timeout <- io_timeout
+      self$menu_callback <- menu_callback
+      self$browse_callback <- browse_callback
+      self$readline_callback <- readline_callback
+    },
+    exec = function(code) {
+      status <- code_status(code)
+      if(status !=  "complete") return(status)
+      lines <- split_lines1(code)
+      lines <- lines[nzchar(lines)]
+      current_chunk <- ""
+      n <- length(lines)
+      lines <- paste0(lines,"\n")
+      m <- 0
+      for(i in 1:n) {
+        line <- lines[i]
+        current_chunk <- paste0(current_chunk,line)
+        m <- m + 1
+        status <- code_status(current_chunk)
+        if(status == "complete") {
+          self$exec_chunk(current_chunk,m)
+          m <- 0
+          current_chunk <- character(0)
+        } 
+      }
+    },
+    found_prompt = FALSE,
+    exec_chunk = function(code,m) {
+      if(!length(code) || !nzchar(code)) return()
+      session <- self$session
+      session$send_input(code)
+      i <- 1
+      self$found_prompt <- FALSE
+      while(!self$found_prompt) {
+        resp <- session$receive_output(timeout = 1)
+        serr <- resp$stderr
+        sout <- resp$stdout
+        if(length(serr) && nzchar(serr)) {
+          self$stderr_callback(serr, session)
+        }
+        if(length(sout) && nzchar(sout)) {
+          if(i == 1) {
+            sout <- drop_echo(sout, m)
+          }
+          i <- i + 1
+          if(nzchar(sout)) {
+            if(endsWith(sout, self$prompt)) {
+              sout <- remove_suffix(sout, self$prompt)
+              self$found_prompt <- TRUE
+            }
+            if(nzchar(sout)) {
+              self$stdout_callback(sout, session)
+            }
+          }
+        }
+      }
+    },
+    quit_browser = function() {
+      self$session$send_input("Q")
+    }
+ )) 
