@@ -42,6 +42,7 @@ See the documentation
 \item \href{#method-CommManager-handle_open}{\code{CommManagerClass$handle_open()}}
 \item \href{#method-CommManager-handle_close}{\code{CommManagerClass$handle_close()}}
 \item \href{#method-CommManager-handle_msg}{\code{CommManagerClass$handle_msg()}}
+\item \href{#method-CommManager-has}{\code{CommManagerClass$has()}}
 \item \href{#method-CommManager-send}{\code{CommManagerClass$send()}}
 \item \href{#method-CommManager-send_open}{\code{CommManagerClass$send_open()}}
 \item \href{#method-CommManager-send_close}{\code{CommManagerClass$send_close()}}
@@ -211,6 +212,15 @@ Handle a comm message from the frontend
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CommManager-has"></a>}}
+\if{latex}{\out{\hypertarget{method-CommManager-has}{}}}
+\subsection{Method \code{has()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CommManagerClass$has(id)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-CommManager-send"></a>}}

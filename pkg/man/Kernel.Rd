@@ -40,6 +40,7 @@ An object of this class handles the low-level communication with
 \item \href{#method-Kernel-input_request}{\code{Kernel$input_request()}}
 \item \href{#method-Kernel-read_stdin}{\code{Kernel$read_stdin()}}
 \item \href{#method-Kernel-send_debug_event}{\code{Kernel$send_debug_event()}}
+\item \href{#method-Kernel-handle_r_msg}{\code{Kernel$handle_r_msg()}}
 \item \href{#method-Kernel-clone}{\code{Kernel$clone()}}
 }
 }
@@ -339,6 +340,23 @@ Send a debug event to the frontend
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{content}}{A list, content provided by the debug adapter}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-handle_r_msg"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-handle_r_msg}{}}}
+\subsection{Method \code{handle_r_msg()}}{
+Handle a generic message sent from the R Session
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$handle_r_msg(msg)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{msg}}{The message, a list}
 }
 \if{html}{\out{</div>}}
 }
