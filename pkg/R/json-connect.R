@@ -24,7 +24,6 @@ json_send <- function(msg){
     msg <- to_json(msg)
     # log_out(msg)
     cat_(DLE,JSON_BEGIN,msg,JSON_END,DLE,sep="")
-    error=function(e) log_error(conditionMessage(e))
 }
 msg_send <- json_send
 
