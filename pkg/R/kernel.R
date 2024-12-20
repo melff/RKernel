@@ -84,6 +84,7 @@ Kernel <- R6Class("Kernel",
       self$r_session$run_cmd("RKernel::startup()")
       self$r_session$run_cmd("RKernel::inject_send_options()")
       self$r_session$run_cmd("suppressWarnings(rm(.pbd_env))")
+      msg_env$send <- self$handle_r_msg
     },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
@@ -275,6 +276,27 @@ Kernel <- R6Class("Kernel",
                            socket="iopub",
                            content=content)
     },
+    #' @description
+    #' Handle a generic message sent from the R Session
+    #' @param msg The message, a list 
+    handle_r_msg = function(msg){
+      # log_out("handle_r_msg")
+      # log_out(msg, use.str = TRUE)
+      if(!is.list(msg)) {
+        log_out("Non-list message")
+        return(NULL)
+      }
+      msg_type <- msg$type
+      # log_out(msg_type)
+      msg_handler <- private$r_msg_handlers[[msg_type]]
+      if(is.function(msg_handler)){
+        msg_handler(msg)
+      } else {
+        log_error(sprintf("R session sent message of unknown type '%s'", msg_type))
+        # log_out(msg_handler, use.str = TRUE)
+        self$stderr(sprintf("R session sent message of unknown type '%s'", msg_type))
+      }
+    },
     errored = FALSE
   ),
 
@@ -317,8 +339,9 @@ Kernel <- R6Class("Kernel",
               tryCatch(eval_capture(expr, 
                                     envir = private$sandbox,
                                     enclos = private$sandbox,
-                                    stdout = private$handle_r_stdout,
-                                    stderr = private$handle_r_stderr))
+                                    stdout = self$stdout,
+                                    stderr = self$stderr),
+                      error = function(e) log_error(conditionMessage(e)))
           } else {
               d <- tryCatch(dispatch_magic_handler(magic,code,args),
                             error = function(e) structure("errored", 
@@ -882,7 +905,7 @@ Kernel <- R6Class("Kernel",
             msg <- remove_prefix(chunk, MSG_BEGIN) |> remove_suffix(MSG_END)
             msg <- msg_unwrap(msg)
             # log_out(msg, use.print = FALSE)
-            private$handle_r_msg(msg)
+            self$handle_r_msg(msg)
           } else {
             private$r_msg_incomplete <- TRUE
             private$r_msg_frag <- remove_prefix(chunk, MSG_BEGIN)
@@ -895,7 +918,7 @@ Kernel <- R6Class("Kernel",
           private$r_msg_incomplete <- FALSE
           private$r_msg_frag <- ""
           msg <- msg_unwrap(msg)
-          private$handle_r_msg(msg)
+          self$handle_r_msg(msg)
         }
         else {
           if(private$r_msg_incomplete) {
@@ -918,24 +941,6 @@ Kernel <- R6Class("Kernel",
       if(startsWith(text, "Error"))
         self$errored <- TRUE
       self$stderr(text)
-    },
-    handle_r_msg = function(msg){
-      # log_out("handle_r_msg")
-      # log_out(msg, use.str = TRUE)
-      if(!is.list(msg)) {
-        log_out("Non-list message")
-        return(NULL)
-      }
-      msg_type <- msg$type
-      # log_out(msg_type)
-      msg_handler <- private$r_msg_handlers[[msg_type]]
-      if(is.function(msg_handler)){
-        msg_handler(msg)
-      } else {
-        log_error(sprintf("R session sent message of unknown type '%s'", msg_type))
-        # log_out(msg_handler, use.str = TRUE)
-        self$stderr(sprintf("R session sent message of unknown type '%s'", msg_type))
-      }
     },
     r_msg_handlers = list(),
     install_r_handlers = function(){

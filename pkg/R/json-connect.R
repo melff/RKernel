@@ -25,7 +25,6 @@ json_send <- function(msg){
     # log_out(msg)
     cat_(DLE,JSON_BEGIN,msg,JSON_END,DLE,sep="")
 }
-msg_send <- json_send
 
 json_unwrap <- function(x) {
     fromJSON(x,

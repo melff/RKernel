@@ -186,3 +186,7 @@ request_handlers$cell_magic <- function(msg, ...) {
     req$argsq
   )
 }
+
+msg_env <- new.env()
+msg_env$send <- json_send
+msg_send <- function(msg) msg_env$send(msg)
