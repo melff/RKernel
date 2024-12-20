@@ -135,10 +135,12 @@ dbgWidget <- function(name="dbgWidget",envir=parent.frame(),depth=NA){
 }
 
 dbgConsole <- function(session, envname = ".GlobalEnv",
-                       use_area=FALSE, clear=FALSE){
+                       use_area=FALSE){
 
     output <- OutputWidget(append_output=TRUE,
                            use_display=TRUE)
+    e <- new.env()
+    e$code <- ""
     if(use_area){
         input <- Textarea(rows=5)
         input$add_class("monospace")
@@ -167,14 +169,29 @@ dbgConsole <- function(session, envname = ".GlobalEnv",
         input$add_class("monospace")
         input$add_class("width-auto")
         run_on_value <- function(tn,tlt,value){
-            if(clear) output$clear()
-            else {
-              output$stdout(add_prompts(input$value))
+            log_out("run_on_value")
+            line <- value
+            if(length(line) && nzchar(line)) {
+                if(nzchar(e$code)) {
+                    e$code <- paste(e$code,line,sep="\n")
+                }
+                else {
+                    e$code <- line
+                }
             }
-            code <- input$value
-            res <- try(session$run_cmd(code))
-            if(length(res$stdout)) output$stdout(res$stdout)
-            if(length(res$stderr)) output$stderr(res$stderr)
+            status <- code_status(e$code)
+            if(status == "complete" && nzchar(e$code)) {
+                # output$stdout(add_prompts(e$code))
+                log_out(e$code)
+                res <- try(session$run_cmd(e$code))
+                e$code <- ""
+                if(length(res$stdout)) output$stdout(paste0(res$stdout,"\n"))
+                if(length(res$stderr)) output$stderr(paste0(res$stderr,"\n"))
+            }
+            else if(status == "invalid") {
+                e$code <- ""
+            }
+            input$clear()
             invisible()
         }
         input$observe("value",run_on_value)
