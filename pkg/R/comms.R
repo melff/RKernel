@@ -101,6 +101,9 @@ CommManagerClass <- R6Class("CommManager",
             if("msg" %in% names(handlers))
                 handlers$msg(comm,data)
         },
+        has = function(id) {
+            id %in% names(self$comms)
+        },
         #' @description
         #' Send data to the frontend
         #' @param id A string, the comm id
