@@ -134,11 +134,10 @@ dbgWidget <- function(name="dbgWidget",envir=parent.frame(),depth=NA){
     vb
 }
 
-dbgConsole <- function(envir,callback=NULL,
+dbgConsole <- function(session, envname = ".GlobalEnv",
                        use_area=FALSE, clear=FALSE){
 
     output <- OutputWidget(append_output=TRUE,
-                           envir=envir,
                            use_display=TRUE)
     if(use_area){
         input <- Textarea(rows=5)
@@ -152,10 +151,10 @@ dbgConsole <- function(envir,callback=NULL,
             }
             expr <- parse(text=input$value)
             output$clear()
-            eval_capture(expr=expr,envir=envir,enclos=envir,
-                         stdout=output$stdout,stderr=output$stderr)
-            if(is.function(callback))
-                callback()
+            code <- input$value
+            res <- session$run_cmd(code)
+            if(length(res$stdout)) output$stdout(res$stdout)
+            if(length(res$stderr)) output$stdout(res$stderr)
             invisible()
         }
         run_btn$on_click(run_on_click)
@@ -172,11 +171,10 @@ dbgConsole <- function(envir,callback=NULL,
             else {
               output$stdout(add_prompts(input$value))
             }
-            expr <- parse(text=input$value)
-            eval_capture(expr=expr,envir=envir,enclos=envir,
-                         stdout=output$stdout,stderr=output$stderr)
-            if(is.function(callback))
-                callback()
+            code <- input$value
+            res <- try(session$run_cmd(code))
+            if(length(res$stdout)) output$stdout(res$stdout)
+            if(length(res$stderr)) output$stderr(res$stderr)
             invisible()
         }
         input$observe("value",run_on_value)
@@ -208,7 +206,7 @@ eval_capture <- function(expr,envir,enclos,stdout,stderr) {
       serr <- paste(c(serr,""), collapse="\n")
       stderr(serr)
     }
-    log_out(sout,use.print=TRUE)
+    # log_out(sout,use.print=TRUE)
 }
 
 add_prompts <- function(txt) {
