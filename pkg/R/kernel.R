@@ -508,11 +508,19 @@ Kernel <- R6Class("Kernel",
     },
 
     handle_comm_msg = function(msg){
-      # return(NULL)
-      private$r_send_request_noreply(list(
-        type = "comm_msg",
-        content = msg$content
-      ))
+      cm <- get_comm_manager()
+      id <- msg$content$comm_id
+      if(cm$has(id)) {
+        data <- msg$content$data
+        data$buffers <- msg$buffers
+        cm$handle_msg(id, data)
+      }
+      else {
+        private$r_send_request_noreply(list(
+          type = "comm_msg",
+          content = msg$content
+        ))
+      }
     },
 
     handle_comm_close = function(msg){
