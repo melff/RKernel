@@ -547,19 +547,3 @@ display_data.tableHTML <- function(x,...,
             id=id,
             update=update)
 }
-
-
-
-#' Create an alert in the frontend
-#'
-#' @description Creates Javascript code and sends it to the frontend that opens
-#'     an alert box in the browser.
-#' @param text A character string with the text that appears in the 
-#' @export
-alert <- function(text){
-    alert.js <- sprintf("alert('%s')",text)
-    d <- Javascript(alert.js)
-    kernel <- get_current_kernel()
-    kernel$display_data(data=d$data,
-                        metadata=d$metadata)
-}
