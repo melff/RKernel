@@ -6,15 +6,6 @@
 RKernelSession <- R6Class("RKernelSession",
   inherit = r_session,
   public = list(
-    poll_conns = list(),
-    prompt = "> ",
-    prompt_regex = "> $",
-    co_prompt = "+ ",
-    co_prompt_regex = "[+] $",
-    menu_prompt = ": ",
-    browse_prompt = "Browse\\[([0-9]+)\\]> $",
-    readline_prompt = "",
-    prompt_found = FALSE,
     banner = "",
     initialize = function(options = r_session_options(
                             stdout = "|",
@@ -25,63 +16,254 @@ RKernelSession <- R6Class("RKernelSession",
                               "--no-save",
                               "--no-restore"
                             ),
-                            env = c(R_CLI_NUM_COLORS="16777216")),
-                            callbacks = list(
-                              stdout = cat,
-                              stderr = function(x){
-                                cat(crayon::red(x))
-                              },
-                              msg = print,
-                              readline = readline,
-                              menu = menu_callback,
-                              browser = browser_callback
-                            )
+                            env = c(R_CLI_NUM_COLORS="16777216"))
                           ) {
       super$initialize(
         options = options,
         wait = FALSE
       )
-      self$poll_conns <- list(
-        stdout = self$get_output_connection(),
-        stderr = self$get_error_connection(),
-        ctrl = self$get_poll_connection()
-      )
-      self$callbacks <- callbacks
       resp <- self$receive_all_output(timeout = 1000)
       banner <- resp$stdout
       self$banner <- unlist(strsplit(banner, self$prompt))[1]
-      self$readline_prompt <- READLINE_prompt
     },
-    run_code = function(code){
-      lines <- split_lines1(code)
-      n_lines <- length(lines)
-      for (i in 1:n_lines) {
-        self$prompt_found <- FALSE
-        line <- lines[i]
-        self$send_input(line)
-        tryCatch(self$process_output(),
-          interrupt = function(e) {
-            self$interrupt()
-            self$receive_to_prompt()
-          }
-        )
+    send_input = function(text) {
+      if (!endsWith(text, "\n")) text <- paste0(text, "\n")
+      while (TRUE) {
+        text <- self$write_input(text)
+        if (!length(text)) {
+          break
+        } 
       }
     },
-    run_cmd = function(cmd, timeout = 1, drop_echo = TRUE){
-      # log_out("Send cmd",cmd)
-      self$send_input(cmd)
-      self$prompt_found <- FALSE
-      interrupted <- FALSE
-      resp <- tryCatch(self$receive_to_prompt(timeout = timeout),
-        interrupt = function(e) {
-          self$interrupt()
-          self$receive_to_prompt()
+    receive_output = function(timeout = 1){
+      poll_res <- self$poll_io(timeout)
+      res <- list()
+      if (poll_res[1] == "ready") {
+        res$stdout <- self$read_output()
+      }
+      if (poll_res[2] == "ready") {
+        res$stderr <- self$read_error()
+      }
+      if (poll_res[3] == "ready") {
+        msg <- self$read()
+        res$msg <- msg
+        res$stdout <- paste0(res$stdout, msg$stdout)
+        res$stderr <- paste0(res$stderr, msg$stderr)
+      }
+      return(res)
+    },
+    receive_all_output = function(timeout = 1){
+      # log_out("receive_all_output")
+      poll_res <- self$poll_io(timeout)
+      resp <- list()
+      while (any(poll_res == "ready")) {
+        if (poll_res[1] == "ready") {
+          sout <- self$read_output()
+          resp$stdout <- paste0(resp$stdout, sout)
         }
-      )
-      if (drop_echo && !interrupted) {
-        resp$stdout <- drop_echo(resp$stdout)
+        if (poll_res[2] == "ready") {
+          serr <- self$read_error()
+          resp$stderr <- paste0(resp$stderr, serr)
+        }
+        if (poll_res[3] == "ready") {
+          msg <- self$read()
+          resp$msg <- msg
+          resp$stdout <- paste0(resp$stdout, msg$stdout)
+          resp$stderr <- paste0(resp$stderr, msg$stderr)
+        }
+        poll_res <- self$poll_io(timeout)
       }
       return(resp)
+    }
+  )
+)
+
+split_lines1 <- function(x) {
+  unlist(strsplit(x, "\n", fixed = TRUE))
+}
+
+drop_echo <- function(txt, n = 1) {
+  if(length(txt) && nzchar(txt)){
+      out_lines <- split_lines1(txt)
+      ii <- 1:n
+      out_lines <- out_lines[-ii]
+      txt <- paste(out_lines, collapse = "\n")
+      # log_out(resp, use.print = TRUE)
+  }
+  txt
+}
+
+SessionAdapter <- R6Class("SessionAdapter",
+ public = list(
+    session = NULL,
+    prompt = NULL,
+    browse_prompt = "Browse\\[([0-9]+)\\]> $",
+    readline_prompt = READLINE_prompt,
+    co_prompt = NULL,
+    run_timeout = 0,
+    io_timeout = 0,
+    stdout = character(0),
+    stderr = character(0),
+    stdout_callback = NULL,
+    stderr_callback = NULL,
+    readline_callback = NULL,
+    browser_callback = NULL,
+    aggreg_stdout = function(txt, ...) {
+      self$stdout <- paste0(self$stdout,txt)
+    },
+    aggreg_stderr = function(txt, ...) {
+      self$stderr <- paste0(self$stderr,txt)
+    },
+    collect = function(clear = TRUE) {
+      res <- list(stdout = self$stdout,
+                  stderr = self$stderr)
+      if(clear) {
+        self$stdout <- character(0)
+        self$stderr <- character(0)
+      }
+      return(res)
+    },
+    initialize = function(
+      session,
+      stdout_callback = self$aggreg_stdout,
+      stderr_callback = self$aggreg_stderr,
+      readline_callback = NULL,
+      browser_callback = NULL,
+      prompt = "> ",
+      co_prompt = "+ "
+    ) {
+      self$session <- session
+      self$prompt <- prompt
+      self$co_prompt <- co_prompt
+      self$stdout_callback <- stdout_callback
+      self$stderr_callback <- stderr_callback
+      self$readline_callback <- readline_callback
+      self$browser_callback <- browser_callback
+    },
+    run_code = function(
+        code,
+        io_timeout = 1,
+        run_timeout = 10,
+        wait_callback = NULL,
+        stdout_callback = self$stdout_callback,
+        stderr_callback = self$stderr_callback,
+        readline_callback = self$readline_callback,
+        browser_callback = self$browser_callback
+      ) {
+        lines <- split_lines1(code)
+        n_lines <- length(lines)
+        for (i in 1:n_lines) {
+          line <- lines[i]
+          self$session$send_input(line)
+          tryCatch(self$process_output(
+                          io_timeout = io_timeout,
+                          run_timeout = run_timeout,
+                          stdout_callback = stdout_callback,
+                          stderr_callback = stderr_callback,
+                          wait_callback = wait_callback,
+                          browser_callback = browser_callback,
+                          readline_callback = readline_callback,
+                          until_prompt = FALSE),
+            interrupt = function(e) {
+              self$session$interrupt()
+              self$process_output()
+            }
+          )
+        }
+    },
+    found_prompt = FALSE,
+    process_output = function(
+        io_timeout = 1,
+        run_timeout = 100,
+        wait_callback = NULL,
+        stdout_callback = self$stdout_callback,
+        stderr_callback = self$stderr_callback,
+        readline_callback = self$readline_callback,
+        browser_callback = self$browser_callback,
+        until_prompt = TRUE
+      ) {
+        session <- self$session
+        output_complete <- FALSE
+        loop_count <- 0
+        self$found_prompt <- FALSE
+        while(!output_complete){
+          loop_count <- loop_count + 1
+          resp <- session$receive_output(timeout = io_timeout)
+          if(!length(resp) && run_timeout > 0) {
+            while(session$get_status() == "running") {
+                Sys.sleep(run_timeout/1000)
+                if(is.function(wait_callback))
+                    wait_callback()
+            } 
+          }
+          if (!is.null(resp$stderr) 
+              && nzchar(resp$stderr)
+              && is.function(stderr_callback)) {
+            stderr_callback(resp$stderr)
+          }
+          if (!is.null(resp$stdout)) {
+            if (loop_count == 1) {
+              resp$stdout <- drop_echo(resp$stdout)
+            }
+            if (grepl(self$browse_prompt, resp$stdout)) {
+              # log_out("Found browser prompt")
+              if(session$get_status() == "sleeping") {
+                if (is.function(browser_callback)) {
+                  inp <- browser_callback(resp$stdout)
+                  session$send_input(inp)
+                } else session$send_input("Q")
+              }
+            } else if (endsWith(resp$stdout, self$co_prompt)) {
+              log_out("Found continuation prompt")
+              resp$stdout <- NULL
+              output_complete <- !until_prompt
+            } else if (endsWith(resp$stdout, self$prompt)) {
+              log_out("Found main prompt")
+              # log_out(self$status)
+              self$found_prompt <- TRUE
+              resp$stdout <- remove_suffix(resp$stdout, self$prompt)
+              if (is.function(stdout_callback) 
+                  && nzchar(resp$stdout)) {
+                stdout_callback(resp$stdout)
+              }
+              output_complete <- TRUE
+            } else if (endsWith(resp$stdout, self$readline_prompt)) {
+              log_out("Found readline prompt")
+              # log_out(self$status)
+              if(session$get_status() == "sleeping") {
+                resp$stdout <- remove_suffix(resp$stdout, self$readline_prompt)
+                if (is.function(readline_callback)) {
+                  # log_out("Calling readline callback")
+                  inp <- readline_callback(prompt = resp$stdout)
+                  session$send_input(inp)
+                }
+                else session$send_input("")
+              }
+            } else {
+              log_out("stdout callback")
+              if (is.function(stdout_callback) 
+                  && nzchar(resp$stdout)) {
+                stdout_callback(resp$stdout)
+              }
+            }
+          }
+        }
+    },
+    run_cmd = function(cmd) {
+      # Runs a one-line command without checking(!) and returns the 
+      # output
+      self$run_code(cmd,
+                    io_timeout = io_timeout,
+                    run_timeout = run_timeout,
+                    stdout_callback = self$aggreg_stdout,
+                    stderr_callback = self$aggreg_stderr,
+                    wait_callback = NULL,
+                    readline_callback = NULL,
+                    browser_callback = NULL,
+                    until_prompt = TRUE
+                    )
+      res <- self$collect()
+      return(res)
     },
     getOption = function(n, default = NULL) {
       cmd <- sprintf("dput(getOption(\"%s\",NULL))",n)
@@ -128,335 +310,5 @@ RKernelSession <- R6Class("RKernelSession",
       opt <- list(self$getOption(n))
       names(opt) <- n
       do.call("options", opt)
-    },
-    send_input = function(text) {
-      if (!endsWith(text, "\n")) text <- paste0(text, "\n")
-      while (TRUE) {
-        text <- self$write_input(text)
-        if (!length(text)) {
-          break
-        } 
-      }
-    },
-    last_stdout = "",
-    last_stderr = "",
-    last_msg = list(),
-    callbacks = list(),
-    status = "",
-    receive_output = function(timeout = 1){
-      poll_res <- self$poll_io(timeout)
-      self$status <- self$get_status()
-      res <- list()
-      if (poll_res[1] == "ready") {
-        res$stdout <- self$read_output()
-      }
-      if (poll_res[2] == "ready") {
-        res$stderr <- self$read_error()
-      }
-      if (poll_res[3] == "ready") {
-        msg <- self$read()
-        res$msg <- msg
-        res$stdout <- paste0(res$stdout, msg$stdout)
-        res$stderr <- paste0(res$stderr, msg$stderr)
-      }
-      return(res)
-    },
-    receive_all_output = function(timeout = 1){
-      # log_out("receive_all_output")
-      poll_res <- self$poll_io(timeout)
-      self$status <- self$get_status()
-      resp <- list()
-      while (any(poll_res == "ready")) {
-        if (poll_res[1] == "ready") {
-          sout <- self$read_output()
-          resp$stdout <- paste0(resp$stdout, sout)
-        }
-        if (poll_res[2] == "ready") {
-          serr <- self$read_error()
-          resp$stderr <- paste0(resp$stderr, serr)
-        }
-        if (poll_res[3] == "ready") {
-          msg <- self$read()
-          resp$msg <- msg
-          resp$stdout <- paste0(resp$stdout, msg$stdout)
-          resp$stderr <- paste0(resp$stderr, msg$stderr)
-        }
-        poll_res <- self$poll_io(timeout)
-      }
-      return(resp)
-    },
-    receive_to_prompt = function(timeout = 1){
-      # log_out("receive_to_prompt")
-      resp <- list()
-      self$prompt_found <- FALSE
-      while (!self$prompt_found) {
-        poll_res <- self$poll_io(timeout)
-        if (poll_res[1] == "ready") {
-          sout <- self$read_output()
-          if (endsWith(sout, self$prompt)) {
-            self$prompt_found <- TRUE
-            sout <- self$drop_prompt(sout)
-          }
-          resp$stdout <- paste0(resp$stdout, sout)
-        }
-        if (poll_res[2] == "ready") {
-          serr <- self$read_error()
-          resp$stderr <- paste0(resp$stderr, serr)
-        }
-        if (poll_res[3] == "ready") {
-          msg <- self$read()
-          resp$msg <- msg
-          resp$stdout <- paste0(resp$stdout, msg$stdout)
-          resp$stderr <- paste0(resp$stderr, msg$stderr)
-        }
-      }
-      return(resp)
-    },
-    process_output = function(drop_echo=TRUE){
-        next_line <- FALSE
-        cnt <- 0
-        force_drop_echo <- FALSE
-        while(!next_line){
-          cnt <- cnt + 1
-          resp <- self$receive_output(timeout = 1)
-          # log_out(sprintf("process_output %d",cnt))
-          # log_out(resp, use.print = TRUE)
-          if (!is.null(resp$msg) && is.function(self$callbacks$msg)) {
-            self$callbacks$msg(resp$msp)
-          }
-          if (!is.null(resp$stderr) 
-              && nzchar(resp$stderr)
-              && is.function(self$callbacks$stderr)) {
-            self$callbacks$stderr(resp$stderr)
-          }
-          if (!is.null(resp$stdout)) {
-            if (drop_echo && cnt == 1 || force_drop_echo) {
-              resp$stdout <- drop_echo(resp$stdout)
-              force_drop_echo <- FALSE
-            }
-            if (grepl(self$browse_prompt, resp$stdout)) {
-              # log_out("Found browser prompt")
-              if(self$status == "sleeping") {
-                if (is.function(self$callbacks$browser)) {
-                  inp <- self$callbacks$browser(resp$stdout)
-                  force_drop_echo <- TRUE
-                  self$send_input(inp)
-                } else self$send_input("Q")
-              }
-            } else if (endsWith(resp$stdout, self$co_prompt)) {
-              # log_out("Found continuation prompt")
-              resp$stdout <- NULL
-              next_line <- TRUE
-            } else if (endsWith(resp$stdout, self$prompt)) {
-              # log_out("Found main prompt")
-              # log_out(self$status)
-              self$prompt_found <- TRUE
-              resp$stdout <- remove_suffix(resp$stdout, self$prompt)
-              if (is.function(self$callbacks$stdout) 
-                  && nzchar(resp$stdout)) {
-                self$callbacks$stdout(resp$stdout)
-              }
-              next_line <- TRUE
-            } else if (endsWith(resp$stdout, self$menu_prompt)) {
-              # log_out("Found menu prompt")
-              # log_out(sprintf("Status: %s",self$status))
-              # log_out(self$callbacks, use.str = TRUE)
-              if(self$status == "sleeping") {
-                resp$stdout <- remove_suffix(resp$stdout, self$menu_prompt)
-                if (is.function(self$callbacks$menu)) {
-                  # log_out("Calling menu callback")
-                  inp <- self$callbacks$menu(resp$stdout)
-                  force_drop_echo <- TRUE
-                  self$send_input(inp)
-                } else {
-                  # log_out("No menu callback available")
-                  self$interrupt()
-                } 
-              }
-            } else if (endsWith(resp$stdout, self$readline_prompt)) {
-              # log_out("Found readline prompt")
-              # log_out(self$status)
-              if(self$status == "sleeping") {
-                resp$stdout <- remove_suffix(resp$stdout, self$readline_prompt)
-                if (is.function(self$callbacks$readline)) {
-                  # log_out("Calling readline callback")
-                  inp <- self$callbacks$readline(prompt = resp$stdout)
-                  force_drop_echo <- TRUE
-                  # log_out("Sending", inp)
-                  self$send_input(inp)
-                }
-                else self$send_input("")
-              }
-            } else {
-              # log_out("stdout callback")
-              if (is.function(self$callbacks$stdout) 
-                  && nzchar(resp$stdout)) {
-                self$callbacks$stdout(resp$stdout)
-              }
-            }
-          }
-        }
-
-    },
-    receive_and_process_output = function(timeout = 1){
-        # log_out("receive_and_process_output")
-        resp <- self$receive_all_output(timeout)
-        # log_out(resp, use.str = TRUE)
-        self$process_output(resp, drop_echo = FALSE)
-    },
-    drop_prompt = function(txt){
-      if (length(txt) && nzchar(txt)) {
-        if (endsWith(txt, self$prompt)) {
-          txt <- gsub(self$prompt_regex, "", txt)
-        }
-      }
-      txt
-    },
-    drop_co_prompt = function(txt) {
-      if (length(txt) && nzchar(txt)) {
-        if (endsWith(txt, self$co_prompt)) {
-          txt <- gsub(self$co_prompt_regex, "", txt)
-        }
-      }
-      txt
-    }
-  )
-)
-
-split_lines1 <- function(x) {
-  unlist(strsplit(x, "\n", fixed = TRUE))
-}
-
-drop_echo <- function(txt, n = 1) {
-  if(length(txt) && nzchar(txt)){
-      out_lines <- split_lines1(txt)
-      ii <- 1:n
-      out_lines <- out_lines[-ii]
-      txt <- paste(out_lines, collapse = "\n")
-      # log_out(resp, use.print = TRUE)
-  }
-  txt
-}
-
-menu_callback <- function(prompt) {
-  readline(prompt = prompt)
-}
-
-browser_callback <- function(prompt) {
-  readline(prompt = prompt)
-}
-
-RREPLAdapter <- R6Class("RREPLAdapter",
- public = list(
-    session = NULL,
-    wait_callback = NULL,
-    stdout_callback = NULL,
-    stderr_callback = NULL,
-    menu_callback = NULL,
-    browse_callback = NULL,
-    readline_callback = NULL,
-    prompt = NULL,
-    menu_prompt = ": ",
-    browse_prompt = "Browse\\[([0-9]+)\\]> $",
-    readline_prompt = READLINE_prompt,
-    co_prompt = NULL,
-    run_timeout = 0,
-    io_timeout = 0,
-    stdout = character(0),
-    stderr = character(0),
-    aggreg_stdout = function(txt, ...) {
-      self$stdout <- paste0(self$stdout,txt)
-    },
-    aggreg_stderr = function(txt, ...) {
-      self$stderr <- paste0(self$stderr,txt)
-    },
-    collect = function(clear = TRUE) {
-      res <- list(stdout = self$stdout,
-                  stderr = self$stderr)
-      if(clear) {
-        self$stdout <- character(0)
-        self$stderr <- character(0)
-      }
-      return(res)
-    },
-    initialize = function(
-      session,
-      wait_callback = function() invisible(),
-      stdout_callback = self$aggreg_stdout,
-      stderr_callback = self$aggreg_stderr,
-      menu_callback = NULL,
-      browse_callback = self$quit_browser,
-      readline_callback = NULL,
-      prompt = "> ",
-      co_prompt = "\n+ ",
-      run_timeout = 10,
-      io_timeout = 10
-    ) {
-      self$session <- session
-      self$wait_callback <- wait_callback
-      self$stdout_callback <- stdout_callback
-      self$stderr_callback <- stderr_callback
-      self$prompt <- prompt
-      self$co_prompt <- co_prompt
-      self$run_timeout <- run_timeout
-      self$io_timeout <- io_timeout
-      self$menu_callback <- menu_callback
-      self$browse_callback <- browse_callback
-      self$readline_callback <- readline_callback
-    },
-    exec = function(code) {
-      status <- code_status(code)
-      if(status !=  "complete") return(status)
-      lines <- split_lines1(code)
-      lines <- lines[nzchar(lines)]
-      current_chunk <- ""
-      n <- length(lines)
-      lines <- paste0(lines,"\n")
-      m <- 0
-      for(i in 1:n) {
-        line <- lines[i]
-        current_chunk <- paste0(current_chunk,line)
-        m <- m + 1
-        status <- code_status(current_chunk)
-        if(status == "complete") {
-          self$exec_chunk(current_chunk,m)
-          m <- 0
-          current_chunk <- character(0)
-        } 
-      }
-    },
-    found_prompt = FALSE,
-    exec_chunk = function(code,m) {
-      if(!length(code) || !nzchar(code)) return()
-      session <- self$session
-      session$send_input(code)
-      i <- 1
-      self$found_prompt <- FALSE
-      while(!self$found_prompt) {
-        resp <- session$receive_output(timeout = 1)
-        serr <- resp$stderr
-        sout <- resp$stdout
-        if(length(serr) && nzchar(serr)) {
-          self$stderr_callback(serr, session)
-        }
-        if(length(sout) && nzchar(sout)) {
-          if(i == 1) {
-            sout <- drop_echo(sout, m)
-          }
-          i <- i + 1
-          if(nzchar(sout)) {
-            if(endsWith(sout, self$prompt)) {
-              sout <- remove_suffix(sout, self$prompt)
-              self$found_prompt <- TRUE
-            }
-            if(nzchar(sout)) {
-              self$stdout_callback(sout, session)
-            }
-          }
-        }
-      }
-    },
-    quit_browser = function() {
-      self$session$send_input("Q")
     }
  )) 
