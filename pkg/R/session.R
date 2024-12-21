@@ -150,7 +150,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         stderr_callback = self$stderr_callback,
         readline_callback = self$readline_callback,
         browser_callback = self$browser_callback,
-        until_prompt = FALSE
+        until_prompt = FALSE,
+        echo = FALSE
       ) {
         lines <- split_lines1(code)
         n_lines <- length(lines)
@@ -165,7 +166,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                           wait_callback = wait_callback,
                           browser_callback = browser_callback,
                           readline_callback = readline_callback,
-                          until_prompt = until_prompt),
+                          until_prompt = until_prompt,
+                          echo = echo),
             interrupt = function(e) {
               self$session$interrupt()
               self$process_output()
@@ -182,7 +184,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         stderr_callback = self$stderr_callback,
         readline_callback = self$readline_callback,
         browser_callback = self$browser_callback,
-        until_prompt = TRUE
+        until_prompt = TRUE,
+        echo = FALSE
       ) {
         session <- self$session
         output_complete <- FALSE
@@ -204,7 +207,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             stderr_callback(resp$stderr)
           }
           if (!is.null(resp$stdout)) {
-            if (loop_count == 1) {
+            if (loop_count == 1 && !echo) {
               resp$stdout <- drop_echo(resp$stdout)
             }
             if (grepl(self$browse_prompt, resp$stdout)) {
