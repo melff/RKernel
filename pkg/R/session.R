@@ -201,56 +201,67 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                     wait_callback()
             } 
           }
-          if (!is.null(resp$stderr) 
-              && nzchar(resp$stderr)
-              && is.function(stderr_callback)) {
-            stderr_callback(resp$stderr)
-          }
           if (!is.null(resp$stdout)) {
             if (loop_count == 1 && !echo) {
               resp$stdout <- drop_echo(resp$stdout)
             }
             if (grepl(self$browse_prompt, resp$stdout)) {
               # log_out("Found browser prompt")
-              if(session$get_status() == "sleeping") {
-                if (is.function(browser_callback)) {
-                  inp <- browser_callback(resp$stdout)
-                  session$send_input(inp)
-                } else session$send_input("Q")
-              }
+              if (is.function(browser_callback)) {
+                inp <- browser_callback(resp$stdout)
+                session$send_input(inp)
+              } else session$send_input("Q")
             } else if (endsWith(resp$stdout, self$co_prompt)) {
-              log_out("Found continuation prompt")
-              resp$stdout <- NULL
+              # log_out("Found continuation prompt")
+              if(echo) {
+                resp$stdout <- remove_suffix(resp$stdout, self$co_prompt)
+                if (is.function(stdout_callback) 
+                  && nzchar(resp$stdout)) {
+                    stdout_callback(resp$stdout)
+                }
+              }
+              else {
+                resp$stdout <- NULL
+              }
               output_complete <- !until_prompt
             } else if (endsWith(resp$stdout, self$prompt)) {
-              log_out("Found main prompt")
+              # log_out("Found main prompt")
               # log_out(self$status)
               self$found_prompt <- TRUE
               resp$stdout <- remove_suffix(resp$stdout, self$prompt)
               if (is.function(stdout_callback) 
                   && nzchar(resp$stdout)) {
                 stdout_callback(resp$stdout)
+              } else if(!is.function(stdout_callback)){
+                log_warning("stdout_callback is not a function")
+                log_out(stdout_callback, use.print = TRUE)
               }
               output_complete <- TRUE
             } else if (endsWith(resp$stdout, self$readline_prompt)) {
-              log_out("Found readline prompt")
+              # log_out("Found readline prompt")
               # log_out(self$status)
-              if(session$get_status() == "sleeping") {
-                resp$stdout <- remove_suffix(resp$stdout, self$readline_prompt)
-                if (is.function(readline_callback)) {
-                  # log_out("Calling readline callback")
-                  inp <- readline_callback(prompt = resp$stdout)
-                  session$send_input(inp)
-                }
-                else session$send_input("")
+              resp$stdout <- remove_suffix(resp$stdout, self$readline_prompt)
+              if (is.function(readline_callback)) {
+                # log_out("Calling readline callback")
+                inp <- readline_callback(prompt = resp$stdout)
+                session$send_input(inp)
               }
+              else session$send_input("")
             } else {
-              log_out("stdout callback")
+              # log_out("stdout callback")
               if (is.function(stdout_callback) 
                   && nzchar(resp$stdout)) {
                 stdout_callback(resp$stdout)
+              } else if(!is.function(stdout_callback)) {
+                log_warning("stdout_callback is not a function")
+                log_out(stdout_callback, use.print = TRUE)
               }
             }
+          }
+          if (!is.null(resp$stderr) 
+              && nzchar(resp$stderr)
+              && is.function(stderr_callback)) {
+            stderr_callback(resp$stderr)
           }
         }
     },
