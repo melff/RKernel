@@ -13,6 +13,8 @@ An object of this class handles the low-level communication with
 \describe{
 \item{\code{r_session}}{See \code{\link{RKernelSession}}.}
 
+\item{\code{r_repl}}{An RSessionAdapter for handling input and output}
+
 \item{\code{DAPServer}}{The current DAP server}
 }
 \if{html}{\out{</div>}}
@@ -29,7 +31,6 @@ An object of this class handles the low-level communication with
 \item \href{#method-Kernel-stream}{\code{Kernel$stream()}}
 \item \href{#method-Kernel-stdout}{\code{Kernel$stdout()}}
 \item \href{#method-Kernel-stderr}{\code{Kernel$stderr()}}
-\item \href{#method-Kernel-r_session_msg}{\code{Kernel$r_session_msg()}}
 \item \href{#method-Kernel-execute_result}{\code{Kernel$execute_result()}}
 \item \href{#method-Kernel-display_send}{\code{Kernel$display_send()}}
 \item \href{#method-Kernel-send_error}{\code{Kernel$send_error()}}
@@ -165,23 +166,6 @@ Stream text to the frontend via 'stderr' stream.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{text}}{Text to be sent to the frontend}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Kernel-r_session_msg"></a>}}
-\if{latex}{\out{\hypertarget{method-Kernel-r_session_msg}{}}}
-\subsection{Method \code{r_session_msg()}}{
-Stream message created from R session process to the frontend via 'stderr' stream.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Kernel$r_session_msg(msg)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{msg}}{The message created by the 'RKernelSession' object.}
 }
 \if{html}{\out{</div>}}
 }

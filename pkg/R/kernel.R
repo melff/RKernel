@@ -56,16 +56,17 @@ Kernel <- R6Class("Kernel",
       assign("kernel",self,envir=private$sandbox)
     },
     start_r_session = function(){
-      self$r_session <- RKernelSession$new(callbacks = list(
-        stdout = private$handle_r_stdout,
-        stderr = private$handle_r_stderr,
-        msg = self$r_session_msg,
-        readline = private$r_get_input,
-        browser = private$r_get_input,
-        menu = private$r_get_input
-      ))
+      self$r_session <- RKernelSession$new()
       # log_out(self$r_session, use.print = TRUE)
       assign("session",self$r_session,envir=private$sandbox)
+      self$r_repl <- RSessionAdapter$new(
+        session = self$r_session,
+        stdout_callback = private$handle_r_stdout,
+        stderr_callback = private$handle_r_stderr,
+        readline_callback = private$r_get_input,
+        browser_callback = private$r_get_input
+      )
+      assign("repl",self$r_repl,envir=private$sandbox)
     },
     start = function(){
       self$start_r_session()
@@ -81,13 +82,15 @@ Kernel <- R6Class("Kernel",
         r_send_cmd = private$r_send_cmd,
         r_send_input = self$r_session$send_input
       )
-      self$r_session$run_cmd("RKernel::startup()")
-      self$r_session$run_cmd("RKernel::inject_send_options()")
-      self$r_session$run_cmd("suppressWarnings(rm(.pbd_env))")
+      self$r_repl$run_cmd("RKernel::startup()")
+      self$r_repl$run_cmd("RKernel::inject_send_options()")
+      self$r_repl$run_cmd("suppressWarnings(rm(.pbd_env))")
       msg_env$send <- self$handle_r_msg
     },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
+    #' @field r_repl An RSessionAdapter for handling input and output
+    r_repl = list(),
     #' @field DAPServer The current DAP server
     DAPServer = NULL,
     #' @description
@@ -153,13 +156,6 @@ Kernel <- R6Class("Kernel",
     #' Stream text to the frontend via 'stderr' stream.
     #' @param text Text to be sent to the frontend
     stderr = function(text) {
-      self$stream(text,stream="stderr")
-    },
-    #' @description
-    #' Stream message created from R session process to the frontend via 'stderr' stream.
-    #' @param msg The message created by the 'RKernelSession' object.
-    r_session_msg = function(msg) {
-      text <- capture.output(print(msg))
       self$stream(text,stream="stderr")
     },
     #' @description
@@ -363,7 +359,7 @@ Kernel <- R6Class("Kernel",
       else {
           private$r_run_cell_begin_hooks()
           private$graphics_client$new_cell <- TRUE
-          r <- tryCatch(self$r_session$run_code(msg$content$code),
+          r <- tryCatch(self$r_repl$run_code(msg$content$code),
             error = function(e) structure("errored", message = conditionMessage(e)), # ,traceback=.traceback()),
             interrupt = function(e) "interrupted"
           )
@@ -851,22 +847,22 @@ Kernel <- R6Class("Kernel",
 
     r_install_hooks = function(){
       # log_out("Installing hooks ...")
-      self$r_session$run_cmd("RKernel::install_output_hooks()")
-      self$r_session$run_cmd("RKernel::install_cell_hooks()")
-      self$r_session$run_cmd("RKernel::install_save_q()")
-      self$r_session$run_cmd("RKernel::install_readline()")
-      # self$r_session$run_cmd("RKernel::install_menu()")
-      self$r_session$run_cmd("RKernel::set_help_displayed")
-      self$r_session$run_cmd("RKernel::install_httpd_handlers()")
-      # self$r_session$run_cmd("options(error = function()print(traceback()))")
+      self$r_repl$run_cmd("RKernel::install_output_hooks()")
+      self$r_repl$run_cmd("RKernel::install_cell_hooks()")
+      self$r_repl$run_cmd("RKernel::install_save_q()")
+      self$r_repl$run_cmd("RKernel::install_readline()")
+      # self$r_repl$run_cmd("RKernel::install_menu()")
+      self$r_repl$run_cmd("RKernel::set_help_displayed")
+      self$r_repl$run_cmd("RKernel::install_httpd_handlers()")
+      # self$r_repl$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")
     },
     graphics_client = NULL,
     r_start_graphics = function(){
       # log_out("Starting graphics ...")
-      # self$r_session$run_cmd("RKernel::start_graphics()")
+      # self$r_repl$run_cmd("RKernel::start_graphics()")
       # log_out("done.")
-      private$graphics_client <- GraphicsClient$new(self$r_session)
+      private$graphics_client <- GraphicsClient$new(self$r_repl)
       private$graphics_client$start()
     },
     r_display_changed_graphics = function() {display
@@ -880,10 +876,10 @@ Kernel <- R6Class("Kernel",
       }
     },
     r_run_cell_begin_hooks = function(){
-      self$r_session$run_code("RKernel::runHooks('cell-begin')")
+      self$r_repl$run_code("RKernel::runHooks('cell-begin')")
     },
     r_run_cell_end_hooks = function(){
-      self$r_session$run_code("RKernel::runHooks('cell-end')")
+      self$r_repl$run_code("RKernel::runHooks('cell-end')")
     },
     r_msg_incomplete = FALSE,
     r_msg_frag = "",
@@ -955,10 +951,10 @@ Kernel <- R6Class("Kernel",
     },
     r_init_help = function(){
       port <- random_open_port()
-      self$r_session$run_cmd(sprintf("RKernel::set_help_port(%d)",port))
+      self$r_repl$run_cmd(sprintf("RKernel::set_help_port(%d)",port))
     },
     r_set_help_displayed = function(){
-      self$r_session$run_cmd("RKernel::set_help_displayed(TRUE)")
+      self$r_repl$run_cmd("RKernel::set_help_displayed(TRUE)")
     },
     r_get_input = function(prompt = ""){
       self$input_request(prompt = prompt)
@@ -968,7 +964,7 @@ Kernel <- R6Class("Kernel",
       # log_out("r_send_request")
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
-      resp <- self$r_session$run_cmd(cmd)
+      resp <- self$r_repl$run_cmd(cmd)
       # log_out("Response:")
       # log_out(resp, use.print = TRUE)
       resp <- remove_prefix(resp$stdout, DLE) |> remove_suffix(DLE)
@@ -981,10 +977,10 @@ Kernel <- R6Class("Kernel",
       # log_out("r_send_request_noreply")
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
-      self$r_session$run_code(cmd)
+      self$r_repl$run_code(cmd)
     },
     r_send_cmd = function(cmd) {
-      resp <- self$r_session$run_cmd(cmd)
+      resp <- self$r_repl$run_cmd(cmd)
       msg <- msg_extract(resp$stdout)
       msg_unwrap(msg)
     },

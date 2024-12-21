@@ -6,14 +6,14 @@
 #' @export
 GraphicsClient <- R6Class("GraphicsClient",
   public = list(
-    initialize = function(session){
-      private$session <- session
+    initialize = function(repl){
+      private$repl <- repl
     },
     host = NULL,
     port = NULL,
     token = NULL,
     start = function(){
-      private$session$run_cmd("RKernel::start_graphics()")
+      private$repl$run_cmd("RKernel::start_graphics()")
       self$host <- self$get_host()
       self$port <- self$get_port()
       self$token <- self$get_token()
@@ -26,13 +26,13 @@ GraphicsClient <- R6Class("GraphicsClient",
           "jupyter.update.graphics"))
     },
     get_host = function(){
-      private$session$run_cmd("RKernel:::get_hgd_host()")$stdout
+      private$repl$run_cmd("RKernel:::get_hgd_host()")$stdout
     },
     get_port = function(){
-      private$session$run_cmd("RKernel:::get_hgd_port()")$stdout
+      private$repl$run_cmd("RKernel:::get_hgd_port()")$stdout
     },
     get_token = function(){
-      private$session$run_cmd("RKernel:::get_hgd_token()")$stdout
+      private$repl$run_cmd("RKernel:::get_hgd_token()")$stdout
     },
     get_state = function(){
       gurl <- paste0(
@@ -210,7 +210,7 @@ GraphicsClient <- R6Class("GraphicsClient",
       }
   ),
   private = list(
-    session = NULL
+    repl = NULL
   )
 )
 

@@ -93,7 +93,8 @@ drop_echo <- function(txt, n = 1) {
   txt
 }
 
-SessionAdapter <- R6Class("SessionAdapter",
+#' @export
+RSessionAdapter <- R6Class("RSessionAdapter",
  public = list(
     session = NULL,
     prompt = NULL,
@@ -148,7 +149,8 @@ SessionAdapter <- R6Class("SessionAdapter",
         stdout_callback = self$stdout_callback,
         stderr_callback = self$stderr_callback,
         readline_callback = self$readline_callback,
-        browser_callback = self$browser_callback
+        browser_callback = self$browser_callback,
+        until_prompt = FALSE
       ) {
         lines <- split_lines1(code)
         n_lines <- length(lines)
@@ -163,7 +165,7 @@ SessionAdapter <- R6Class("SessionAdapter",
                           wait_callback = wait_callback,
                           browser_callback = browser_callback,
                           readline_callback = readline_callback,
-                          until_prompt = FALSE),
+                          until_prompt = until_prompt),
             interrupt = function(e) {
               self$session$interrupt()
               self$process_output()
@@ -253,8 +255,8 @@ SessionAdapter <- R6Class("SessionAdapter",
       # Runs a one-line command without checking(!) and returns the 
       # output
       self$run_code(cmd,
-                    io_timeout = io_timeout,
-                    run_timeout = run_timeout,
+                    io_timeout = 1,
+                    run_timeout = 0,
                     stdout_callback = self$aggreg_stdout,
                     stderr_callback = self$aggreg_stderr,
                     wait_callback = NULL,
