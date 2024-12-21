@@ -139,24 +139,23 @@ dbgConsole <- function(session, envname = ".GlobalEnv",
 
     output <- OutputWidget(append_output=TRUE,
                            use_display=TRUE)
-    e <- new.env()
-    e$code <- ""
+    repl <- RSessionAdapter$new(
+        session = session,
+        stdout_callback = output$stdout,
+        stderr_callback = output$stderr
+    )
     if(use_area){
         input <- Textarea(rows=5)
         input$add_class("monospace")
         run_btn <- Button(description="Run")
 
         run_on_click <- function(){
-            if(clear) output$clear()
-            else {
-              output$stdout(add_prompts(input$value))
-            }
-            expr <- parse(text=input$value)
-            output$clear()
             code <- input$value
-            res <- session$run_cmd(code)
-            if(length(res$stdout)) output$stdout(res$stdout)
-            if(length(res$stderr)) output$stdout(res$stderr)
+            status <- code_status(code)
+            if(status == "complete") {
+                try(repl$run_code(code, echo = TRUE))
+                input$clear()
+            }
             invisible()
         }
         run_btn$on_click(run_on_click)
@@ -170,26 +169,8 @@ dbgConsole <- function(session, envname = ".GlobalEnv",
         input$add_class("width-auto")
         run_on_value <- function(tn,tlt,value){
             log_out("run_on_value")
-            line <- value
-            if(length(line) && nzchar(line)) {
-                if(nzchar(e$code)) {
-                    e$code <- paste(e$code,line,sep="\n")
-                }
-                else {
-                    e$code <- line
-                }
-            }
-            status <- code_status(e$code)
-            if(status == "complete" && nzchar(e$code)) {
-                # output$stdout(add_prompts(e$code))
-                log_out(e$code)
-                res <- try(session$run_cmd(e$code))
-                e$code <- ""
-                if(length(res$stdout)) output$stdout(paste0(res$stdout,"\n"))
-                if(length(res$stderr)) output$stderr(paste0(res$stderr,"\n"))
-            }
-            else if(status == "invalid") {
-                e$code <- ""
+            if(length(value) && nzchar(value)) {
+                try(repl$run_code(value, echo = TRUE))
             }
             input$clear()
             invisible()
