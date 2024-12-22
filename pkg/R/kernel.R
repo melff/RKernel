@@ -284,7 +284,9 @@ Kernel <- R6Class("Kernel",
       # log_out("handle_r_msg")
       # log_out(msg, use.str = TRUE)
       if(!is.list(msg)) {
-        log_out("Non-list message")
+        err_msg <- "R session sent an invalid message - not a list"
+        self$stderr(err_msg)
+        log_error(err_msg)
         return(NULL)
       }
       msg_type <- msg$type
@@ -293,9 +295,10 @@ Kernel <- R6Class("Kernel",
       if(is.function(msg_handler)){
         msg_handler(msg)
       } else {
-        log_error(sprintf("R session sent message of unknown type '%s'", msg_type))
+        err_msg <- sprintf("R session sent message of unknown type '%s'", msg_type)
+        log_error(err_msg)
         # log_out(msg_handler, use.str = TRUE)
-        self$stderr(sprintf("R session sent message of unknown type '%s'", msg_type))
+        self$stderr(err_msg)
       }
     },
     errored = FALSE
