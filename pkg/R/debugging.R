@@ -134,7 +134,7 @@ dbgWidget <- function(name="dbgWidget",envir=parent.frame(),depth=NA){
     vb
 }
 
-dbgConsole <- function(session, envname = ".GlobalEnv",
+dbgConsole <- function(session, 
                        use_area=FALSE){
 
     output <- OutputWidget(append_output=TRUE,

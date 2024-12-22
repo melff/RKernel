@@ -100,7 +100,7 @@ env_matrix <- function(pos = -1, name, envir, parent=NULL, all.names = FALSE, pa
     list(m=m, n=n)
 }
 
-session_env_matrix <- function(session, 
+session_env_matrix <- function(repl, 
                                pos = -1L,
                                envname = NULL) {
     cmd <- if(!missing(envname)) {
@@ -109,13 +109,18 @@ session_env_matrix <- function(session,
            else {
                sprintf("RKernel:::env_matrix(pos = %d)", pos)
            }
-    session$eval_code(cmd)
+    repl$eval_code(cmd)
 }
 
 env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FALSE, pattern = NULL, 
-    mode = "any", id=NULL, include_css = TRUE, session = NULL){
-    if(inherits(session, "RKernelSession")) {
-        em <- session_env_matrix(pos, session)
+    mode = "any", id=NULL, include_css = TRUE, repl = NULL){
+    if(inherits(repl, "RSessionAdapter")) {
+        if(!missing(name)) {
+            em <- session_env_matrix(repl=repl,envname=name)
+        }
+        else {
+            em <- session_env_matrix(repl=repl,pos=pos)
+        }
     }
     else {
         em <- env_matrix(pos, name, envir, parent, all.names, pattern, mode)
