@@ -177,6 +177,11 @@ Kernel <- R6Class("Kernel",
     #' Send rich format data to the frontend
     #' @param msg A list with the appropriate structure. [TODO]
     display_send = function(msg){
+      if(inherits(msg, "display_data")) {
+        d <- msg
+        msg <- list(type = class(d),
+                    content = unclass(d))
+      }
       # log_out("display_send")
       private$send_message(type=msg$type,
                            parent=private$parent$shell,
@@ -347,9 +352,7 @@ Kernel <- R6Class("Kernel",
               if(is.character(d))
                 self$stderr(attr(d,"message"))
               else if(inherits(d,"display_data")){
-                msg <- list(type = class(d),
-                            content = unclass(d))
-                self$display_send(msg)
+                self$display_send(d)
               }
           } 
               
