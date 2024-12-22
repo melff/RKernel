@@ -56,7 +56,9 @@ Kernel <- R6Class("Kernel",
       assign("kernel",self,envir=private$sandbox)
     },
     start_r_session = function(){
-      self$r_session <- RKernelSession$new()
+      self$r_session <- RKernelSession$new(
+        yield = self$poll_and_respond,
+        kernel = self)
       # log_out(self$r_session, use.print = TRUE)
       assign("session",self$r_session,envir=private$sandbox)
       self$r_repl <- RSessionAdapter$new(
@@ -64,7 +66,7 @@ Kernel <- R6Class("Kernel",
         stdout_callback = private$handle_r_stdout,
         stderr_callback = private$handle_r_stderr,
         readline_callback = private$r_get_input,
-        browser_callback = private$r_get_input
+        browser_callback = NULL
       )
       assign("repl",self$r_repl,envir=private$sandbox)
     },
@@ -98,17 +100,16 @@ Kernel <- R6Class("Kernel",
     run = function(){
       self$start()
       # log_out("*** RKernel started ***")
+      rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
       continue <- TRUE
       while(continue) {
-        continue <- self$poll_and_respond()
+        continue <- self$poll_and_respond(rkernel_poll_timeout)
       }
       # log_out("*** RKernel shut down ***")
     },
     #' @description
     #' A single iteration of the kernel loop
-    poll_and_respond = function(){
-        rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
-        poll_timeout <- rkernel_poll_timeout 
+    poll_and_respond = function(poll_timeout = getOption("rkernel_poll_timeout",10L)){
         # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
         # log_out("kernel$poll_request")
