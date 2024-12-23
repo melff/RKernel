@@ -134,50 +134,127 @@ dbgWidget <- function(name="dbgWidget",envir=parent.frame(),depth=NA){
     vb
 }
 
-dbgConsole <- function(session, 
-                       use_area=FALSE){
+dbgConsole_style <- '<style>
+.monospace,
+.widget-text.monospace,
+.monospace input[type="text"],
+.widget-text.monospace input[type="text"] {
+    font-family: monospace !important;
+}
+.debug-box .widget-textarea {
+    width: 100%
+}
+button.console-button {
+    width: 30px;
+    text-align: center;
+}
+.width-auto,
+.widget-text.widget-auto {
+    width: auto;
+}
+.debugger-console {
+    border: 1px solid #cfcfcf;
+}
+.debugger-console .widget-text input[type="text"] {
+    border: 1px dotted #cfcfcf;
+}
+.debugger-console .invisible {
+    display: none;
+}
+</style>'
 
-    output <- OutputWidget(append_output=TRUE,
+
+dbgConsoleClass <- R6Class("dbgConsole",
+    public = list(
+        style = NULL,
+        session = NULL,
+        repl = NULL,
+        input = NULL,
+        output = NULL,
+        continue_loop = TRUE,
+        initialize = function(session) {
+            self$session <- session
+            self$output <- OutputWidget(append_output=TRUE,
                            use_display=TRUE)
-    repl <- RSessionAdapter$new(
-        session = session,
-        stdout_callback = output$stdout,
-        stderr_callback = output$stderr
-    )
-    if(use_area){
-        input <- Textarea(rows=5)
-        input$add_class("monospace")
-        run_btn <- Button(description="Run")
-
-        run_on_click <- function(){
-            code <- input$value
+            self$style <- HTML(dbgConsole_style)
+            self$continue_loop <- TRUE
+            self$repl <- RSessionAdapter$new(
+                session = session,
+                stdout_callback = self$output$stdout,
+                stderr_callback = self$output$stderr,
+                browser_callback = self$browser_callback,
+                prompt_callback = self$prompt_callback,
+                echo = TRUE
+                )
+        },
+        browser_callback = function() {
+            log_out("browser_callback")
+            return(TRUE)
+        },
+        prompt_callback = function() {
+            log_out("prompt_callback")
+            log_out(self$continue_loop)
+            self$continue_loop <- FALSE
+            log_out(self$continue_loop)
+            log_out("prompt_callback done")
+            return(TRUE)
+        },
+        run_on_click = function(){
+            code <- self$input$value
             status <- code_status(code)
             if(status == "complete") {
-                try(repl$run_code(code, echo = TRUE))
-                input$clear()
+                try(self$repl$run_code(code, echo = TRUE))
+                self$input$clear()
             }
             invisible()
-        }
-        run_btn$on_click(run_on_click)
-
-        input_hbox <- HBox(input,run_btn)
-        input_hbox$add_class("debug-box")
-        VBox(input_hbox,output)
-    } else {
-        input <- TextWidget()
-        input$add_class("monospace")
-        input$add_class("width-auto")
-        run_on_value <- function(tn,tlt,value){
+        },
+        run_on_value = function(tn,tlt,value){
             log_out("run_on_value")
             if(length(value) && nzchar(value)) {
-                try(repl$run_code(value, echo = TRUE))
+                r <- try(self$repl$run_code(value, echo = TRUE))
+                if(inherits(r,"try-error")) log_error(r)
             }
-            input$clear()
+            self$input$clear()
+            log_out(self$continue_loop)
+            log_out("run_on_value done")
             invisible()
+        },
+        main_widget = NULL,
+        run = function(use_area = FALSE) {
+            if(use_area) {
+                self$input <- Textarea(rows=5)
+                self$input$add_class("monospace")
+                run_btn <- Button(description="Run")
+                run_btn$on_click(self$run_on_click)
+                input_hbox <- HBox(self$input,run_btn)
+                input_hbox$add_class("debug-box")
+                self$main_widget <- VBox(self$style,input_hbox,self$output)
+            }
+            else {
+                self$input <- TextWidget()
+                self$input$add_class("monospace")
+                self$input$add_class("width-auto")
+                self$input$observe("value",self$run_on_value)
+                self$main_widget <- VBox(self$style,self$input,self$output)
+            }
+            d <- display_data(self$main_widget)
+            log_out(d, use.str=TRUE)
+            self$session$kernel$display_send(d)
+            log_out("enter loop")
+            while(self$continue_loop) {
+                self$session$yield(1000)
+            }
+            self$input$disabled <- TRUE
+            self$input$add_class("invisible")
+            log_out("exit loop")
+            return(invisible())
         }
-        input$observe("value",run_on_value)
-        VBox(input,output)
-    }
+    )
+)
+
+dbgConsole <- function(session, use_area = FALSE) {
+    cons <- dbgConsoleClass$new(session)
+    cons$run(use_area = use_area)
 }
 
 fa_icon <- function(text) sprintf('<i class="fa fa-%s"></i>',text)
