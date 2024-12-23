@@ -317,6 +317,7 @@ Kernel <- R6Class("Kernel",
           msg$content$store_history <- FALSE
         }
       }
+      execute_parent <- private$parent$shell
       execution_count <- private$execution_count
       private$send_message(
         type = "execute_input",
@@ -417,6 +418,7 @@ Kernel <- R6Class("Kernel",
                 content$payload <- payload
           }
       }
+      private$parent$shell <- execute_parent
       if(!isTRUE(msg$content$silent))
         private$send_message(type="execute_reply",
                               parent=private$parent$shell,
