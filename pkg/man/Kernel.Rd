@@ -96,7 +96,7 @@ Run the kernel.
 \subsection{Method \code{poll_and_respond()}}{
 A single iteration of the kernel loop
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Kernel$poll_and_respond()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$poll_and_respond(poll_timeout = getOption("rkernel_poll_timeout", 10L))}\if{html}{\out{</div>}}
 }
 
 }
