@@ -346,7 +346,12 @@ Kernel <- R6Class("Kernel",
                                     enclos = private$sandbox,
                                     stdout = self$stdout,
                                     stderr = self$stderr),
-                      error = function(e) log_error(conditionMessage(e)))
+                      error = function(e) {
+                          m <- conditionMessage(e)
+                          log_error(m)
+                          self$stderr(m)
+                        }
+                      )
           } else {
               d <- tryCatch(dispatch_magic_handler(magic,code,args),
                             error = function(e) structure("errored", 
