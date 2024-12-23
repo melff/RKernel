@@ -514,6 +514,10 @@ Kernel <- R6Class("Kernel",
     comm_info_reply = function(msg){
       # return(NULL)
       # log_out("comm_info_reply")
+      target <- msg$content$target_name
+      if(target == "jupyter.widget") {
+        private$has_widgets <- TRUE
+      }
       reply <- private$r_send_request(list(
         type = "comm_info_request",
         content = msg$content
@@ -532,6 +536,10 @@ Kernel <- R6Class("Kernel",
 
     handle_comm_open = function(msg){
       # return(NULL)
+      target <- msg$content$target_name
+      if(target == "jupyter.widget.control") {
+        private$has_widgets <- TRUE
+      }
       private$r_send_request_noreply(list(
         type = "comm_open",
         content = msg$content
@@ -1006,7 +1014,8 @@ Kernel <- R6Class("Kernel",
       #log_out(.Options[names(res)], use.str = TRUE)
     },
 
-    sandbox = NULL
+    sandbox = NULL,
+    has_widgets = FALSE
   )
 )
 
