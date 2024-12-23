@@ -116,6 +116,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
     readline_callback = NULL,
     browser_callback = NULL,
     prompt_callback = NULL,
+    echo = FALSE,
     aggreg_stdout = function(txt, ...) {
       self$stdout <- paste0(self$stdout,txt)
     },
@@ -139,7 +140,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       browser_callback = NULL,
       prompt_callback = NULL,
       prompt = "> ",
-      co_prompt = "+ "
+      co_prompt = "+ ",
+      echo = FALSE
     ) {
       self$session <- session
       self$prompt <- prompt
@@ -149,6 +151,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       self$readline_callback <- readline_callback
       self$browser_callback <- browser_callback
       self$prompt_callback <- prompt_callback
+      self$echo <- echo
     },
     run_code = function(
         code,
@@ -161,12 +164,13 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         browser_callback = self$browser_callback,
         prompt_callback = self$prompt_callback,
         until_prompt = FALSE,
-        echo = FALSE
+        echo = self$echo
       ) {
         lines <- split_lines1(code)
         n_lines <- length(lines)
         for (i in 1:n_lines) {
           line <- lines[i]
+          # log_out(sprintf("Sending line '%s'",line))
           self$session$send_input(line)
           tryCatch(self$process_output(
                           io_timeout = io_timeout,
@@ -199,6 +203,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         until_prompt = TRUE,
         echo = FALSE
       ) {
+        stopifnot(is.function(stdout_callback))
+        stopifnot(is.function(stderr_callback))
         session <- self$session
         output_complete <- FALSE
         loop_count <- 0
@@ -218,16 +224,21 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               resp$stdout <- drop_echo(resp$stdout)
             }
             if (grepl(self$browse_prompt, resp$stdout)) {
-              log_out("Found browser prompt")
+              # log_out("Found browser prompt")
+              if(!echo) {
+                resp$stdout <- gsub(self$browse_prompt,"",resp$stdout)
+              }
+              if (nzchar(resp$stdout)) {
+                stdout_callback(resp$stdout)
+              } 
               if (is.function(browser_callback)) {
-                output_complete <- browser_callback(resp$stdout)
+                output_complete <- browser_callback()
               } else session$send_input("Q")
             } else if (endsWith(resp$stdout, self$co_prompt)) {
               # log_out("Found continuation prompt")
               if(echo) {
                 #resp$stdout <- remove_suffix(resp$stdout, self$co_prompt)
-                if (is.function(stdout_callback) 
-                  && nzchar(resp$stdout)) {
+                if (nzchar(resp$stdout)) {
                     stdout_callback(resp$stdout)
                 }
               }
@@ -242,12 +253,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               if(!echo) {
                 resp$stdout <- remove_suffix(resp$stdout, self$prompt)
               }
-              if (is.function(stdout_callback) 
-                  && nzchar(resp$stdout)) {
+              if (nzchar(resp$stdout)) {
                 stdout_callback(resp$stdout)
-              } else if(!is.function(stdout_callback)){
-                log_warning("stdout_callback is not a function")
-                log_out(stdout_callback, use.print = TRUE)
               }
               if(is.function(prompt_callback)) {
                 output_complete <- prompt_callback()
@@ -266,25 +273,19 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               else session$send_input("")
             } else {
               # log_out("stdout callback")
-              if (is.function(stdout_callback) 
-                  && nzchar(resp$stdout)) {
-                stdout_callback(resp$stdout)
-              } else if(!is.function(stdout_callback)) {
-                log_warning("stdout_callback is not a function")
-                log_out(stdout_callback, use.print = TRUE)
-              }
+              stdout_callback(resp$stdout)
             }
           }
           if (!is.null(resp$stderr) 
-              && nzchar(resp$stderr)
-              && is.function(stderr_callback)) {
-            stderr_callback(resp$stderr)
+              && nzchar(resp$stderr)) {
+              stderr_callback(resp$stderr)
           }
         }
     },
     run_cmd = function(cmd) {
       # Runs a one-line command without checking(!) and returns the 
       # output
+      # log_out(sprintf("Run cmd '%s'",cmd))
       self$run_code(cmd,
                     io_timeout = 1,
                     run_timeout = 0,
@@ -293,7 +294,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                     wait_callback = NULL,
                     readline_callback = NULL,
                     browser_callback = NULL,
-                    until_prompt = TRUE
+                    until_prompt = TRUE,
+                    echo = FALSE
                     )
       res <- self$collect()
       return(res)
