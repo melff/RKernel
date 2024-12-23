@@ -869,7 +869,7 @@ Kernel <- R6Class("Kernel",
       # log_out("Installing hooks ...")
       self$r_repl$run_cmd("RKernel::install_output_hooks()")
       self$r_repl$run_cmd("RKernel::install_cell_hooks()")
-      self$r_repl$run_cmd("RKernel::install_save_q()")
+      self$r_repl$run_cmd("RKernel::install_safe_q()")
       self$r_repl$run_cmd("RKernel::install_readline()")
       # self$r_repl$run_cmd("RKernel::install_menu()")
       self$r_repl$run_cmd("RKernel::set_help_displayed")

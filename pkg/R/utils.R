@@ -211,7 +211,7 @@ q_defunct <- function(save = "default", status = 0, runLast = TRUE) {
 }
 
 #' @export
-install_save_q <- function(){
+install_safe_q <- function(){
     replace_in_package("base","q",q_defunct)
     replace_in_package("base","quit",q_defunct)
 }
