@@ -85,6 +85,7 @@ Kernel <- R6Class("Kernel",
         r_send_input = self$r_session$send_input
       )
       self$r_repl$run_cmd("RKernel::startup()")
+      self$r_repl$run_cmd("options(error=NULL)") # Undo callr's setting to enable traceback
       self$r_repl$run_cmd("RKernel::inject_send_options()")
       self$r_repl$run_cmd("suppressWarnings(rm(.pbd_env))")
       msg_env$send <- self$handle_r_msg
