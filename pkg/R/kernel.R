@@ -66,7 +66,7 @@ Kernel <- R6Class("Kernel",
         stdout_callback = private$handle_r_stdout,
         stderr_callback = private$handle_r_stderr,
         readline_callback = private$r_get_input,
-        browser_callback = NULL
+        browser_callback = private$handle_r_browser
       )
       assign("repl",self$r_repl,envir=private$sandbox)
     },
@@ -178,7 +178,7 @@ Kernel <- R6Class("Kernel",
     #' Send rich format data to the frontend
     #' @param msg A list with the appropriate structure. [TODO]
     display_send = function(msg){
-      if(inherits(msg, "display_data")) {
+      if(inherits(msg, "display_data") || inherits(msg, "update_display_data")) {
         d <- msg
         msg <- list(type = class(d),
                     content = unclass(d))
@@ -302,7 +302,14 @@ Kernel <- R6Class("Kernel",
         self$stderr(err_msg)
       }
     },
-    errored = FALSE
+    errored = FALSE,
+    has_widgets = FALSE,
+    save_shell_parent = function() {
+      private$parent$shell
+    },
+    restore_shell_parent = function(saved_parent) {
+      private$parent$shell <- saved_parent
+    }
   ),
 
   private = list(
@@ -518,7 +525,7 @@ Kernel <- R6Class("Kernel",
       # log_out("comm_info_reply")
       target <- msg$content$target_name
       if(target == "jupyter.widget") {
-        private$has_widgets <- TRUE
+        self$has_widgets <- TRUE
       }
       reply <- private$r_send_request(list(
         type = "comm_info_request",
@@ -540,7 +547,7 @@ Kernel <- R6Class("Kernel",
       # return(NULL)
       target <- msg$content$target_name
       if(target == "jupyter.widget.control") {
-        private$has_widgets <- TRUE
+        self$has_widgets <- TRUE
       }
       private$r_send_request_noreply(list(
         type = "comm_open",
@@ -1017,7 +1024,14 @@ Kernel <- R6Class("Kernel",
     },
 
     sandbox = NULL,
-    has_widgets = FALSE
+    handle_r_browser = function(prompt) {
+      saved_parent <- private$parent$shell
+      dbgConsole(session = self$r_session,
+                 prompt = prompt,
+                 use_widgets = self$has_widgets)
+      private$parent$shell <- saved_parent
+      return(TRUE)
+    }
   )
 )
 

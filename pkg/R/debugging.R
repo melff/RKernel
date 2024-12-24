@@ -164,7 +164,7 @@ button.console-button {
 </style>'
 
 
-dbgConsoleClass <- R6Class("dbgConsole",
+dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
     public = list(
         style = NULL,
         session = NULL,
@@ -187,16 +187,13 @@ dbgConsoleClass <- R6Class("dbgConsole",
                 echo = TRUE
                 )
         },
-        browser_callback = function() {
-            log_out("browser_callback")
+        browser_callback = function(prompt) {
+            self$output$stdout(prompt)
+            # log_out("browser_callback")
             return(TRUE)
         },
-        prompt_callback = function() {
-            log_out("prompt_callback")
-            log_out(self$continue_loop)
+        prompt_callback = function(...) {
             self$continue_loop <- FALSE
-            log_out(self$continue_loop)
-            log_out("prompt_callback done")
             return(TRUE)
         },
         run_on_click = function(){
@@ -204,25 +201,31 @@ dbgConsoleClass <- R6Class("dbgConsole",
             status <- code_status(code)
             if(status == "complete") {
                 try(self$repl$run_code(code, echo = TRUE))
-                self$input$clear()
+                self$input$value <- ""
             }
             invisible()
         },
         run_on_value = function(tn,tlt,value){
-            log_out("run_on_value")
             if(length(value) && nzchar(value)) {
                 r <- try(self$repl$run_code(value, echo = TRUE))
-                if(inherits(r,"try-error")) log_error(r)
+                if(inherits(r,"try-error")) {
+                    log_error(r)
+                    kernel <- self$session$kernel
+                    kernel$stderr(r)
+                }
             }
             self$input$clear()
-            log_out(self$continue_loop)
-            log_out("run_on_value done")
             invisible()
         },
         main_widget = NULL,
-        run = function(use_area = FALSE) {
-            if(use_area) {
-                self$input <- Textarea(rows=5)
+        run = function(prompt) {
+            kernel <- self$session$kernel
+            use_area <- FALSE
+            if(use_area) { # Currently not recommended - Textarea widgets do no
+                           # work, only one line can be used ...
+                self$input <- Textarea(
+                    placeholder="Enter expression, 'c', 'n', or 'Q'"
+                )
                 self$input$add_class("monospace")
                 run_btn <- Button(description="Run")
                 run_btn$on_click(self$run_on_click)
@@ -231,31 +234,87 @@ dbgConsoleClass <- R6Class("dbgConsole",
                 self$main_widget <- VBox(self$style,input_hbox,self$output)
             }
             else {
-                self$input <- TextWidget()
+                self$input <- TextWidget(
+                    placeholder="Enter expression, 'c', 'n', or 'Q'"
+                )
                 self$input$add_class("monospace")
                 self$input$add_class("width-auto")
                 self$input$observe("value",self$run_on_value)
-                self$main_widget <- VBox(self$style,self$input,self$output)
+                self$main_widget <- VBox(self$style,self$output,self$input)
             }
             d <- display_data(self$main_widget)
-            log_out(d, use.str=TRUE)
-            self$session$kernel$display_send(d)
-            log_out("enter loop")
+            saved_parent <- kernel$save_shell_parent()
+            kernel$display_send(d)
+            self$output$stdout(prompt)
             while(self$continue_loop) {
                 self$session$yield(1000)
             }
             self$input$disabled <- TRUE
+            self$input$placeholder <- "--"
             self$input$add_class("invisible")
-            log_out("exit loop")
-            return(invisible())
+            self$main_widget <- VBox(self$output)
+            d <- update(d,self$main_widget)
+            kernel$restore_shell_parent(saved_parent)
+            kernel$display_send(d)
         }
     )
 )
 
-dbgConsole <- function(session, use_area = FALSE) {
-    cons <- dbgConsoleClass$new(session)
-    cons$run(use_area = use_area)
+dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
+    public = list(
+        session = NULL,
+        repl = NULL,
+        continue_loop = TRUE,
+        initialize = function(session) {
+            kernel <- session$kernel
+            self$session <- session
+            self$continue_loop <- TRUE
+            self$repl <- RSessionAdapter$new(
+                session = session,
+                stdout_callback = kernel$stdout,
+                stderr_callback = kernel$stderr,
+                browser_callback = self$browser_callback,
+                prompt_callback = self$prompt_callback,
+                echo = TRUE
+                )
+        },
+        browser_callback = function(prompt) {
+            # log_out("browser_callback")
+            return(TRUE)
+        },
+        prompt_callback = function(...) {
+            self$continue_loop <- FALSE
+            return(TRUE)
+        },
+        run = function(prompt) {
+            kernel <- self$session$kernel
+            while(self$continue_loop) {
+                kernel$input_request(prompt = prompt)
+                input <- kernel$read_stdin()
+                r <- try(self$repl$run_code(input, echo = TRUE))
+                if(inherits(r,"try-error")) {
+                    kernel$stderr(unclass(r))
+                }
+            }
+        }
+    )
+)
+
+dbgConsole <- function(session, prompt, use_widgets = TRUE) {
+    # log_out("dbgConsole")
+    # log_out(prompt)
+    # log_out(use_widgets)
+    if(use_widgets) {
+        # log_out("creating a dbgConsoleWidgetClass object")
+        cons <- dbgConsoleWidgetClass$new(session)
+    }
+    else {
+        # log_out("creating a dbgSimpleConsoleClass object")
+        cons <- dbgSimpleConsoleClass$new(session)
+    }
+    cons$run(prompt)
 }
+
 
 fa_icon <- function(text) sprintf('<i class="fa fa-%s"></i>',text)
 

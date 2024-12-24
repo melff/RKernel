@@ -170,7 +170,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         n_lines <- length(lines)
         for (i in 1:n_lines) {
           line <- lines[i]
-          # log_out(sprintf("Sending line '%s'",line))
+          if(!length(line) || !is.character(line) || is.na(line)) break
+          log_out(sprintf("Sending line '%s'",line))
           self$session$send_input(line)
           tryCatch(self$process_output(
                           io_timeout = io_timeout,
@@ -225,14 +226,13 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             }
             if (grepl(self$browse_prompt, resp$stdout)) {
               # log_out("Found browser prompt")
-              if(!echo) {
-                resp$stdout <- gsub(self$browse_prompt,"",resp$stdout)
-              }
+              prompt <- getlastmatch(self$browse_prompt, resp$stdout)
+              resp$stdout <- gsub(self$browse_prompt,"",resp$stdout)
               if (nzchar(resp$stdout)) {
                 stdout_callback(resp$stdout)
               } 
               if (is.function(browser_callback)) {
-                output_complete <- browser_callback()
+                output_complete <- browser_callback(prompt=prompt)
               } else session$send_input("Q")
             } else if (endsWith(resp$stdout, self$co_prompt)) {
               # log_out("Found continuation prompt")
@@ -250,9 +250,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               # log_out("Found main prompt")
               # log_out(self$status)
               self$found_prompt <- TRUE
-              if(!echo) {
-                resp$stdout <- remove_suffix(resp$stdout, self$prompt)
-              }
+              resp$stdout <- remove_suffix(resp$stdout, self$prompt)
               if (nzchar(resp$stdout)) {
                 stdout_callback(resp$stdout)
               }
@@ -293,7 +291,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                     stderr_callback = self$aggreg_stderr,
                     wait_callback = NULL,
                     readline_callback = NULL,
-                    browser_callback = NULL,
+                    browser_callback = TrueFunc,
                     until_prompt = TRUE,
                     echo = FALSE
                     )
@@ -347,3 +345,10 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       do.call("options", opt)
     }
  )) 
+
+TrueFunc <- function(...) TRUE
+
+getlastmatch <- function(pattern, txt) {
+  m <- regexpr(pattern, txt)
+  tail(regmatches(txt,m), n = 1L)
+}
