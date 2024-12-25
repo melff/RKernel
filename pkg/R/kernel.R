@@ -926,9 +926,9 @@ Kernel <- R6Class("Kernel",
     r_run_cell_end_hooks = function(){
       self$r_repl$run_code("RKernel::runHooks('cell-end')")
     },
-    r_msg_incomplete = FALSE,
-    r_msg_frag = "",
-    handle_r_stdout = function(text){
+    r_msg_incomplete = list(stdout=FALSE, stderr=FALSE),
+    r_msg_frag = list(stdout="",stderr=""),
+    handle_r_output = function(text, stream="stdout"){
       # log_out("=========================================================")
       # log_out("handle_r_stdout")
       if (grepl(DLE, text)) {
@@ -948,27 +948,27 @@ Kernel <- R6Class("Kernel",
             # log_out(msg, use.print = FALSE)
             self$handle_r_msg(msg)
           } else {
-            private$r_msg_incomplete <- TRUE
-            private$r_msg_frag <- remove_prefix(chunk, MSG_BEGIN)
+            private$r_msg_incomplete[[stream]] <- TRUE
+            private$r_msg_frag[[stream]] <- remove_prefix(chunk, MSG_BEGIN)
           }
         }
         else if(endsWith(chunk, MSG_END)){
           # log_out("MSG_END found")
           # log_out(chunk, use.print = TRUE)
-          msg <- paste0(private$r_msg_frag, remove_suffix(chunk, MSG_END))
-          private$r_msg_incomplete <- FALSE
-          private$r_msg_frag <- ""
+          msg <- paste0(private$r_msg_frag[[stream]], remove_suffix(chunk, MSG_END))
+          private$r_msg_incomplete[[stream]] <- FALSE
+          private$r_msg_frag[[stream]] <- ""
           msg <- msg_unwrap(msg)
           self$handle_r_msg(msg)
         }
         else {
-          if(private$r_msg_incomplete) {
+          if(private$r_msg_incomplete[[stream]]) {
             # log_out("incomplete chunk ...")
-            private$r_msg_frag <- paste0(private$r_msg_frag, chunk)
+            private$r_msg_frag[[stream]] <- paste0(private$r_msg_frag[[stream]], chunk)
           }
           else if(nzchar(chunk)) {
             # log_out(chunk, use.print = TRUE)
-            self$stdout(chunk)
+            self$stream(chunk, stream = stream)
           }
         }
         private$r_display_changed_graphics()
@@ -976,12 +976,11 @@ Kernel <- R6Class("Kernel",
       }
       # log_out("handle_r_stdout done")
     },
+    handle_r_stdout = function(text) {
+      private$handle_r_output(text, stream = "stdout")
+    },
     handle_r_stderr = function(text){
-      # log_out("handle_r_stderr")
-      # log_out(text)
-      if(startsWith(text, "Error"))
-        self$errored <- TRUE
-      self$stderr(text)
+      private$handle_r_output(text, stream = "stderr")
     },
     r_msg_handlers = list(),
     install_r_handlers = function(){
