@@ -282,7 +282,7 @@ Kernel <- R6Class("Kernel",
     #' @description
     #' Handle a generic message sent from the R Session
     #' @param msg The message, a list 
-    handle_r_msg = function(msg){
+    handle_r_msg = function(msg, ...){
       # log_out("handle_r_msg")
       # log_out(msg, use.str = TRUE)
       if(!is.list(msg)) {

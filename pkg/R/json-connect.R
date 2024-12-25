@@ -18,12 +18,12 @@ JSON_END <- SI
 MSG_BEGIN <- JSON_BEGIN
 MSG_END <- JSON_END
 
-json_send <- function(msg){
+json_send <- function(msg, file=stdout()){
     # log_out("msg_send\n")
     # log_out(msg,use.print=TRUE)
     msg <- to_json(msg)
     # log_out(msg)
-    cat_(DLE,JSON_BEGIN,msg,JSON_END,DLE,sep="")
+    cat_(DLE,JSON_BEGIN,msg,JSON_END,DLE,sep="",file=file)
 }
 
 json_unwrap <- function(x) {
