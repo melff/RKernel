@@ -310,15 +310,16 @@ Kernel <- R6Class("Kernel",
     },
     restore_shell_parent = function(saved_parent) {
       private$parent$shell <- saved_parent
-    }
+    },
+    stop_on_error = TRUE
   ),
 
   private = list(
     pid = 0,
     execution_count = 1,
     handle_execute_request = function(msg){
-      # log_out("handle_execute_request")
-      # log_out(msg,use.print=TRUE)
+      log_out("handle_execute_request")
+      log_out(msg, use.str = TRUE)
       if(msg$content$silent){
         if(msg$content$store_history){
           log_warning("store_history forced to FALSE")
@@ -337,8 +338,7 @@ Kernel <- R6Class("Kernel",
         )
       )
       self$errored <- FALSE
-      aborted <- FALSE
-
+      clear_queue <- FALSE
       code <- msg$content$code
 
       mparsed <- parse_magic(code)
@@ -359,6 +359,7 @@ Kernel <- R6Class("Kernel",
                           m <- conditionMessage(e)
                           log_error(m)
                           self$stderr(m)
+                          self$errored <- TRUE
                         }
                       )
           } else {
@@ -367,14 +368,22 @@ Kernel <- R6Class("Kernel",
                                                           message = conditionMessage(e)), # ,traceback=.traceback()),
                             interrupt = function(e) "interrupted")
               # log_out(d,use.str=TRUE)
-              if(is.character(d))
+              if(is.character(d)){
                 self$stderr(attr(d,"message"))
+                self$errored <- TRUE
+                }
               else if(inherits(d,"display_data")){
                 self$display_send(d)
               }
           } 
-              
-          content <- list(status = "ok",
+          if(self$errored) {
+            status <- "errored"
+            clear_queue <- TRUE
+          }
+          else {
+            status <- "ok"
+          }
+          content <- list(status = status,
                           execution_count = execution_count)
       }
       else {
@@ -388,12 +397,13 @@ Kernel <- R6Class("Kernel",
           private$r_display_changed_graphics()
           private$r_run_cell_end_hooks()
           payload <- NULL
-          aborted <- FALSE
-          if (is.character(r) && (identical(r[1], "errored") || identical(r[1], "interrupted"))) {
+          if (!self$r_session$is_alive()) {
             aborted <- TRUE
-          }
-          if (is.character(r)) {
-            self$errored <- TRUE
+            self$stderr("\nR session ended - restarting ... ")
+            self$start_session()
+            self$stderr("done.\n")
+            clear_queue <- TRUE
+          } else if (is.character(r)) {
             log_error(r)
             r_msg <- attr(r, "message")
             if (length(r_msg)) log_error(r_msg)
@@ -402,23 +412,20 @@ Kernel <- R6Class("Kernel",
               tb <- unlist(tb)
               log_error(paste(tb, sep = "\n"))
             }
-          } else self$errored <- FALSE
-          if (!self$r_session$is_alive()) {
-            aborted <- TRUE
-            self$stderr("\nR session ended - restarting ... ")
-            self$start_session()
-            self$stderr("done.\n")
+            content <- list(
+              status = "error",
+              ename = r,
+              evalue = r_msg,
+              traceback = tb,
+              execution_count = execution_count 
+            )
+            clear_queue <- TRUE
           } else if (self$errored) {
-              # log_out(r, use.str = TRUE)
-              content <- list(
-                status = "error",
-                ename = r,
-                evalue = r_msg,
-                traceback = tb,
-                execution_count = execution_count 
-              )
+            content <- list(status = "error",
+                            execution_count = execution_count)
+            clear_queue <- TRUE
           }
-          else {
+          else {               
               # Collect output created by cell-end hooks etc.
               content <- list(status = "ok",
                               execution_count = execution_count)
@@ -426,6 +433,7 @@ Kernel <- R6Class("Kernel",
                 content$payload <- payload
           }
       }
+      log_out(sprintf("kernel$errored: %s",self$errored))
       private$parent$shell <- execute_parent
       if(!isTRUE(msg$content$silent))
         private$send_message(type="execute_reply",
@@ -434,8 +442,10 @@ Kernel <- R6Class("Kernel",
                               content=content)
       if(msg$content$store_history)
         private$execution_count <- private$execution_count + 1
-      if (aborted) private$clear_shell_queue()
-      # log_out("handle_execute_request done")
+      if(clear_queue && self$stop_on_error && msg$content$stop_on_error) {
+        private$clear_queue_requested <- TRUE
+      }
+      log_out("handle_execute_request done")
     },
 
     display_id = character(0),
@@ -656,18 +666,19 @@ Kernel <- R6Class("Kernel",
       return(continue)
     },
 
-    respond_shell = function(req,debug=FALSE){
+    respond_shell = function(req,debug=TRUE){
       if(debug)
         log_out("respond_shell")
       msg <- private$get_message("shell")
-      if(debug)
-         log_out(msg,use.str=TRUE)
+      # if(debug)
+      #    log_out(msg,use.str=TRUE)
       private$parent$shell <- msg
       if(!length(msg)) return(TRUE)
       private$send_busy(private$parent$shell)
       if(debug)
         log_out(paste("Got a", msg$header$msg_type, "request ..."))
       # do_stuff ...
+      private$clear_queue_requested <- FALSE
       r <- tryCatch(
       switch(msg$header$msg_type,
              execute_request = private$handle_execute_request(msg),
@@ -684,12 +695,13 @@ Kernel <- R6Class("Kernel",
       )
       if(is.character(r)) log_error(r)
       private$send_idle(private$parent$shell)
+      if (private$clear_queue_requested) private$clear_shell_queue()
       if (debug)  log_out("done")
       return(TRUE)
     },
 
     send_busy = function(parent){
-      # log_out("send_busy")
+      log_out("send_busy")
       private$send_message(type="status",
                            parent=parent,
                            socket_name="iopub",
@@ -698,7 +710,7 @@ Kernel <- R6Class("Kernel",
     },
 
     send_idle = function(parent){
-      # log_out("send_idle")
+      log_out("send_idle")
       private$send_message(type="status",
                            parent=parent,
                            socket_name="iopub",
@@ -851,9 +863,10 @@ Kernel <- R6Class("Kernel",
            identities = identities,
            metadata = metadata)
     },
-
+    clear_queue_requested = FALSE,
     clear_shell_queue = function(...){
       # Empty message queue from shell
+      log_out("clear_shell_queue")
       POLLIN <- private$.pbd_env$ZMQ.PO$POLLIN
       repeat {
         r <- zmq.poll(c(private$sockets$shell),POLLIN,timeout=0L,
@@ -861,6 +874,7 @@ Kernel <- R6Class("Kernel",
         if(bitwAnd(zmq.poll.get.revents(1),POLLIN)){
           msg <- private$get_message("shell")
           msg_type <- msg$header$msg_type
+          log_out(msg_type)
           reply_type <- sub("_request","_reply",msg_type,fixed=TRUE)
           private$parent$shell <- msg
           private$send_message(type=reply_type,
@@ -871,6 +885,7 @@ Kernel <- R6Class("Kernel",
         }
         else break
       }
+      log_out("clear_shell_queue done")
     },
     
     logfile = NULL,
