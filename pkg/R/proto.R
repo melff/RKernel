@@ -42,15 +42,16 @@ make_dput_request <- function(msg) {
 }
 
 wrap_dput <- function(msg) {
-  con <- textConnection(NULL, open = "w")
-  dput(msg, file = con)
-  paste(textConnectionValue(con), collapse = "")
+  # con <- textConnection(NULL, open = "w")
+  # dput(msg, file = con)
+  # paste(textConnectionValue(con), collapse = "")
+  deparse1(wsg)
 }
 
 #' @export
-send_dput_msg <- function(msg) {
+send_dput_msg <- function(msg, file=stdout()) {
   msg_dput <- wrap_dput(msg)
-  cat_(DLE, STX, msg_dput, ETX, DLE, sep = "")
+  cat_(DLE, STX, msg_dput, ETX, DLE, sep = "", file=file)
 }
 
 unwrap_dput_msg <- function(msg){
