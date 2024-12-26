@@ -45,7 +45,7 @@ wrap_dput <- function(msg) {
   # con <- textConnection(NULL, open = "w")
   # dput(msg, file = con)
   # paste(textConnectionValue(con), collapse = "")
-  deparse1(wsg)
+  deparse0(wsg)
 }
 
 #' @export

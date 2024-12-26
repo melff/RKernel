@@ -41,7 +41,7 @@ truncate_log <- function(){
 is_kernel <- function() !is.null(kernel$current)
 
 log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
-  dcl <- deparse1(match.call())
+  dcl <- deparse0(match.call())
   tryCatch({
     if(use.print)
       message <- paste0("\n",paste0(capture.output(print_orig(message)),collapse="\n"))
@@ -129,7 +129,7 @@ str2iframe <- function(code,
                       style = "border-style:none",
                       ...){
             # cl <- match.call()
-            # log_out(deparse1(cl))
+            # log_out(deparse0(cl))
     # id <- UUIDgenerate()
     # path <- paste0("/iframe/",id,"/")
     # url <- paste0(httpd_url(),path)
@@ -266,4 +266,9 @@ install_menu <- function(){
 read_asset <- function(path) {
   path <- system.file(path,package="RKernel")
   paste(readLines(path),collapse="\n")
+}
+
+deparse0 <- function(expr, width.cutoff = 60L) {
+  paste(deparse(expr, width.cutoff = width.cutoff),
+        collapse = "\n")
 }

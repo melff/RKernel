@@ -25,7 +25,7 @@ http_eval <- function(path, query, ...){
       env <- new.env()
       res <- try(eval(expr,envir=env,enclos=.GlobalEnv))
       payload <- switch(query["format"],
-        deparse = deparse1(res),
+        deparse = deparse0(res),
         str = capture.output(str(res)),
         raw = res,
         cat = capture.output(cat(res)),
@@ -95,7 +95,7 @@ http_data <- function(path, query, ...){
         }
     })
     payload <- switch(fmt,
-        deparse = deparse1(res),
+        deparse = deparse0(res),
         str = capture.output(str(res)),
         raw = res,
         cat = capture.output(cat(res)),
