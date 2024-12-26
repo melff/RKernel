@@ -289,6 +289,9 @@ Kernel <- R6Class("Kernel",
         err_msg <- "R session sent an invalid message - not a list"
         self$stderr(err_msg)
         log_error(err_msg)
+        dep_msg <- deparse0(msg)
+        self$stderr(dep_msg)
+        log_error(dep_msg)
         return(NULL)
       }
       msg_type <- msg$type
@@ -301,6 +304,9 @@ Kernel <- R6Class("Kernel",
         log_error(err_msg)
         # log_out(msg_handler, use.str = TRUE)
         self$stderr(err_msg)
+        dep_msg <- deparse0(msg)
+        self$stderr(dep_msg)
+        log_error(dep_msg)
       }
     },
     errored = FALSE,
