@@ -272,3 +272,24 @@ deparse0 <- function(expr, width.cutoff = 60L) {
   paste(deparse(expr, width.cutoff = width.cutoff),
         collapse = "\n")
 }
+
+error_condition_msg <- function(e) {
+  msg <- list(
+    type = "condition",
+    content = list(
+      condition = "error",
+      message = conditionMessage(e),
+      call = deparse0(conditionCall(e)),
+      options=list(
+          rkernel_stop_on_error = getOption("rkernel_stop_on_error",TRUE),
+          rkernel_show_traceback = getOption("rkernel_show_traceback",TRUE)
+      )
+    )
+  )
+  RKernel:::msg_send(msg)
+}
+install_globalCallingHandlers <- function() {
+  globalCallingHandlers(
+    error = error_condition_msg
+  )
+}

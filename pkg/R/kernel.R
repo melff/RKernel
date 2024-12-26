@@ -290,7 +290,9 @@ Kernel <- R6Class("Kernel",
         self$stderr(err_msg)
         log_error(err_msg)
         dep_msg <- deparse0(msg)
+        self$stderr("\n")
         self$stderr(dep_msg)
+        self$stderr("\n")
         log_error(dep_msg)
         return(NULL)
       }
@@ -305,7 +307,9 @@ Kernel <- R6Class("Kernel",
         # log_out(msg_handler, use.str = TRUE)
         self$stderr(err_msg)
         dep_msg <- deparse0(msg)
+        self$stderr("\n")
         self$stderr(dep_msg)
+        self$stderr("\n")
         log_error(dep_msg)
       }
     },
@@ -344,6 +348,8 @@ Kernel <- R6Class("Kernel",
         )
       )
       self$errored <- FALSE
+      self$stop_on_error <- (msg$content$stop_on_error &&
+                             self$r_repl$getOption("rkernel_stop_on_error",TRUE))
       clear_queue <- FALSE
       code <- msg$content$code
 
@@ -368,6 +374,8 @@ Kernel <- R6Class("Kernel",
                           self$errored <- TRUE
                         }
                       )
+              if(self$errored)
+                clear_queue <- TRUE
           } else {
               d <- tryCatch(dispatch_magic_handler(magic,code,args),
                             error = function(e) structure("errored", 
@@ -377,6 +385,8 @@ Kernel <- R6Class("Kernel",
               if(is.character(d)){
                 self$stderr(attr(d,"message"))
                 self$errored <- TRUE
+                if(self$stop_on_error)
+                  clear_queue <- TRUE
                 }
               else if(inherits(d,"display_data")){
                 self$display_send(d)
@@ -384,7 +394,6 @@ Kernel <- R6Class("Kernel",
           } 
           if(self$errored) {
             status <- "errored"
-            clear_queue <- TRUE
           }
           else {
             status <- "ok"
@@ -404,7 +413,7 @@ Kernel <- R6Class("Kernel",
           private$r_run_cell_end_hooks()
           payload <- NULL
           if (!self$r_session$is_alive()) {
-            aborted <- TRUE
+            clear_queue <- TRUE
             self$stderr("\nR session ended - restarting ... ")
             self$start_session()
             self$stderr("done.\n")
@@ -429,7 +438,8 @@ Kernel <- R6Class("Kernel",
           } else if (self$errored) {
             content <- list(status = "error",
                             execution_count = execution_count)
-            clear_queue <- TRUE
+            if(self$stop_on_error)
+              clear_queue <- TRUE
           }
           else {               
               # Collect output created by cell-end hooks etc.
@@ -448,7 +458,7 @@ Kernel <- R6Class("Kernel",
                               content=content)
       if(msg$content$store_history)
         private$execution_count <- private$execution_count + 1
-      if(clear_queue && self$stop_on_error && msg$content$stop_on_error) {
+      if(clear_queue) {
         private$clear_queue_requested <- TRUE
       }
       log_out("handle_execute_request done")
@@ -905,6 +915,7 @@ Kernel <- R6Class("Kernel",
       # self$r_repl$run_cmd("RKernel::install_menu()")
       self$r_repl$run_cmd("RKernel::set_help_displayed")
       self$r_repl$run_cmd("RKernel::install_httpd_handlers()")
+      self$r_repl$run_cmd("RKernel:::install_globalCallingHandlers()")
       # self$r_repl$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")
     },
@@ -998,6 +1009,7 @@ Kernel <- R6Class("Kernel",
       private$r_msg_handlers$options <- private$handle_options_msg
       for(msg_type in c("comm_msg", "comm_open", "comm_close"))
         private$r_msg_handlers[[msg_type]] <- self$send_comm
+      private$r_msg_handlers$condition <- private$handle_condition_msg
     },
     r_init_help = function(){
       port <- random_open_port()
@@ -1052,6 +1064,18 @@ Kernel <- R6Class("Kernel",
                  use_widgets = self$has_widgets)
       private$parent$shell <- saved_parent
       return(TRUE)
+    },
+
+    condition = NULL,
+    handle_condition_msg = function(msg) {
+      content <- msg$content
+      private$condition <- content
+      condition <- content$condition
+      options <- content$options
+      if(condition == "error") {
+        self$errored <- TRUE
+        self$stop_on_error <- options$rkernel_stop_on_error
+      }
     }
   )
 )
