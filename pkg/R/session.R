@@ -153,7 +153,34 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       self$prompt_callback <- prompt_callback
       self$echo <- echo
     },
-    run_code = function(
+    run_code = function(code,
+        io_timeout = 1,
+        run_timeout = 10,
+        wait_callback = NULL,
+        stdout_callback = self$stdout_callback,
+        stderr_callback = self$stderr_callback,
+        readline_callback = self$readline_callback,
+        browser_callback = self$browser_callback,
+        prompt_callback = self$prompt_callback,
+        until_prompt = FALSE,
+        echo = self$echo
+      ) {
+        code_blocks <- preproc_code(code)
+        for(block in code_blocks) {
+          self$run_code1(block,
+                        io_timeout = io_timeout,
+                        run_timeout = run_timeout,
+                        stdout_callback = stdout_callback,
+                        stderr_callback = stderr_callback,
+                        wait_callback = wait_callback,
+                        browser_callback = browser_callback,
+                        readline_callback = readline_callback,
+                        prompt_callback = prompt_callback,
+                        until_prompt = until_prompt,
+                        echo = echo)
+        }
+    },
+    run_code1 = function(
         code,
         io_timeout = 1,
         run_timeout = 10,
@@ -351,4 +378,30 @@ TrueFunc <- function(...) TRUE
 getlastmatch <- function(pattern, txt) {
   m <- regexpr(pattern, txt)
   tail(regmatches(txt,m), n = 1L)
+}
+
+
+preproc_code_ <- function(code) {
+  log_out("preproc_code")
+  parse <- parse(text = code, keep.source=TRUE)
+  log_out(parse,use.str=TRUE)
+  sf <- attr(parse,"srcref")
+  log_out(sf,use.str=TRUE)
+  if(!length(sf)) return(code)
+  else {
+    res <- lapply(sf,as.character)
+    res <- lapply(res, pasteCR)
+    return(unlist(res))
+  }
+}
+
+preproc_code <- function(code) {
+  log_out("preproc_code")
+  parsed <- str2expression(code)
+  res <- lapply(parsed, deparse)
+  unlist(lapply(res,pasteCR))
+}
+
+pasteCR <- function(x) {
+  paste0(x,"\n", collapse="")
 }

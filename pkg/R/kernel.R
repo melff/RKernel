@@ -405,7 +405,7 @@ Kernel <- R6Class("Kernel",
           private$r_run_cell_begin_hooks()
           private$graphics_client$new_cell <- TRUE
           r <- tryCatch(self$r_repl$run_code(msg$content$code),
-            error = function(e) structure("errored", message = conditionMessage(e)), # ,traceback=.traceback()),
+            error = function(e) structure("errored", message = conditionMessage(e)), 
             interrupt = function(e) "interrupted"
           )
           # log_out(r, use.print = TRUE)
@@ -419,19 +419,18 @@ Kernel <- R6Class("Kernel",
             self$stderr("done.\n")
             clear_queue <- TRUE
           } else if (is.character(r)) {
-            log_error(r)
             r_msg <- attr(r, "message")
-            if (length(r_msg)) log_error(r_msg)
-            tb <- attr(r, "traceback")
-            if (length(tb)) {
-              tb <- unlist(tb)
-              log_error(paste(tb, sep = "\n"))
+            if (length(r_msg)) {
+              log_error(r_msg)
+              self$stderr(r_msg)
+            } else {
+              log_error(r)
+              self$stderr(r)
             }
             content <- list(
               status = "error",
               ename = r,
               evalue = r_msg,
-              traceback = tb,
               execution_count = execution_count 
             )
             clear_queue <- TRUE
