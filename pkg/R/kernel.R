@@ -435,19 +435,17 @@ Kernel <- R6Class("Kernel",
             )
             clear_queue <- TRUE
           } else if (self$errored) {
-            if(length(private$condition) && FALSE) {
+            if(length(private$condition)) {
               log_out("Handling condition")
               condition <- private$condition
               log_out(condition, use.str=TRUE)
               options <- condition$options
-              if(options$rkernel_show_traceback) {
+              if(options$rkernel_show_traceback &) {
                 log_out("Obtaining traceback")
-                r <- try(self$r_repl$run_code("traceback()",
-                                      stdout_callback=self$r_repl$aggreg_stdout,
-                                      stderr_callback=self$r_repl$aggreg_stderr,
-                                      until_prompt=TRUE))
+                r <- try(self$r_repl$run_cmd("traceback()"))
                 log_out(r, use.str=TRUE)
-                tb <- NULL #r$stdout
+                tb <- r$stdout
+                self$stderr(pasteCR(tb))
                 log_out("done")
               }
               else {
@@ -461,6 +459,7 @@ Kernel <- R6Class("Kernel",
                 execution_count = execution_count 
               )
               log_out("Handling condition done")
+              log_out(content, use.str = TRUE)
             } else {
               content <- list(status = "error",
                               execution_count = execution_count)
