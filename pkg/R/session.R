@@ -168,7 +168,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         self$errored <- FALSE
         code_blocks <- preproc_code(code)
         for(block in code_blocks) {
-          self$run_code1(block,
+          self$run_code_lines(block,
                         io_timeout = io_timeout,
                         run_timeout = run_timeout,
                         stdout_callback = stdout_callback,
@@ -182,8 +182,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
           if(self$errored) break
         }
     },
-    run_code1 = function(
-        code,
+    run_code_lines = function(
+        lines,
         io_timeout = 1,
         run_timeout = 10,
         wait_callback = NULL,
@@ -195,7 +195,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         until_prompt = FALSE,
         echo = self$echo
       ) {
-        lines <- split_lines1(code)
         n_lines <- length(lines)
         for (i in 1:n_lines) {
           line <- lines[i]
@@ -387,8 +386,8 @@ getlastmatch <- function(pattern, txt) {
 preproc_code <- function(code) {
   # log_out("preproc_code")
   parsed <- str2expression(code)
-  res <- lapply(parsed, deparse)
-  unlist(lapply(res,pasteCR))
+  lapply(parsed, deparse)
+  # unlist(lapply(res,pasteCR))
 }
 
 pasteCR <- function(x) {
