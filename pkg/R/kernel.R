@@ -1102,6 +1102,7 @@ Kernel <- R6Class("Kernel",
       if(condition == "error") {
         self$errored <- TRUE
         self$stop_on_error <- options$rkernel_stop_on_error
+        self$r_repl$errored <- TRUE
       }
     }
   )

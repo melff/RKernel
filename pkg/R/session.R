@@ -165,6 +165,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         until_prompt = FALSE,
         echo = self$echo
       ) {
+        self$errored <- FALSE
         code_blocks <- preproc_code(code)
         for(block in code_blocks) {
           self$run_code1(block,
@@ -178,6 +179,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                         prompt_callback = prompt_callback,
                         until_prompt = until_prompt,
                         echo = echo)
+          if(self$errored) break
         }
     },
     run_code1 = function(
@@ -370,7 +372,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       opt <- list(self$getOption(n))
       names(opt) <- n
       do.call("options", opt)
-    }
+    },
+    errored = FALSE
  )) 
 
 TrueFunc <- function(...) TRUE
