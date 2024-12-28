@@ -274,6 +274,7 @@ deparse0 <- function(expr, width.cutoff = 60L) {
 }
 
 error_condition_msg <- function(e) {
+  log_out("error_condition_msg")
   msg <- list(
     type = "condition",
     content = list(
@@ -286,7 +287,7 @@ error_condition_msg <- function(e) {
       )
     )
   )
-  RKernel:::msg_send(msg)
+  msg_send(msg)
 }
 install_globalCallingHandlers <- function() {
   globalCallingHandlers(

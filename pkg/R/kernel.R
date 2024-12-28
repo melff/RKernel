@@ -329,7 +329,7 @@ Kernel <- R6Class("Kernel",
     execution_count = 1,
     handle_execute_request = function(msg){
       log_out("handle_execute_request")
-      log_out(msg, use.str = TRUE)
+      # log_out(msg, use.str = TRUE)
       if(msg$content$silent){
         if(msg$content$store_history){
           log_warning("store_history forced to FALSE")
@@ -359,8 +359,8 @@ Kernel <- R6Class("Kernel",
           args <- mparsed$args
           code <- mparsed$code
           if(magic == "kernel") {
-              log_out("kernel magic found")
-              log_out(code)
+              # log_out("kernel magic found")
+              # log_out(code)
               expr <- str2expression(code)
               tryCatch(eval_capture(expr, 
                                     envir = private$sandbox,
@@ -709,7 +709,7 @@ Kernel <- R6Class("Kernel",
       return(continue)
     },
 
-    respond_shell = function(req,debug=TRUE){
+    respond_shell = function(req,debug=FALSE){
       if(debug)
         log_out("respond_shell")
       msg <- private$get_message("shell")
@@ -744,7 +744,7 @@ Kernel <- R6Class("Kernel",
     },
 
     send_busy = function(parent){
-      log_out("send_busy")
+      # log_out("send_busy")
       private$send_message(type="status",
                            parent=parent,
                            socket_name="iopub",
@@ -753,7 +753,7 @@ Kernel <- R6Class("Kernel",
     },
 
     send_idle = function(parent){
-      log_out("send_idle")
+      # log_out("send_idle")
       private$send_message(type="status",
                            parent=parent,
                            socket_name="iopub",

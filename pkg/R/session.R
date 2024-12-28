@@ -200,7 +200,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         for (i in 1:n_lines) {
           line <- lines[i]
           if(!length(line) || !is.character(line) || is.na(line)) break
-          log_out(sprintf("Sending line '%s'",line))
+          # log_out(sprintf("Sending line '%s'",line))
           self$session$send_input(line)
           tryCatch(self$process_output(
                           io_timeout = io_timeout,
@@ -384,22 +384,8 @@ getlastmatch <- function(pattern, txt) {
 }
 
 
-preproc_code_ <- function(code) {
-  log_out("preproc_code")
-  parse <- parse(text = code, keep.source=TRUE)
-  log_out(parse,use.str=TRUE)
-  sf <- attr(parse,"srcref")
-  log_out(sf,use.str=TRUE)
-  if(!length(sf)) return(code)
-  else {
-    res <- lapply(sf,as.character)
-    res <- lapply(res, pasteCR)
-    return(unlist(res))
-  }
-}
-
 preproc_code <- function(code) {
-  log_out("preproc_code")
+  # log_out("preproc_code")
   parsed <- str2expression(code)
   res <- lapply(parsed, deparse)
   unlist(lapply(res,pasteCR))
