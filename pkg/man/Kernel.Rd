@@ -42,6 +42,8 @@ An object of this class handles the low-level communication with
 \item \href{#method-Kernel-read_stdin}{\code{Kernel$read_stdin()}}
 \item \href{#method-Kernel-send_debug_event}{\code{Kernel$send_debug_event()}}
 \item \href{#method-Kernel-handle_r_msg}{\code{Kernel$handle_r_msg()}}
+\item \href{#method-Kernel-save_shell_parent}{\code{Kernel$save_shell_parent()}}
+\item \href{#method-Kernel-restore_shell_parent}{\code{Kernel$restore_shell_parent()}}
 \item \href{#method-Kernel-clone}{\code{Kernel$clone()}}
 }
 }
@@ -334,7 +336,7 @@ Send a debug event to the frontend
 \subsection{Method \code{handle_r_msg()}}{
 Handle a generic message sent from the R Session
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Kernel$handle_r_msg(msg)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$handle_r_msg(msg, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -344,6 +346,24 @@ Handle a generic message sent from the R Session
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-save_shell_parent"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-save_shell_parent}{}}}
+\subsection{Method \code{save_shell_parent()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$save_shell_parent()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-restore_shell_parent"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-restore_shell_parent}{}}}
+\subsection{Method \code{restore_shell_parent()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$restore_shell_parent(saved_parent)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Kernel-clone"></a>}}

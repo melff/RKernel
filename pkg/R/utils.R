@@ -268,7 +268,7 @@ read_asset <- function(path) {
   paste(readLines(path),collapse="\n")
 }
 
-deparse0 <- function(expr, width.cutoff = 60L) {
+deparse0 <- function(expr, width.cutoff = 500L) {
   paste(deparse(expr, width.cutoff = width.cutoff),
         collapse = "\n")
 }
@@ -293,4 +293,17 @@ install_globalCallingHandlers <- function() {
   globalCallingHandlers(
     error = error_condition_msg
   )
+}
+
+
+
+preproc_code <- function(code) {
+  # log_out("preproc_code")
+  parsed <- str2expression(code)
+  lapply(parsed, deparse)
+  # unlist(lapply(res,pasteCR))
+}
+
+pasteCR <- function(x) {
+  paste0(x,"\n", collapse="")
 }

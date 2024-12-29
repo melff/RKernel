@@ -153,7 +153,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       self$prompt_callback <- prompt_callback
       self$echo <- echo
     },
-    run_code = function(code,
+    run_code = function(
+        code,
         io_timeout = 1,
         run_timeout = 10,
         wait_callback = NULL,
@@ -165,41 +166,12 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         until_prompt = FALSE,
         echo = self$echo
       ) {
-        self$errored <- FALSE
-        code_blocks <- preproc_code(code)
-        for(block in code_blocks) {
-          self$run_code_lines(block,
-                        io_timeout = io_timeout,
-                        run_timeout = run_timeout,
-                        stdout_callback = stdout_callback,
-                        stderr_callback = stderr_callback,
-                        wait_callback = wait_callback,
-                        browser_callback = browser_callback,
-                        readline_callback = readline_callback,
-                        prompt_callback = prompt_callback,
-                        until_prompt = until_prompt,
-                        echo = echo)
-          if(self$errored) break
-        }
-    },
-    run_code_lines = function(
-        lines,
-        io_timeout = 1,
-        run_timeout = 10,
-        wait_callback = NULL,
-        stdout_callback = self$stdout_callback,
-        stderr_callback = self$stderr_callback,
-        readline_callback = self$readline_callback,
-        browser_callback = self$browser_callback,
-        prompt_callback = self$prompt_callback,
-        until_prompt = FALSE,
-        echo = self$echo
-      ) {
+        lines <- split_lines1(code)
         n_lines <- length(lines)
         for (i in 1:n_lines) {
           line <- lines[i]
           if(!length(line) || !is.character(line) || is.na(line)) break
-          # log_out(sprintf("Sending line '%s'",line))
+          log_out(sprintf("Sending line '%s'",line))
           self$session$send_input(line)
           tryCatch(self$process_output(
                           io_timeout = io_timeout,
@@ -253,7 +225,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               resp$stdout <- drop_echo(resp$stdout)
             }
             if (grepl(self$browse_prompt, resp$stdout)) {
-              # log_out("Found browser prompt")
+              log_out("Found browser prompt")
               prompt <- getlastmatch(self$browse_prompt, resp$stdout)
               resp$stdout <- gsub(self$browse_prompt,"",resp$stdout)
               if (nzchar(resp$stdout)) {
@@ -263,7 +235,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                 output_complete <- browser_callback(prompt=prompt)
               } else session$send_input("Q")
             } else if (endsWith(resp$stdout, self$co_prompt)) {
-              # log_out("Found continuation prompt")
+              log_out("Found continuation prompt")
               if(echo) {
                 #resp$stdout <- remove_suffix(resp$stdout, self$co_prompt)
                 if (nzchar(resp$stdout)) {
@@ -275,7 +247,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               }
               output_complete <- !until_prompt
             } else if (endsWith(resp$stdout, self$prompt)) {
-              # log_out("Found main prompt")
+              log_out("Found main prompt")
               # log_out(self$status)
               self$found_prompt <- TRUE
               resp$stdout <- remove_suffix(resp$stdout, self$prompt)
@@ -288,7 +260,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                 output_complete <- TRUE
               }
             } else if (endsWith(resp$stdout, self$readline_prompt)) {
-              # log_out("Found readline prompt")
+              log_out("Found readline prompt")
               # log_out(self$status)
               resp$stdout <- remove_suffix(resp$stdout, self$readline_prompt)
               if (is.function(readline_callback)) {
@@ -380,16 +352,4 @@ TrueFunc <- function(...) TRUE
 getlastmatch <- function(pattern, txt) {
   m <- regexpr(pattern, txt)
   tail(regmatches(txt,m), n = 1L)
-}
-
-
-preproc_code <- function(code) {
-  # log_out("preproc_code")
-  parsed <- str2expression(code)
-  lapply(parsed, deparse)
-  # unlist(lapply(res,pasteCR))
-}
-
-pasteCR <- function(x) {
-  paste0(x,"\n", collapse="")
 }
