@@ -307,3 +307,24 @@ preproc_code <- function(code) {
 pasteCR <- function(x) {
   paste0(x,"\n", collapse="")
 }
+
+send_menu_request <- function(choices,title,...) {
+  msg <- list(
+    type = "menu_request",
+    choices = choices,
+    title = title
+  )
+  msg_send(msg)
+}
+
+Sys.sleep.orig <- getFromNamespace("Sys.sleep","base")
+
+Sys_sleep <- function(time) {
+  cat_(XOFF)
+  Sys.sleep.orig(time)
+  cat_(XON)
+}
+
+install_sleep <- function(){
+    replace_in_package("base", "Sys.sleep", Sys_sleep)
+}

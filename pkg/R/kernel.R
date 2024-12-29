@@ -66,7 +66,8 @@ Kernel <- R6Class("Kernel",
         stdout_callback = private$handle_r_stdout,
         stderr_callback = private$handle_r_stderr,
         readline_callback = private$r_get_input,
-        browser_callback = private$handle_r_browser
+        browser_callback = private$handle_r_browser,
+        input_callback = private$r_get_input
       )
       assign("repl",self$r_repl,envir=private$sandbox)
     },
@@ -88,6 +89,7 @@ Kernel <- R6Class("Kernel",
       self$r_repl$run_cmd("options(error=NULL)") # Undo callr's setting to enable traceback
       self$r_repl$run_cmd("RKernel::inject_send_options()")
       self$r_repl$run_cmd("suppressWarnings(rm(.pbd_env))")
+      self$r_repl$run_cmd("RKernel:::install_sleep()")
       msg_env$send <- self$handle_r_msg
     },
     #' @field r_session See \code{\link{RKernelSession}}.
@@ -927,7 +929,7 @@ Kernel <- R6Class("Kernel",
       self$r_repl$run_cmd("RKernel::install_cell_hooks()")
       self$r_repl$run_cmd("RKernel::install_safe_q()")
       self$r_repl$run_cmd("RKernel::install_readline()")
-      # self$r_repl$run_cmd("RKernel::install_menu()")
+      self$r_repl$run_cmd("RKernel::install_menu()")
       self$r_repl$run_cmd("RKernel::set_help_displayed")
       self$r_repl$run_cmd("RKernel::install_httpd_handlers()")
       self$r_repl$run_cmd("RKernel:::install_globalCallingHandlers()")
@@ -1033,9 +1035,12 @@ Kernel <- R6Class("Kernel",
     r_set_help_displayed = function(){
       self$r_repl$run_cmd("RKernel::set_help_displayed(TRUE)")
     },
+    input_suspended = TRUE,
     r_get_input = function(prompt = ""){
-      self$input_request(prompt = prompt)
-      self$read_stdin()
+      if(!private$input_suspended) {
+        self$input_request(prompt = prompt)
+        self$read_stdin()
+      }
     },
     r_send_request = function(msg){
       # log_out("r_send_request")
@@ -1095,6 +1100,8 @@ Kernel <- R6Class("Kernel",
 
     run_code_cell = function(code) {
       # log_out("= run_code_cell ========================")
+      private$input_suspended <- FALSE
+      on.exit(private$input_suspended <- TRUE)
       code_blocks <- preproc_code(code)
       for(block in code_blocks) {
         self$errored <- FALSE 

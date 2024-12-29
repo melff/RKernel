@@ -7,6 +7,7 @@ RKernelSession <- R6Class("RKernelSession",
   inherit = r_session,
   public = list(
     banner = "",
+    waiting = FALSE,
     initialize = function(options = r_session_options(
                             stdout = "|",
                             stderr = "|",
@@ -40,6 +41,8 @@ RKernelSession <- R6Class("RKernelSession",
       }
     },
     receive_output = function(timeout = 1){
+      self$waiting <- FALSE
+      sleeping <- self$get_status() == "sleeping"
       poll_res <- self$poll_io(timeout)
       res <- list()
       if (poll_res[1] == "ready") {
@@ -54,6 +57,8 @@ RKernelSession <- R6Class("RKernelSession",
         res$stdout <- paste0(res$stdout, msg$stdout)
         res$stderr <- paste0(res$stderr, msg$stderr)
       }
+      if(all(poll_res == "timeout") && sleeping)
+        self$waiting <- TRUE
       return(res)
     },
     receive_all_output = function(timeout = 1){
@@ -99,10 +104,14 @@ drop_echo <- function(txt, n = 1) {
   txt
 }
 
+XON <- '\x11'
+XOFF <- '\x13'
+
 #' @export
 RSessionAdapter <- R6Class("RSessionAdapter",
  public = list(
     session = NULL,
+    suspended = FALSE,
     prompt = NULL,
     browse_prompt = "Browse\\[([0-9]+)\\]> $",
     readline_prompt = READLINE_prompt,
@@ -116,6 +125,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
     readline_callback = NULL,
     browser_callback = NULL,
     prompt_callback = NULL,
+    input_callback = NULL,
     echo = FALSE,
     aggreg_stdout = function(txt, ...) {
       self$stdout <- paste0(self$stdout,txt)
@@ -139,6 +149,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       readline_callback = NULL,
       browser_callback = NULL,
       prompt_callback = NULL,
+      input_callback = NULL,
       prompt = "> ",
       co_prompt = "+ ",
       echo = FALSE
@@ -151,6 +162,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       self$readline_callback <- readline_callback
       self$browser_callback <- browser_callback
       self$prompt_callback <- prompt_callback
+      self$input_callback <- input_callback
       self$echo <- echo
     },
     run_code = function(
@@ -163,6 +175,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         readline_callback = self$readline_callback,
         browser_callback = self$browser_callback,
         prompt_callback = self$prompt_callback,
+        input_callback = self$input_callback,
         until_prompt = FALSE,
         echo = self$echo
       ) {
@@ -182,6 +195,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                           browser_callback = browser_callback,
                           readline_callback = readline_callback,
                           prompt_callback = prompt_callback,
+                          input_callback = input_callback,
                           until_prompt = until_prompt,
                           echo = echo),
             interrupt = function(e) {
@@ -200,6 +214,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         stderr_callback = self$stderr_callback,
         readline_callback = self$readline_callback,
         browser_callback = self$browser_callback,
+        input_callback = self$input_callback,
         prompt_callback = self$prompt_callback,
         until_prompt = TRUE,
         echo = FALSE
@@ -220,10 +235,33 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                     wait_callback()
             } 
           }
+          if(!length(resp) && session$waiting && !self$suspended) {
+            # log_out("Session waiting for input(?)")
+            if(is.function(input_callback)) {
+              inp <- input_callback()
+              session$send_input(inp)
+            }
+          }
           if (!is.null(resp$stdout)) {
             if (loop_count == 1 && !echo) {
               resp$stdout <- drop_echo(resp$stdout)
             }
+            # so <- resp$stdout
+            # if(grepl(XOFF,so) || grepl(XON,so)) {
+            #   so <- sub(XOFF,"[XOFF]",so)
+            #   so <- sub(XON,"[XON]",so)
+            #   log_out(so)
+            # }
+            if(startsWith(resp$stdout,XON) && !endsWith(resp$stdout,XOFF)) {
+              self$suspended <- FALSE
+              # log_out("Output restarted")
+            }
+            else if(endsWith(resp$stdout,XOFF)) {
+              self$suspended <- TRUE
+              # log_out("Output suspended")
+            } 
+            resp$stdout <- gsub(XON,"",resp$stdout)
+            resp$stdout <- gsub(XOFF,"",resp$stdout)
             if (grepl(self$browse_prompt, resp$stdout)) {
               # log_out("Found browser prompt")
               prompt <- getlastmatch(self$browse_prompt, resp$stdout)
@@ -292,6 +330,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                     wait_callback = NULL,
                     readline_callback = NULL,
                     browser_callback = TrueFunc,
+                    input_callback = NULL,
                     until_prompt = TRUE,
                     echo = FALSE
                     )
