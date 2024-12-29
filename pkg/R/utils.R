@@ -273,7 +273,7 @@ deparse0 <- function(expr, width.cutoff = 500L) {
         collapse = "\n")
 }
 
-error_condition_msg <- function(e) {
+send_error_condition <- function(e) {
   # log_out("error_condition_msg")
   msg <- list(
     type = "condition",
@@ -291,7 +291,7 @@ error_condition_msg <- function(e) {
 }
 install_globalCallingHandlers <- function() {
   globalCallingHandlers(
-    error = error_condition_msg
+    error = send_error_condition
   )
 }
 
