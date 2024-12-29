@@ -217,18 +217,18 @@ install_safe_q <- function(){
 }
 
 #' @export
-readline_orig <- getFromNamespace("readline","base")
+readline_ <- getFromNamespace("readline","base")
 
 READLINE_prompt <- "[$$READLINE$$]"
 
-readline_ <- function(prompt = "") {
+readline <- function(prompt = "") {
   prompt <- paste0(prompt, READLINE_prompt)
-  readline_orig(prompt = prompt)
+  readline_(prompt = prompt)
 }
 
 #' @export
 install_readline <- function(){
-    replace_in_package("base", "readline", readline_)
+    replace_in_package("base", "readline", readline)
 }
 
 menu_ <- function(choices,title=NULL,...) {
