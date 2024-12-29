@@ -328,7 +328,7 @@ Kernel <- R6Class("Kernel",
     pid = 0,
     execution_count = 1,
     handle_execute_request = function(msg){
-      log_out("handle_execute_request")
+      # log_out("handle_execute_request")
       # log_out(msg, use.str = TRUE)
       if(msg$content$silent){
         if(msg$content$store_history){
@@ -474,7 +474,7 @@ Kernel <- R6Class("Kernel",
       if(clear_queue) {
         private$clear_queue_requested <- TRUE
       }
-      log_out("handle_execute_request done")
+      # log_out("handle_execute_request done")
     },
 
     display_id = character(0),
@@ -895,7 +895,7 @@ Kernel <- R6Class("Kernel",
     clear_queue_requested = FALSE,
     clear_shell_queue = function(...){
       # Empty message queue from shell
-      log_out("clear_shell_queue")
+      # log_out("clear_shell_queue")
       POLLIN <- private$.pbd_env$ZMQ.PO$POLLIN
       repeat {
         r <- zmq.poll(c(private$sockets$shell),POLLIN,timeout=0L,
@@ -916,7 +916,7 @@ Kernel <- R6Class("Kernel",
         }
         else break
       }
-      log_out("clear_shell_queue done")
+      # log_out("clear_shell_queue done")
     },
     
     logfile = NULL,
@@ -1094,26 +1094,26 @@ Kernel <- R6Class("Kernel",
     },
 
     run_code_cell = function(code) {
-      log_out("= run_code_cell ========================")
+      # log_out("= run_code_cell ========================")
       code_blocks <- preproc_code(code)
       for(block in code_blocks) {
         self$errored <- FALSE 
-        log_out("- run code block ----")
-        log_out(block, use.str=TRUE)
+        # log_out("- run code block ----")
+        # log_out(block, use.str=TRUE)
         self$r_repl$run_code(block)
-        log_out("- done running code block ----")
-        log_out(sprintf("kernel$errored: %s",self$errored))
+        # log_out("- done running code block ----")
+        # log_out(sprintf("kernel$errored: %s",self$errored))
         if(self$errored) {
-          log_out("Handling error in code chunk")
+          # log_out("Handling error in code chunk")
           condition <- private$condition
-          log_out(condition, use.str=TRUE)
+          # log_out(condition, use.str=TRUE)
           options <- condition$options
           if(options$rkernel_show_traceback) {
-            log_out("Obtaining traceback")
+            # log_out("Obtaining traceback")
             r <- self$r_repl$run_cmd("traceback()")
-            log_out(r, use.str=TRUE)
+            # log_out(r, use.str=TRUE)
             tb <- list("Traceback:",r$stdout)
-            log_out("done")
+            # log_out("done")
           }
           else {
             tb <- NULL
@@ -1123,9 +1123,9 @@ Kernel <- R6Class("Kernel",
           content <- list(ename="error",
                           evalue=condition$message,
                           traceback=tb)
-          log_out("Sending error message")
-          log_out("content")
-          log_out(content)
+          # log_out("Sending error message")
+          # log_out("content")
+          # log_out(content)
           private$send_message(type="error",
                           parent=private$parent$shell,
                           socket="iopub",

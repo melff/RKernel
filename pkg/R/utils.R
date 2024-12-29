@@ -232,7 +232,7 @@ install_readline <- function(){
 }
 
 menu_ <- function(choices,title=NULL,...) {
-    # Needed because it is possible to spot menues based on a specific
+    # Needed because it is impossible to spot menues based on a specific
     # prompt without encountering many false positives.
     nc <- length(choices)
     if (length(title) && nzchar(title[1L])) 
@@ -274,7 +274,7 @@ deparse0 <- function(expr, width.cutoff = 500L) {
 }
 
 error_condition_msg <- function(e) {
-  log_out("error_condition_msg")
+  # log_out("error_condition_msg")
   msg <- list(
     type = "condition",
     content = list(
