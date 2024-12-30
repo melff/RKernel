@@ -31,6 +31,7 @@ An object of this class handles the low-level communication with
 \item \href{#method-Kernel-stream}{\code{Kernel$stream()}}
 \item \href{#method-Kernel-stdout}{\code{Kernel$stdout()}}
 \item \href{#method-Kernel-stderr}{\code{Kernel$stderr()}}
+\item \href{#method-Kernel-readline}{\code{Kernel$readline()}}
 \item \href{#method-Kernel-execute_result}{\code{Kernel$execute_result()}}
 \item \href{#method-Kernel-display_send}{\code{Kernel$display_send()}}
 \item \href{#method-Kernel-send_error}{\code{Kernel$send_error()}}
@@ -171,6 +172,15 @@ Stream text to the frontend via 'stderr' stream.
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-readline"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-readline}{}}}
+\subsection{Method \code{readline()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$readline(prompt = "")}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Kernel-execute_result"></a>}}

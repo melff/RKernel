@@ -216,21 +216,6 @@ install_safe_q <- function(){
     replace_in_package("base","quit",q_defunct)
 }
 
-#' @export
-readline_ <- getFromNamespace("readline","base")
-
-READLINE_prompt <- "[$$READLINE$$]"
-
-readline <- function(prompt = "") {
-  prompt <- paste0(prompt, READLINE_prompt)
-  readline_(prompt = prompt)
-}
-
-#' @export
-install_readline <- function(){
-    replace_in_package("base", "readline", readline)
-}
-
 read_asset <- function(path) {
   path <- system.file(path,package="RKernel")
   paste(readLines(path),collapse="\n")
