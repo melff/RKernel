@@ -31,14 +31,29 @@ RKernelSession <- R6Class("RKernelSession",
       self$yield <- yield
       self$kernel <- kernel
     },
-    send_input = function(text) {
+    drop_last_input = FALSE,
+    last_input = "",
+    send_input = function(text, drop_echo = FALSE) {
       if (!endsWith(text, "\n")) text <- paste0(text, "\n")
+      self$drop_last_input <- drop_echo
+      if(drop_echo) {
+        self$last_input <- text
+      }
       while (TRUE) {
         text <- self$write_input(text)
         if (!length(text)) {
           break
         } 
       }
+    },
+    read_output = function(n = -1) {
+      res <- super$read_output(n = n)
+      if(self$drop_last_input) {
+          res <- remove_prefix(res,self$last_input)
+          self$drop_last_input <- FALSE
+          self$last_input <- ""
+      }
+      res
     },
     receive_output = function(timeout = 1){
       self$waiting <- FALSE
@@ -239,7 +254,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             # log_out("Session waiting for input(?)")
             if(is.function(input_callback)) {
               inp <- input_callback()
-              session$send_input(inp)
+              session$send_input(inp, drop_echo = TRUE)
             }
           }
           if (!is.null(resp$stdout)) {
@@ -304,9 +319,9 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               if (is.function(readline_callback)) {
                 # log_out("Calling readline callback")
                 inp <- readline_callback(prompt = resp$stdout)
-                session$send_input(inp)
+                session$send_input(inp, drop_echo = TRUE)
               }
-              else session$send_input("")
+              else session$send_input("", drop_echo = TRUE)
             } else {
               # log_out("stdout callback")
               stdout_callback(resp$stdout)
