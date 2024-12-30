@@ -215,7 +215,6 @@ SelectionSliderClass <- R6Class_("SelectionSlider",
 SelectionSlider <- function(options,value,...) SelectionSliderClass$new(options=options,value=value,...)
 
 
-
 #' @rdname SelectionWidget
 #' @export
 MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
@@ -244,8 +243,8 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
       #' @param value Names of selectable options.
       #' @param ... Any other arguments, ignored.
       initialize = function(options,value,...){
-          # log_out("MultipleSelectionWidgetClass$validate_index")
-          # super$initialize(...)
+          log_out("MultipleSelectionWidgetClass$initialize")
+          super$initialize(...)
           options <- as.character(options)
           self[["_options_labels"]] <- options
           self$validate("index",self$validate_index)

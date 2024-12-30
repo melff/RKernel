@@ -3,43 +3,11 @@ Menu <- function(kernel, args, ...) {
   m$run()
 }
 
-
-
-send_menu_request <- function(choices,title,multiple=FALSE,...) {
-  msg <- list(
-    type = "menu",
-    content = list(
-      choices = choices,
-      title = title,
-      multiple = multiple)
-  )
-  msg_send(msg)
-}
-
-menu_orig <- getFromNamespace("menu","utils")
-
-menu_ <- function(choices,title=NULL,...) {
-    if(get_config('use_widgets')) {
-      nc <- length(choices)
-      choices <- paste(format(1:nc,justify="right"),choices,sep=": ")
-      send_menu_request(choices,title,...)
-      ind <- readline()
-      ind <- as.integer(ind)
-    } else {
-      ind <- menu_orig(choices,title=title,...)
-    }
-    return(ind)
-}
-
-#' @export
-install_menu <- function(){
-    replace_in_package("utils", "menu", menu_)
-}
-
 MenuWidgetClass <- R6Class("MenuWidget",
     public = list(
         choices = NULL,
-        allow_none = NULL,
+        preselect = NULL,
+        multiple = NULL,
         title = NULL,
         index = 0,
         value = NULL,
@@ -51,6 +19,8 @@ MenuWidgetClass <- R6Class("MenuWidget",
             self$choices <- unlist(args$choices)
             self$title <- args$title
             self$kernel <- kernel
+            self$multiple <- args$multiple
+            self$preselect <- args$preselect
         },
         on_ok = function() {
             ind <- self$listbox$index + 1L # widget indices are zero-based
@@ -65,7 +35,18 @@ MenuWidgetClass <- R6Class("MenuWidget",
             kernel <- self$kernel
             choices <- self$choices
             nc <- length(choices)
-            self$listbox <- ListBox(options=choices,value="",rows=nc)
+            multiple <- self$multiple
+            rows <- min(nc, getOption("rowsListBox",10L))
+            if(multiple) {
+              self$listbox <- ListBoxMultiple(options=choices,value="",rows=rows)
+              if(length(self$preselect)) {
+                preselect <- intersect(self$preselect, self$choices)
+                ind <- match(preselect,self$choices)
+                self$listbox$index <- ind - 1L
+              }
+            } else {
+              self$listbox <- ListBox(options=choices,value="",rows=rows)
+            }
             ok_button <- Button(description="OK")
             ok_button$on_click(self$on_ok)
             cancel_button <- Button(description="Cancel")
@@ -86,14 +67,72 @@ MenuWidgetClass <- R6Class("MenuWidget",
                 kernel$r_session$yield(1000)
             }
             self$listbox$disabled <- TRUE
-            self$main_widget <- TextWidget(value=self$listbox$value,disabled=TRUE)
+            self$main_widget <- TextWidget(value=paste(self$listbox$value,
+                                                       collapse=", "),
+                                                 disabled=TRUE)
             d <- update(d,self$main_widget)
             kernel$display_send(d)
-            res <- as.character(self$index)
+            res <- deparse(self$index)
             kernel$r_session$send_input(res, drop_echo = TRUE)
         }
     )
 )
 
-# labs <- format(1:nc,justify="right")
-# ops_labs <- paste0(labs,": ",choices)
+
+send_menu_request <- function(choices,preselect=NULL,multiple=FALSE,title=NULL,...) {
+  msg <- list(
+    type = "menu",
+    content = list(
+      choices = choices,
+      preselect = preselect,
+      title = title,
+      multiple = multiple)
+  )
+  msg_send(msg)
+}
+
+menu_orig <- getFromNamespace("menu","utils")
+
+menu_ <- function(choices,graphics=FALSE,title=NULL) {
+    if(get_config('use_widgets')) {
+      nc <- length(choices)
+      labs <- formatC(1:nc,flag="0",format="d",digits=as.integer(nc>=10))
+      choices <- paste(labs,choices,sep=": ")
+      send_menu_request(choices,title=title)
+      ind <- readline()
+      ind <- eval(str2expression(ind))
+    } else {
+      ind <- menu_orig(choices,graphics=graphics,title=title)
+    }
+    return(ind)
+}
+
+select_list_orig <- getFromNamespace("select.list","utils")
+
+select_list_ <- function(choices, preselect = NULL, multiple = FALSE, title = NULL, 
+                         graphics = getOption("menu.graphics")) {
+    if(get_config('use_widgets')) {
+      send_menu_request(choices,
+                        preselect = preselect,
+                        multiple = multiple,
+                        title = title
+                        )
+      ind <- readline()
+      ind <- eval(str2expression(ind))
+      value <- choices[ind]
+    } else {
+      value <- select_list_orig(choices,
+                              preselect = preselect,
+                              multiple = multiple,
+                              title = title,
+                              graphics=graphics)
+    }
+    return(value)
+}
+
+
+#' @export
+install_menu <- function(){
+    replace_in_package("utils", "menu", menu_)
+    replace_in_package("utils", "select.list", select_list_)
+}
