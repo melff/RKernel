@@ -89,6 +89,7 @@ Kernel <- R6Class("Kernel",
       self$r_repl$run_cmd("RKernel::inject_send_options()")
       self$r_repl$run_cmd("suppressWarnings(rm(.pbd_env))")
       self$r_repl$run_cmd("RKernel:::install_sleep()")
+      self$r_repl$run_cmd("RKernel:::set_config(use_widgets = FALSE)")
       msg_env$send <- self$handle_r_msg
     },
     #' @field r_session See \code{\link{RKernelSession}}.
@@ -318,7 +319,6 @@ Kernel <- R6Class("Kernel",
       }
     },
     errored = FALSE,
-    has_widgets = FALSE,
     save_shell_parent = function() {
       private$parent$shell
     },
@@ -569,7 +569,8 @@ Kernel <- R6Class("Kernel",
       # log_out("comm_info_reply")
       target <- msg$content$target_name
       if(target == "jupyter.widget") {
-        self$has_widgets <- TRUE
+        config$use_widgets <- TRUE
+        self$r_repl$run_cmd("RKernel:::set_config(use_widgets=TRUE)")
       }
       reply <- private$r_send_request(list(
         type = "comm_info_request",
@@ -591,7 +592,8 @@ Kernel <- R6Class("Kernel",
       # return(NULL)
       target <- msg$content$target_name
       if(target == "jupyter.widget.control") {
-        self$has_widgets <- TRUE
+        config$use_widgets <- TRUE
+        self$r_repl$run_cmd("RKernel:::set_config(use_widgets=TRUE)")
       }
       private$r_send_request_noreply(list(
         type = "comm_open",
@@ -1084,7 +1086,7 @@ Kernel <- R6Class("Kernel",
       saved_parent <- private$parent$shell
       dbgConsole(session = self$r_session,
                  prompt = prompt,
-                 use_widgets = self$has_widgets)
+                 use_widgets = config$use_widgets)
       private$parent$shell <- saved_parent
       return(TRUE)
     },
@@ -1104,8 +1106,7 @@ Kernel <- R6Class("Kernel",
     handle_menu_request = function(msg) {
       saved_parent <- private$parent$shell
       Menu(kernel = self,
-           args = msg$content,
-           use_widgets = self$has_widgets)
+           args = msg$content)
       private$parent$shell <- saved_parent
       return(TRUE)
     },
@@ -1201,6 +1202,20 @@ remove_suffix <- function(text, prefix) {
 
 prefix <- function(x, n) substr(x, start = 1, stop = n)
 suffix <- function(x, n) substr(x, start=nchar(x) - n, nchar(x))
+
+config <- new.env()
+config$use_widgets <- FALSE
+
+set_config <- function(...) {
+  args <- list(...)
+  for(n in names(args)) {
+    assign(n,args[[n]],envir=config)
+  }
+}
+
+get_config <- function(name) {
+  get0(name,envir=config)
+}
 
 # Local Variables:
 # ess-indent-offset: 2
