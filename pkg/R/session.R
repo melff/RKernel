@@ -6,6 +6,7 @@
 RKernelSession <- R6Class("RKernelSession",
   inherit = r_session,
   public = list(
+    prompt = "> ",
     banner = "",
     waiting = FALSE,
     initialize = function(options = r_session_options(
@@ -19,7 +20,8 @@ RKernelSession <- R6Class("RKernelSession",
                             ),
                             env = c(R_CLI_NUM_COLORS="16777216")),
                           yield = NULL,
-                          kernel = NULL
+                          kernel = NULL,
+                          prompt = "> "
                           ) {
       super$initialize(
         options = options,
@@ -27,8 +29,11 @@ RKernelSession <- R6Class("RKernelSession",
       )
       resp <- self$receive_all_output(timeout = 1000)
       banner <- resp$stdout
-      self$banner <- unlist(strsplit(banner, self$prompt))[1]
+      banner <- strsplit(banner, self$prompt, fixed = TRUE)
+      banner <- unlist(banner)[1]
+      banner <- remove_prefix(banner,"\n") |> remove_suffix("\n")
       self$yield <- yield
+      self$banner <- banner
       self$kernel <- kernel
     },
     drop_last_input = FALSE,
