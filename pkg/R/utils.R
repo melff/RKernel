@@ -231,38 +231,6 @@ install_readline <- function(){
     replace_in_package("base", "readline", readline)
 }
 
-menu_ <- function(choices,title=NULL,...) {
-    # Needed because it is impossible to spot menues based on a specific
-    # prompt without encountering many false positives.
-    nc <- length(choices)
-    if (length(title) && nzchar(title[1L])) 
-        cat(title[1L], "\n")
-    op <- paste0(format(seq_len(nc)), ": ", choices)
-    if (nc > 10L) {
-        fop <- format(op)
-        nw <- nchar(fop[1L], "w") + 2L
-        ncol <- getOption("width")%/%nw
-        if (ncol > 1L) 
-            op <- paste0(fop, c(rep.int("  ", min(nc, ncol) - 
-                1L), "\n"), collapse = "")
-    }
-    cat("", op, "", sep = "\n")
-    repeat {
-        resp <- readline()
-        if(grepl("[0-9]+",resp)) {
-            ind <- as.integer(resp)
-            if (ind <= nc) 
-                return(ind)
-        }
-        cat(gettext("Enter an item from the menu, or 0 to exit\n"))
-    }
-}
-
-#' @export
-install_menu <- function(){
-    replace_in_package("utils", "menu", menu_)
-}
-
 read_asset <- function(path) {
   path <- system.file(path,package="RKernel")
   paste(readLines(path),collapse="\n")
@@ -306,15 +274,6 @@ preproc_code <- function(code) {
 
 pasteCR <- function(x) {
   paste0(x,"\n", collapse="")
-}
-
-send_menu_request <- function(choices,title,...) {
-  msg <- list(
-    type = "menu_request",
-    choices = choices,
-    title = title
-  )
-  msg_send(msg)
 }
 
 Sys.sleep.orig <- getFromNamespace("Sys.sleep","base")

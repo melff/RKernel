@@ -83,6 +83,7 @@ Collate:
     'kernel.R'
     'magic-codes.R'
     'main.R'
+    'menu.R'
     'options.R'
     'output.R'
     'proto.R'

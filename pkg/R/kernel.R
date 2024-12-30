@@ -162,6 +162,9 @@ Kernel <- R6Class("Kernel",
     stderr = function(text) {
       self$stream(text,stream="stderr")
     },
+    readline = function(prompt="") {
+      private$r_get_input(prompt=prompt)
+    },
     #' @description
     #' Send execution results to the frontend
     #' @param data Execution result in rich format
@@ -1002,6 +1005,7 @@ Kernel <- R6Class("Kernel",
           }
           else if(nzchar(chunk)) {
             # log_out(chunk, use.print = TRUE)
+            # chunk <- paste0("<|",chunk,"|>")
             self$stream(chunk, stream = stream)
           }
         }
@@ -1024,6 +1028,7 @@ Kernel <- R6Class("Kernel",
       private$r_msg_handlers$new_plot <- private$graphics_client$new_plot
       private$r_msg_handlers$before_new_plot <- private$graphics_client$before_new_plot
       private$r_msg_handlers$options <- private$handle_options_msg
+      private$r_msg_handlers$menu <- private$handle_menu_request
       for(msg_type in c("comm_msg", "comm_open", "comm_close"))
         private$r_msg_handlers[[msg_type]] <- self$send_comm
       private$r_msg_handlers$condition <- private$handle_condition_msg
@@ -1096,6 +1101,15 @@ Kernel <- R6Class("Kernel",
         self$errored <- TRUE
         self$stop_on_error <- options$rkernel_stop_on_error
       }
+    },
+
+    handle_menu_request = function(msg) {
+      saved_parent <- private$parent$shell
+      Menu(kernel = self,
+           args = msg$content,
+           use_widgets = self$has_widgets)
+      private$parent$shell <- saved_parent
+      return(TRUE)
     },
 
     run_code_cell = function(code) {
