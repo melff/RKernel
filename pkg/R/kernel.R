@@ -65,7 +65,6 @@ Kernel <- R6Class("Kernel",
         session = self$r_session,
         stdout_callback = private$handle_r_stdout,
         stderr_callback = private$handle_r_stderr,
-        readline_callback = private$r_get_input,
         browser_callback = private$handle_r_browser,
         input_callback = private$r_get_input
       )
@@ -931,7 +930,6 @@ Kernel <- R6Class("Kernel",
       self$r_repl$run_cmd("RKernel::install_output_hooks()")
       self$r_repl$run_cmd("RKernel::install_cell_hooks()")
       self$r_repl$run_cmd("RKernel::install_safe_q()")
-      self$r_repl$run_cmd("RKernel::install_readline()")
       self$r_repl$run_cmd("RKernel::install_menu()")
       self$r_repl$run_cmd("RKernel::set_help_displayed")
       self$r_repl$run_cmd("RKernel::install_httpd_handlers()")
