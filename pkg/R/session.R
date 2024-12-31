@@ -194,7 +194,11 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         until_prompt = FALSE,
         echo = self$echo
       ) {
-        lines <- split_lines1(code)
+        if(any(nzchar(code))) {
+          lines <- split_lines1(code)
+        } else {
+          lines <- code
+        }
         n_lines <- length(lines)
         for (i in 1:n_lines) {
           line <- lines[i]
