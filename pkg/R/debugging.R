@@ -205,14 +205,16 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             }
             invisible()
         },
-        run_on_value = function(tn,tlt,value){
-            if(length(value) && nzchar(value)) {
-                r <- try(self$repl$run_code(value, echo = TRUE))
-                if(inherits(r,"try-error")) {
-                    log_error(r)
-                    kernel <- self$session$kernel
-                    kernel$stderr(r)
-                }
+        run_on_submit = function(...){
+            code <- self$input$value
+            if(!length(code)) {
+                code <- ""
+            }
+            r <- try(self$repl$run_code(code, echo = TRUE))
+            if(inherits(r,"try-error")) {
+                log_error(r)
+                kernel <- self$session$kernel
+                kernel$stderr(r)
             }
             self$input$clear()
             invisible()
@@ -235,11 +237,12 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             }
             else {
                 self$input <- TextWidget(
-                    placeholder="Enter expression, 'c', 'n', or 'Q'"
+                    placeholder="Enter expression, 'c', 'n', or 'Q'",
+                    continuous_update = TRUE
                 )
                 self$input$add_class("monospace")
                 self$input$add_class("width-auto")
-                self$input$observe("value",self$run_on_value)
+                self$input$on_submit(self$run_on_submit)
                 self$main_widget <- VBox(self$style,self$output,self$input)
             }
             d <- display_data(self$main_widget)
@@ -254,6 +257,9 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             self$input$add_class("invisible")
             self$main_widget <- VBox(self$output)
             d <- update(d,self$main_widget)
+            d$data[["text/plain"]] <- "dbgConsole()"
+            d$data[["text/html"]] <- "<pre>dbgConsole()</pre>"
+            log_out(d,use.str=TRUE)
             kernel$restore_shell_parent(saved_parent)
             kernel$display_send(d)
         }
@@ -300,8 +306,13 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
     )
 )
 
+debugging_state <- new.env()
+debugging_state$depth <- 0L
+
 dbgConsole <- function(session, prompt, use_widgets = TRUE) {
+    debugging_state$depth <- debugging_state$depth + 1L
     # log_out("dbgConsole")
+    # log_out(sprintf("Depth: %d",debugging_state$depth))
     # log_out(prompt)
     # log_out(use_widgets)
     if(use_widgets) {
@@ -313,6 +324,7 @@ dbgConsole <- function(session, prompt, use_widgets = TRUE) {
         cons <- dbgSimpleConsoleClass$new(session)
     }
     cons$run(prompt)
+    debugging_state$depth <- debugging_state$depth - 1L
 }
 
 
@@ -354,4 +366,59 @@ add_prompts <- function(txt) {
   }
   txt <- paste(c(txt,""),collapse="\n")
   txt
+}
+
+debugger_orig <- getFromNamespace("debugger","utils")
+recover_orig <- getFromNamespace("recover","utils")
+
+
+debugger_ <- function(dump = last.dump) {
+    debugger_look <- function(.index) { #adapted from utils::debugger
+        .this_dump <- dump[[.index]]
+        for (.thing in ls(envir = .this_dump, all.names = TRUE)) {
+            tryCatch(assign(.thing, get(.thing, envir = .this_dump)), 
+                error = function(e) {})
+        }
+        rm(.thing, .index, .this_dump)
+        eval(substitute(browser()),envir=dump[[.index]])
+    }
+    if(get_config("use_widgets")) {
+        if (!inherits(dump, "dump.frames")) { #adapted from utils::debugger
+        cat(gettextf("'dump' is not an object of class %s\n", 
+            dQuote("dump.frames")))
+        return(invisible())
+        }
+        n <- length(dump)
+        if (!n) {
+            cat(gettextf("'dump' is empty\n"))
+            return(invisible())
+        }
+        err.action <- getOption("error")
+        on.exit(options(error = err.action))   
+        err_msg <- attr(dump, "error.message")
+        calls <- names(dump)
+        ind <- request_menu_widget(calls,title="Select a frame")
+        if(ind > 0) eval(substitute(browser()),envir=dump[[ind]])
+    } else {
+        debugger_orig(dump)
+    }
+}
+
+recover_ <- function() {
+    log_out("recover_")
+    if(get_config("use_widgets")) {
+        calls <- sys.calls()
+        call_labels <- limitedLabels(calls)
+        ind <- request_menu_widget(call_labels,title="Select a frame")
+        if(ind > 0L) {
+            eval(substitute(browser()), envir = sys.frame(ind))
+        }
+    } else {
+        recover_orig()
+    }
+}
+
+install_debugging <- function() {
+    replace_in_package("utils", "debugger", debugger_)
+    replace_in_package("utils", "recover", recover_)
 }
