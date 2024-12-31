@@ -161,7 +161,7 @@ WidgetClass <- R6Class_("Widget",
     display_data = function(){
       data <- list(
         "text/plain" = self$call,
-        "text/html" = paste("<code>",self$call,"</code>")
+        "text/html" = paste("<pre>",self$call,"</pre>")
       )
       if(length(self[["_view_name"]]))
         data[["application/vnd.jupyter.widget-view+json"]] <- list(

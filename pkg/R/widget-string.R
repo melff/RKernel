@@ -213,7 +213,14 @@ TextareaClass <- R6Class_("Textarea",
        #' @field rows An integer, the number of rows
        rows = structure(Integer(),sync=TRUE),
        #' @field style The Text style, an object of class "TextStyleClass"
-       style = structure(R6Instance(TextStyleClass),sync=TRUE)
+       style = structure(R6Instance(TextStyleClass),sync=TRUE),
+       #' @description Add or remove a handler for submit events.
+       #' @param handler A function that is called when content is submitted 
+       #'   by the user hitting 'enter'.
+       #' @param remove Logical value, whether the handler is to be removed
+       on_submit = function(handler, remove=FALSE) {
+         self$on_event("submit",handler,remove)
+       }
    )
 )
 
@@ -245,7 +252,14 @@ TextWidgetClass <- R6Class_("TextWidget",
            self$send_state()
        },
        #' @field style The Text style, an object of class "TextStyleClass"
-       style = structure(R6Instance(TextStyleClass),sync=TRUE)
+       style = structure(R6Instance(TextStyleClass),sync=TRUE),
+       #' @description Add or remove a handler for submit events.
+       #' @param handler A function that is called when content is submitted 
+       #'   by the user hitting 'enter'.
+       #' @param remove Logical value, whether the handler is to be removed
+       on_submit = function(handler, remove=FALSE) {
+         self$on_event("submit",handler,remove)
+       }
    )
 )
 
