@@ -104,7 +104,7 @@ request_menu_widget <- function(choices,preselect=NULL,multiple=FALSE,title=NULL
       multiple = multiple)
   )
   # log_out(msg,use.str=TRUE)
-  # msg_send(msg)
+  msg_send(msg)
   ind <- readline()
   eval(str2expression(ind))
 }
