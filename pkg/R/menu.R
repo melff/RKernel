@@ -1,6 +1,15 @@
 Menu <- function(kernel, args, ...) {
-  m <- MenuWidgetClass$new(kernel, args, ...)
-  m$run()
+  # log_out("Menu with args:")
+  # log_out(args,use.str=TRUE)
+  # log_out(sprintf("debugging_state$depth = %d",debugging_state$depth))
+  if(debugging_state$depth == 0L) {
+    m <- MenuWidgetClass$new(kernel, args, ...)
+    m$run()
+  } else {
+    log_warning("Menu from within browser not supported yet")
+    # TODO: Provide support for this ...
+    kernel$r_session$send_input("0L", drop_echo = TRUE)
+  }
 }
 
 MenuWidgetClass <- R6Class("MenuWidget",
@@ -43,6 +52,7 @@ MenuWidgetClass <- R6Class("MenuWidget",
                 preselect <- intersect(self$preselect, self$choices)
                 ind <- match(preselect,self$choices)
                 self$listbox$index <- ind - 1L
+                self$index <- ind
               }
             } else {
               self$listbox <- ListBox(options=choices,value="",rows=rows)
@@ -67,8 +77,12 @@ MenuWidgetClass <- R6Class("MenuWidget",
                 kernel$r_session$yield(1000)
             }
             self$listbox$disabled <- TRUE
-            self$main_widget <- TextWidget(value=paste(self$listbox$value,
-                                                       collapse=", "),
+            if(any(self$index > 0L)) {
+              value <- paste(self$listbox$value, collapse=", ")
+            } else {
+              value <- "--"
+            }
+            self$main_widget <- TextWidget(value=value,
                                                  disabled=TRUE)
             d <- update(d,self$main_widget)
             kernel$display_send(d)
@@ -79,7 +93,8 @@ MenuWidgetClass <- R6Class("MenuWidget",
 )
 
 
-send_menu_request <- function(choices,preselect=NULL,multiple=FALSE,title=NULL,...) {
+request_menu_widget <- function(choices,preselect=NULL,multiple=FALSE,title=NULL,...) {
+  # log_out("request_menu_widget")
   msg <- list(
     type = "menu",
     content = list(
@@ -88,19 +103,20 @@ send_menu_request <- function(choices,preselect=NULL,multiple=FALSE,title=NULL,.
       title = title,
       multiple = multiple)
   )
-  msg_send(msg)
+  # log_out(msg,use.str=TRUE)
+  # msg_send(msg)
+  ind <- readline()
+  eval(str2expression(ind))
 }
 
 menu_orig <- getFromNamespace("menu","utils")
 
 menu_ <- function(choices,graphics=FALSE,title=NULL) {
-    if(get_config('use_widgets')) {
+    if(get_config("use_widgets")) {
       nc <- length(choices)
       labs <- formatC(1:nc,flag="0",format="d",digits=as.integer(nc>=10))
       choices <- paste(labs,choices,sep=": ")
-      send_menu_request(choices,title=title)
-      ind <- readline()
-      ind <- eval(str2expression(ind))
+      ind <- request_menu_widget(choices,title=title)
     } else {
       ind <- menu_orig(choices,graphics=graphics,title=title)
     }
@@ -112,13 +128,11 @@ select_list_orig <- getFromNamespace("select.list","utils")
 select_list_ <- function(choices, preselect = NULL, multiple = FALSE, title = NULL, 
                          graphics = getOption("menu.graphics")) {
     if(get_config('use_widgets')) {
-      send_menu_request(choices,
+      ind <- request_menu_widget(choices,
                         preselect = preselect,
                         multiple = multiple,
                         title = title
                         )
-      ind <- readline()
-      ind <- eval(str2expression(ind))
       value <- choices[ind]
     } else {
       value <- select_list_orig(choices,
