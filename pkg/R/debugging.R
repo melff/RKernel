@@ -1,139 +1,5 @@
 #' @include traitlets.R widget-button.R widget-output.R
 
-dbgWidget <- function(name="dbgWidget",envir=parent.frame(),depth=NA){
-    style <- HTML('<style>
-    button.dbgwidget-button {
-      width: auto;
-      height: auto;
-      background: unset;
-      line-height: 15px;
-      text-align: left;
-      border: 1px solid #cfcfcf;
-      padding: 6px;
-    }
-    button.dbgwidget-button.dbgwidget-button-expanded {
-      border-bottom-style: none;
-    }
-    .monospace,
-    .widget-text.monospace,
-    .monospace input[type="text"],
-    .widget-text.monospace input[type="text"] {
-        font-family: monospace !important;
-    }
-    .margin-0 {
-        margin: 0;
-    }
-    .debugger-subwidget ~ .debugger-subwidget {
-        margin-top: -1px;
-    }
-    .debugger-subwidget > .widget-html {
-        margin-top: 0;
-        margin-bottom: 0;
-    }
-    .widget-checkbox.nolabel label.widget-label {
-        display: none;
-    }
-    .debug-box .widget-textarea {
-        width: 100%
-    }
-    .no-display {
-        display: none;
-    }
-    button.details-button {
-        width: calc(100% - 30px);
-    }
-    button.console-button {
-        width: 30px;
-        text-align: center;
-    }
-    .width-auto,
-    .widget-text.widget-auto {
-        width: auto;
-    }
-    button.dbgwidget-button-collapsed::before {
-        content: "\\2BC8";
-    }
-    button.dbgwidget-button-expanded::before {
-        content: "\\2BC6";
-    }
-    .debugger-console {
-        border: 1px solid #cfcfcf;
-    }
-    .debugger-console .widget-text input[type="text"] {
-        border: 1px dotted #cfcfcf;
-    }
-    </style>')
-    b_details <- Button(description=name)
-    b_details$add_class(c("dbgwidget-button","monospace","margin-0",
-                          "details-button"))
-    details <- HTML("")
-    details$add_class("margin-0")
-    toggle_details <- function(){
-        if(details$value==""){
-            table <- env_browser_table(envir=envir,
-                                       all.names=TRUE,
-                                       mode="any",
-                                       include_css=TRUE)
-            text_html <- paste(
-                    table,
-                    sep="\n")
-            details$value <- text_html
-            #b_details$description <- paste(sprintf("%3d:",depth),"[-]",name)
-            b_details$add_class("dbgwidget-button-expanded")
-            b_details$remove_class("dbgwidget-button-collapsed")
-        } else {
-            details$value <- ""
-           # b_details$description <- paste(sprintf("%3d:",depth),"[+]",name)
-            b_details$remove_class("dbgwidget-button-expanded")
-            b_details$add_class("dbgwidget-button-collapsed")
-        }
-    }
-    b_details$add_class("dbgwidget-button-collapsed")
-    b_details$on_click(toggle_details)
-    refresh_details <- function() {
-        if(details$value!=""){
-            table <- env_browser_table(envir=envir,
-                                       all.names=TRUE,
-                                       mode="any",
-                                       include_css=TRUE)
-            text_html <- paste(
-                    table,
-                    sep="\n")
-            details$value <- text_html
-        }
-    }
-    # VBox(style,b_details,details)
-    b_console <- Button(icon="keyboard-o")
-    b_console$add_class(c("dbgwidget-button","monospace","margin-0",
-                          "console-button"))
-    buttons <- HBox(b_details,b_console)
-    vb <- VBox(style,buttons,details)
-    vb$add_class("debugger-subwidget")
-    # b_console <- Button(description=fa_icon("keyboard-o"))
-    toggle_console <- function(){
-        if(length(vb$children) < 4){
-            console <- dbgConsole(envir=envir,
-                          callback=refresh_details)
-            console$add_class("no-display")
-            console$add_class("debugger-console")
-            vb$children[[4]] <- console
-        }
-        else {
-            console <- vb$children[[4]] 
-        }
-        if(console$has_class("no-display")){
-            console$remove_class("no-display")
-            b_console$icon <- "close"
-        }
-        else{
-            console$add_class("no-display")
-            b_console$icon <- "keyboard-o"
-        }
-    }
-    b_console$on_click(toggle_console)
-    vb
-}
-
 dbgConsole_style <- '<style>
 .monospace,
 .widget-text.monospace,
@@ -171,12 +37,14 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
         repl = NULL,
         input = NULL,
         output = NULL,
+        env_browser = NULL,
         continue_loop = TRUE,
         initialize = function(session) {
             self$session <- session
+            self$style <- HTML(dbgConsole_style)
             self$output <- OutputWidget(append_output=TRUE,
                            use_display=TRUE)
-            self$style <- HTML(dbgConsole_style)
+            self$env_browser <- HTML("")
             self$continue_loop <- TRUE
             self$repl <- RSessionAdapter$new(
                 session = session,
@@ -217,7 +85,12 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
                 kernel$stderr(r)
             }
             self$input$clear()
+            self$update_env_browser()
             invisible()
+        },
+        update_env_browser = function() {
+            table <- env_browser_table(repl = self$repl)
+            self$env_browser$value <- table
         },
         main_widget = NULL,
         run = function(prompt) {
@@ -233,7 +106,10 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
                 run_btn$on_click(self$run_on_click)
                 input_hbox <- HBox(self$input,run_btn)
                 input_hbox$add_class("debug-box")
-                self$main_widget <- VBox(self$style,input_hbox,self$output)
+                self$main_widget <- VBox(self$style,
+                                         input_hbox,
+                                         self$output,
+                                         self$env_browser)
             }
             else {
                 self$input <- TextWidget(
@@ -243,8 +119,12 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
                 self$input$add_class("monospace")
                 self$input$add_class("width-auto")
                 self$input$on_submit(self$run_on_submit)
-                self$main_widget <- VBox(self$style,self$output,self$input)
+                self$main_widget <- VBox(self$style,
+                                         self$output,
+                                         self$input,
+                                         self$env_browser)
             }
+            self$update_env_browser()
             d <- display_data(self$main_widget)
             saved_parent <- kernel$save_shell_parent()
             kernel$display_send(d)
