@@ -251,7 +251,7 @@ send_error_condition <- function(e) {
       )
     )
   )
-  msg_send(msg)
+  msg_send(msg, file=stderr())
 }
 install_globalCallingHandlers <- function() {
   globalCallingHandlers(
