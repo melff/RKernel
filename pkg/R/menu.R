@@ -93,7 +93,12 @@ MenuWidgetClass <- R6Class("MenuWidget",
 )
 
 
-request_menu_widget <- function(choices,preselect=NULL,multiple=FALSE,title=NULL,...) {
+request_menu_widget <- function(choices,
+                                preselect=NULL,
+                                multiple=FALSE,
+                                title=NULL,
+                                file=stdout(),
+                                ...) {
   # log_out("request_menu_widget")
   msg <- list(
     type = "menu",
@@ -104,7 +109,7 @@ request_menu_widget <- function(choices,preselect=NULL,multiple=FALSE,title=NULL
       multiple = multiple)
   )
   # log_out(msg,use.str=TRUE)
-  msg_send(msg)
+  msg_send(msg, file=file)
   ind <- readline()
   eval(str2expression(ind))
 }
