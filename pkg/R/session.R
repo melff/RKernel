@@ -259,6 +259,10 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               session$send_input(inp, drop_echo = TRUE)
             }
           }
+          if (!is.null(resp$stderr) 
+              && nzchar(resp$stderr)) {
+              stderr_callback(resp$stderr)
+          }
           if (!is.null(resp$stdout)) {
             if (loop_count == 1 && !echo) {
               resp$stdout <- drop_echo(resp$stdout)
@@ -318,10 +322,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               # log_out("stdout callback")
               stdout_callback(resp$stdout)
             }
-          }
-          if (!is.null(resp$stderr) 
-              && nzchar(resp$stderr)) {
-              stderr_callback(resp$stderr)
           }
         }
     },
