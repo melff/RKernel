@@ -113,7 +113,7 @@ session_env_matrix <- function(repl,
 }
 
 env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FALSE, pattern = NULL, 
-    mode = "any", id=NULL, include_css = TRUE, repl = NULL){
+    mode = "any", id=NULL, include_css = TRUE, repl = NULL, title = NULL){
     if(inherits(repl, "RSessionAdapter")) {
         if(!missing(name)) {
             em <- session_env_matrix(repl=repl,envname=name)
@@ -131,9 +131,13 @@ env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FA
     thead <- c("Name","Value")
     thead <- c(paste0("<th class='object-name border-left border-top'>",thead[1],"</th>"),
                paste0("<th class='object-summary border-left border-right border-top'>",thead[2],"</th>"))
-    thead <- c("<thead>",thead,"</thead>")           
     thead <- paste0(thead,collapse="")
+    if(is.character(title)) {
+        title <- paste0("<th colspan=\"2\">",title,"</th>")
+        thead <- c(title,thead)
+    }
     thead <- paste0("<tr>",thead,"</tr>")
+    thead <- c("<thead>",thead,"</thead>")           
     thead <- c("<table class='env-browser env-browser-head'>",thead,"</table>")
     thead <- paste(thead,collapse="\n") 
     result <- append(result,thead)

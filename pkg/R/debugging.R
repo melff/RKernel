@@ -93,7 +93,9 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             invisible()
         },
         update_env_browser = function() {
-            table <- env_browser_table(repl = self$repl)
+            title <- self$repl$eval(browserText(), safe = TRUE)
+            if(!nzchar(title)) title <- NULL
+            table <- env_browser_table(repl = self$repl, title = title)
             self$env_browser$value <- table
         },
         main_widget = NULL,
@@ -280,9 +282,13 @@ debugger_ <- function(dump = last.dump) {
         err.action <- getOption("error")
         on.exit(options(error = err.action))   
         err_msg <- attr(dump, "error.message")
-        calls <- names(dump)
-        ind <- request_menu_widget(calls,title="Select a frame")
-        if(ind > 0) eval(substitute(browser()),envir=dump[[ind]])
+        call_labels <- names(dump)
+        ind <- request_menu_widget(call_labels,title="Select a frame")
+        if(ind > 0) {
+            title <- paste("Variables in frame of call",call_labels[ind])
+            eval(substitute(browser(text=title),list(title=title)), 
+                 envir=dump[[ind]])
+        }
     } else {
         debugger_orig(dump)
     }
@@ -296,7 +302,9 @@ recover_ <- function() {
         ind <- request_menu_widget(call_labels,title="Select a frame",
                                    file=stderr())
         if(ind > 0L) {
-            eval(substitute(browser()), envir = sys.frame(ind))
+            title <- paste("Variables in frame of call",call_labels[ind])
+            eval(substitute(browser(text=title),list(title=title)), 
+                 envir = sys.frame(ind))
         }
     } else {
         recover_orig()
