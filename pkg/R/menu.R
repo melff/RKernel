@@ -82,8 +82,7 @@ MenuWidgetClass <- R6Class("MenuWidget",
             } else {
               value <- "--"
             }
-            self$main_widget <- TextWidget(value=value,
-                                                 disabled=TRUE)
+            self$main_widget <- HTML()
             d <- update(d,self$main_widget)
             kernel$display_send(d)
             res <- deparse(self$index)
