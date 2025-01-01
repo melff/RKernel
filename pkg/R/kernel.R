@@ -503,7 +503,7 @@ Kernel <- R6Class("Kernel",
                          file_extension = ".R",
                          version = rversion),
                        banner = self$r_session$banner,
-                       debugger = FALSE)
+                       debugger = TRUE)
       private$send_message(type="kernel_info_reply",
                            parent=private$parent$shell,
                            socket_name="shell",
