@@ -503,7 +503,7 @@ Kernel <- R6Class("Kernel",
                          file_extension = ".R",
                          version = rversion),
                        banner = self$r_session$banner,
-                       debugger = TRUE)
+                       debugger = FALSE)
       private$send_message(type="kernel_info_reply",
                            parent=private$parent$shell,
                            socket_name="shell",
@@ -901,7 +901,7 @@ Kernel <- R6Class("Kernel",
         if(bitwAnd(zmq.poll.get.revents(1),POLLIN)){
           msg <- private$get_message("shell")
           msg_type <- msg$header$msg_type
-          log_out(msg_type)
+          # log_out(msg_type)
           reply_type <- sub("_request","_reply",msg_type,fixed=TRUE)
           private$parent$shell <- msg
           private$send_busy(private$parent$shell)
@@ -1012,9 +1012,14 @@ Kernel <- R6Class("Kernel",
       # log_out("handle_r_stdout done")
     },
     handle_r_stdout = function(text) {
+      # log_out("=========================================================")
+      # log_out("handle_r_stdout")
       private$handle_r_output(text, stream = "stdout")
     },
     handle_r_stderr = function(text){
+      # log_out("=========================================================")
+      # log_out("handle_r_stderr")
+      # log_out(text)
       private$handle_r_output(text, stream = "stderr")
     },
     r_msg_handlers = list(),
