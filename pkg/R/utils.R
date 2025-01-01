@@ -85,10 +85,21 @@ log_warning = function(message){
 log_error = function(message){
   message <- crayon::red(format(Sys.time()),"\t",message,"\n")
   message <- paste("ERROR:",message)
-  if (is_kernel()) 
+  if (is_kernel()) {
     message <- paste("R KERNEL -", message)
-  else 
-    message <- paste("          R SESSION -", message)
+    indent <- ""
+  }
+  else {
+    message <- paste("R SESSION -", message)
+    indent <- "        "
+    message <- paste0(indent, message)
+  }
+
+  calls <- head(limitedLabels(sys.calls()),-1)
+  calls <- paste0(indent,"  ",calls)
+  calls <- paste(calls,collapse="\n")
+  calls <- paste0(calls,"\n")
+  message <- paste0(message,calls)
   cat_(message,file=log_fn(),append=TRUE)
 }
 
