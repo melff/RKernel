@@ -350,13 +350,17 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       if(is.null(res)) res <- default
       res
     },
-    eval = function(expr) {
+    eval = function(expr, safe = FALSE) {
       # log_out("session$eval()")
       code <- deparse(substitute(expr))
-      self$eval_code(code)
+      self$eval_code(code, safe = safe)
     },
-    eval_code = function(code) {
-      code <- sprintf("dput(%s)",code)
+    eval_code = function(code, safe = FALSE) {
+      if(safe) {
+        code <- sprintf("try(dput(%s),silent=TRUE)",code)
+      } else {
+        code <- sprintf("dput(%s)",code)
+      }
       res <- self$run_cmd(code)
       if(length(res$stderr))
         res$stderr
