@@ -56,13 +56,16 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
                 echo = TRUE
                 )
         },
+        in_browser = FALSE,
         browser_callback = function(prompt) {
             if(self$show_prompt) self$output$stdout(prompt)
             # log_out("browser_callback")
+            self$in_browser <- TRUE
             return(TRUE)
         },
         prompt_callback = function(...) {
             self$continue_loop <- FALSE
+            self$in_browser <- FALSE
             return(TRUE)
         },
         run_on_click = function(){
@@ -86,7 +89,7 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
                 kernel$stderr(r)
             }
             self$input$clear()
-            self$update_env_browser()
+            if(self$in_browser) self$update_env_browser()
             invisible()
         },
         update_env_browser = function() {
@@ -136,7 +139,8 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             self$input$disabled <- TRUE
             self$input$placeholder <- "--"
             self$input$add_class("invisible")
-            self$main_widget <- VBox(self$output)
+            self$main_widget <- VBox(self$output,
+                                     self$env_browser)
             d <- update(d,self$main_widget)
             d$data[["text/plain"]] <- "dbgConsole()"
             d$data[["text/html"]] <- "<pre>dbgConsole()</pre>"
@@ -289,7 +293,8 @@ recover_ <- function() {
     if(get_config("use_widgets")) {
         calls <- sys.calls()
         call_labels <- limitedLabels(calls)
-        ind <- request_menu_widget(call_labels,title="Select a frame")
+        ind <- request_menu_widget(call_labels,title="Select a frame",
+                                   file=stderr())
         if(ind > 0L) {
             eval(substitute(browser()), envir = sys.frame(ind))
         }
