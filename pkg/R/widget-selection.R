@@ -243,7 +243,7 @@ MultipleSelectionWidgetClass <- R6Class_("MultipleSelectionWidget",
       #' @param value Names of selectable options.
       #' @param ... Any other arguments, ignored.
       initialize = function(options,value,...){
-          log_out("MultipleSelectionWidgetClass$initialize")
+          # log_out("MultipleSelectionWidgetClass$initialize")
           super$initialize(...)
           options <- as.character(options)
           self[["_options_labels"]] <- options
