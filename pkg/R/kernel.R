@@ -937,6 +937,10 @@ Kernel <- R6Class("Kernel",
       self$r_repl$run_cmd("RKernel::install_httpd_handlers()")
       self$r_repl$run_cmd("RKernel:::install_globalCallingHandlers()")
       self$r_repl$run_cmd("RKernel:::install_debugging()")
+      add_sync_options(c(
+        "rkernel_stop_on_error",
+        "rkernel_show_traceback",
+        "browser_show_prompt"))
       # self$r_repl$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")
     },
@@ -1217,7 +1221,6 @@ set_config <- function(...) {
 get_config <- function(name) {
   get0(name,envir=config)
 }
-
 
 # Local Variables:
 # ess-indent-offset: 2

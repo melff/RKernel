@@ -63,7 +63,7 @@ init_env_browser <- function(){
 
 env_matrix <- function(pos = -1, name, envir, parent=NULL, all.names = FALSE, pattern = NULL, 
     mode = "any") {
-    log_out("env_matrix")
+    # log_out("env_matrix")
     if (missing(envir)) 
         envir <- as.environment(pos)
     if(length(pattern))

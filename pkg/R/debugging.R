@@ -39,6 +39,7 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
         output = NULL,
         env_browser = NULL,
         continue_loop = TRUE,
+        show_prompt = FALSE,
         initialize = function(session) {
             self$session <- session
             self$style <- HTML(dbgConsole_style)
@@ -56,7 +57,7 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
                 )
         },
         browser_callback = function(prompt) {
-            self$output$stdout(prompt)
+            if(self$show_prompt) self$output$stdout(prompt)
             # log_out("browser_callback")
             return(TRUE)
         },
@@ -128,7 +129,7 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             d <- display_data(self$main_widget)
             saved_parent <- kernel$save_shell_parent()
             kernel$display_send(d)
-            self$output$stdout(prompt)
+            if(self$show_prompt) self$output$stdout(prompt)
             while(self$continue_loop) {
                 self$session$yield(1000)
             }
@@ -139,7 +140,6 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             d <- update(d,self$main_widget)
             d$data[["text/plain"]] <- "dbgConsole()"
             d$data[["text/html"]] <- "<pre>dbgConsole()</pre>"
-            log_out(d,use.str=TRUE)
             kernel$restore_shell_parent(saved_parent)
             kernel$display_send(d)
         }
@@ -285,7 +285,7 @@ debugger_ <- function(dump = last.dump) {
 }
 
 recover_ <- function() {
-    log_out("recover_")
+    # log_out("recover_")
     if(get_config("use_widgets")) {
         calls <- sys.calls()
         call_labels <- limitedLabels(calls)
@@ -301,4 +301,8 @@ recover_ <- function() {
 install_debugging <- function() {
     replace_in_package("utils", "debugger", debugger_)
     replace_in_package("utils", "recover", recover_)
+    add_sync_options(c(
+        "rkernel_stop_on_error",
+        "rkernel_show_traceback",
+        "browser_show_prompt"))
 }
