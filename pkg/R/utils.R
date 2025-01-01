@@ -238,13 +238,15 @@ deparse0 <- function(expr, width.cutoff = 500L) {
 }
 
 send_error_condition <- function(e) {
-  # log_out("error_condition_msg")
+  # log_out("send_error_condition")
+  calls <- head(limitedLabels(sys.calls()),-2)
   msg <- list(
     type = "condition",
     content = list(
       condition = "error",
       message = conditionMessage(e),
       call = deparse0(conditionCall(e)),
+      traceback = calls,
       options=list(
           rkernel_stop_on_error = getOption("rkernel_stop_on_error",TRUE),
           rkernel_show_traceback = getOption("rkernel_show_traceback",TRUE)

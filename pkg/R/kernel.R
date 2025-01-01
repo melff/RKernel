@@ -439,19 +439,11 @@ Kernel <- R6Class("Kernel",
             )
             clear_queue <- TRUE
           } else if (self$errored) {
-            if(length(private$condition)) {
-              # log_out("Handling condition")
-              condition <- private$condition
-              # log_out(condition, use.str=TRUE)
-              content <-list(
-                status = "error",
-                ename = "error",
-                evalue = condition$message,
-                traceback = condition$traceback,
-                execution_count = execution_count 
-              )
-              # log_out("Handling condition done")
-              # log_out(content, use.str = TRUE)
+            if(length(private$err_msg)) {
+              content <- private$err_msg
+              content$status <- "error"
+              content$execution_count <- execution_count
+              private$err_msg <- NULL
             } else {
               content <- list(status = "error",
                               execution_count = execution_count)
@@ -972,7 +964,7 @@ Kernel <- R6Class("Kernel",
     r_msg_frag = list(stdout="",stderr=""),
     handle_r_output = function(text, stream="stdout"){
       # log_out("=========================================================")
-      # log_out("handle_r_stdout")
+      # log_out("handle_r_output")
       if (grepl(DLE, text)) {
         # log_out("DLE found")
         text <- split_string1(text, DLE)
@@ -1096,15 +1088,31 @@ Kernel <- R6Class("Kernel",
       return(TRUE)
     },
 
-    condition = NULL,
+    err_msg = NULL,
     handle_condition_msg = function(msg) {
-      content <- msg$content
-      private$condition <- content
-      condition <- content$condition
-      options <- content$options
+      # log_out("handle_condition_message")
+      msg_content <- msg$content
+      condition <- msg_content$condition
+      options <- msg_content$options
       if(condition == "error") {
         self$errored <- TRUE
         self$stop_on_error <- options$rkernel_stop_on_error
+        # log_out(condition, use.str=TRUE)
+        if(options$rkernel_show_traceback) {
+            tb <- msg_content$traceback
+            tb <- c("Traceback:",tb)
+        }
+        else {
+            tb <- NULL
+        }
+        content <- list(ename="error",
+                        evalue=msg_content$message,
+                        traceback=tb)
+        private$send_message(type="error",
+                          parent=private$parent$shell,
+                          socket="iopub",
+                          content=content)
+        private$err_msg <- content
       }
     },
 
@@ -1129,32 +1137,6 @@ Kernel <- R6Class("Kernel",
         # log_out("- done running code block ----")
         # log_out(sprintf("kernel$errored: %s",self$errored))
         if(self$errored) {
-          # log_out("Handling error in code chunk")
-          condition <- private$condition
-          # log_out(condition, use.str=TRUE)
-          options <- condition$options
-          if(options$rkernel_show_traceback) {
-            # log_out("Obtaining traceback")
-            r <- self$r_repl$run_cmd("traceback()")
-            # log_out(r, use.str=TRUE)
-            tb <- list("Traceback:",r$stdout)
-            # log_out("done")
-          }
-          else {
-            tb <- NULL
-          }
-          condition$traceback <- tb
-          private$condition <- condition
-          content <- list(ename="error",
-                          evalue=condition$message,
-                          traceback=tb)
-          # log_out("Sending error message")
-          # log_out("content")
-          # log_out(content)
-          private$send_message(type="error",
-                          parent=private$parent$shell,
-                          socket="iopub",
-                          content=content)
           if(self$stop_on_error) break
         }
       }
