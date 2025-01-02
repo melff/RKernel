@@ -70,7 +70,7 @@ log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
 #' @description
 #' Show a warning in the Jupyter server log
 #' @param message A string to be shown in the log
-log_warning = function(message){
+log_warning <- function(message){
   message <- paste(crayon::yellow(format(Sys.time()),"\t",message,"\n"))
   message <- paste("R WARNING:",message)
   if (is_kernel()) 
@@ -82,7 +82,7 @@ log_warning = function(message){
 #' @description
 #' Show an error message in the Jupyter server log
 #' @param message A string to be shown in the log
-log_error = function(message){
+log_error <- function(message){
   message <- crayon::red(format(Sys.time()),"\t",message,"\n")
   message <- paste("ERROR:",message)
   if (is_kernel()) {
