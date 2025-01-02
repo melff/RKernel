@@ -14,7 +14,6 @@ reference:
   - View
   - add_displayed_classes
   - add_paged_classes
-  - alert
   - display
   - display_data
   - envBrowser
