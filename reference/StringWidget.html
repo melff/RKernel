@@ -789,7 +789,8 @@ current widget class is supported.</p></dd>
 <div class="section">
 <h3 id="public-methods-9">Public methods<a class="anchor" aria-label="anchor" href="#public-methods-9"></a></h3>
 
-<ul><li><p><a href="#method-Textarea-clone"><code>TextareaClass$clone()</code></a></p></li>
+<ul><li><p><a href="#method-Textarea-on_submit"><code>TextareaClass$on_submit()</code></a></p></li>
+<li><p><a href="#method-Textarea-clone"><code>TextareaClass$clone()</code></a></p></li>
 </ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>RKernel::HasTraits$notify()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>RKernel::HasTraits$observe()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="validate"><a href="HasTraits.html#method-validate"><code>RKernel::HasTraits$validate()</code></a></span></li>
@@ -817,15 +818,36 @@ current widget class is supported.</p></dd>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>RKernel::DOMWidget$remove_class()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="ValueWidget" data-id="initialize"><a href="ValueWidget.html#method-initialize"><code>RKernel::ValueWidget$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="ValueWidget" data-id="on_change"><a href="ValueWidget.html#method-on_change"><code>RKernel::ValueWidget$on_change()</code></a></span></li>
-</ul></details></p><hr><a id="method-Textarea-clone"></a><div class="section">
-<h3 id="method-clone--9">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone--9"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
+</ul></details></p><hr><a id="method-Textarea-on_submit"></a><div class="section">
+<h3 id="method-on-submit-">Method <code>on_submit()</code><a class="anchor" aria-label="anchor" href="#method-on-submit-"></a></h3>
+<p>Add or remove a handler for submit events.</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextareaClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextareaClass</span><span class="op">$</span><span class="fu">on_submit</span><span class="op">(</span><span class="va">handler</span>, remove <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>handler</code></dt>
+<dd><p>A function that is called when content is submitted
+by the user hitting 'enter'.</p></dd>
+
+
+<dt><code>remove</code></dt>
+<dd><p>Logical value, whether the handler is to be removed</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-Textarea-clone"></a><div class="section">
+<h3 id="method-clone--9">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone--9"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextareaClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
@@ -871,6 +893,7 @@ current widget class is supported.</p></dd>
 <h3 id="public-methods-10">Public methods<a class="anchor" aria-label="anchor" href="#public-methods-10"></a></h3>
 
 <ul><li><p><a href="#method-TextWidget-clear"><code>TextWidgetClass$clear()</code></a></p></li>
+<li><p><a href="#method-TextWidget-on_submit"><code>TextWidgetClass$on_submit()</code></a></p></li>
 <li><p><a href="#method-TextWidget-clone"><code>TextWidgetClass$clone()</code></a></p></li>
 </ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>RKernel::HasTraits$notify()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>RKernel::HasTraits$observe()</code></a></span></li>
@@ -902,20 +925,41 @@ current widget class is supported.</p></dd>
 </ul></details></p><hr><a id="method-TextWidget-clear"></a><div class="section">
 <h3 id="method-clear-">Method <code>clear()</code><a class="anchor" aria-label="anchor" href="#method-clear-"></a></h3>
 <p>Clear the text area</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextWidgetClass</span><span class="op">$</span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
+</div><p></p><hr><a id="method-TextWidget-on_submit"></a><div class="section">
+<h3 id="method-on-submit--1">Method <code>on_submit()</code><a class="anchor" aria-label="anchor" href="#method-on-submit--1"></a></h3>
+<p>Add or remove a handler for submit events.</p><div class="section">
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextWidgetClass</span><span class="op">$</span><span class="fu">on_submit</span><span class="op">(</span><span class="va">handler</span>, remove <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>handler</code></dt>
+<dd><p>A function that is called when content is submitted
+by the user hitting 'enter'.</p></dd>
+
+
+<dt><code>remove</code></dt>
+<dd><p>Logical value, whether the handler is to be removed</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
 </div><p></p><hr><a id="method-TextWidget-clone"></a><div class="section">
 <h3 id="method-clone--10">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone--10"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextWidgetClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
+<h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
@@ -977,15 +1021,16 @@ current widget class is supported.</p></dd>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="ValueWidget" data-id="initialize"><a href="ValueWidget.html#method-initialize"><code>RKernel::ValueWidget$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="ValueWidget" data-id="on_change"><a href="ValueWidget.html#method-on_change"><code>RKernel::ValueWidget$on_change()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="TextWidget" data-id="clear"><a href="TextWidget.html#method-clear"><code>RKernel::TextWidget$clear()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="RKernel" data-topic="TextWidget" data-id="on_submit"><a href="TextWidget.html#method-on_submit"><code>RKernel::TextWidget$on_submit()</code></a></span></li>
 </ul></details></p><hr><a id="method-PasswordWidget-clone"></a><div class="section">
 <h3 id="method-clone--11">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone--11"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PasswordWidgetClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
+<h4 id="arguments-14">Arguments<a class="anchor" aria-label="anchor" href="#arguments-14"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
@@ -1055,15 +1100,16 @@ current widget class is supported.</p></dd>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="ValueWidget" data-id="initialize"><a href="ValueWidget.html#method-initialize"><code>RKernel::ValueWidget$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="ValueWidget" data-id="on_change"><a href="ValueWidget.html#method-on_change"><code>RKernel::ValueWidget$on_change()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="TextWidget" data-id="clear"><a href="TextWidget.html#method-clear"><code>RKernel::TextWidget$clear()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="RKernel" data-topic="TextWidget" data-id="on_submit"><a href="TextWidget.html#method-on_submit"><code>RKernel::TextWidget$on_submit()</code></a></span></li>
 </ul></details></p><hr><a id="method-Combobox-clone"></a><div class="section">
 <h3 id="method-clone--12">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone--12"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ComboboxClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
+<h4 id="arguments-15">Arguments<a class="anchor" aria-label="anchor" href="#arguments-15"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

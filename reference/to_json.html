@@ -36,7 +36,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>A Genereric Converter to JSON</h1>
-      <small class="dont-index">Source: <a href="https://github.com/melff/RKernel/blob/main/R/json.R" class="external-link"><code>R/json.R</code></a>, <a href="https://github.com/melff/RKernel/blob/main/R/traitlets.R" class="external-link"><code>R/traitlets.R</code></a>, <a href="https://github.com/melff/RKernel/blob/main/R/traitlets-bytes.R" class="external-link"><code>R/traitlets-bytes.R</code></a>, and 2 more</small>
+      <small class="dont-index">Source: <a href="https://github.com/melff/RKernel/blob/main/R/json.R" class="external-link"><code>R/json.R</code></a>, <a href="https://github.com/melff/RKernel/blob/main/R/traitlets.R" class="external-link"><code>R/traitlets.R</code></a>, <a href="https://github.com/melff/RKernel/blob/main/R/traitlets-vector.R" class="external-link"><code>R/traitlets-vector.R</code></a>, and 2 more</small>
       <div class="d-none name"><code>to_json.Rd</code></div>
     </div>
 
@@ -61,9 +61,6 @@
 <span><span class="co"># S3 method for class 'Trait'</span></span>
 <span><span class="fu">to_json</span><span class="op">(</span><span class="va">x</span>, auto_unbox <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for class 'Bytes'</span></span>
-<span><span class="fu">to_json</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
 <span><span class="co"># S3 method for class 'Vector'</span></span>
 <span><span class="fu">to_json</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -71,6 +68,9 @@
 <span><span class="fu">to_json</span><span class="op">(</span><span class="va">x</span>, auto_unbox <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'Widget'</span></span>
+<span><span class="fu">to_json</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'Bytes'</span></span>
 <span><span class="fu">to_json</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -99,10 +99,10 @@ changed into JSON scalar.</p></dd>
 <li><p><code>to_json(json)</code>: S3 method for JSON character strings. Returns its
 argument as is, making <code>to_json</code> idempotent.</p></li>
 <li><p><code>to_json(Trait)</code>: S3 method for 'TraitClass' objects, i.e. traitlets.</p></li>
-<li><p><code>to_json(Bytes)</code>: S3 method for 'BytesClass' objects</p></li>
 <li><p><code>to_json(Vector)</code>: S3 method for 'VectorClass' objects</p></li>
 <li><p><code>to_json(List)</code>: S3 method for 'ListClass' objects</p></li>
 <li><p><code>to_json(Widget)</code>: S3 method for 'WidgetClass' objects, i.e. jupyter widgets</p></li>
+<li><p><code>to_json(Bytes)</code>: S3 method for 'BytesClass' objects</p></li>
 </ul></div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

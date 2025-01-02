@@ -55,6 +55,10 @@
 <dd><p>See <code>RKernelSession</code>.</p></dd>
 
 
+<dt><code>r_repl</code></dt>
+<dd><p>An RSessionAdapter for handling input and output</p></dd>
+
+
 <dt><code>DAPServer</code></dt>
 <dd><p>The current DAP server</p></dd>
 
@@ -76,7 +80,7 @@
 <li><p><a href="#method-Kernel-stream"><code>Kernel$stream()</code></a></p></li>
 <li><p><a href="#method-Kernel-stdout"><code>Kernel$stdout()</code></a></p></li>
 <li><p><a href="#method-Kernel-stderr"><code>Kernel$stderr()</code></a></p></li>
-<li><p><a href="#method-Kernel-r_session_msg"><code>Kernel$r_session_msg()</code></a></p></li>
+<li><p><a href="#method-Kernel-readline"><code>Kernel$readline()</code></a></p></li>
 <li><p><a href="#method-Kernel-execute_result"><code>Kernel$execute_result()</code></a></p></li>
 <li><p><a href="#method-Kernel-display_send"><code>Kernel$display_send()</code></a></p></li>
 <li><p><a href="#method-Kernel-send_error"><code>Kernel$send_error()</code></a></p></li>
@@ -87,6 +91,9 @@
 <li><p><a href="#method-Kernel-input_request"><code>Kernel$input_request()</code></a></p></li>
 <li><p><a href="#method-Kernel-read_stdin"><code>Kernel$read_stdin()</code></a></p></li>
 <li><p><a href="#method-Kernel-send_debug_event"><code>Kernel$send_debug_event()</code></a></p></li>
+<li><p><a href="#method-Kernel-handle_r_msg"><code>Kernel$handle_r_msg()</code></a></p></li>
+<li><p><a href="#method-Kernel-save_shell_parent"><code>Kernel$save_shell_parent()</code></a></p></li>
+<li><p><a href="#method-Kernel-restore_shell_parent"><code>Kernel$restore_shell_parent()</code></a></p></li>
 <li><p><a href="#method-Kernel-clone"><code>Kernel$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-Kernel-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
@@ -134,7 +141,7 @@
 <h3 id="method-poll-and-respond-">Method <code>poll_and_respond()</code><a class="anchor" aria-label="anchor" href="#method-poll-and-respond-"></a></h3>
 <p>A single iteration of the kernel loop</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">poll_and_respond</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">poll_and_respond</span><span class="op">(</span>poll_timeout <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"rkernel_poll_timeout"</span>, <span class="fl">10L</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
@@ -206,21 +213,14 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Kernel-r_session_msg"></a><div class="section">
-<h3 id="method-r-session-msg-">Method <code>r_session_msg()</code><a class="anchor" aria-label="anchor" href="#method-r-session-msg-"></a></h3>
-<p>Stream message created from R session process to the frontend via 'stderr' stream.</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">r_session_msg</span><span class="op">(</span><span class="va">msg</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
+</div><p></p><hr><a id="method-Kernel-readline"></a><div class="section">
+<h3 id="method-readline-">Method <code><a href="https://rdrr.io/r/base/readline.html" class="external-link">readline()</a></code><a class="anchor" aria-label="anchor" href="#method-readline-"></a></h3>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>msg</code></dt>
-<dd><p>The message created by the 'RKernelSession' object.</p></dd>
-
-
-</dl><p></p></div>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">readline</span><span class="op">(</span>prompt <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
+
 
 </div><p></p><hr><a id="method-Kernel-execute_result"></a><div class="section">
 <h3 id="method-execute-result-">Method <code>execute_result()</code><a class="anchor" aria-label="anchor" href="#method-execute-result-"></a></h3>
@@ -230,7 +230,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>data</code></dt>
 <dd><p>Execution result in rich format</p></dd>
 
@@ -250,7 +250,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>msg</code></dt>
 <dd><p>A list with the appropriate structure. [TODO]</p></dd>
 
@@ -266,7 +266,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>name</code></dt>
 <dd><p>A string, the error name.</p></dd>
 
@@ -290,7 +290,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>msg</code></dt>
 <dd><p>A list containing a comm message.</p></dd>
 
@@ -306,7 +306,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
+<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>channel</code></dt>
 <dd><p>A string, the relevant input channel.</p></dd>
 
@@ -338,7 +338,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
+<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>prompt</code></dt>
 <dd><p>A prompt string</p></dd>
 
@@ -367,7 +367,7 @@ password dialog</p></dd>
 </div>
 
 <div class="section">
-<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
+<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>content</code></dt>
 <dd><p>A list, content provided by the debug adapter</p></dd>
 
@@ -375,10 +375,44 @@ password dialog</p></dd>
 </dl><p></p></div>
 </div>
 
+</div><p></p><hr><a id="method-Kernel-handle_r_msg"></a><div class="section">
+<h3 id="method-handle-r-msg-">Method <code>handle_r_msg()</code><a class="anchor" aria-label="anchor" href="#method-handle-r-msg-"></a></h3>
+<p>Handle a generic message sent from the R Session</p><div class="section">
+<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">handle_r_msg</span><span class="op">(</span><span class="va">msg</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>msg</code></dt>
+<dd><p>The message, a list</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-Kernel-save_shell_parent"></a><div class="section">
+<h3 id="method-save-shell-parent-">Method <code>save_shell_parent()</code><a class="anchor" aria-label="anchor" href="#method-save-shell-parent-"></a></h3>
+
+<div class="section">
+<h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">save_shell_parent</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
+</div><p></p><hr><a id="method-Kernel-restore_shell_parent"></a><div class="section">
+<h3 id="method-restore-shell-parent-">Method <code>restore_shell_parent()</code><a class="anchor" aria-label="anchor" href="#method-restore-shell-parent-"></a></h3>
+
+<div class="section">
+<h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">restore_shell_parent</span><span class="op">(</span><span class="va">saved_parent</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-Kernel-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
+<h4 id="usage-23">Usage<a class="anchor" aria-label="anchor" href="#usage-23"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
