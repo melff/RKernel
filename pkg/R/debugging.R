@@ -93,15 +93,33 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             invisible()
         },
         update_env_browser = function() {
+            # log_out("update_env_browser")
             title <- self$repl$eval(browserText(), safe = TRUE)
             if(!nzchar(title)) title <- NULL
             table <- env_browser_table(repl = self$repl, title = title)
             self$env_browser$value <- table
+            # log_out("update_env_browser done")
+        },
+        on_click_next = function() {
+            # log_out("on_click_next")
+            self$repl$run_code("")
+            if(self$in_browser) self$update_env_browser()
+            invisible()
+        },
+        on_click_quit = function() {
+            # log_out("on_click_quit")
+            self$repl$run_code("Q")
+            invisible()
         },
         main_widget = NULL,
         run = function(prompt) {
             kernel <- self$session$kernel
             use_area <- FALSE
+            next_btn <- Button(description="Next")
+            quit_btn <- Button(description="Quit")
+            next_btn$on_click(self$on_click_next)
+            quit_btn$on_click(self$on_click_quit)
+            button_box <- HBox(next_btn,quit_btn)
             if(use_area) { # Currently not recommended - Textarea widgets do no
                            # work, only one line can be used ...
                 self$input <- Textarea(
@@ -128,7 +146,8 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
                 self$main_widget <- VBox(self$style,
                                          self$output,
                                          self$input,
-                                         self$env_browser)
+                                         self$env_browser,
+                                         button_box)
             }
             self$update_env_browser()
             d <- display_data(self$main_widget)
@@ -140,14 +159,25 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             }
             self$input$disabled <- TRUE
             self$input$placeholder <- "--"
-            self$input$add_class("invisible")
-            self$main_widget <- VBox(self$output,
-                                     self$env_browser)
+            close_btn <- Button(description="Close")
+            self$main_widget$children <- list(self$output,
+                                              self$env_browser,
+                                              close_btn)
             d <- update(d,self$main_widget)
             d$data[["text/plain"]] <- "dbgConsole()"
             d$data[["text/html"]] <- "<pre>dbgConsole()</pre>"
             kernel$restore_shell_parent(saved_parent)
             kernel$display_send(d)
+            on_click_close_btn <- function() { 
+                # log_out("on_click_close_btn")
+                self$main_widget$children <- list()
+                d <- display_data(self$main_widget)
+                d <- update(d,self$main_widget)
+                d$data[["text/plain"]] <- "dbgConsole()"
+                d$data[["text/html"]] <- "<pre>dbgConsole()</pre>"
+                kernel$display_send(d)
+            }
+            close_btn$on_click(on_click_close_btn)
         }
     )
 )
@@ -244,7 +274,7 @@ eval_capture <- function(expr,envir,enclos,stdout,stderr) {
 add_prompts <- function(txt) {
   txt <- paste(txt,collapse="\n")
   txt <- unlist(strsplit(txt,"\n"))
-  log_out(txt, use.print=TRUE)
+  # log_out(txt, use.print=TRUE)
   if(length(txt)) {
     txt[1] <- paste(">",txt[1])
     if(length(txt) > 1)
