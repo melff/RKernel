@@ -196,6 +196,7 @@ Kernel <- R6Class("Kernel",
                            content=msg$content)
       private$display_id <- msg$content$transient$display_id
       # log_out("display_send succeeded")
+      invisible()
     },
     #' @description
     #' Send an error message and traceback to the frontend.
@@ -1067,6 +1068,7 @@ Kernel <- R6Class("Kernel",
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
       self$r_repl$run_code(cmd)
+      return(invisible())
     },
     r_send_cmd = function(cmd) {
       resp <- self$r_repl$run_cmd(cmd)
