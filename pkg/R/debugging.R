@@ -106,6 +106,12 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             if(self$in_browser) self$update_env_browser()
             invisible()
         },
+        on_click_continue = function() {
+            # log_out("on_click_continue")
+            self$repl$run_code("c")
+            if(self$in_browser) self$update_env_browser()
+            invisible()
+        },
         on_click_quit = function() {
             # log_out("on_click_quit")
             self$repl$run_code("Q")
@@ -115,11 +121,13 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
         run = function(prompt) {
             kernel <- self$session$kernel
             use_area <- FALSE
-            next_btn <- Button(description="Next")
-            quit_btn <- Button(description="Quit")
+            next_btn <- Button(icon="play",style=ButtonStyle(font_size="70%"))
+            continue_btn <- Button(icon="forward",style=ButtonStyle(font_size="70%"))
+            quit_btn <- Button(icon="stop",style=ButtonStyle(font_size="70%"))
             next_btn$on_click(self$on_click_next)
+            continue_btn$on_click(self$on_click_continue)
             quit_btn$on_click(self$on_click_quit)
-            button_box <- HBox(next_btn,quit_btn)
+            button_box <- HBox(next_btn,continue_btn,quit_btn)
             if(use_area) { # Currently not recommended - Textarea widgets do no
                            # work, only one line can be used ...
                 self$input <- Textarea(
@@ -137,7 +145,7 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             }
             else {
                 self$input <- TextWidget(
-                    placeholder="Enter expression, 'c', 'n', or 'Q'",
+                    placeholder="Enter expression, 'c', 'n', 'Q' or hit <enter>",
                     continuous_update = TRUE
                 )
                 self$input$add_class("monospace")
@@ -159,7 +167,7 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             }
             self$input$disabled <- TRUE
             self$input$placeholder <- "--"
-            close_btn <- Button(description="Close")
+            close_btn <- Button(icon="eject",style=ButtonStyle(font_size="70%"))
             self$main_widget$children <- list(self$output,
                                               self$env_browser,
                                               close_btn)
