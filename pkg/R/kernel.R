@@ -985,8 +985,6 @@ Kernel <- R6Class("Kernel",
       private$r_msg_handlers$update_display_data <- self$display_send
       private$r_msg_handlers$test <- function(msg) self$stdout(msg$content)
       private$r_msg_handlers$options <- private$handle_options_msg
-      private$r_msg_handlers$new_plot <- private$handle_new_plot
-      private$r_msg_handlers$before_new_plot <- private$handle_before_new_plot
       private$r_msg_handlers$menu <- private$handle_menu_request
       for(msg_type in c("comm_msg", "comm_open", "comm_close"))
         private$r_msg_handlers[[msg_type]] <- self$send_comm
@@ -1083,19 +1081,6 @@ Kernel <- R6Class("Kernel",
     graphics_display_id = "",
     graphics_plot_id = integer(0),
     graphics_new_cell = FALSE,
-    handle_new_plot = function(msg) {
-      log_out("handle_new_plot")
-      log_out(msg, use.str = TRUE)
-      # plot_id <- msg$plot_id
-      # d <- private$r_graphics_observer$display_data(plot_id = plot_id)
-      # self$display_send(d)
-      # private$graphics_display_id <- display_id(d)
-      # private$graphics_plot_id <- d$metadata$plot_id
-    },
-    handle_before_new_plot = function(msg) {
-      log_out("handle_before_new_plot")
-      log_out(msg, use.str = TRUE)
-    },
     display_changed_graphics = function() {
       if(self$r_session$sleeping()) {
         poll_res <- private$r_graphics_observer$poll()

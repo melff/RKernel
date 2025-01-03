@@ -123,63 +123,16 @@ GraphicsObserver <- R6Class("GraphicsObserver",
     }
   ))
 
-get_hgd_host <- function() {
-  info <- httpgd::hgd_details()
-  cat(info$host)
-}
-
-get_hgd_port <- function() {
-  info <- httpgd::hgd_details()
-  cat(info$port)
-}
-
-get_hgd_token <- function() {
-  info <- httpgd::hgd_details()
-  cat(info$token)
-}
-
-
-graphics_formats <- c(
-  "image/svg+xml"   = "svgp",
-  "image/png"       = "png",
-  "application/pdf" = "pdf"
-)
 
 #' @export
 start_graphics <- function(){
     options(device=httpgd::hgd)
-    setHook('plot.new', plot_new_hook)
-    setHook('grid.newpage', send_new_plot)
-    setHook('before.plot.new', send_before_new_plot)
-    setHook('before.grid.newpage', send_before_new_plot)
     add_sync_options(c(
           "jupyter.plot.width",
           "jupyter.plot.height",
           "jupyter.plot.res",
           "jupyter.graphics.types",
           "jupyter.update.graphics"))
-}
-
-plot_new_hook <- function() {
-  if(par("page")) send_new_plot()
-}
-
-send_new_plot <- function() {
-  # log_out("send_new_plot")
-  if(dev_is_unigd()){
-    id <- ugd_id()$id
-    msg <- list(type = "new_plot", 
-                plot_id = id + 1L)
-    msg_send(msg)
-    }
-}
-
-send_before_new_plot <- function() {
-  # log_out("before_send_new_plot")
-  if(dev_is_unigd()){
-    msg <- list(type = "before_new_plot")
-    msg_send(msg)
-  }
 }
 
 dev_is_unigd <- function(which = dev.cur()) {
