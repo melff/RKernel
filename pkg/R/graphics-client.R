@@ -58,26 +58,32 @@ GraphicsObserver <- R6Class("GraphicsObserver",
     png_res = 288,
     dpi = 72,
     render = function(format = "svgp", 
-                      plot_id = integer(0)) {
+                      plot_id = integer(0),
+                      width = getOption("jupyter.plot.width",self$width),
+                      height = getOption("jupyter.plot.height",self$height)) {
       gurl <- self$render_url(format = format,
-                        plot_id = plot_id)
+                              plot_id = plot_id,
+                              width = width,
+                              height = height)
       data <- curl_fetch_memory(gurl)
-      data$width <- self$width
-      data$height <- self$height
+      data$width <- width
+      data$height <- height
       data$format <- format
       data
     },
     render_url = function(format = "svgp", 
-                          plot_id = integer(0)) {
+                          plot_id = integer(0),
+                          width = getOption("jupyter.plot.width",self$width),
+                          height = getOption("jupyter.plot.height",self$height)) {
       if(format == "png") {
         zoom <- self$png_res/self$dpi
-        width <- self$width * self$png_res
-        height <- self$height * self$png_res
+        width  <- width * self$png_res
+        height <- height * self$png_res
       }
       else {
         zoom <- 1
-        width <- self$width * self$dpi
-        height <- self$height * self$dpi
+        width  <- width * self$dpi
+        height <- height * self$dpi
       }
       paste0(
         "http://",
@@ -94,20 +100,26 @@ GraphicsObserver <- R6Class("GraphicsObserver",
     display_res = 144,
     display_data = function(plot_id = integer(0),
                             display_id=UUIDgenerate(),
-                            update=FALSE) {
+                            update=FALSE,
+                            width = getOption("jupyter.plot.width",self$width),
+                            height = getOption("jupyter.plot.height",self$height)
+                            ) {
       renders <- lapply(self$formats,
                         self$render,
-                        plot_id = plot_id)
+                        plot_id = plot_id,
+                        width = width,
+                        height = height)
       mime_data <- lapply(renders, "[[","content")
       mime_types <- lapply(renders, "[[","type")
       mime_data[self$fmt_bin] <- lapply(mime_data[self$fmt_bin],base64_enc)
       mime_data[!self$fmt_bin] <- lapply(mime_data[!self$fmt_bin],rawToChar)
       names(mime_data) <- mime_types
+      display_res <- getOption("jupyter.plot.res",self$display_res)
       mime_metadata <- lapply(renders, 
                               function(r) {
                                 list(
-                                  width = r$width * self$display_res,
-                                  height = r$height * self$display_res,
+                                  width   = r$width * display_res,
+                                  height  = r$height * display_res,
                                   plot_id = plot_id
                                 )
                               })
