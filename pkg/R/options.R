@@ -8,8 +8,6 @@ add_sync_options <- function(n) {
 
 #' @export
 send_options <- function(nms){
-  # Do not use 'log_out' here as it may lead to a recursion
-  # log_out("send_options")
   n <- ls(snc_opts)
   n <- intersect(nms,n)
   n <- intersect(n, names(.Options))
@@ -33,7 +31,7 @@ options_orig <- getFromNamespace("options", "base")
 options_with_send <- function(...) {
   args <- list(...)
   res <- options_orig(...)
-  if(n <- length(names(args))) {
+  if(length(n <- names(args))) {
     send_options(n)
   }
   invisible(res)
