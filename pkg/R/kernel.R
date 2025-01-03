@@ -91,6 +91,14 @@ Kernel <- R6Class("Kernel",
       self$r_repl$run_cmd("RKernel:::install_sleep()")
       self$r_repl$run_cmd("RKernel:::set_config(use_widgets = FALSE)")
       msg_env$send <- self$handle_r_msg
+      private$stdout_filter <- MessageFilter$new(
+                                    text_handler = self$stdout,
+                                    msg_handler = self$handle_r_msg
+                                  )
+      private$stderr_filter <- MessageFilter$new(
+                                    text_handler = self$stderr,
+                                    msg_handler = self$handle_r_msg
+                                  )
     },
     #' @field r_session See \code{\link{RKernelSession}}.
     r_session = list(),
@@ -952,66 +960,18 @@ Kernel <- R6Class("Kernel",
     r_run_cell_end_hooks = function(){
       self$r_repl$run_code("RKernel::runHooks('cell-end')")
     },
-    r_msg_incomplete = list(stdout=FALSE, stderr=FALSE),
-    r_msg_frag = list(stdout="",stderr=""),
-    handle_r_output = function(text, stream="stdout"){
-      # log_out("=========================================================")
-      # log_out("handle_r_output")
-      if (grepl(DLE, text)) {
-        # log_out("DLE found")
-        text <- split_string1(text, DLE)
-      }
-      for(chunk in text){
-        if(!length(chunk) || !nzchar(chunk)) next
-        # log_out(chunk, use.str = TRUE)
-        if (startsWith(chunk, MSG_BEGIN)) {
-          # log_out("MSG_BEGIN found")
-          # log_out(chunk, use.print = TRUE)
-          if (endsWith(chunk, MSG_END)) {
-            # log_out("MSG_END found")
-            msg <- remove_prefix(chunk, MSG_BEGIN) |> remove_suffix(MSG_END)
-            msg <- msg_unwrap(msg)
-            # log_out(msg, use.print = FALSE)
-            self$handle_r_msg(msg)
-          } else {
-            private$r_msg_incomplete[[stream]] <- TRUE
-            private$r_msg_frag[[stream]] <- remove_prefix(chunk, MSG_BEGIN)
-          }
-        }
-        else if(endsWith(chunk, MSG_END)){
-          # log_out("MSG_END found")
-          # log_out(chunk, use.print = TRUE)
-          msg <- paste0(private$r_msg_frag[[stream]], remove_suffix(chunk, MSG_END))
-          private$r_msg_incomplete[[stream]] <- FALSE
-          private$r_msg_frag[[stream]] <- ""
-          msg <- msg_unwrap(msg)
-          self$handle_r_msg(msg)
-        }
-        else {
-          if(private$r_msg_incomplete[[stream]]) {
-            # log_out("incomplete chunk ...")
-            private$r_msg_frag[[stream]] <- paste0(private$r_msg_frag[[stream]], chunk)
-          }
-          else if(nzchar(chunk)) {
-            # log_out(chunk, use.print = TRUE)
-            # chunk <- paste0("<|",chunk,"|>")
-            self$stream(chunk, stream = stream)
-          }
-        }
-        # log_out("----------------------------------------------")
-      }
-      # log_out("handle_r_stdout done")
-    },
+    stdout_filter = NULL,
+    stderr_filter = NULL,
     handle_r_stdout = function(text) {
       # log_out("=========================================================")
       # log_out("handle_r_stdout")
-      private$handle_r_output(text, stream = "stdout")
+      private$stdout_filter$process(text)
     },
     handle_r_stderr = function(text){
       # log_out("=========================================================")
       # log_out("handle_r_stderr")
       # log_out(text)
-      private$handle_r_output(text, stream = "stderr")
+      private$stderr_filter$process(text)
     },
     r_msg_handlers = list(),
     install_r_handlers = function(){

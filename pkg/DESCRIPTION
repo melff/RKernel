@@ -84,6 +84,7 @@ Collate:
     'magic-codes.R'
     'main.R'
     'menu.R'
+    'message-filter.R'
     'options.R'
     'output.R'
     'proto.R'
