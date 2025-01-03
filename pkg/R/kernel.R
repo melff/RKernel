@@ -197,7 +197,8 @@ Kernel <- R6Class("Kernel",
         msg <- list(type = class(d),
                     content = unclass(d))
       }
-      # log_out("display_send")
+      log_out("display_send")
+      log_out(msg$content$transient$display_id)
       private$send_message(type=msg$type,
                            parent=private$parent$shell,
                            socket_name="iopub",
@@ -317,14 +318,13 @@ Kernel <- R6Class("Kernel",
         msg_handler(msg)
       } else {
         err_msg <- sprintf("R session sent message of unknown type '%s'", msg_type)
-        log_error(err_msg)
         # log_out(msg_handler, use.str = TRUE)
         self$stderr(err_msg)
         dep_msg <- deparse0(msg)
         self$stderr("\n")
         self$stderr(dep_msg)
         self$stderr("\n")
-        log_error(dep_msg)
+        log_error(paste(err_msg,dep_msg,sep=":\n "))
       }
     },
     errored = FALSE,
@@ -943,8 +943,9 @@ Kernel <- R6Class("Kernel",
       # self$r_repl$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")
     },
+    r_graphics_observer = NULL,
     r_start_graphics = function(){
-      # log_out("Starting graphics ...")
+      log_out("Starting graphics ...")
       self$r_repl$run_cmd("RKernel::start_graphics()")
       add_sync_options(c(
           "jupyter.plot.width",
@@ -952,7 +953,11 @@ Kernel <- R6Class("Kernel",
           "jupyter.plot.res",
           "jupyter.graphics.types",
           "jupyter.update.graphics"))
-      # log_out("done.")
+      self$r_repl$run_cmd("httpgd::hgd()")
+      gdetails <- self$r_repl$eval_code("httpgd::hgd_details()")
+      log_out(gdetails, use.str = TRUE)
+      private$r_graphics_observer = GraphicsObserver$new(gdetails)
+      log_out("done.")
     },
     r_run_cell_begin_hooks = function(){
       self$r_repl$run_code("RKernel::runHooks('cell-begin')")
@@ -966,6 +971,7 @@ Kernel <- R6Class("Kernel",
       # log_out("=========================================================")
       # log_out("handle_r_stdout")
       private$stdout_filter$process(text)
+      private$display_changed_graphics()
     },
     handle_r_stderr = function(text){
       # log_out("=========================================================")
@@ -979,6 +985,8 @@ Kernel <- R6Class("Kernel",
       private$r_msg_handlers$update_display_data <- self$display_send
       private$r_msg_handlers$test <- function(msg) self$stdout(msg$content)
       private$r_msg_handlers$options <- private$handle_options_msg
+      private$r_msg_handlers$new_plot <- private$handle_new_plot
+      private$r_msg_handlers$before_new_plot <- private$handle_before_new_plot
       private$r_msg_handlers$menu <- private$handle_menu_request
       for(msg_type in c("comm_msg", "comm_open", "comm_close"))
         private$r_msg_handlers[[msg_type]] <- self$send_comm
@@ -1024,9 +1032,10 @@ Kernel <- R6Class("Kernel",
       msg_unwrap(msg)
     },
     handle_options_msg = function(msg){
-      # log_out("handle_options_msg")
+      log_out("handle_options_msg")
       #log_out(msg, use.str = TRUE)
       opts <- msg$content
+      log_out(opts, use.str = TRUE)
       import_options(opts)
       #res <- do.call("options",opts)
       #log_out(res, use.str = TRUE)
@@ -1071,6 +1080,51 @@ Kernel <- R6Class("Kernel",
       }
     },
 
+    graphics_display_id = "",
+    graphics_plot_id = integer(0),
+    graphics_new_cell = FALSE,
+    handle_new_plot = function(msg) {
+      log_out("handle_new_plot")
+      log_out(msg, use.str = TRUE)
+      # plot_id <- msg$plot_id
+      # d <- private$r_graphics_observer$display_data(plot_id = plot_id)
+      # self$display_send(d)
+      # private$graphics_display_id <- display_id(d)
+      # private$graphics_plot_id <- d$metadata$plot_id
+    },
+    handle_before_new_plot = function(msg) {
+      log_out("handle_before_new_plot")
+      log_out(msg, use.str = TRUE)
+    },
+    display_changed_graphics = function() {
+      if(self$r_session$sleeping()) {
+        poll_res <- private$r_graphics_observer$poll()
+        if(poll_res["active"]) {
+          log_out(sprintf("private$graphics_new_cell = %s",private$graphics_new_cell))
+          force_new_display <- private$graphics_new_cell && 
+                                !getOption("jupyter.update.graphics",TRUE)
+          log_out(sprintf("force_new_display = %s",force_new_display))
+          if(poll_res[2] || 
+             (poll_res[3] && force_new_display)) { # New plot
+            d <- private$r_graphics_observer$display_data()
+            self$display_send(d)
+            private$graphics_display_id <- display_id(d)
+            private$graphics_plot_id <- d$metadata$plot_id
+          }
+          else if(poll_res[3]) { # Plot update
+            display_id <- private$graphics_display_id
+            plot_id <- private$graphics_plot_id
+            d <- private$r_graphics_observer$display_data(
+                                                plot_id = plot_id,
+                                                display_id = display_id,
+                                                update = TRUE)
+            self$display_send(d)
+          }
+          private$graphics_new_cell <- FALSE
+        }
+      }
+    },
+
     handle_menu_request = function(msg) {
       saved_parent <- private$parent$shell
       Menu(kernel = self,
@@ -1080,13 +1134,14 @@ Kernel <- R6Class("Kernel",
     },
 
     run_code_cell = function(code) {
-      # log_out("= run_code_cell ========================")
+      log_out("= run_code_cell ========================")
+      private$graphics_new_cell <- TRUE
       private$input_suspended <- FALSE
       on.exit(private$input_suspended <- TRUE)
       code_blocks <- preproc_code(code)
       for(block in code_blocks) {
         self$errored <- FALSE 
-        # log_out("- run code block ----")
+        log_out("- run code block ----")
         # log_out(block, use.str=TRUE)
         self$r_repl$run_code(block)
         # log_out("- done running code block ----")
@@ -1094,6 +1149,7 @@ Kernel <- R6Class("Kernel",
         if(self$errored) {
           if(self$stop_on_error) break
         }
+        private$display_changed_graphics()
       }
     }
   )

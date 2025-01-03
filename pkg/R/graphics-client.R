@@ -58,7 +58,17 @@ GraphicsObserver <- R6Class("GraphicsObserver",
     png_res = 288,
     dpi = 72,
     render = function(format = "svgp", 
-                      id = character(0)) {
+                      plot_id = integer(0)) {
+      gurl <- self$render_url(format = format,
+                        plot_id = plot_id)
+      data <- curl_fetch_memory(gurl)
+      data$width <- self$width
+      data$height <- self$height
+      data$format <- format
+      data
+    },
+    render_url = function(format = "svgp", 
+                          plot_id = integer(0)) {
       if(format == "png") {
         zoom <- self$png_res/self$dpi
         width <- self$width * self$png_res
@@ -69,28 +79,25 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         width <- self$width * self$dpi
         height <- self$height * self$dpi
       }
-      gurl <- paste0(
-                "http://",
-                self$host,":",
-                self$port,"/",
-                "plot","?",
-                if(length(id)) paste0("id=",(id - 1L),"&"),
-                "token=", self$token,"&",
-                "renderer=", format,"&",
-                "width=", width,"&",
-                "height=", height,"&",
-                "zoom=",zoom)
-      # gurl
-      data <- curl_fetch_memory(gurl)
-      data$width <- self$width
-      data$height <- self$height
-      data$format <- format
-      data
+      paste0(
+        "http://",
+        self$host,":",
+        self$port,"/",
+        "plot","?",
+        if(length(plot_id)) paste0("id=",(plot_id - 1L),"&"),
+        "token=", self$token,"&",
+        "renderer=", format,"&",
+        "width=", width,"&",
+        "height=", height,"&",
+        "zoom=",zoom)
     },
     display_res = 144,
-    display_data = function() {
+    display_data = function(plot_id = integer(0),
+                            display_id=UUIDgenerate(),
+                            update=FALSE) {
       renders <- lapply(self$formats,
-                        self$render)
+                        self$render,
+                        plot_id = plot_id)
       mime_data <- lapply(renders, "[[","content")
       mime_types <- lapply(renders, "[[","type")
       mime_data[self$fmt_bin] <- lapply(mime_data[self$fmt_bin],base64_enc)
@@ -100,12 +107,19 @@ GraphicsObserver <- R6Class("GraphicsObserver",
                               function(r) {
                                 list(
                                   width = r$width * self$display_res,
-                                  height = r$height * self$display_res
+                                  height = r$height * self$display_res,
+                                  plot_id = plot_id
                                 )
                               })
       names(mime_metadata) <- mime_types
-      list(data = mime_data,
-           metadata = mime_metadata)
+      mime_data[["text/plain"]] <- self$render_url(plot_id = plot_id)
+      d <- list(data = mime_data,
+                metadata = mime_metadata)
+      d$transient <- list(display_id=display_id)
+      if(update) cl <- "update_display_data"
+      else cl <- "display_data"
+      self$store()
+      structure(d,class=cl)
     }
   ))
 
@@ -154,7 +168,8 @@ send_new_plot <- function() {
   # log_out("send_new_plot")
   if(dev_is_unigd()){
     id <- ugd_id()$id
-    msg <- list(type = "new_plot", plot_id = id)
+    msg <- list(type = "new_plot", 
+                plot_id = id + 1L)
     msg_send(msg)
     }
 }
