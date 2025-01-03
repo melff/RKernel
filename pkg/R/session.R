@@ -36,6 +36,9 @@ RKernelSession <- R6Class("RKernelSession",
       self$banner <- banner
       self$kernel <- kernel
     },
+    sleeping = function() {
+      self$get_status() == "sleeping"
+    },
     drop_last_input = FALSE,
     last_input = "",
     send_input = function(text, drop_echo = FALSE) {
