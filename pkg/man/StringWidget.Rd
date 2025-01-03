@@ -740,6 +740,7 @@ The objects of this class are cloneable with this method.
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-Textarea-on_submit}{\code{TextareaClass$on_submit()}}
 \item \href{#method-Textarea-clone}{\code{TextareaClass$clone()}}
 }
 }
@@ -776,6 +777,26 @@ The objects of this class are cloneable with this method.
 </ul>
 </details>
 }}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Textarea-on_submit"></a>}}
+\if{latex}{\out{\hypertarget{method-Textarea-on_submit}{}}}
+\subsection{Method \code{on_submit()}}{
+Add or remove a handler for submit events.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextareaClass$on_submit(handler, remove = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{handler}}{A function that is called when content is submitted 
+by the user hitting 'enter'.}
+
+\item{\code{remove}}{Logical value, whether the handler is to be removed}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Textarea-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-Textarea-clone}{}}}
@@ -816,6 +837,7 @@ The objects of this class are cloneable with this method.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-TextWidget-clear}{\code{TextWidgetClass$clear()}}
+\item \href{#method-TextWidget-on_submit}{\code{TextWidgetClass$on_submit()}}
 \item \href{#method-TextWidget-clone}{\code{TextWidgetClass$clone()}}
 }
 }
@@ -861,6 +883,26 @@ Clear the text area
 \if{html}{\out{<div class="r">}}\preformatted{TextWidgetClass$clear()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TextWidget-on_submit"></a>}}
+\if{latex}{\out{\hypertarget{method-TextWidget-on_submit}{}}}
+\subsection{Method \code{on_submit()}}{
+Add or remove a handler for submit events.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TextWidgetClass$on_submit(handler, remove = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{handler}}{A function that is called when content is submitted 
+by the user hitting 'enter'.}
+
+\item{\code{remove}}{Logical value, whether the handler is to be removed}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TextWidget-clone"></a>}}
@@ -929,6 +971,7 @@ The objects of this class are cloneable with this method.
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="ValueWidget" data-id="initialize"><a href='../../RKernel/html/ValueWidget.html#method-ValueWidget-initialize'><code>RKernel::ValueWidget$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="ValueWidget" data-id="on_change"><a href='../../RKernel/html/ValueWidget.html#method-ValueWidget-on_change'><code>RKernel::ValueWidget$on_change()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="TextWidget" data-id="clear"><a href='../../RKernel/html/TextWidget.html#method-TextWidget-clear'><code>RKernel::TextWidget$clear()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="RKernel" data-topic="TextWidget" data-id="on_submit"><a href='../../RKernel/html/TextWidget.html#method-TextWidget-on_submit'><code>RKernel::TextWidget$on_submit()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -1003,6 +1046,7 @@ The objects of this class are cloneable with this method.
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="ValueWidget" data-id="initialize"><a href='../../RKernel/html/ValueWidget.html#method-ValueWidget-initialize'><code>RKernel::ValueWidget$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="ValueWidget" data-id="on_change"><a href='../../RKernel/html/ValueWidget.html#method-ValueWidget-on_change'><code>RKernel::ValueWidget$on_change()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="TextWidget" data-id="clear"><a href='../../RKernel/html/TextWidget.html#method-TextWidget-clear'><code>RKernel::TextWidget$clear()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="RKernel" data-topic="TextWidget" data-id="on_submit"><a href='../../RKernel/html/TextWidget.html#method-TextWidget-on_submit'><code>RKernel::TextWidget$on_submit()</code></a></span></li>
 </ul>
 </details>
 }}

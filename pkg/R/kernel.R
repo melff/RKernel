@@ -408,13 +408,11 @@ Kernel <- R6Class("Kernel",
       }
       else {
           private$r_run_cell_begin_hooks()
-          private$graphics_client$new_cell <- TRUE
           r <- tryCatch(private$run_code_cell(msg$content$code),
             error = function(e) structure("errored", message = conditionMessage(e)), 
             interrupt = function(e) "interrupted"
           )
           # log_out(r, use.print = TRUE)
-          private$r_display_changed_graphics()
           private$r_run_cell_end_hooks()
           payload <- NULL
           if (!self$r_session$is_alive()) {
@@ -937,23 +935,16 @@ Kernel <- R6Class("Kernel",
       # self$r_repl$run_cmd("options(error = function()print(traceback()))")
       # log_out("done.")
     },
-    graphics_client = NULL,
     r_start_graphics = function(){
       # log_out("Starting graphics ...")
-      # self$r_repl$run_cmd("RKernel::start_graphics()")
+      self$r_repl$run_cmd("RKernel::start_graphics()")
+      add_sync_options(c(
+          "jupyter.plot.width",
+          "jupyter.plot.height",
+          "jupyter.plot.res",
+          "jupyter.graphics.types",
+          "jupyter.update.graphics"))
       # log_out("done.")
-      private$graphics_client <- GraphicsClient$new(self$r_repl)
-      private$graphics_client$start()
-    },
-    r_display_changed_graphics = function() {display
-      # log_out("r_display_changed_graphics")
-      d <- private$graphics_client$display_changed()
-      if(length(d)) {
-        msg <- list(type = class(d),
-                    content = unclass(d))
-        # log_out(msg, use.str = TRUE)
-        self$display_send(msg)
-      }
     },
     r_run_cell_begin_hooks = function(){
       self$r_repl$run_code("RKernel::runHooks('cell-begin')")
@@ -1007,7 +998,6 @@ Kernel <- R6Class("Kernel",
             self$stream(chunk, stream = stream)
           }
         }
-        private$r_display_changed_graphics()
         # log_out("----------------------------------------------")
       }
       # log_out("handle_r_stdout done")
@@ -1028,8 +1018,6 @@ Kernel <- R6Class("Kernel",
       private$r_msg_handlers$display_data <- self$display_send
       private$r_msg_handlers$update_display_data <- self$display_send
       private$r_msg_handlers$test <- function(msg) self$stdout(msg$content)
-      private$r_msg_handlers$new_plot <- private$graphics_client$new_plot
-      private$r_msg_handlers$before_new_plot <- private$graphics_client$before_new_plot
       private$r_msg_handlers$options <- private$handle_options_msg
       private$r_msg_handlers$menu <- private$handle_menu_request
       for(msg_type in c("comm_msg", "comm_open", "comm_close"))
