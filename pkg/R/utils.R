@@ -95,7 +95,7 @@ log_error <- function(message){
     message <- paste0(indent, message)
   }
 
-  calls <- head(limitedLabels(sys.calls()),-1)
+  calls <- limitedLabels(sys.calls())
   calls <- paste0(indent,"  ",calls)
   calls <- paste(calls,collapse="\n")
   calls <- paste0(calls,"\n")
