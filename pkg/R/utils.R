@@ -285,3 +285,10 @@ Sys_sleep <- function(time) {
 install_sleep <- function(){
     replace_in_package("base", "Sys.sleep", Sys_sleep)
 }
+
+update_list <- function(l1, l2) {
+  n <- names(l2)
+  n <- n[nzchar(n) & !is.na(n)]
+  l1[n] <- l2[n]
+  l1
+}
