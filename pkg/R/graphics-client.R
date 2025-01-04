@@ -9,10 +9,17 @@ GraphicsObserver <- R6Class("GraphicsObserver",
     host = NULL,
     port = NULL,
     token = NULL,
-    initialize = function(details) {
-      self$host <- details$host
-      self$port <- details$port
-      self$token <- details$token
+    internal = FALSE,
+    device = NULL,
+    initialize = function(details, internal = FALSE) {
+      self$internal <- internal
+      if(internal) {
+        self$device <- dev.cur()
+      } else {
+        self$host <- details$host
+        self$port <- details$port
+        self$token <- details$token
+      }
     },
     id = 0,
     upid = 0,
@@ -28,6 +35,22 @@ GraphicsObserver <- R6Class("GraphicsObserver",
       self$upid <- state$upid
     },
     get_current_state = function() {
+      if(self$internal) {
+        self$get_current_state_internal()
+      } else {
+        self$get_current_state_http()
+      }
+    },
+    get_current_state_internal = function() {
+      state <- ugd_state(self$device)
+      list(
+        active = state$active,
+        hsize = state$hsize,
+        id = state$hsize,
+        upid = state$upid
+      )
+    },
+    get_current_state_http = function() {
       gurl <- paste0(
                 "http://",
                 self$host,":",
@@ -61,11 +84,19 @@ GraphicsObserver <- R6Class("GraphicsObserver",
                       plot_id = integer(0),
                       width = getOption("jupyter.plot.width",self$width),
                       height = getOption("jupyter.plot.height",self$height)) {
-      gurl <- self$render_url(format = format,
-                              plot_id = plot_id,
-                              width = width,
-                              height = height)
-      data <- curl_fetch_memory(gurl)
+      if(self$internal) {
+        data <- self$render_internal(
+                                format = format,
+                                plot_id = plot_id,
+                                width = width,
+                                height = height)
+      } else {
+        gurl <- self$render_url(format = format,
+                                plot_id = plot_id,
+                                width = width,
+                                height = height)
+        data <- curl_fetch_memory(gurl)
+      }
       data$width <- width
       data$height <- height
       data$format <- format
@@ -97,6 +128,34 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         "height=", height,"&",
         "zoom=",zoom)
     },
+    render_internal = function(format = "svgp", 
+                          plot_id = integer(0),
+                          width = getOption("jupyter.plot.width",self$width),
+                          height = getOption("jupyter.plot.height",self$height)) {
+      if(format == "png") {
+        zoom <- self$png_res/self$dpi
+        width  <- width * self$png_res
+        height <- height * self$png_res
+      }
+      else {
+        zoom <- 1
+        width  <- width * self$dpi
+        height <- height * self$dpi
+      }
+      content <- ugd_render(
+        page = 0,
+        width = width,
+        height = height,
+        zoom = zoom,
+        as = format,
+        which = self$device
+      )
+      urend <- ugd_renderers()
+      ii <- match(format,urend$id)
+      type <- urend$mime[ii]
+      list(content = content,
+           type = type)
+    },
     display_res = 144,
     display_data = function(plot_id = integer(0),
                             display_id=UUIDgenerate(),
@@ -112,7 +171,7 @@ GraphicsObserver <- R6Class("GraphicsObserver",
       mime_data <- lapply(renders, "[[","content")
       mime_types <- lapply(renders, "[[","type")
       mime_data[self$fmt_bin] <- lapply(mime_data[self$fmt_bin],base64_enc)
-      mime_data[!self$fmt_bin] <- lapply(mime_data[!self$fmt_bin],rawToChar)
+      mime_data[!self$fmt_bin] <- lapply(mime_data[!self$fmt_bin],rawToChar_)
       names(mime_data) <- mime_types
       display_res <- getOption("jupyter.plot.res",self$display_res)
       mime_metadata <- lapply(renders, 
@@ -151,3 +210,8 @@ dev_is_unigd <- function(which = dev.cur()) {
   names(which) == "unigd"
 }
 
+rawToChar_ <- function(x) {
+  if(is.raw(x)) rawToChar(x)
+  else if(is.character(x)) x[1]
+  else ""
+}
