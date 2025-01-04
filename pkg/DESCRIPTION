@@ -48,6 +48,7 @@ Collate:
     'check-options.R'
     'comms.R'
     'completions.R'
+    'context.R'
     'dap-helpers.R'
     'dap-server.R'
     'httpd.R'
