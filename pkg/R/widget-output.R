@@ -55,49 +55,29 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             self$send_state("outputs")
         },
         stdout = function(text) private$stream(text,"stdout"),
-        stderr = function(text) private$stream(text,"stderr")
+        stderr = function(text) private$stream(text,"stderr"),
+        handle_msg = function(msg) {
+            if(!is.list(msg)) return(NULL)
+            if (msg$type %in% c("display_data", "update_display_data")) {
+                d <- structure(msg$content, class = msg$type)
+                private$display_send(d)
+            }
+            else {
+                msg_send(msg) # Pass message on to frontend
+            }
+        }
     ),
     private = list(
 
         append_output = FALSE,
         current_output = NULL,
-        r_msg_incomplete = FALSE,
-        r_msg_frag = "",
-
-        stream = function(text,stream_name){
-            # log_out("Widget-context: stream")
-            text <- split_string1(text, DLE)
-            for(chunk in text){
-                if (!length(chunk) || !nzchar(chunk)) next
-                if (startsWith(chunk, MSG_BEGIN)) {
-                    if (endsWith(chunk, MSG_END)) {
-                        msg <- remove_prefix(chunk, MSG_BEGIN) |> remove_suffix(MSG_END)
-                        msg <- msg_unwrap(msg)
-                        private$handle_r_msg(msg)
-                    } else {
-                        private$r_msg_incomplete <- TRUE
-                        private$r_msg_frag <- remove_prefix(chunk, MSG_BEGIN)
-                    }
-                }
-                else if(endsWith(chunk, MSG_END)){
-                    msg <- paste0(private$r_msg_frag, remove_suffix(chunk, MSG_END))
-                    private$r_msg_incomplete <- FALSE
-                    private$r_msg_frag <- ""
-                    msg <- msg_unwrap(msg)
-                    private$handle_r_msg(msg)
-                }
-                else {
-                    if(private$r_msg_incomplete) {
-                        private$r_msg_frag <- paste0(private$r_msg_frag, chunk)
-                    }
-                    else if(nzchar(chunk)) {
-                        private$stream1(chunk, stream_name)
-                    }
-                }
+        stream = function(text,stream_name) {
+            if(!length(text)) return()
+            if(length(text) > 1) {
+                text <- paste(text, collapse="\n")
             }
-        },
-        stream1 = function(text,stream_name) {
             if(!nzchar(text)) return()
+            text <- paste0(text,"\n")
             # log_out("Widget-context: stream1")
             private$sync_suspended <- TRUE
             l <- length(self$outputs)
@@ -130,16 +110,6 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             }
             private$sync_suspended <- FALSE
             self$send_state("outputs")
-        },
-        handle_r_msg = function(msg) {
-            if(!is.list(msg)) return(NULL)
-            if (msg$type %in% c("display_data", "update_display_data")) {
-                d <- structure(msg$content, class = msg$type)
-                private$display_send(d)
-            }
-            else {
-                msg_send(msg) # Pass message on to frontend
-            }
         },
         display_index = integer(0),
         display_send = function(d){
@@ -216,27 +186,27 @@ OutputWidget <- function(append_output=FALSE,...)
 #' @param ... Other arguments, ignored.
 #' @export
 with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear=TRUE,...){
-    sout <- NULL
-    serr <- NULL
-    sout_con <- textConnection("sout","w",local=TRUE)
-    serr_con <- textConnection("serr","w",local=TRUE)
-    sink(serr_con,type="message")
-    sink(sout_con,type="output")
-    r <- eval(substitute(withVisible(expr)),envir=envir,enclos=enclos)
-    # cat("")
-    if(r$visible)
-        print(r$value)
-    sink(type="message")
-    sink(type="output")
-    close(serr_con)
-    close(sout_con)
-    data$clear()
-    if(length(sout)){
-        sout <- paste(sout,collapse="\n")
-        data$stdout(sout)
+    log_out("with.OutputWidget")
+    ctx <- Context$new(
+        stdout_callback = data$stdout,
+        stderr_callback = data$stderr,
+        msg_handlers = list(default=data$handle_msg)
+    )
+    expr <- substitute(expr)
+    ctx$start_graphics()
+    if(expr[[1]] == as.symbol("{")) {
+        expr <- expr[-1]
+        for(e in as.list(expr)) {
+            log_out(e, use.print=TRUE)
+            r <- ctx$eval(e,envir=envir,enclos=enclos)
+            ctx$process_graphics()
+        }
+    } else {
+        log_out(expr, use.print=TRUE)
+        log_out(expr, use.str=TRUE)
+        r <- ctx$eval(expr,envir=envir,enclos=enclos)
+        ctx$process_graphics()
     }
-    if (length(serr)) {
-        serr <- paste(serr, collapse = "\n")
-        data$stderr(serr)
-    }
+    ctx$stop_graphics()
+    invisible(r)
 }
