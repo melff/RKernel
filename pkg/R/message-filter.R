@@ -14,18 +14,24 @@ MessageFilter <- R6Class("MessageFilter",
     msg_incomplete = FALSE,
     msg_frag = "",
     process = function(text) {
+      # log_out("MessageFilter$process")
+      # log_out(text, use.str=TRUE)
+      if(!length(text)) return(invisible())
+      if(length(text)> 1) {
+        text <- paste(text, collapse="\n")
+      }
       if (grepl(DLE, text)) {
-        log_out("DLE found")
+        # log_out("DLE found")
         text <- split_string1(text, DLE)
       }
       for(chunk in text){
         if(!length(chunk) || !nzchar(chunk)) next
         # log_out(chunk, use.str = TRUE)
         if (startsWith(chunk, MSG_BEGIN)) {
-          log_out("MSG_BEGIN found")
+          # log_out("MSG_BEGIN found")
           # log_out(chunk, use.print = TRUE)
           if (endsWith(chunk, MSG_END)) {
-            log_out("MSG_END found")
+            # log_out("MSG_END found")
             msg <- remove_prefix(chunk, MSG_BEGIN) |> remove_suffix(MSG_END)
             msg <- msg_unwrap(msg)
             # log_out(msg, use.print = FALSE)
@@ -36,8 +42,8 @@ MessageFilter <- R6Class("MessageFilter",
           }
         }
         else if(endsWith(chunk, MSG_END)){
-          log_out("MSG_END found")
-          log_out(chunk, use.print = TRUE)
+          # log_out("MSG_END found")
+          # log_out(chunk, use.print =s TRUE)
           msg <- paste0(self$msg_frag, remove_suffix(chunk, MSG_END))
           self$msg_incomplete <- FALSE
           self$msg_frag <- ""
