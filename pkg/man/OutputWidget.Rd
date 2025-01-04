@@ -58,6 +58,7 @@ Classes and constructors to wrap output created by code
 \item \href{#method-OutputWidget-clear}{\code{OutputWidgetClass$clear()}}
 \item \href{#method-OutputWidget-stdout}{\code{OutputWidgetClass$stdout()}}
 \item \href{#method-OutputWidget-stderr}{\code{OutputWidgetClass$stderr()}}
+\item \href{#method-OutputWidget-handle_msg}{\code{OutputWidgetClass$handle_msg()}}
 \item \href{#method-OutputWidget-clone}{\code{OutputWidgetClass$clone()}}
 }
 }
@@ -167,6 +168,15 @@ the output.}
 \subsection{Method \code{stderr()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{OutputWidgetClass$stderr(text)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-OutputWidget-handle_msg"></a>}}
+\if{latex}{\out{\hypertarget{method-OutputWidget-handle_msg}{}}}
+\subsection{Method \code{handle_msg()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OutputWidgetClass$handle_msg(msg)}\if{html}{\out{</div>}}
 }
 
 }

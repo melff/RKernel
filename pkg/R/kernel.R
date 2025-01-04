@@ -197,8 +197,8 @@ Kernel <- R6Class("Kernel",
         msg <- list(type = class(d),
                     content = unclass(d))
       }
-      log_out("display_send")
-      log_out(msg$content$transient$display_id)
+      # log_out("display_send")
+      # log_out(msg$content$transient$display_id)
       private$send_message(type=msg$type,
                            parent=private$parent$shell,
                            socket_name="iopub",
@@ -227,6 +227,7 @@ Kernel <- R6Class("Kernel",
     #' @param msg A list containing a comm message.
     send_comm = function(msg){
       # log_out("kernel$send_comm")
+      # log_out(msg, use.str=TRUE)
       private$send_message(type=msg$type,debug=FALSE,
                    parent=private$parent$shell,
                    socket_name="iopub",
@@ -415,13 +416,13 @@ Kernel <- R6Class("Kernel",
                           execution_count = execution_count)
       }
       else {
-          private$r_run_cell_begin_hooks()
+          # private$r_run_cell_begin_hooks()
           r <- tryCatch(private$run_code_cell(msg$content$code),
             error = function(e) structure("errored", message = conditionMessage(e)), 
             interrupt = function(e) "interrupted"
           )
           # log_out(r, use.print = TRUE)
-          private$r_run_cell_end_hooks()
+          # private$r_run_cell_end_hooks()
           payload <- NULL
           if (!self$r_session$is_alive()) {
             clear_queue <- TRUE
@@ -945,7 +946,7 @@ Kernel <- R6Class("Kernel",
     },
     r_graphics_observer = NULL,
     r_start_graphics = function(){
-      log_out("Starting graphics ...")
+      # log_out("Starting graphics ...")
       self$r_repl$run_cmd("RKernel::start_graphics()")
       add_sync_options(c(
           "jupyter.plot.width",
@@ -955,9 +956,9 @@ Kernel <- R6Class("Kernel",
           "jupyter.update.graphics"))
       self$r_repl$run_cmd("httpgd::hgd()")
       gdetails <- self$r_repl$eval_code("httpgd::hgd_details()")
-      log_out(gdetails, use.str = TRUE)
+      # log_out(gdetails, use.str = TRUE)
       private$r_graphics_observer = GraphicsObserver$new(gdetails)
-      log_out("done.")
+      # log_out("done.")
     },
     r_run_cell_begin_hooks = function(){
       self$r_repl$run_code("RKernel::runHooks('cell-begin')")
@@ -1030,10 +1031,10 @@ Kernel <- R6Class("Kernel",
       msg_unwrap(msg)
     },
     handle_options_msg = function(msg){
-      log_out("handle_options_msg")
+      # log_out("handle_options_msg")
       #log_out(msg, use.str = TRUE)
       opts <- msg$content
-      log_out(opts, use.str = TRUE)
+      # log_out(opts, use.str = TRUE)
       import_options(opts)
       #res <- do.call("options",opts)
       #log_out(res, use.str = TRUE)
@@ -1085,10 +1086,10 @@ Kernel <- R6Class("Kernel",
       if(self$r_session$sleeping()) {
         poll_res <- private$r_graphics_observer$poll()
         if(poll_res["active"]) {
-          log_out(sprintf("private$graphics_new_cell = %s",private$graphics_new_cell))
+          # log_out(sprintf("private$graphics_new_cell = %s",private$graphics_new_cell))
           force_new_display <- private$graphics_new_cell && 
                                 !getOption("jupyter.update.graphics",TRUE)
-          log_out(sprintf("force_new_display = %s",force_new_display))
+          # log_out(sprintf("force_new_display = %s",force_new_display))
           if(poll_res[2] || 
              (poll_res[3] && force_new_display)) { # New plot
             d <- private$r_graphics_observer$display_data()
@@ -1119,16 +1120,16 @@ Kernel <- R6Class("Kernel",
     },
 
     run_code_cell = function(code) {
-      log_out("= run_code_cell ========================")
+      # log_out("= run_code_cell ========================")
       private$graphics_new_cell <- TRUE
       private$input_suspended <- FALSE
       on.exit(private$input_suspended <- TRUE)
       code_blocks <- preproc_code(code)
       for(block in code_blocks) {
         self$errored <- FALSE 
-        log_out("- run code block ----")
+        # log_out("- run code block ----")
         # log_out(block, use.str=TRUE)
-        self$r_repl$run_code(block)
+        self$r_repl$run_code(block,io_timeout=10)
         # log_out("- done running code block ----")
         # log_out(sprintf("kernel$errored: %s",self$errored))
         if(self$errored) {

@@ -13,11 +13,11 @@ public=list(
     self$msg_handlers <- msg_handlers
     self$stdout_filter <- MessageFilter$new(
       text_handler = stdout_callback,
-      msg_handler = self$handle_message
+      msg_handler = self$handle_msg
     )
     self$stderr_filter <- MessageFilter$new(
       text_handler = stderr_callback,
-      msg_handler = self$handle_message
+      msg_handler = self$handle_msg
     )
   },
   handle_msg = function(msg) {
@@ -50,8 +50,8 @@ public=list(
     r <- try(withVisible(eval(expr,
                     envir=envir,enclos=enclos)),
              silent=TRUE)
-    log_out("eval done")
-    log_out(r, use.str=TRUE)
+    # log_out("eval done")
+    # log_out(r, use.str=TRUE)
     if(inherits(r,"try-error")) {
       cat(r,file=stderr())
     } else if(r$visible) {

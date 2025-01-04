@@ -121,6 +121,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             # log_out("Widget-context: display_send")
             id <- d$transient$display_id
             update <- inherits(d,"update_display_data")
+            private$sync_suspended <- TRUE
             l <- length(private$display_index)
             # log_out(id,use.print=TRUE)
             # log_out("OutputWidget$display_send")
@@ -152,6 +153,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
                 private$display_index <- structure(1,names=id)
                 self$outputs <- list(out_data)
             }
+            private$sync_suspended <- FALSE
         },
         last_display = function(){
             l <- length(private$display_index)
@@ -186,25 +188,26 @@ OutputWidget <- function(append_output=FALSE,...)
 #' @param ... Other arguments, ignored.
 #' @export
 with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear=TRUE,...){
-    log_out("with.OutputWidget")
+    # log_out("with.OutputWidget")
+    widget <- data
     ctx <- Context$new(
-        stdout_callback = data$stdout,
-        stderr_callback = data$stderr,
-        msg_handlers = list(default=data$handle_msg)
+        stdout_callback = widget$stdout,
+        stderr_callback = widget$stderr,
+        msg_handlers = list(default=widget$handle_msg)
     )
     expr <- substitute(expr)
     ctx$start_graphics()
+    envir$display <- widget$display
     if(expr[[1]] == as.symbol("{")) {
         expr <- expr[-1]
         for(e in as.list(expr)) {
-            log_out(e, use.print=TRUE)
             r <- ctx$eval(e,envir=envir,enclos=enclos)
+            widget$send_state("outputs")
             ctx$process_graphics()
         }
     } else {
-        log_out(expr, use.print=TRUE)
-        log_out(expr, use.str=TRUE)
         r <- ctx$eval(expr,envir=envir,enclos=enclos)
+        widget$send_state("outputs")
         ctx$process_graphics()
     }
     ctx$stop_graphics()
