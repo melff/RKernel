@@ -59,7 +59,7 @@ log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
     else 
       message <- paste("          R SESSION -", message)
         # self$cat(message,file=stderr())
-    cat_(message,file=log_fn(),append=TRUE)
+    cat(message,file=log_fn(),append=TRUE)
   },error=function(e){
     log_error(sprintf("Error in %s",dcl))
     msg <- conditionMessage(e)
@@ -77,7 +77,7 @@ log_warning <- function(message){
     message <- paste("R KERNEL -", message)
   else 
     message <- paste("          R SESSION -", message)
-  cat_(message,file=log_fn(),append=TRUE)
+  cat(message,file=log_fn(),append=TRUE)
 }
 #' @description
 #' Show an error message in the Jupyter server log
@@ -100,7 +100,7 @@ log_error <- function(message){
   calls <- paste(calls,collapse="\n")
   calls <- paste0(calls,"\n")
   message <- paste0(message,calls)
-  cat_(message,file=log_fn(),append=TRUE)
+  cat(message,file=log_fn(),append=TRUE)
 }
 
 log_check <- function(...){
@@ -277,9 +277,9 @@ pasteCR <- function(x) {
 Sys.sleep.orig <- getFromNamespace("Sys.sleep","base")
 
 Sys_sleep <- function(time) {
-  cat_(XOFF)
+  cat(XOFF)
   Sys.sleep.orig(time)
-  cat_(XON)
+  cat(XON)
 }
 
 install_sleep <- function(){

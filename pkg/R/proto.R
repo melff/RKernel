@@ -51,7 +51,7 @@ wrap_dput <- function(msg) {
 #' @export
 send_dput_msg <- function(msg, file=stdout()) {
   msg_dput <- wrap_dput(msg)
-  cat_(DLE, STX, msg_dput, ETX, DLE, sep = "", file=file)
+  cat(DLE, STX, msg_dput, ETX, DLE, sep = "", file=file)
 }
 
 unwrap_dput_msg <- function(msg){

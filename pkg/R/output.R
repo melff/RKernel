@@ -77,7 +77,7 @@ message_stdout <- function (..., domain = NULL, appendLF = TRUE)
         simpleMessage(msg, call)
     }
     defaultHandler <- function(c) {
-        cat_(conditionMessage(c), file = stdout(), sep = "")
+        cat(conditionMessage(c), file = stdout(), sep = "")
     }
     withRestarts({
         signalCondition(cond)
