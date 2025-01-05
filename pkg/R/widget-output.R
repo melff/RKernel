@@ -76,9 +76,10 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             if(length(text) > 1) {
                 text <- paste(text, collapse="\n")
             }
+            text <- gsub(XON,'',text)
+            text <- gsub(XOFF,'',text)
             if(!nzchar(text)) return()
-            text <- paste0(text,"\n")
-            # log_out("Widget-context: stream1")
+            # text <- paste0(text,"\n")
             private$sync_suspended <- TRUE
             l <- length(self$outputs)
             if(private$append_output){

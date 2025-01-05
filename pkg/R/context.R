@@ -37,8 +37,11 @@ public=list(
     invisible()
   },
   eval = function(expr,envir=list(),enclos=parent.frame()) {
-    serr_con <- textConnection(NULL,"w")
-    sout_con <- textConnection(NULL,"w")
+    # log_out("Context$eval")
+    serr <- ""
+    sout <- ""
+    serr_con <- textConnection("serr","w",local=TRUE)
+    sout_con <- textConnection("sout","w",local=TRUE)
     sink(serr_con,type="message")
     sink(sout_con,type="output")
     on.exit({
@@ -60,10 +63,13 @@ public=list(
     on.exit()
     sink(type="message")
     sink(type="output")
-    serr <- textConnectionValue(serr_con)
-    sout <- textConnectionValue(sout_con)
+    # NOTE: The following does not work if
+    # output is not ended by '\n'
+    #serr <- textConnectionValue(serr_con)
+    #sout <- textConnectionValue(sout_con)
     close(serr_con)
     close(sout_con)
+    # log_out(sprintf("sout = '%s'",sout))
     self$stderr_filter$process(serr)
     self$stdout_filter$process(sout)
   },
