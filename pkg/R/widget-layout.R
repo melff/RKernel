@@ -153,7 +153,13 @@ LayoutClass <- R6Class_("Layout",
     #' @param ... Arguments passed to the superclass initializer
     initialize = function(...){
       super$initialize(...)
-      if(has_iw_ver(8)) self$observe("border",self$observe_border)
+      if(has_iw_ver(8)) {
+        self$observe("border",self$observe_border)
+        if(length(self$border)) {
+          # Distribute border properties to top, bottom, left, right
+          self$observe_border("border",self,self$border)
+        }
+      }
     }
    )
 )
