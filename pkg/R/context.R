@@ -21,9 +21,9 @@ public=list(
     )
   },
   handle_msg = function(msg) {
-    log_out("Context$handle_msg")
+    # log_out("Context$handle_msg")
     type <- msg$type
-    log_out(type)
+    # log_out(type)
     msg_handlers <- self$msg_handlers
     if(length(msg_handlers)) {
       if(type %in% names(msg_handlers)) {

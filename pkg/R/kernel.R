@@ -731,7 +731,7 @@ Kernel <- R6Class("Kernel",
       if(is.character(r)) log_error(r)
       private$send_idle(private$parent$shell)
       if (private$clear_queue_requested) private$clear_shell_queue()
-      if (debug)  log_out("done")
+      if (debug) log_out("done")
       return(TRUE)
     },
 
