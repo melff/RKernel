@@ -416,7 +416,15 @@ Kernel <- R6Class("Kernel",
                           execution_count = execution_count)
       }
       else {
-          r <- tryCatch(private$run_code_cell(msg$content$code),
+          if(grepl(special_regex,code)) {
+            speco <- get_special_comments(code)
+            log_out(speco, use.print=TRUE)
+            for(s in speco) {
+              dispatch_special_comment_handler(opcode = s$opcode,
+                                               args = s$args)
+            }
+          }
+          r <- tryCatch(private$run_code_cell(code),
             error = function(e) structure("errored", message = conditionMessage(e)), 
             interrupt = function(e) "interrupted"
           )
@@ -463,6 +471,7 @@ Kernel <- R6Class("Kernel",
               if(length(payload))
                 content$payload <- payload
           }
+          restore_options()
       }
       private$parent$shell <- execute_parent
       if(!isTRUE(msg$content$silent))

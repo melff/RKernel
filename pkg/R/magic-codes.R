@@ -80,3 +80,71 @@ parse_magic <- function(code){
     } else NULL
 }
 
+special_regex <- "^#!([a-zA-Z0-9_]+):\\s*(\\S.*)?$"
+comment_handlers <- new.env()
+
+dispatch_special_comment_handler <- function(opcode,args) {
+    # log_out("dispatch_special_comment_handler")
+    opcode <- tolower(opcode)
+    handler <- get0(opcode,envir=comment_handlers,inherits=FALSE)
+    if(is.null(handler)) stop("Unsupported special comment")
+    handler(args,opcode)
+}
+
+get_special_comment1 <- function(line) {
+    m <- getMatch(line,regexec(special_regex,line))
+    list(opcode=m[2], args=m[3])
+}
+
+get_special_comments <- function(code) {
+    # log_out("get_special_comments")
+    lines <- split_lines1(code)
+    sel <- grepl(special_regex,lines)
+    lines <- lines[sel]
+    lapply(lines,get_special_comment1)
+}
+
+register_comment_handler <- function(opcode,handler){
+    if(is.function(handler))
+        assign(opcode,handler,envir=comment_handlers)
+    else
+        remove(list=as.character(opcode),envir=comment_handlers)
+}
+
+opt_comment_handler <- function(args, ...) {
+    args <- sprintf("options(%s)",args)
+    expr <- try(str2expression(args))
+    if(!inherits(expr,"try-error")) {
+        eval(expr)
+    }
+}
+
+cell_opt_comment_handler <- function(args, ...) {
+    args <- sprintf("cell_options(%s)",args)
+    expr <- try(str2expression(args))
+    if(!inherits(expr,"try-error")) {
+        eval(expr)
+    }
+}
+
+
+register_comment_handler("opt", opt_comment_handler)
+register_comment_handler("cell_opt", cell_opt_comment_handler)
+
+cell_save_env <- new.env()
+
+cell_options <- function(...) {
+    opts <- options(...)
+    
+    for(n in names(opts)) {
+        assign(n,opts[[n]],envir=cell_save_env)
+    }
+    invisible()
+}
+
+restore_options <- function() {
+    n <- ls(cell_save_env)
+    opts <- lapply(n,get0,envir=cell_save_env)
+    names(opts) <- n
+    options(opts)
+}
