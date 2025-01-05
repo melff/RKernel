@@ -416,13 +416,11 @@ Kernel <- R6Class("Kernel",
                           execution_count = execution_count)
       }
       else {
-          # private$r_run_cell_begin_hooks()
           r <- tryCatch(private$run_code_cell(msg$content$code),
             error = function(e) structure("errored", message = conditionMessage(e)), 
             interrupt = function(e) "interrupted"
           )
           # log_out(r, use.print = TRUE)
-          # private$r_run_cell_end_hooks()
           payload <- NULL
           if (!self$r_session$is_alive()) {
             clear_queue <- TRUE
@@ -460,7 +458,6 @@ Kernel <- R6Class("Kernel",
               clear_queue <- TRUE
           }
           else {               
-              # Collect output created by cell-end hooks etc.
               content <- list(status = "ok",
                               execution_count = execution_count)
               if(length(payload))
@@ -930,7 +927,6 @@ Kernel <- R6Class("Kernel",
     r_install_hooks = function(){
       # log_out("Installing hooks ...")
       self$r_repl$run_cmd("RKernel::install_output_hooks()")
-      self$r_repl$run_cmd("RKernel::install_cell_hooks()")
       self$r_repl$run_cmd("RKernel::install_safe_q()")
       self$r_repl$run_cmd("RKernel::install_menu()")
       self$r_repl$run_cmd("RKernel::set_help_displayed")
@@ -959,12 +955,6 @@ Kernel <- R6Class("Kernel",
       # log_out(gdetails, use.str = TRUE)
       private$r_graphics_observer = GraphicsObserver$new(gdetails)
       # log_out("done.")
-    },
-    r_run_cell_begin_hooks = function(){
-      self$r_repl$run_code("RKernel::runHooks('cell-begin')")
-    },
-    r_run_cell_end_hooks = function(){
-      self$r_repl$run_code("RKernel::runHooks('cell-end')")
     },
     stdout_filter = NULL,
     stderr_filter = NULL,

@@ -44,7 +44,6 @@ Collate:
     'View.R'
     'aa-versions.R'
     'callbacks.R'
-    'cell-options.R'
     'check-options.R'
     'comms.R'
     'completions.R'
