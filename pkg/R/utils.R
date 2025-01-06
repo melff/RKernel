@@ -49,7 +49,7 @@ log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
         message <- to_json(message,pretty=TRUE,force=TRUE)
     }
     else if(use.str){
-        message <- paste0("\n",paste0(capture.output(str_(message)),collapse="\n"))
+        message <- paste0("\n",paste0(capture.output(str(message)),collapse="\n"))
     }
     else message <- paste(message,...,collapse="")
     message <- paste(crayon::green(format(Sys.time()),"\t",message,"\n"))
