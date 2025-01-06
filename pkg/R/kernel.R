@@ -965,6 +965,12 @@ Kernel <- R6Class("Kernel",
       # log_out(gdetails, use.str = TRUE)
       private$r_graphics_observer = GraphicsObserver$new(gdetails)
       # log_out("done.")
+      register_magic_handler("plots",function(...){
+        frm <- IFrame(url = private$r_graphics_observer$live_url(),
+                      width="7in",
+                      height="5in")
+        self$display_send(frm)
+      })
     },
     stdout_filter = NULL,
     stderr_filter = NULL,

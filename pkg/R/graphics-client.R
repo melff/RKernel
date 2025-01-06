@@ -222,6 +222,16 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         m$isolated <- TRUE
       }
       m
+    },
+    live_url = function() {
+      if(self$internal) ""
+      else paste0(
+        "http://",
+        self$host,":",
+        self$port,"/",
+        "live","?",
+        "token=", self$token
+      )
     }
   ))
 
