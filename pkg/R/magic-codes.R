@@ -70,6 +70,7 @@ parse_magic_args <- function(perc_line){
 }
 
 parse_magic <- function(code){
+    if(!grepl("\n",code,fixed=TRUE)) code <- paste0(code,"\n")
     perc_match <- getMatch(code,regexec("^%%([a-zA-Z0-9]+).*?\n",code))
     if(length(perc_match) > 1){
         magic <- perc_match[2]
