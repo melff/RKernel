@@ -957,7 +957,7 @@ Kernel <- R6Class("Kernel",
           "jupyter.plot.width",
           "jupyter.plot.height",
           "jupyter.plot.res",
-          "jupyter.graphics.types",
+          "jupyter.plot.formats",
           "jupyter.update.graphics"))
       self$r_repl$run_cmd("httpgd::hgd()")
       gdetails <- self$r_repl$eval_code("httpgd::hgd_details()")

@@ -20,6 +20,12 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         self$port <- details$port
         self$token <- details$token
       }
+      ur <- subset(ugd_renderers(),type=="plot")
+      tikz <- which(ur$id == "tikz")
+      ur$mime[tikz] <- "text/latex"
+      self$formats <- ur$id
+      self$mime_types <- ur$mime
+      self$binary_formats <- !ur$text
     },
     id = 0,
     upid = 0,
@@ -74,45 +80,60 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         upid = plots_res$state$upid
       )
     },
-    formats = c("png", "pdf", "svgp"),
-    fmt_bin = c(TRUE,  TRUE,  FALSE),
+    formats = character(0),
+    mime_types = character(0),
+    binary_formats = logical(0),
     width = 7,
     height = 7,
-    png_res = 288,
     dpi = 72,
     render = function(format = "svgp", 
                       plot_id = integer(0),
                       width = getOption("jupyter.plot.width",self$width),
-                      height = getOption("jupyter.plot.height",self$height)) {
+                      height = getOption("jupyter.plot.height",self$height),
+                      resolution = getOption("jupyter.plot.resolution",self$dpi),
+                      zoom = getOption("jupyter.plot.zoom",1)) {
       if(self$internal) {
         data <- self$render_internal(
                                 format = format,
                                 plot_id = plot_id,
                                 width = width,
-                                height = height)
+                                height = height,
+                                resolution = resolution,
+                                zoom = zoom)
       } else {
         gurl <- self$render_url(format = format,
                                 plot_id = plot_id,
                                 width = width,
-                                height = height)
+                                height = height,
+                                resolution = resolution,
+                                zoom = zoom)
         data <- curl_fetch_memory(gurl)
+      }
+      ii <- match(format, self$formats)
+      if(self$binary_formats[ii]) {
+        data$content <- base64_enc(data$content)
+      } else {
+        data$content <- rawToChar_(data$content)
       }
       data$width <- width
       data$height <- height
       data$format <- format
+      data$zoom <- zoom
+      data$resolution <- resolution
       data
     },
     render_url = function(format = "svgp", 
                           plot_id = integer(0),
                           width = getOption("jupyter.plot.width",self$width),
-                          height = getOption("jupyter.plot.height",self$height)) {
-      if(format == "png") {
-        zoom <- self$png_res/self$dpi
-        width  <- width * self$png_res
-        height <- height * self$png_res
+                          height = getOption("jupyter.plot.height",self$height),
+                          resolution = getOption("jupyter.plot.resolution",self$dpi),
+                          zoom = getOption("jupyter.plot.zoom",1)) {
+      if(format %in% c("png", "tiff", "png-base64")) {
+        zoom <- resolution/self$dpi * zoom
+        width  <- width * resolution
+        height <- height * resolution
       }
       else {
-        zoom <- 1
         width  <- width * self$dpi
         height <- height * self$dpi
       }
@@ -131,14 +152,15 @@ GraphicsObserver <- R6Class("GraphicsObserver",
     render_internal = function(format = "svgp", 
                           plot_id = integer(0),
                           width = getOption("jupyter.plot.width",self$width),
-                          height = getOption("jupyter.plot.height",self$height)) {
-      if(format == "png") {
-        zoom <- self$png_res/self$dpi
-        width  <- width * self$png_res
-        height <- height * self$png_res
+                          height = getOption("jupyter.plot.height",self$height),
+                          resolution = getOption("jupyter.plot.resolution",self$dpi),
+                          zoom = getOption("jupyter.plot.zoom",1)) {
+      if(format %in% c("png", "tiff", "png-base64")) {
+        zoom <- resolution/self$dpi * zoom
+        width  <- width * resolution
+        height <- height * resolution
       }
       else {
-        zoom <- 1
         width  <- width * self$dpi
         height <- height * self$dpi
       }
@@ -150,9 +172,8 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         as = format,
         which = self$device
       )
-      urend <- ugd_renderers()
-      ii <- match(format,urend$id)
-      type <- urend$mime[ii]
+      ii <- match(format,self$formats)
+      type <- self$mime_types[ii]
       list(content = content,
            type = type)
     },
@@ -160,30 +181,29 @@ GraphicsObserver <- R6Class("GraphicsObserver",
     display_data = function(plot_id = integer(0),
                             display_id=UUIDgenerate(),
                             update=FALSE,
+                            formats = getOption("jupyter.plot.formats",c("pdf","png","svgp")),
                             width = getOption("jupyter.plot.width",self$width),
-                            height = getOption("jupyter.plot.height",self$height)
-                            ) {
-      renders <- lapply(self$formats,
+                            height = getOption("jupyter.plot.height",self$height),
+                            resolution = getOption("jupyter.plot.resolution",288),
+                            zoom = getOption("jupyter.plot.zoom",1)) {
+      renders <- lapply(formats,
                         self$render,
                         plot_id = plot_id,
                         width = width,
-                        height = height)
+                        height = height,
+                        resolution = resolution,
+                        zoom = zoom)
       mime_data <- lapply(renders, "[[","content")
       mime_types <- lapply(renders, "[[","type")
-      mime_data[self$fmt_bin] <- lapply(mime_data[self$fmt_bin],base64_enc)
-      mime_data[!self$fmt_bin] <- lapply(mime_data[!self$fmt_bin],rawToChar_)
       names(mime_data) <- mime_types
-      display_res <- getOption("jupyter.plot.res",self$display_res)
-      mime_metadata <- lapply(renders, 
-                              function(r) {
-                                list(
-                                  width   = r$width * display_res,
-                                  height  = r$height * display_res,
-                                  plot_id = plot_id
-                                )
-                              })
+      mime_metadata <- lapply(renders, self$render_metadata, plot_id)
       names(mime_metadata) <- mime_types
-      mime_data[["text/plain"]] <- self$render_url(plot_id = plot_id)
+      mime_data[["text/plain"]] <- self$render_url(
+                                          plot_id = plot_id,
+                                          width = width,
+                                          height = height,
+                                          resolution = resolution,
+                                          zoom = zoom)
       d <- list(data = mime_data,
                 metadata = mime_metadata)
       d$transient <- list(display_id=display_id)
@@ -191,6 +211,17 @@ GraphicsObserver <- R6Class("GraphicsObserver",
       else cl <- "display_data"
       self$store()
       structure(d,class=cl)
+    },
+    render_metadata = function(r, plot_id) {
+      m <- list(plot_id = plot_id)
+      if(r$format %in% c("png", "tiff", "png-base64")) {
+        f <- self$dpi
+        m$width <- r$width * f
+        m$height <- r$height * f
+      } else if(r$format %in% c("svg","svgp", "svgz", "svgzp")) {
+        m$isolated <- TRUE
+      }
+      m
     }
   ))
 
@@ -202,7 +233,7 @@ start_graphics <- function(){
           "jupyter.plot.width",
           "jupyter.plot.height",
           "jupyter.plot.res",
-          "jupyter.graphics.types",
+          "jupyter.plot.formats",
           "jupyter.update.graphics"))
 }
 
