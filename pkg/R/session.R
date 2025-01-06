@@ -197,7 +197,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         until_prompt = FALSE,
         echo = self$echo
       ) {
-        if(any(nzchar(code))) {
+        if(length(code) == 1 && grepl('\n',code)) {
           lines <- split_lines1(code)
         } else {
           lines <- code

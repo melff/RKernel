@@ -1129,19 +1129,107 @@ Kernel <- R6Class("Kernel",
       # log_out("= run_code_cell ========================")
       private$graphics_new_cell <- TRUE
       private$input_suspended <- FALSE
+      exec_parent <- private$parent$shell
       on.exit(private$input_suspended <- TRUE)
-      code_blocks <- preproc_code(code)
-      for(block in code_blocks) {
-        self$errored <- FALSE 
-        # log_out("- run code block ----")
-        # log_out(block, use.str=TRUE)
-        self$r_repl$run_code(block,io_timeout=10)
-        # log_out("- done running code block ----")
-        # log_out(sprintf("kernel$errored: %s",self$errored))
-        if(self$errored) {
-          if(self$stop_on_error) break
+      if(getOption("rkernel_trace_cell",FALSE)) {
+        sleep_duration <- getOption("rkernel_trace_sleep",1)
+        use_boxes <- getOption("rkernel_trace_boxes",TRUE)
+        code_lines <- split_lines1(code)
+        if(use_boxes && config$use_widgets ) {
+            e <- new.env()
+            e$n_lines <- length(code_lines)
+            e$line_no <- 1
+            next_btn <- Button(icon="play",style=ButtonStyle(font_size="70%"))
+            continue_btn <- Button(icon="forward",style=ButtonStyle(font_size="70%"))
+            quit_btn <- Button(icon="stop",style=ButtonStyle(font_size="70%"))
+            button_box <- HBox(next_btn,continue_btn,quit_btn)
+            on_next_btn <- function() {
+              line <- code_lines[e$line_no]
+              parent_save <- private$parent$shell
+              private$parent$shell <- exec_parent
+              self$r_repl$run_code( 
+                              line, 
+                              io_timeout=10, 
+                              echo = TRUE,
+                              prompt_callback = function() {
+                                    private$display_changed_graphics()
+                                    self$stdout("> ")
+                                    return(TRUE)
+                              }
+                          )
+              private$parent$shell <- parent_save
+              e$line_no <- e$line_no + 1
+              if(e$line_no > e$n_lines) e$continue_loop <- FALSE
+            }
+            on_continue_btn <- function() {
+              ii <- seq(from=e$line_no,to=e$n_lines)
+              lines <- code_lines[ii]
+              parent_save <- private$parent$shell
+              private$parent$shell <- exec_parent
+              self$r_repl$run_code( 
+                              lines, 
+                              io_timeout=10, 
+                              echo = TRUE,
+                              prompt_callback = function() {
+                                    private$display_changed_graphics()
+                                    self$stdout("> ")
+                                    return(TRUE)
+                              }
+                          )
+              private$parent$shell <- parent_save
+              e$continue_loop <- FALSE
+            }
+            on_quit_btn <- function() {
+              e$continue_loop <- FALSE
+            }
+            next_btn$on_click(on_next_btn)
+            continue_btn$on_click(on_continue_btn)
+            quit_btn$on_click(on_quit_btn)
+            d <- display_data(button_box)
+            self$display_send(d)
+            e$continue_loop <- TRUE
+            while(e$continue_loop) {
+              self$r_session$yield(1000)
+            }
+            d <- update(d,"text/plain"="",
+                          "text/html"="")
+            private$parent$shell <- exec_parent
+            self$display_send(d)
         }
-        private$display_changed_graphics()
+        else {
+          for(line in code_lines) {
+            self$errored <- FALSE 
+            self$r_repl$run_code( 
+                              line, 
+                              io_timeout=10, 
+                              echo = TRUE,
+                              prompt_callback = function() {
+                                    private$display_changed_graphics()
+                                    self$stdout("> ")
+                                    return(TRUE)
+                              }
+                          )
+            if(self$errored) {
+              if(self$stop_on_error) break
+            }
+            Sys.sleep(sleep_duration)
+          }
+        }
+      }
+      else {
+        code_blocks <- preproc_code(code)
+        for(block in code_blocks) {
+          self$errored <- FALSE 
+          # log_out("- run code block ----")
+          # log_out(block, use.str=TRUE)
+          self$r_repl$run_code(block,io_timeout=10)
+          # log_out("- done running code block ----")
+          # log_out(sprintf("kernel$errored: %s",self$errored))
+          if(self$errored) {
+            if(self$stop_on_error) break
+          }
+          private$display_changed_graphics()
+        }
       }
     }
   )
