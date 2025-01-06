@@ -292,3 +292,30 @@ update_list <- function(l1, l2) {
   l1[n] <- l2[n]
   l1
 }
+
+rkernel_urlbrowser <- function(url) {
+    if(jupyter_gui()) {
+      if(startsWith(url, "file://")) {
+        data <- curl_fetch_memory(url)
+        text_html <- rawToChar(data$content)
+      }
+      else {
+        text_html <- url2iframe(url)
+      }
+      d <- display_data(
+              "text/plain" = url,
+              "text/html" = text_html
+            )
+      display(d)
+    }
+}
+
+jupyter_gui <- function() {
+  "JPY_SESSION_NAME" %in% names(Sys.getenv())
+}
+
+install_browseURL <- function(){
+    if(jupyter_gui()) {
+      options(browser=rkernel_urlbrowser)
+    }
+}

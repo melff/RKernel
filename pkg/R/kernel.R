@@ -89,6 +89,7 @@ Kernel <- R6Class("Kernel",
       self$r_repl$run_cmd("RKernel::inject_send_options()")
       self$r_repl$run_cmd("suppressWarnings(rm(.pbd_env))")
       self$r_repl$run_cmd("RKernel:::install_sleep()")
+      self$r_repl$run_cmd("RKernel:::install_browseURL()")
       self$r_repl$run_cmd("RKernel:::set_config(use_widgets = FALSE)")
       msg_env$send <- self$handle_r_msg
       private$stdout_filter <- MessageFilter$new(
