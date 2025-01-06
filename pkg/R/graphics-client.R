@@ -219,7 +219,9 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         m$width <- r$width * f
         m$height <- r$height * f
       } else if(r$format %in% c("svg","svgp", "svgz", "svgzp")) {
-        m$isolated <- TRUE
+        f <- self$dpi
+        m$width <- r$width * f
+        m$height <- r$height * f
       }
       m
     },
