@@ -82,7 +82,7 @@ log_warning <- function(message){
 #' @description
 #' Show an error message in the Jupyter server log
 #' @param message A string to be shown in the log
-log_error <- function(message){
+log_error <- function(message, traceback = TRUE){
   message <- crayon::red(format(Sys.time()),"\t",message,"\n")
   message <- paste("ERROR:",message)
   if (is_kernel()) {
@@ -94,12 +94,17 @@ log_error <- function(message){
     indent <- "        "
     message <- paste0(indent, message)
   }
-
-  calls <- limitedLabels(sys.calls())
-  calls <- paste0(indent,"  ",calls)
-  calls <- paste(calls,collapse="\n")
-  calls <- paste0(calls,"\n")
-  message <- paste0(message,calls)
+  if(isTRUE(traceback)) {
+    calls <- limitedLabels(sys.calls())
+    calls <- paste0(indent,"  ",calls)
+    calls <- paste(calls,collapse="\n")
+    calls <- paste0(calls,"\n")
+    message <- paste0(message,calls)
+  } else if(is.character(traceback)) {
+    traceback <- paste(traceback, collapse = "\n")
+    traceback <- paste0(traceback,"\n")
+    message <- paste0(message,traceback)
+  }
   cat(message,file=log_fn(),append=TRUE)
 }
 
