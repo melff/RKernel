@@ -305,12 +305,12 @@ Kernel <- R6Class("Kernel",
       if(!is.list(msg)) {
         err_msg <- "R session sent an invalid message - not a list"
         self$stderr(err_msg)
-        log_error(err_msg)
+        log_error(err_msg, traceback = FALSE)
         dep_msg <- deparse0(msg)
         self$stderr("\n")
         self$stderr(dep_msg)
         self$stderr("\n")
-        log_error(dep_msg)
+        log_error(dep_msg, traceback = FALSE)
         return(NULL)
       }
       msg_type <- msg$type
@@ -443,7 +443,7 @@ Kernel <- R6Class("Kernel",
               log_error(r_msg)
               self$stderr(r_msg)
             } else {
-              log_error(r)
+              log_error(r, traceback = FALSE)
               self$stderr(r)
             }
             content <- list(
@@ -735,7 +735,7 @@ Kernel <- R6Class("Kernel",
              ),
              error = function(e) conditionMessage(e)
       )
-      if(is.character(r)) log_error(r)
+      if(is.character(r)) log_error(r, traceback = FALSE)
       private$send_idle(private$parent$shell)
       if (private$clear_queue_requested) private$clear_shell_queue()
       if (debug) log_out("done")
