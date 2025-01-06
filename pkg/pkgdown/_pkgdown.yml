@@ -94,8 +94,6 @@ reference:
   - mkWidget
 - title: "Utilities"
   contents: 
-  - cell.options
-  - cell.par
   - dictionary
 - title: "Internal functions"
   contents:
