@@ -18,6 +18,7 @@ MenuWidgetClass <- R6Class("MenuWidget",
         preselect = NULL,
         multiple = NULL,
         title = NULL,
+        button_labels = c("OK","Cancel"),
         index = 0,
         value = NULL,
         main_widget = NULL,
@@ -30,6 +31,7 @@ MenuWidgetClass <- R6Class("MenuWidget",
             self$kernel <- kernel
             self$multiple <- args$multiple
             self$preselect <- args$preselect
+            self$button_labels <- args$buttons
         },
         on_ok = function() {
             ind <- self$listbox$index + 1L # widget indices are zero-based
@@ -55,11 +57,14 @@ MenuWidgetClass <- R6Class("MenuWidget",
                 self$index <- ind
               }
             } else {
-              self$listbox <- ListBox(options=choices,value="",rows=rows)
+              self$listbox <- ListBox(options=choices,
+                                      value="",
+                                      rows=rows,
+                                      layout=Layout(width="95%"))
             }
-            ok_button <- Button(description="OK")
+            ok_button <- Button(description=self$button_labels[1])
             ok_button$on_click(self$on_ok)
-            cancel_button <- Button(description="Cancel")
+            cancel_button <- Button(description=self$button_labels[2])
             cancel_button$on_click(self$on_cancel)
             if(length(self$title)) {
               label <- Label(self$title)
@@ -72,6 +77,7 @@ MenuWidgetClass <- R6Class("MenuWidget",
                                        HBox(ok_button,cancel_button))
             }
             d <- display_data(self$main_widget)
+            d_id <- display_id(d)
             kernel$display_send(d)
             while(self$continue_loop) {
                 kernel$r_session$yield(1000)
@@ -82,8 +88,10 @@ MenuWidgetClass <- R6Class("MenuWidget",
             } else {
               value <- "--"
             }
-            self$main_widget <- HTML()
-            d <- update(d,self$main_widget)
+            d <- display_data("text/plain"="",
+                              "text/html"="",
+                              id = d_id,
+                              update = TRUE)
             kernel$display_send(d)
             res <- deparse(self$index)
             kernel$r_session$send_input(res, drop_echo = TRUE)
@@ -96,6 +104,7 @@ request_menu_widget <- function(choices,
                                 preselect=NULL,
                                 multiple=FALSE,
                                 title=NULL,
+                                buttons = c("OK","Cancel"),
                                 file=stdout(),
                                 ...) {
   # log_out("request_menu_widget")
@@ -105,9 +114,10 @@ request_menu_widget <- function(choices,
       choices = choices,
       preselect = preselect,
       title = title,
+      buttons = buttons,
       multiple = multiple)
   )
-  # log_out(msg,use.str=TRUE)
+  log_out(msg,use.str=TRUE)
   msg_send(msg, file=file)
   ind <- readline()
   eval(str2expression(ind))
