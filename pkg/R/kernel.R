@@ -63,8 +63,8 @@ Kernel <- R6Class("Kernel",
       assign("session",self$r_session,envir=private$sandbox)
       self$r_repl <- RSessionAdapter$new(
         session = self$r_session,
-        stdout_callback = private$handle_r_stdout,
-        stderr_callback = private$handle_r_stderr,
+        stdout_callback = self$handle_r_stdout,
+        stderr_callback = self$handle_r_stderr,
         browser_callback = private$handle_r_browser,
         input_callback = private$r_get_input
       )
@@ -295,6 +295,18 @@ Kernel <- R6Class("Kernel",
                            parent=private$parent$control,
                            socket="iopub",
                            content=content)
+    },
+    handle_r_stdout = function(text) {
+      # log_out("=========================================================")
+      # log_out("handle_r_stdout")
+      private$stdout_filter$process(text)
+      private$display_changed_graphics()
+    },
+    handle_r_stderr = function(text){
+      # log_out("=========================================================")
+      # log_out("handle_r_stderr")
+      # log_out(text)
+      private$stderr_filter$process(text)
     },
     #' @description
     #' Handle a generic message sent from the R Session
@@ -974,18 +986,6 @@ Kernel <- R6Class("Kernel",
     },
     stdout_filter = NULL,
     stderr_filter = NULL,
-    handle_r_stdout = function(text) {
-      # log_out("=========================================================")
-      # log_out("handle_r_stdout")
-      private$stdout_filter$process(text)
-      private$display_changed_graphics()
-    },
-    handle_r_stderr = function(text){
-      # log_out("=========================================================")
-      # log_out("handle_r_stderr")
-      # log_out(text)
-      private$stderr_filter$process(text)
-    },
     r_msg_handlers = list(),
     install_r_handlers = function(){
       private$r_msg_handlers$display_data <- self$display_send
