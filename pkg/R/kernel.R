@@ -1131,9 +1131,9 @@ Kernel <- R6Class("Kernel",
       private$input_suspended <- FALSE
       exec_parent <- private$parent$shell
       on.exit(private$input_suspended <- TRUE)
-      if(getOption("rkernel_trace_cell",FALSE)) {
-        sleep_duration <- getOption("rkernel_trace_sleep",1)
-        use_boxes <- getOption("rkernel_trace_boxes",TRUE)
+      if(getOption("trace_cell",FALSE)) {
+        sleep_duration <- getOption("trace_sleep",1)
+        use_boxes <- getOption("trace_boxes",TRUE)
         code_lines <- split_lines1(code)
         if(use_boxes && config$use_widgets ) {
             e <- new.env()
