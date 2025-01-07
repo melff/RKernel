@@ -34,32 +34,49 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
     public = list(
         style = NULL,
         session = NULL,
+        kernel = NULL,
         repl = NULL,
         input = NULL,
         output = NULL,
         env_browser = NULL,
+        button_box = NULL,
         continue_loop = TRUE,
-        show_prompt = FALSE,
+        show_prompt = TRUE,
         initialize = function(session) {
             self$session <- session
             self$style <- HTML(dbgConsole_style)
-            self$output <- OutputWidget(append_output=TRUE,
-                           use_display=TRUE)
+            self$kernel <- session$kernel
+            self$parent_msg <- self$kernel$save_shell_parent()
             self$env_browser <- HTML("")
             self$continue_loop <- TRUE
+
             self$repl <- RSessionAdapter$new(
                 session = session,
-                stdout_callback = self$output$stdout,
-                stderr_callback = self$output$stderr,
+                stdout_callback = self$stdout_callback,
+                stderr_callback = self$stderr_callback,
                 browser_callback = self$browser_callback,
                 prompt_callback = self$prompt_callback,
                 echo = TRUE
                 )
+            if(get_config("browser_in_condition")) self$show_prompt <- FALSE
+        },
+        parent_msg = NULL,
+        stdout_callback = function(text) {
+            saved_parent <- self$kernel$save_shell_parent()
+            self$kernel$restore_shell_parent(self$parent_msg)
+            self$kernel$handle_r_stdout(text)
+            self$kernel$restore_shell_parent(saved_parent)
+        },
+        stderr_callback = function(text) {
+            saved_parent <- self$kernel$save_shell_parent()
+            self$kernel$restore_shell_parent(self$parent_msg)
+            self$kernel$handle_r_stderr(text)
+            self$kernel$restore_shell_parent(saved_parent)
         },
         in_browser = FALSE,
         browser_callback = function(prompt) {
-            if(self$show_prompt) self$output$stdout(prompt)
-            # log_out("browser_callback")
+            # log_out("dbgConsoleWidgetClass$browser_callback")
+            if(self$show_prompt) self$stdout_callback(prompt)
             self$in_browser <- TRUE
             return(TRUE)
         },
@@ -68,27 +85,30 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             self$in_browser <- FALSE
             return(TRUE)
         },
-        run_on_click = function(){
-            code <- self$input$value
-            status <- code_status(code)
-            if(status == "complete") {
-                try(self$repl$run_code(code, echo = TRUE))
-                self$input$value <- ""
+        handle_input = function(txt) {
+            # log_out("handle_input")
+            if(!length(txt)) {
+                txt <- ""
             }
-            invisible()
-        },
-        run_on_submit = function(...){
-            code <- self$input$value
-            if(!length(code)) {
-                code <- ""
+            # log_out(sprintf("txt='%s'",txt))
+            if(get_config("browser_in_condition") && 
+                txt %in% c("","c","n","Q")) {
+                # Do not wait for output ...
+                r <- try(self$session$send_input(txt))
+                self$continue_loop <- FALSE
+            } else {
+                r <- try(self$repl$run_code(txt, echo = TRUE))
             }
-            r <- try(self$repl$run_code(code, echo = TRUE))
             if(inherits(r,"try-error")) {
                 log_error(r)
                 kernel <- self$session$kernel
-                kernel$stderr(r)
+                kernel$stderr(unclass(r))
             }
             self$input$clear()
+        },
+        run_on_submit = function(...){
+            txt <- self$input$value
+            self$handle_input(txt)
             if(self$in_browser) self$update_env_browser()
             invisible()
         },
@@ -102,90 +122,84 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
         },
         on_click_next = function() {
             # log_out("on_click_next")
-            self$repl$run_code("")
+            self$handle_input("")
             if(self$in_browser) self$update_env_browser()
             invisible()
         },
         on_click_continue = function() {
             # log_out("on_click_continue")
-            self$repl$run_code("c")
+            self$handle_input("c")
             if(self$in_browser) self$update_env_browser()
             invisible()
         },
         on_click_quit = function() {
             # log_out("on_click_quit")
-            self$repl$run_code("Q")
+            self$handle_input("Q")
             invisible()
         },
         main_widget = NULL,
-        run = function(prompt) {
+        display_id = NULL,
+        display = function() {
+            # log_out("dbgConsoleWidget$display()")
             kernel <- self$session$kernel
-            use_area <- FALSE
-            next_btn <- Button(icon="play",style=ButtonStyle(font_size="70%"))
-            continue_btn <- Button(icon="forward",style=ButtonStyle(font_size="70%"))
-            quit_btn <- Button(icon="stop",style=ButtonStyle(font_size="70%"))
-            next_btn$on_click(self$on_click_next)
-            continue_btn$on_click(self$on_click_continue)
-            quit_btn$on_click(self$on_click_quit)
-            button_box <- HBox(next_btn,continue_btn,quit_btn)
-            if(use_area) { # Currently not recommended - Textarea widgets do no
-                           # work, only one line can be used ...
-                self$input <- Textarea(
-                    placeholder="Enter expression, 'c', 'n', or 'Q'"
-                )
-                self$input$add_class("monospace")
-                run_btn <- Button(description="Run")
-                run_btn$on_click(self$run_on_click)
-                input_hbox <- HBox(self$input,run_btn)
-                input_hbox$add_class("debug-box")
+            if(!get_config("browser_in_condition"))  {
+                next_btn <- Button(icon="play",style=ButtonStyle(font_size="70%"))
+                continue_btn <- Button(icon="forward",style=ButtonStyle(font_size="70%"))
+                quit_btn <- Button(icon="stop",style=ButtonStyle(font_size="70%"))
+                next_btn$on_click(self$on_click_next)
+                continue_btn$on_click(self$on_click_continue)
+                quit_btn$on_click(self$on_click_quit)
+                self$button_box <- HBox(next_btn,continue_btn,quit_btn)
+            }
+            self$input <- TextWidget(
+                placeholder="Enter expression, 'c', 'n', 'Q' or hit <enter>",
+                continuous_update = TRUE
+            )
+            self$input$add_class("monospace")
+            self$input$add_class("width-auto")
+            self$input$on_submit(self$run_on_submit)
+            if(length(self$button_box)) {
                 self$main_widget <- VBox(self$style,
-                                         input_hbox,
-                                         self$output,
-                                         self$env_browser)
+                                        self$button_box,
+                                        self$input,
+                                        self$env_browser)
             }
             else {
-                self$input <- TextWidget(
-                    placeholder="Enter expression, 'c', 'n', 'Q' or hit <enter>",
-                    continuous_update = TRUE
-                )
-                self$input$add_class("monospace")
-                self$input$add_class("width-auto")
-                self$input$on_submit(self$run_on_submit)
                 self$main_widget <- VBox(self$style,
-                                         self$output,
-                                         self$input,
-                                         self$env_browser,
-                                         button_box)
+                                        self$input,
+                                        self$env_browser)
             }
             self$update_env_browser()
+            # log_out("display_data(self$main_widget)")
             d <- display_data(self$main_widget)
+            self$display_id <- display_id(d)
+            # log_out(display_id(d))
             saved_parent <- kernel$save_shell_parent()
+            kernel$restore_shell_parent(self$parent_msg)
             kernel$display_send(d)
-            if(self$show_prompt) self$output$stdout(prompt)
-            while(self$continue_loop) {
-                self$session$yield(1000)
-            }
-            self$input$disabled <- TRUE
-            self$input$placeholder <- "--"
-            close_btn <- Button(icon="eject",style=ButtonStyle(font_size="70%"))
-            self$main_widget$children <- list(self$output,
-                                              self$env_browser,
-                                              close_btn)
-            d <- update(d,self$main_widget)
-            d$data[["text/plain"]] <- "dbgConsole()"
-            d$data[["text/html"]] <- "<pre>dbgConsole()</pre>"
             kernel$restore_shell_parent(saved_parent)
-            kernel$display_send(d)
-            on_click_close_btn <- function() { 
-                # log_out("on_click_close_btn")
-                self$main_widget$children <- list()
-                d <- display_data(self$main_widget)
-                d <- update(d,self$main_widget)
-                d$data[["text/plain"]] <- "dbgConsole()"
-                d$data[["text/html"]] <- "<pre>dbgConsole()</pre>"
-                kernel$display_send(d)
+        },
+        run = function(prompt) {
+            # log_out("dbgConsole$run()")
+            if(self$show_prompt) self$stdout_callback(prompt)
+            repeat {
+                self$session$yield(10000)
+                if(!self$continue_loop) {
+                    break
+                }
             }
-            close_btn$on_click(on_click_close_btn)
+            d <- display_data(self$main_widget)
+            # log_out("loop ended")
+            # log_out(display_id(d))
+            d <- display_data("text/plain"="",
+                              "text/html"="",
+                              id = self$display_id,
+                              update = TRUE)
+            # log_out(display_id(d))
+            kernel <- self$session$kernel
+            kernel$restore_shell_parent(self$parent_msg)
+            kernel$display_send(d)
+            log_out("dbgConsole$run - finished")
         }
     )
 )
@@ -242,6 +256,7 @@ dbgConsole <- function(session, prompt, use_widgets = TRUE) {
     if(use_widgets) {
         # log_out("creating a dbgConsoleWidgetClass object")
         cons <- dbgConsoleWidgetClass$new(session)
+        cons$display()
     }
     else {
         # log_out("creating a dbgSimpleConsoleClass object")
@@ -304,7 +319,7 @@ debugger_ <- function(dump = last.dump) {
                 error = function(e) {})
         }
         rm(.thing, .index, .this_dump)
-        eval(substitute(browser()),envir=dump[[.index]])
+        browser()
     }
     if(get_config("use_widgets")) {
         msg_send(list(type="event",content=list(event="debugger")))
@@ -322,11 +337,16 @@ debugger_ <- function(dump = last.dump) {
         on.exit(options(error = err.action))   
         err_msg <- attr(dump, "error.message")
         call_labels <- names(dump)
-        ind <- request_menu_widget(call_labels,title="Select a frame")
-        if(ind > 0) {
-            title <- paste("Variables in frame of call",call_labels[ind])
-            eval(substitute(browser(text=title),list(title=title)), 
-                 envir=dump[[ind]])
+        repeat {
+            ind <- request_menu_widget(call_labels,
+                                       title="Select a frame",
+                                       buttons = c("Select","Quit"))
+            if(ind > 0) {
+                debugger_look(ind)
+            }
+            else break
+        }
+        # log_out("debug iter done")
         msg_send(list(type="event",content=list(event="debugger-finished")))
     } else {
         debugger_orig(dump)
@@ -338,13 +358,21 @@ recover_ <- function() {
     if(get_config("use_widgets")) {
         msg_send(list(type="event",content=list(event="recover")))
         calls <- sys.calls()
-        call_labels <- limitedLabels(calls)
-        ind <- request_menu_widget(call_labels,title="Select a frame",
-                                   file=stderr())
-        if(ind > 0L) {
-            title <- paste("Variables in frame of call",call_labels[ind])
-            eval(substitute(browser(text=title),list(title=title)), 
-                 envir = sys.frame(ind))
+        call_labels <- limitedLabels(head(calls,-1))
+        recover_look <- function(index, title)  {
+            browser_call <- substitute(browser(text=title),list(title=title))
+            eval(browser_call,sys.frame(index))
+        }
+        repeat {
+            ind <- request_menu_widget(call_labels,
+                                    title = "Select a frame",
+                                    buttons = c("Select","Quit"),
+                                    file=stderr())
+            if(ind > 0L) {
+                title <- paste("Variables in frame of call",call_labels[ind])
+                recover_look(ind,title)
+            } 
+            else break
         }
         msg_send(list(type="event",content=list(event="recover-finished")))
     } else {

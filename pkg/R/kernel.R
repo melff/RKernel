@@ -91,6 +91,7 @@ Kernel <- R6Class("Kernel",
       self$r_repl$run_cmd("RKernel:::install_sleep()")
       self$r_repl$run_cmd("RKernel:::install_browseURL()")
       self$r_repl$run_cmd("RKernel:::set_config(use_widgets = FALSE)")
+      set_config(browser_in_condition = FALSE)
       msg_env$send <- self$handle_r_msg
       private$stdout_filter <- MessageFilter$new(
                                     text_handler = self$stdout,
@@ -1054,6 +1055,8 @@ Kernel <- R6Class("Kernel",
       dbgConsole(session = self$r_session,
                  prompt = prompt,
                  use_widgets = config$use_widgets)
+      if(get_config("browser_in_condition"))
+        self$r_repl$process_output(until_prompt=TRUE)
       private$parent$shell <- saved_parent
       return(TRUE)
     },
