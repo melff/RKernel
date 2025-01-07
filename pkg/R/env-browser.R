@@ -133,7 +133,7 @@ env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FA
                paste0("<th class='object-summary border-left border-right border-top'>",thead[2],"</th>"))
     thead <- paste0(thead,collapse="")
     if(is.character(title)) {
-        title <- paste0("<th colspan=\"2\">",title,"</th>")
+        title <- paste0("<th class='border-left border-right border-top no-border-bottom' colspan=\"2\">",title,"</th>")
         thead <- c(title,thead)
     }
     thead <- paste0("<tr>",thead,"</tr>")

@@ -94,6 +94,12 @@ details table.env-browser {
     border-right: 1px solid #cfcfcf;    
 }
 
+.env-browser th.no-border-bottom,
+.env-browser td.no-border-bottom {
+    border-bottom: none;    
+}
+
+
 .env-browser td code {
     background: unset;
 }
