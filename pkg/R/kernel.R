@@ -57,7 +57,7 @@ Kernel <- R6Class("Kernel",
     },
     start_r_session = function(){
       self$r_session <- RKernelSession$new(
-        yield = self$poll_and_respond,
+        yield = private$handle_yield,
         kernel = self)
       # log_out(self$r_session, use.print = TRUE)
       assign("session",self$r_session,envir=private$sandbox)
@@ -122,7 +122,10 @@ Kernel <- R6Class("Kernel",
     },
     #' @description
     #' A single iteration of the kernel loop
-    poll_and_respond = function(poll_timeout = getOption("rkernel_poll_timeout",10L)){
+    poll_and_respond = function(
+      poll_timeout = getOption("rkernel_poll_timeout",10L),
+      drop = NULL
+      ){
         # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
         # log_out("kernel$poll_request")
@@ -137,7 +140,7 @@ Kernel <- R6Class("Kernel",
         switch(req$socket_name,
                hb=private$respond_hb(req),
                control=private$respond_control(req),
-               shell=private$respond_shell(req))
+               shell=private$respond_shell(req, drop = drop))
     },
     #' @description
     #' Clear the current output cell in the frontend.
@@ -344,6 +347,8 @@ Kernel <- R6Class("Kernel",
     },
     errored = FALSE,
     save_shell_parent = function() {
+      # log_out("save_shell_parent")
+      # log_out(private$parent$shell$header$msg_id)
       private$parent$shell
     },
     restore_shell_parent = function(saved_parent) {
@@ -721,21 +726,26 @@ Kernel <- R6Class("Kernel",
       return(continue)
     },
 
-    respond_shell = function(req,debug=FALSE){
+    respond_shell = function(req, debug=FALSE, drop = NULL){
       if(debug)
         log_out("respond_shell")
       msg <- private$get_message("shell")
+      msg_type <- msg$header$msg_type
+      if(debug)
+        log_out(paste("Got a", msg_type, "request ..."))
+      if(length(drop) && is.character(drop) && msg_type %in% drop) {
+        private$abort_reply(msg)
+        return(TRUE)
+      }
       # if(debug)
       #    log_out(msg,use.str=TRUE)
       private$parent$shell <- msg
       if(!length(msg)) return(TRUE)
       private$send_busy(private$parent$shell)
-      if(debug)
-        log_out(paste("Got a", msg$header$msg_type, "request ..."))
       # do_stuff ...
       private$clear_queue_requested <- FALSE
       r <- tryCatch(
-      switch(msg$header$msg_type,
+        switch(msg_type,
              execute_request = private$handle_execute_request(msg),
              is_complete_request = private$is_complete_reply(msg),
              kernel_info_request = private$kernel_info_reply(msg),
@@ -928,23 +938,29 @@ Kernel <- R6Class("Kernel",
                       MC=ZMQ.MC(check.eintr=TRUE))
         if(bitwAnd(zmq.poll.get.revents(1),POLLIN)){
           msg <- private$get_message("shell")
-          msg_type <- msg$header$msg_type
-          # log_out(msg_type)
-          reply_type <- sub("_request","_reply",msg_type,fixed=TRUE)
-          private$parent$shell <- msg
-          private$send_busy(private$parent$shell)
-          private$send_message(type=reply_type,
-                           parent=private$parent$shell,
-                           socket_name="shell",
-                           content=list(
-                             status="aborted"))
-          private$send_idle(private$parent$shell)
+          private$abort_reply(msg, restore = FALSE)
         }
         else break
       }
       # log_out("clear_shell_queue done")
     },
     
+    abort_reply = function(msg, restore = TRUE) {
+      save_parent <- private$parent$shell
+      private$parent$shell <- msg
+      private$send_busy(private$parent$shell)
+      msg_type <- msg$header$msg_type
+      reply_type <- sub("_request","_reply",msg_type,fixed=TRUE)
+      private$send_message(type=reply_type,
+                           parent=private$parent$shell,
+                           socket_name="shell",
+                           content=list(
+                             status="aborted"))
+      private$send_idle(private$parent$shell)
+      if(restore)
+        private$parent$shell <- save_parent
+    },
+
     logfile = NULL,
 
     r_install_hooks = function(){
@@ -1245,6 +1261,11 @@ Kernel <- R6Class("Kernel",
           private$display_changed_graphics()
         }
       }
+    },
+
+    handle_yield = function(timeout) {
+      self$poll_and_respond(timeout,
+                            drop="execute_request")
     }
   )
 )
