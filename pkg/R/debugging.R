@@ -307,6 +307,7 @@ debugger_ <- function(dump = last.dump) {
         eval(substitute(browser()),envir=dump[[.index]])
     }
     if(get_config("use_widgets")) {
+        msg_send(list(type="event",content=list(event="debugger")))
         if (!inherits(dump, "dump.frames")) { #adapted from utils::debugger
         cat(gettextf("'dump' is not an object of class %s\n", 
             dQuote("dump.frames")))
@@ -326,7 +327,7 @@ debugger_ <- function(dump = last.dump) {
             title <- paste("Variables in frame of call",call_labels[ind])
             eval(substitute(browser(text=title),list(title=title)), 
                  envir=dump[[ind]])
-        }
+        msg_send(list(type="event",content=list(event="debugger-finished")))
     } else {
         debugger_orig(dump)
     }
@@ -335,6 +336,7 @@ debugger_ <- function(dump = last.dump) {
 recover_ <- function() {
     # log_out("recover_")
     if(get_config("use_widgets")) {
+        msg_send(list(type="event",content=list(event="recover")))
         calls <- sys.calls()
         call_labels <- limitedLabels(calls)
         ind <- request_menu_widget(call_labels,title="Select a frame",
@@ -344,6 +346,7 @@ recover_ <- function() {
             eval(substitute(browser(text=title),list(title=title)), 
                  envir = sys.frame(ind))
         }
+        msg_send(list(type="event",content=list(event="recover-finished")))
     } else {
         recover_orig()
     }

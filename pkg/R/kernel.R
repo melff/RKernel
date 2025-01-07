@@ -996,6 +996,7 @@ Kernel <- R6Class("Kernel",
       for(msg_type in c("comm_msg", "comm_open", "comm_close"))
         private$r_msg_handlers[[msg_type]] <- self$send_comm
       private$r_msg_handlers$condition <- private$handle_condition_msg
+      private$r_msg_handlers$event <- private$handle_event_msg
     },
     r_init_help = function(){
       port <- random_open_port()
@@ -1083,6 +1084,16 @@ Kernel <- R6Class("Kernel",
                           content=content)
         private$err_msg <- content
       }
+    },
+
+    handle_event_msg = function(msg) {
+      event <- msg$content$event
+      switch(event,
+             recover=,
+             debugger=set_config(browser_in_condition = TRUE),
+             "recover-finished"=,
+             "debugger-finished"=set_config(browser_in_condition = FALSE)
+             )
     },
 
     graphics_display_id = "",
