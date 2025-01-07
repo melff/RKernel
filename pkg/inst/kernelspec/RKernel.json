@@ -8,6 +8,6 @@
  "display_name":"R (RKernel)",
  "language":"R",
  "metadata": {
-     "debugger": true
+     "debugger": false
  }
 }
