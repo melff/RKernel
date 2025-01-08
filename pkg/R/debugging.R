@@ -388,3 +388,89 @@ install_debugging <- function() {
         "rkernel_show_traceback",
         "browser_show_prompt"))
 }
+
+CellTracer <- R6Class("CellTracer",
+    public = list(
+        parent = NULL,
+        kernel = NULL,
+        repl = NULL,
+        kernel_callback = NULL,
+        initialize = function(
+            kernel,
+            repl,
+            callback
+        ) {
+            self$next_btn <- Button(icon="play",style=ButtonStyle(font_size="70%"))
+            self$continue_btn <- Button(icon="forward",style=ButtonStyle(font_size="70%"))
+            self$quit_btn <- Button(icon="stop",style=ButtonStyle(font_size="70%"))
+            self$button_box <- HBox(self$next_btn,
+                                    self$continue_btn,
+                                    self$quit_btn)
+            self$kernel <- kernel
+            self$repl <- repl
+            self$kernel_callback <- callback
+            self$next_btn$on_click(self$on_next_btn)
+            self$continue_btn$on_click(self$on_continue_btn)
+            self$quit_btn$on_click(self$on_quit_btn)
+            self$parent <- kernel$save_shell_parent()
+        },
+        continue_loop = TRUE,
+        line_no = 1,
+        code_lines = character(0),
+        run = function(code_lines) {
+            d <- display_data(self$button_box)
+            self$kernel$display_send(d)
+            self$code_lines <- code_lines
+            self$continue_loop <- TRUE
+            session <- self$repl$session
+            while(self$continue_loop) {
+                session$yield(1000)
+                if(self$kernel$errored &&
+                    self$kernel$stop_on_error) 
+                    break
+            }
+            d <- update(d,"text/plain"="",
+                          "text/html"="")
+            self$kernel$restore_shell_parent(self$parent)
+            self$kernel$display_send(d)
+            self$line_no <- 1
+        },
+        next_btn = NULL,
+        continue_btn = NULL,
+        quit_btn = NULL,
+        button_box = NULL,
+        on_next_btn = function() {
+            line <- self$code_lines[self$line_no]
+            n_lines <- length(self$code_lines)
+            self$run_(line)
+            self$line_no <- self$line_no + 1
+            if(self$line_no > n_lines) self$continue_loop <- FALSE
+        },
+        on_continue_btn = function() {
+            n_lines <- length(self$code_lines)
+            ii <- seq(from=self$line_no,to=n_lines)
+            lines <- self$code_lines[ii]
+            self$run_(lines)
+            self$continue_loop <- FALSE
+        },
+        on_quit_btn = function() {
+            self$continue_loop <- FALSE
+        },
+        run_ = function(lines) {
+            parent_save <- self$kernel$save_shell_parent()
+            self$kernel$restore_shell_parent(self$parent)
+            self$repl$run_code( 
+                            lines, 
+                            io_timeout=10, 
+                            echo = TRUE,
+                            prompt_callback = self$prompt_callback
+                        )
+            self$kernel$restore_shell_parent(parent_save)
+        },
+        prompt_callback = function() {
+            self$kernel_callback()
+            self$kernel$stdout("> ")
+            return(TRUE)
+        }
+    )
+)

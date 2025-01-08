@@ -1163,68 +1163,15 @@ Kernel <- R6Class("Kernel",
       on.exit(private$input_suspended <- TRUE)
       if(getOption("trace_cell",FALSE)) {
         sleep_duration <- getOption("trace_sleep",1)
-        use_boxes <- getOption("trace_boxes",TRUE)
+        trace_interactive <- getOption("trace_interactive",TRUE)
         code_lines <- split_lines1(code)
-        if(use_boxes && config$use_widgets ) {
-            e <- new.env()
-            e$n_lines <- length(code_lines)
-            e$line_no <- 1
-            next_btn <- Button(icon="play",style=ButtonStyle(font_size="70%"))
-            continue_btn <- Button(icon="forward",style=ButtonStyle(font_size="70%"))
-            quit_btn <- Button(icon="stop",style=ButtonStyle(font_size="70%"))
-            button_box <- HBox(next_btn,continue_btn,quit_btn)
-            on_next_btn <- function() {
-              line <- code_lines[e$line_no]
-              parent_save <- private$parent$shell
-              private$parent$shell <- exec_parent
-              self$r_repl$run_code( 
-                              line, 
-                              io_timeout=10, 
-                              echo = TRUE,
-                              prompt_callback = function() {
-                                    private$display_changed_graphics()
-                                    self$stdout("> ")
-                                    return(TRUE)
-                              }
-                          )
-              private$parent$shell <- parent_save
-              e$line_no <- e$line_no + 1
-              if(e$line_no > e$n_lines) e$continue_loop <- FALSE
-            }
-            on_continue_btn <- function() {
-              ii <- seq(from=e$line_no,to=e$n_lines)
-              lines <- code_lines[ii]
-              parent_save <- private$parent$shell
-              private$parent$shell <- exec_parent
-              self$r_repl$run_code( 
-                              lines, 
-                              io_timeout=10, 
-                              echo = TRUE,
-                              prompt_callback = function() {
-                                    private$display_changed_graphics()
-                                    self$stdout("> ")
-                                    return(TRUE)
-                              }
-                          )
-              private$parent$shell <- parent_save
-              e$continue_loop <- FALSE
-            }
-            on_quit_btn <- function() {
-              e$continue_loop <- FALSE
-            }
-            next_btn$on_click(on_next_btn)
-            continue_btn$on_click(on_continue_btn)
-            quit_btn$on_click(on_quit_btn)
-            d <- display_data(button_box)
-            self$display_send(d)
-            e$continue_loop <- TRUE
-            while(e$continue_loop) {
-              self$r_session$yield(1000)
-            }
-            d <- update(d,"text/plain"="",
-                          "text/html"="")
-            private$parent$shell <- exec_parent
-            self$display_send(d)
+        if(trace_interactive && config$use_widgets ) {
+          tracer <- CellTracer$new(kernel = self, 
+                                   repl = self$r_repl,
+                                   callback = private$display_changed_graphics
+                                   )
+          log_out("CellTracer created")
+          tracer$run(code_lines)
         }
         else {
           for(line in code_lines) {
@@ -1239,9 +1186,8 @@ Kernel <- R6Class("Kernel",
                                     return(TRUE)
                               }
                           )
-            if(self$errored) {
-              if(self$stop_on_error) break
-            }
+            if(self$errored && 
+              self$stop_on_error) break
             Sys.sleep(sleep_duration)
           }
         }
