@@ -40,6 +40,10 @@ GraphicsObserver <- R6Class("GraphicsObserver",
       self$id <- state$id
       self$upid <- state$upid
     },
+    active_id = function() {
+      state <- self$get_current_state()
+      state$id
+    },
     get_current_state = function() {
       if(self$internal) {
         self$get_current_state_internal()
@@ -137,6 +141,7 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         width  <- width * self$dpi
         height <- height * self$dpi
       }
+      plot_id <- as.integer(plot_id)
       paste0(
         "http://",
         self$host,":",
@@ -241,6 +246,10 @@ GraphicsObserver <- R6Class("GraphicsObserver",
 #' @export
 start_graphics <- function(){
     options(device=httpgd::hgd)
+    setHook('plot.new', plot_new_hook)
+    setHook('grid.newpage', send_new_plot)
+    # setHook('before.plot.new', send_before_new_plot)
+    # setHook('before.grid.newpage', send_before_new_plot)
     add_sync_options(c(
           "jupyter.plot.width",
           "jupyter.plot.height",
@@ -248,6 +257,34 @@ start_graphics <- function(){
           "jupyter.plot.formats",
           "jupyter.update.graphics"))
 }
+
+
+plot_new_hook <- function() {
+  if(par("page")) send_new_plot()
+}
+
+send_new_plot <- function() {
+  # log_out("send_new_plot")
+  if(dev_is_unigd()){
+    id <- ugd_id()$id + 1L
+    msg <- list(type="event",
+                content = list(event = "new_plot", 
+                               plot_id = id))
+    msg_send(msg)
+  }
+}
+
+send_before_new_plot <- function() {
+  # log_out("before_send_new_plot")
+  if(dev_is_unigd()){
+    id <- ugd_id()$id
+    msg <- list(type="event",
+                content = list(event = "before_new_plot", 
+                               plot_id = id))
+    msg_send(msg)
+  }
+}
+
 
 dev_is_unigd <- function(which = dev.cur()) {
   names(which) == "unigd"

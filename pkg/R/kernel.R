@@ -178,6 +178,8 @@ Kernel <- R6Class("Kernel",
                     content = unclass(d))
       }
       # log_out("display_send")
+      # log_str(d)
+      # log_str(msg)
       # log_out(msg$content$transient$display_id)
       private$send_message(type=msg$type,
                            parent=private$parent$shell,
@@ -1096,41 +1098,74 @@ Kernel <- R6Class("Kernel",
     },
 
     handle_event_msg = function(msg) {
+      # log_out("handle_event_msg")
+      # log_str(msg)
       event <- msg$content$event
+      plot_id <- msg$content$plot_id
       switch(event,
-             recover=,
-             debugger=set_config(browser_in_condition = TRUE),
-             "recover-finished"=,
-             "debugger-finished"=set_config(browser_in_condition = FALSE)
+             recover = ,
+             debugger = set_config(browser_in_condition = TRUE),
+             "recover-finished" = ,
+             "debugger-finished" = set_config(browser_in_condition = FALSE),
+             new_plot = private$handle_new_plot(plot_id = plot_id)
              )
     },
 
-    graphics_display_id = "",
-    graphics_plot_id = integer(0),
+    handle_new_plot = function(plot_id) {
+      # log_out("handle_new_plot")
+      if(length(private$graphics_plot_id) &&
+         plot_id == private$graphics_plot_id) {
+        private$display_changed_graphics()
+      }
+      else {
+        private$graphics_display(plot_id)
+      }
+    },
+
+    graphics_display_id = character(0),
+    graphics_plot_id = NULL,
+    graphics_display = function(plot_id, 
+                                update = FALSE,
+                                force_new_display = FALSE) {
+      # log_out("graphics_display")
+      update <- update && !force_new_display
+      if(update) {
+        display_id <- private$graphics_display_id
+      } else {
+        display_id <- UUIDgenerate()
+      }
+      d <- private$r_graphics_observer$display_data(plot_id,
+                                          display_id = display_id,
+                                          update = update)
+      self$display_send(d)
+      private$graphics_plot_id <- plot_id
+      private$graphics_display_id <- display_id
+    },
+
     graphics_new_cell = FALSE,
     display_changed_graphics = function() {
+      # log_out("display_changed_graphics")
       if(self$r_session$sleeping()) {
+        plot_id <- as.character(private$r_graphics_observer$active_id())
         poll_res <- private$r_graphics_observer$poll()
         if(poll_res["active"]) {
+          # log_print(poll_res)
           # log_out(sprintf("private$graphics_new_cell = %s",private$graphics_new_cell))
           force_new_display <- private$graphics_new_cell && 
                                 !getOption("jupyter.update.graphics",TRUE)
           # log_out(sprintf("force_new_display = %s",force_new_display))
-          if(poll_res[2] || 
-             (poll_res[3] && force_new_display)) { # New plot
-            d <- private$r_graphics_observer$display_data()
-            self$display_send(d)
-            private$graphics_display_id <- display_id(d)
-            private$graphics_plot_id <- d$metadata$plot_id
+          if(poll_res[2]) { # New plot
+            # log_out("New plot")
+            private$graphics_display(plot_id)
           }
           else if(poll_res[3]) { # Plot update
-            display_id <- private$graphics_display_id
-            plot_id <- private$graphics_plot_id
-            d <- private$r_graphics_observer$display_data(
-                                                plot_id = plot_id,
-                                                display_id = display_id,
-                                                update = TRUE)
-            self$display_send(d)
+            # log_out("Plot update")
+            if(plot_id != private$graphics_plot_id) {
+              log_warn("We seem to have lost a plot ...")
+            }
+            private$graphics_display(plot_id,
+                                    update = TRUE,
+                                    force_new_display = force_new_display)
           }
           private$graphics_new_cell <- FALSE
         }
