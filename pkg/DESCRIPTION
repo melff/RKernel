@@ -110,6 +110,7 @@ Collate:
     'widget-play.R'
     'widget-plot.R'
     'widget-progress.R'
+    'widget-readline.R'
     'widget-resizeable.R'
     'widget-slider.R'
     'widget-selection.R'
