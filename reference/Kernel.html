@@ -72,7 +72,6 @@
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
 <ul><li><p><a href="#method-Kernel-new"><code>Kernel$new()</code></a></p></li>
-<li><p><a href="#method-Kernel-start_r_session"><code>Kernel$start_r_session()</code></a></p></li>
 <li><p><a href="#method-Kernel-start"><code>Kernel$start()</code></a></p></li>
 <li><p><a href="#method-Kernel-run"><code>Kernel$run()</code></a></p></li>
 <li><p><a href="#method-Kernel-poll_and_respond"><code>Kernel$poll_and_respond()</code></a></p></li>
@@ -97,6 +96,7 @@
 <li><p><a href="#method-Kernel-save_shell_parent"><code>Kernel$save_shell_parent()</code></a></p></li>
 <li><p><a href="#method-Kernel-restore_shell_parent"><code>Kernel$restore_shell_parent()</code></a></p></li>
 <li><p><a href="#method-Kernel-shutdown"><code>Kernel$shutdown()</code></a></p></li>
+<li><p><a href="#method-Kernel-restart"><code>Kernel$restart()</code></a></p></li>
 <li><p><a href="#method-Kernel-restore_execute_parent"><code>Kernel$restore_execute_parent()</code></a></p></li>
 <li><p><a href="#method-Kernel-clone"><code>Kernel$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-Kernel-new"></a><div class="section">
@@ -115,20 +115,11 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Kernel-start_r_session"></a><div class="section">
-<h3 id="method-start-r-session-">Method <code>start_r_session()</code><a class="anchor" aria-label="anchor" href="#method-start-r-session-"></a></h3>
-
-<div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">start_r_session</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-
 </div><p></p><hr><a id="method-Kernel-start"></a><div class="section">
 <h3 id="method-start-">Method <code><a href="https://rdrr.io/r/stats/start.html" class="external-link">start()</a></code><a class="anchor" aria-label="anchor" href="#method-start-"></a></h3>
 
 <div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">start</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -136,7 +127,7 @@
 </div><p></p><hr><a id="method-Kernel-run"></a><div class="section">
 <h3 id="method-run-">Method <code>run()</code><a class="anchor" aria-label="anchor" href="#method-run-"></a></h3>
 <p>Run the kernel.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -144,7 +135,7 @@
 </div><p></p><hr><a id="method-Kernel-poll_and_respond"></a><div class="section">
 <h3 id="method-poll-and-respond-">Method <code>poll_and_respond()</code><a class="anchor" aria-label="anchor" href="#method-poll-and-respond-"></a></h3>
 <p>A single iteration of the kernel loop</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">poll_and_respond</span><span class="op">(</span></span>
 <span>  poll_timeout <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"rkernel_poll_timeout"</span>, <span class="fl">10L</span><span class="op">)</span>,</span>
 <span>  drop <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -155,7 +146,7 @@
 </div><p></p><hr><a id="method-Kernel-clear_output"></a><div class="section">
 <h3 id="method-clear-output-">Method <code>clear_output()</code><a class="anchor" aria-label="anchor" href="#method-clear-output-"></a></h3>
 <p>Clear the current output cell in the frontend.</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">clear_output</span><span class="op">(</span><span class="va">wait</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -171,7 +162,7 @@
 </div><p></p><hr><a id="method-Kernel-stream"></a><div class="section">
 <h3 id="method-stream-">Method <code>stream()</code><a class="anchor" aria-label="anchor" href="#method-stream-"></a></h3>
 <p>Stream text to the frontend.</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">stream</span><span class="op">(</span><span class="va">text</span>, <span class="va">stream</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -191,7 +182,7 @@
 </div><p></p><hr><a id="method-Kernel-stdout"></a><div class="section">
 <h3 id="method-stdout-">Method <code><a href="https://rdrr.io/r/base/showConnections.html" class="external-link">stdout()</a></code><a class="anchor" aria-label="anchor" href="#method-stdout-"></a></h3>
 <p>Stream text to the frontend via 'stdout' stream.</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">stdout</span><span class="op">(</span><span class="va">text</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -207,7 +198,7 @@
 </div><p></p><hr><a id="method-Kernel-stderr"></a><div class="section">
 <h3 id="method-stderr-">Method <code><a href="https://rdrr.io/r/base/showConnections.html" class="external-link">stderr()</a></code><a class="anchor" aria-label="anchor" href="#method-stderr-"></a></h3>
 <p>Stream text to the frontend via 'stderr' stream.</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">stderr</span><span class="op">(</span><span class="va">text</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -224,7 +215,7 @@
 <h3 id="method-readline-">Method <code><a href="https://rdrr.io/r/base/readline.html" class="external-link">readline()</a></code><a class="anchor" aria-label="anchor" href="#method-readline-"></a></h3>
 
 <div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">readline</span><span class="op">(</span>prompt <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -232,7 +223,7 @@
 </div><p></p><hr><a id="method-Kernel-execute_result"></a><div class="section">
 <h3 id="method-execute-result-">Method <code>execute_result()</code><a class="anchor" aria-label="anchor" href="#method-execute-result-"></a></h3>
 <p>Send execution results to the frontend</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">execute_result</span><span class="op">(</span><span class="va">data</span>, metadata <span class="op">=</span> <span class="va">emptyNamedList</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -252,7 +243,7 @@
 </div><p></p><hr><a id="method-Kernel-display_send"></a><div class="section">
 <h3 id="method-display-send-">Method <code>display_send()</code><a class="anchor" aria-label="anchor" href="#method-display-send-"></a></h3>
 <p>Send rich format data to the frontend</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">display_send</span><span class="op">(</span><span class="va">msg</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -268,7 +259,7 @@
 </div><p></p><hr><a id="method-Kernel-send_error"></a><div class="section">
 <h3 id="method-send-error-">Method <code>send_error()</code><a class="anchor" aria-label="anchor" href="#method-send-error-"></a></h3>
 <p>Send an error message and traceback to the frontend.</p><div class="section">
-<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">send_error</span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span>, <span class="va">traceback</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -292,7 +283,7 @@
 </div><p></p><hr><a id="method-Kernel-send_comm"></a><div class="section">
 <h3 id="method-send-comm-">Method <code>send_comm()</code><a class="anchor" aria-label="anchor" href="#method-send-comm-"></a></h3>
 <p>Send a message via a comm.</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">send_comm</span><span class="op">(</span><span class="va">msg</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -308,7 +299,7 @@
 </div><p></p><hr><a id="method-Kernel-get_parent"></a><div class="section">
 <h3 id="method-get-parent-">Method <code>get_parent()</code><a class="anchor" aria-label="anchor" href="#method-get-parent-"></a></h3>
 <p>The parent of the message currently sent.</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">get_parent</span><span class="op">(</span>channel <span class="op">=</span> <span class="st">"shell"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -324,7 +315,7 @@
 </div><p></p><hr><a id="method-Kernel-get_conn_info"></a><div class="section">
 <h3 id="method-get-conn-info-">Method <code>get_conn_info()</code><a class="anchor" aria-label="anchor" href="#method-get-conn-info-"></a></h3>
 <p>Return the current connection info.</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">get_conn_info</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -332,7 +323,7 @@
 </div><p></p><hr><a id="method-Kernel-is_child"></a><div class="section">
 <h3 id="method-is-child-">Method <code>is_child()</code><a class="anchor" aria-label="anchor" href="#method-is-child-"></a></h3>
 <p>Check if the current process is a fork from the original kernel process</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">is_child</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -340,7 +331,7 @@
 </div><p></p><hr><a id="method-Kernel-input_request"></a><div class="section">
 <h3 id="method-input-request-">Method <code>input_request()</code><a class="anchor" aria-label="anchor" href="#method-input-request-"></a></h3>
 <p>Send an input request to the frontend</p><div class="section">
-<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">input_request</span><span class="op">(</span>prompt <span class="op">=</span> <span class="st">""</span>, password <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -361,7 +352,7 @@ password dialog</p></dd>
 </div><p></p><hr><a id="method-Kernel-read_stdin"></a><div class="section">
 <h3 id="method-read-stdin-">Method <code>read_stdin()</code><a class="anchor" aria-label="anchor" href="#method-read-stdin-"></a></h3>
 <p>Read a line from the frontend</p><div class="section">
-<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">read_stdin</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -369,7 +360,7 @@ password dialog</p></dd>
 </div><p></p><hr><a id="method-Kernel-send_debug_event"></a><div class="section">
 <h3 id="method-send-debug-event-">Method <code>send_debug_event()</code><a class="anchor" aria-label="anchor" href="#method-send-debug-event-"></a></h3>
 <p>Send a debug event to the frontend</p><div class="section">
-<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">send_debug_event</span><span class="op">(</span><span class="va">content</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -386,7 +377,7 @@ password dialog</p></dd>
 <h3 id="method-handle-r-stdout-">Method <code>handle_r_stdout()</code><a class="anchor" aria-label="anchor" href="#method-handle-r-stdout-"></a></h3>
 
 <div class="section">
-<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">handle_r_stdout</span><span class="op">(</span><span class="va">text</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -395,7 +386,7 @@ password dialog</p></dd>
 <h3 id="method-handle-r-stderr-">Method <code>handle_r_stderr()</code><a class="anchor" aria-label="anchor" href="#method-handle-r-stderr-"></a></h3>
 
 <div class="section">
-<h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
+<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">handle_r_stderr</span><span class="op">(</span><span class="va">text</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -403,7 +394,7 @@ password dialog</p></dd>
 </div><p></p><hr><a id="method-Kernel-handle_r_msg"></a><div class="section">
 <h3 id="method-handle-r-msg-">Method <code>handle_r_msg()</code><a class="anchor" aria-label="anchor" href="#method-handle-r-msg-"></a></h3>
 <p>Handle a generic message sent from the R Session</p><div class="section">
-<h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
+<h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">handle_r_msg</span><span class="op">(</span><span class="va">msg</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -420,7 +411,7 @@ password dialog</p></dd>
 <h3 id="method-save-shell-parent-">Method <code>save_shell_parent()</code><a class="anchor" aria-label="anchor" href="#method-save-shell-parent-"></a></h3>
 
 <div class="section">
-<h4 id="usage-23">Usage<a class="anchor" aria-label="anchor" href="#usage-23"></a></h4>
+<h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">save_shell_parent</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -429,7 +420,7 @@ password dialog</p></dd>
 <h3 id="method-restore-shell-parent-">Method <code>restore_shell_parent()</code><a class="anchor" aria-label="anchor" href="#method-restore-shell-parent-"></a></h3>
 
 <div class="section">
-<h4 id="usage-24">Usage<a class="anchor" aria-label="anchor" href="#usage-24"></a></h4>
+<h4 id="usage-23">Usage<a class="anchor" aria-label="anchor" href="#usage-23"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">restore_shell_parent</span><span class="op">(</span><span class="va">saved_parent</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -438,8 +429,17 @@ password dialog</p></dd>
 <h3 id="method-shutdown-">Method <code>shutdown()</code><a class="anchor" aria-label="anchor" href="#method-shutdown-"></a></h3>
 
 <div class="section">
-<h4 id="usage-25">Usage<a class="anchor" aria-label="anchor" href="#usage-25"></a></h4>
+<h4 id="usage-24">Usage<a class="anchor" aria-label="anchor" href="#usage-24"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">shutdown</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
+</div><p></p><hr><a id="method-Kernel-restart"></a><div class="section">
+<h3 id="method-restart-">Method <code>restart()</code><a class="anchor" aria-label="anchor" href="#method-restart-"></a></h3>
+
+<div class="section">
+<h4 id="usage-25">Usage<a class="anchor" aria-label="anchor" href="#usage-25"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">restart</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
