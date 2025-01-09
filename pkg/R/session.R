@@ -151,7 +151,6 @@ RKernelSession <- R6Class("RKernelSession",
   gdetails = NULL
   )
 )
-
 split_lines1 <- function(x) {
   unlist(strsplit(x, "\n", fixed = TRUE))
 }
@@ -162,7 +161,6 @@ drop_echo <- function(txt, n = 1) {
       ii <- 1:n
       out_lines <- out_lines[-ii]
       txt <- paste(out_lines, collapse = "\n")
-      # log_out(resp, use.print = TRUE)
   }
   txt
 }
@@ -289,10 +287,12 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         }
         counter <- counter + 1
         if(counter > 5) {
-          self$session$close()
-          self$session$kernel$restore_execute_parent()
-          self$session$kernel$stderr("R process cannot be interrupted, shutting down")
-          self$session$kernel$shutdown()
+          kernel <- self$session$kernel
+          # self$session$close()
+          kernel$restore_execute_parent()
+          kernel$stderr("R process cannot be interrupted, restarting ...\n")
+          kernel$restart()
+          kernel$stderr("Restart done.")
           return(TRUE)
         }
         # log_out("trying again ...")
@@ -331,7 +331,13 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             # log_out("Session waiting for input(?)")
             if(is.function(input_callback)) {
               inp <- input_callback()
-              session$send_input(inp, drop_echo = TRUE)
+              if(session$is_alive()) {
+                # Because the callback might have restarted the session
+                session$send_input(inp, drop_echo = TRUE)
+              } else {
+                output_complete <- TRUE
+                break
+              }
             }
           }
           if (!is.null(resp$stderr) 
@@ -484,3 +490,4 @@ getlastmatch <- function(pattern, txt) {
   m <- regexpr(pattern, txt)
   tail(regmatches(txt,m), n = 1L)
 }
+

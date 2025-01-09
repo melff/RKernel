@@ -279,6 +279,7 @@ Kernel <- R6Class("Kernel",
       # log_out("=========================================================")
       # log_out("handle_r_stdout")
       private$stdout_filter$process(text)
+      # log_out("filtering done")
       private$display_changed_graphics()
     },
     handle_r_stderr = function(text){
@@ -333,6 +334,11 @@ Kernel <- R6Class("Kernel",
 
     shutdown = function() {
       invokeRestart("abort")
+    },
+    restart = function() {
+      self$r_session$close()
+      private$clear_shell_queue()
+      private$start_r_session()
     },
     restore_execute_parent = function() {
       self$restore_shell_parent(private$execute_parent)
@@ -453,7 +459,7 @@ Kernel <- R6Class("Kernel",
           if (!self$r_session$is_alive()) {
             clear_queue <- TRUE
             self$stderr("\nR session ended - restarting ... ")
-            self$start_session()
+            self$restart()
             self$stderr("done.\n")
             clear_queue <- TRUE
           } else if (is.character(r)) {
