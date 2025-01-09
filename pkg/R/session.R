@@ -3,7 +3,7 @@
 #' @importFrom crayon red
 
 #' @export
-RKernelSession <- R6Class("RKernelSession",
+RSessionBase <- R6Class("RSessionBase",
   inherit = r_session,
   public = list(
     prompt = "> ",
@@ -19,8 +19,6 @@ RKernelSession <- R6Class("RKernelSession",
                               "--no-restore"
                             ),
                             env = c(R_CLI_NUM_COLORS="16777216")),
-                          yield = NULL,
-                          kernel = NULL,
                           prompt = "> "
                           ) {
       super$initialize(
@@ -32,9 +30,7 @@ RKernelSession <- R6Class("RKernelSession",
       banner <- strsplit(banner, self$prompt, fixed = TRUE)
       banner <- unlist(banner)[1]
       banner <- remove_prefix(banner,"\n") |> remove_suffix("\n")
-      self$yield <- yield
       self$banner <- banner
-      self$kernel <- kernel
     },
     sleeping = function() {
       self$get_status() == "sleeping"
@@ -108,8 +104,51 @@ RKernelSession <- R6Class("RKernelSession",
       }
       return(resp)
     },
-    yield = NULL, # Optional function to service kernel requests
-    kernel = NULL # Reference to the controlling kernel
+    send_receive = function(text, timeout = 1000) {
+      self$send_input(text)
+      self$receive_all_output(timeout = timeout)
+    }
+  )
+)
+
+RKernelSession <- R6Class("RKernelSession",
+  inherit = RSessionBase,
+  public = list(
+    connect = function(yield, kernel) {
+      self$yield <- yield
+      self$kernel <- kernel
+    },
+    start = function() {
+      self$send_receive("RKernel::startup()")
+      self$send_receive("options(error=NULL)") # Undo callr's setting to enable traceback
+      self$send_receive("RKernel::inject_send_options()")
+      self$send_receive("suppressWarnings(rm(.pbd_env))")
+      self$send_receive("RKernel:::install_sleep()")
+      self$send_receive("RKernel:::install_browseURL()")
+      self$send_receive("RKernel:::set_config(use_widgets = FALSE)")
+      self$help_port <- random_open_port()
+      self$send_receive(sprintf("RKernel::set_help_port(%d)",self$help_port))
+      self$send_receive("RKernel::set_help_displayed(TRUE)")
+      self$send_receive("RKernel::install_output_hooks()")
+      self$send_receive("RKernel::install_safe_q()")
+      self$send_receive("RKernel::install_menu()")
+      self$send_receive("RKernel::set_help_displayed")
+      self$send_receive("RKernel::install_httpd_handlers()")
+      self$send_receive("RKernel:::install_globalCallingHandlers()")
+      self$send_receive("RKernel:::install_debugging()")
+  },
+  help_port = NULL,
+  start_graphics = function() {
+      self$send_receive("RKernel::start_graphics()")
+      self$send_receive("httpgd::hgd()")
+      gd <- self$send_receive("dput(httpgd::hgd_details())")
+      gd <- drop_echo(gd$stdout) |> drop_prompt(prompt=self$prompt)
+      gd <- str2expression(gd)
+      eval(gd)
+  },
+  yield = NULL, # Optional function to service kernel requests
+  kernel = NULL, # Reference to the controlling kernel
+  gdetails = NULL
   )
 )
 
@@ -127,6 +166,13 @@ drop_echo <- function(txt, n = 1) {
   }
   txt
 }
+
+drop_prompt <- function(txt, prompt="> ") {
+  if(endsWith(txt, prompt))
+    txt <- remove_suffix(txt,prompt)
+  txt
+}
+
 
 XON <- '\x11'
 XOFF <- '\x13'

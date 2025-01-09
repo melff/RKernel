@@ -56,28 +56,9 @@ Kernel <- R6Class("Kernel",
       assign("kernel",self,envir=private$sandbox)
       config$use_widgets <- FALSE
     },
-    start_r_session = function(){
-      self$r_session <- RKernelSession$new(
-        yield = private$handle_yield,
-        kernel = self)
-      # log_out(self$r_session, use.print = TRUE)
-      assign("session",self$r_session,envir=private$sandbox)
-      self$r_repl <- RSessionAdapter$new(
-        session = self$r_session,
-        stdout_callback = self$handle_r_stdout,
-        stderr_callback = self$handle_r_stderr,
-        browser_callback = private$handle_r_browser,
-        input_callback = private$r_get_input
-      )
-      assign("repl",self$r_repl,envir=private$sandbox)
-    },
     start = function(){
-      self$start_r_session()
-      private$r_install_hooks()
-      private$r_start_graphics()
+      private$start_r_session()
       private$install_r_handlers()
-      private$r_init_help()
-      private$r_set_help_displayed()
       self$DAPServer <- DAPServer$new(
         r_session = self$r_session,
         send_debug_event = self$send_debug_event,
@@ -85,13 +66,6 @@ Kernel <- R6Class("Kernel",
         r_send_cmd = private$r_send_cmd,
         r_send_input = self$r_session$send_input
       )
-      self$r_repl$run_cmd("RKernel::startup()")
-      self$r_repl$run_cmd("options(error=NULL)") # Undo callr's setting to enable traceback
-      self$r_repl$run_cmd("RKernel::inject_send_options()")
-      self$r_repl$run_cmd("suppressWarnings(rm(.pbd_env))")
-      self$r_repl$run_cmd("RKernel:::install_sleep()")
-      self$r_repl$run_cmd("RKernel:::install_browseURL()")
-      self$r_repl$run_cmd("RKernel:::set_config(use_widgets = FALSE)")
       set_config(browser_in_condition = FALSE)
       msg_env$send <- self$handle_r_msg
       private$stdout_filter <- MessageFilter$new(
@@ -366,6 +340,24 @@ Kernel <- R6Class("Kernel",
   ),
 
   private = list(
+    start_r_session = function(){
+      self$r_session <- RKernelSession$new()
+      log_print(self$r_session)
+      self$r_session$connect(yield = private$handle_yield,
+                             kernel = self)
+      self$r_session$start()
+      # log_out(self$r_session, use.print = TRUE)
+      private$r_start_graphics()
+      assign("session",self$r_session,envir=private$sandbox)
+      self$r_repl <- RSessionAdapter$new(
+        session = self$r_session,
+        stdout_callback = self$handle_r_stdout,
+        stderr_callback = self$handle_r_stderr,
+        browser_callback = private$handle_r_browser,
+        input_callback = private$r_get_input
+      )
+      assign("repl",self$r_repl,envir=private$sandbox)
+    },
     pid = 0,
     execution_count = 1,
     execute_parent = NULL,
@@ -975,36 +967,19 @@ Kernel <- R6Class("Kernel",
 
     logfile = NULL,
 
-    r_install_hooks = function(){
-      # log_out("Installing hooks ...")
-      self$r_repl$run_cmd("RKernel::install_output_hooks()")
-      self$r_repl$run_cmd("RKernel::install_safe_q()")
-      self$r_repl$run_cmd("RKernel::install_menu()")
-      self$r_repl$run_cmd("RKernel::set_help_displayed")
-      self$r_repl$run_cmd("RKernel::install_httpd_handlers()")
-      self$r_repl$run_cmd("RKernel:::install_globalCallingHandlers()")
-      self$r_repl$run_cmd("RKernel:::install_debugging()")
-      add_sync_options(c(
-        "rkernel_stop_on_error",
-        "rkernel_show_traceback",
-        "browser_show_prompt"))
-      # self$r_repl$run_cmd("options(error = function()print(traceback()))")
-      # log_out("done.")
-    },
     r_graphics_observer = NULL,
     r_start_graphics = function(){
       # log_out("Starting graphics ...")
-      self$r_repl$run_cmd("RKernel::start_graphics()")
       add_sync_options(c(
           "jupyter.plot.width",
           "jupyter.plot.height",
           "jupyter.plot.res",
           "jupyter.plot.formats",
           "jupyter.update.graphics"))
-      self$r_repl$run_cmd("httpgd::hgd()")
-      gdetails <- self$r_repl$eval_code("httpgd::hgd_details()")
+      gdetails <- self$r_session$start_graphics()
       # log_out(gdetails, use.str = TRUE)
       private$r_graphics_observer = GraphicsObserver$new(gdetails)
+      # log_out(private$r_graphics_observer, use.str = TRUE)
       # log_out("done.")
       register_magic_handler("plots",function(...){
         frm <- IFrame(url = private$r_graphics_observer$live_url(),
@@ -1026,13 +1001,6 @@ Kernel <- R6Class("Kernel",
         private$r_msg_handlers[[msg_type]] <- self$send_comm
       private$r_msg_handlers$condition <- private$handle_condition_msg
       private$r_msg_handlers$event <- private$handle_event_msg
-    },
-    r_init_help = function(){
-      port <- random_open_port()
-      self$r_repl$run_cmd(sprintf("RKernel::set_help_port(%d)",port))
-    },
-    r_set_help_displayed = function(){
-      self$r_repl$run_cmd("RKernel::set_help_displayed(TRUE)")
     },
     input_suspended = TRUE,
     r_get_input = function(prompt = ""){
