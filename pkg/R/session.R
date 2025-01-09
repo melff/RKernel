@@ -104,7 +104,7 @@ RSessionBase <- R6Class("RSessionBase",
       }
       return(resp)
     },
-    send_receive = function(text, timeout = 1000) {
+    send_receive = function(text, timeout = 100) {
       self$send_input(text)
       self$receive_all_output(timeout = timeout)
     }
@@ -281,7 +281,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         # log_out("receiving output")
         res <- self$session$receive_all_output()
         if(length(res)) {
-          log_out(res, use.print = TRUE)
+          # log_out(res, use.print = TRUE)
           # log_out("finished ...")
           return(TRUE)
         }

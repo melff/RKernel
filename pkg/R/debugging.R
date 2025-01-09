@@ -199,7 +199,7 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             kernel <- self$session$kernel
             kernel$restore_shell_parent(self$parent_msg)
             kernel$display_send(d)
-            log_out("dbgConsole$run - finished")
+            # log_out("dbgConsole$run - finished")
         }
     )
 )

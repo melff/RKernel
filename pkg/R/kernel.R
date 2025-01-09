@@ -444,7 +444,7 @@ Kernel <- R6Class("Kernel",
       else {
           if(grepl(special_regex,code)) {
             speco <- get_special_comments(code)
-            log_out(speco, use.print=TRUE)
+            # log_out(speco, use.print=TRUE)
             for(s in speco) {
               dispatch_special_comment_handler(opcode = s$opcode,
                                                args = s$args)
@@ -1160,7 +1160,6 @@ Kernel <- R6Class("Kernel",
                                    repl = self$r_repl,
                                    callback = private$display_changed_graphics
                                    )
-          log_out("CellTracer created")
           tracer$run(code_lines)
         }
         else {
