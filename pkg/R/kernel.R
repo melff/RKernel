@@ -54,6 +54,7 @@ Kernel <- R6Class("Kernel",
       truncate_log()
       private$sandbox <- new.env()
       assign("kernel",self,envir=private$sandbox)
+      config$use_widgets <- FALSE
     },
     start_r_session = function(){
       self$r_session <- RKernelSession$new(
@@ -354,12 +355,20 @@ Kernel <- R6Class("Kernel",
     restore_shell_parent = function(saved_parent) {
       private$parent$shell <- saved_parent
     },
-    stop_on_error = TRUE
+    stop_on_error = TRUE,
+
+    shutdown = function() {
+      invokeRestart("abort")
+    },
+    restore_execute_parent = function() {
+      self$restore_shell_parent(private$execute_parent)
+    }
   ),
 
   private = list(
     pid = 0,
     execution_count = 1,
+    execute_parent = NULL,
     handle_execute_request = function(msg){
       # log_out("handle_execute_request")
       # log_out(msg, use.str = TRUE)
@@ -369,7 +378,7 @@ Kernel <- R6Class("Kernel",
           msg$content$store_history <- FALSE
         }
       }
-      execute_parent <- private$parent$shell
+      private$execute_parent <- private$parent$shell
       execution_count <- private$execution_count
       private$send_message(
         type = "execute_input",
@@ -492,7 +501,7 @@ Kernel <- R6Class("Kernel",
           }
           restore_options()
       }
-      private$parent$shell <- execute_parent
+      private$parent$shell <- private$execute_parent
       if(!isTRUE(msg$content$silent))
         private$send_message(type="execute_reply",
                               parent=private$parent$shell,
@@ -669,7 +678,10 @@ Kernel <- R6Class("Kernel",
         interrupt = function(e) "SIGINT"
       )
       req$interrupt <- identical(r[1L],"SIGINT") 
-      if(!req$interrupt){
+      if(req$interrupt) {
+        # log_out("Interrupt!!")
+        self$r_repl$interrupt()
+      } else {
         for(i in seq_along(sock_names)){
           if(bitwAnd(zmq.poll.get.revents(i),POLLIN)){
             req$socket_name <- sock_names[i]
@@ -1025,8 +1037,12 @@ Kernel <- R6Class("Kernel",
     input_suspended = TRUE,
     r_get_input = function(prompt = ""){
       if(!private$input_suspended) {
-        self$input_request(prompt = prompt)
-        self$read_stdin()
+        if(config$use_widgets) {
+          widget_readline(self, prompt)
+        } else {
+          self$input_request(prompt = prompt)
+          self$read_stdin()
+        }
       }
     },
     r_send_request = function(msg){
@@ -1263,7 +1279,6 @@ prefix <- function(x, n) substr(x, start = 1, stop = n)
 suffix <- function(x, n) substr(x, start=nchar(x) - n, nchar(x))
 
 config <- new.env()
-config$use_widgets <- FALSE
 
 set_config <- function(...) {
   args <- list(...)

@@ -42,6 +42,8 @@ An object of this class handles the low-level communication with
 \item \href{#method-Kernel-input_request}{\code{Kernel$input_request()}}
 \item \href{#method-Kernel-read_stdin}{\code{Kernel$read_stdin()}}
 \item \href{#method-Kernel-send_debug_event}{\code{Kernel$send_debug_event()}}
+\item \href{#method-Kernel-handle_r_stdout}{\code{Kernel$handle_r_stdout()}}
+\item \href{#method-Kernel-handle_r_stderr}{\code{Kernel$handle_r_stderr()}}
 \item \href{#method-Kernel-handle_r_msg}{\code{Kernel$handle_r_msg()}}
 \item \href{#method-Kernel-save_shell_parent}{\code{Kernel$save_shell_parent()}}
 \item \href{#method-Kernel-restore_shell_parent}{\code{Kernel$restore_shell_parent()}}
@@ -99,7 +101,10 @@ Run the kernel.
 \subsection{Method \code{poll_and_respond()}}{
 A single iteration of the kernel loop
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Kernel$poll_and_respond(poll_timeout = getOption("rkernel_poll_timeout", 10L))}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$poll_and_respond(
+  poll_timeout = getOption("rkernel_poll_timeout", 10L),
+  drop = NULL
+)}\if{html}{\out{</div>}}
 }
 
 }
@@ -339,6 +344,24 @@ Send a debug event to the frontend
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-handle_r_stdout"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-handle_r_stdout}{}}}
+\subsection{Method \code{handle_r_stdout()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$handle_r_stdout(text)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-handle_r_stderr"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-handle_r_stderr}{}}}
+\subsection{Method \code{handle_r_stderr()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$handle_r_stderr(text)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Kernel-handle_r_msg"></a>}}

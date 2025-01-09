@@ -42,7 +42,8 @@ RKernelSession <- R6Class("RKernelSession",
     drop_last_input = FALSE,
     last_input = "",
     send_input = function(text, drop_echo = FALSE) {
-      if (!endsWith(text, "\n")) text <- paste0(text, "\n")
+      if(!length(text) || !is.character(text)) return(invisible())
+      if(!endsWith(text, "\n")) text <- paste0(text, "\n")
       self$drop_last_input <- drop_echo
       if(drop_echo) {
         self$last_input <- text
@@ -220,11 +221,36 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                           until_prompt = until_prompt,
                           echo = echo),
             interrupt = function(e) {
-              self$session$interrupt()
-              self$process_output()
+              self$interrupt()
             }
           )
         }
+    },
+    interrupt = function() {
+      # log_out("REPL interrupt")
+      counter <- 1
+      repeat {
+        self$session$interrupt()
+        self$suspended <- FALSE
+        # log_out("interrupt sent")
+        self$session$send_input("")
+        # log_out("receiving output")
+        res <- self$session$receive_all_output()
+        if(length(res)) {
+          log_out(res, use.print = TRUE)
+          # log_out("finished ...")
+          return(TRUE)
+        }
+        counter <- counter + 1
+        if(counter > 5) {
+          self$session$close()
+          self$session$kernel$restore_execute_parent()
+          self$session$kernel$stderr("R process cannot be interrupted, shutting down")
+          self$session$kernel$shutdown()
+          return(TRUE)
+        }
+        # log_out("trying again ...")
+      }
     },
     found_prompt = FALSE,
     process_output = function(
@@ -263,11 +289,15 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             }
           }
           if (!is.null(resp$stderr) 
-              && nzchar(resp$stderr)) {
+              && nzchar(resp$stderr)
+              && grepl('\\S',resp$stderr)) {
+              # log_out("stderr_callback")
               stderr_callback(resp$stderr)
+              # log_out("returned from stderr_callback")
           }
           if (!is.null(resp$stdout)) {
-            if (loop_count == 1 && !echo) {
+            if (loop_count == 1 && !echo 
+                && !startsWith(resp$stdout, self$prompt)) {
               resp$stdout <- drop_echo(resp$stdout)
             }
             # so <- resp$stdout
@@ -276,16 +306,19 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             #   so <- sub(XON,"[XON]",so)
             #   log_out(so)
             # }
-            if(startsWith(resp$stdout,XON) && !endsWith(resp$stdout,XOFF)) {
-              self$suspended <- FALSE
-              # log_out("Output restarted")
+            if(startsWith(resp$stdout,XON)) { 
+              if(endsWith(resp$stdout,XOFF)) {
+                resp$stdout <- remove_suffix(resp$stdout, XOFF)
+              } else {
+                self$suspended <- FALSE
+                # log_out("Outrun_codeput restarted")
+              }
+              resp$stdout <- remove_prefix(resp$stdout, XON)
             }
             else if(endsWith(resp$stdout,XOFF)) {
               self$suspended <- TRUE
-              # log_out("Output suspended")
+              resp$stdout <- remove_suffix(resp$stdout, XOFF)
             } 
-            resp$stdout <- gsub(XON,"",resp$stdout)
-            resp$stdout <- gsub(XOFF,"",resp$stdout)
             if (grepl(self$browse_prompt, resp$stdout)) {
               # log_out("Found browser prompt")
               prompt <- getlastmatch(self$browse_prompt, resp$stdout)
