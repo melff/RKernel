@@ -67,6 +67,10 @@ log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
   })
 }
 
+log_print <- function(x,...) log_out(x, use.print = TRUE)
+log_str <- function(x,...) log_out(x, use.str = TRUE)
+
+
 #' @description
 #' Show a warning in the Jupyter server log
 #' @param message A string to be shown in the log
