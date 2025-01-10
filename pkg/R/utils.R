@@ -86,7 +86,7 @@ log_warning <- function(message){
 #' @description
 #' Show an error message in the Jupyter server log
 #' @param message A string to be shown in the log
-log_error <- function(message, traceback = TRUE){
+log_error <- function(message, traceback = FALSE){
   message <- crayon::red(format(Sys.time()),"\t",message,"\n")
   message <- paste("ERROR:",message)
   if (is_kernel()) {

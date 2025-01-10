@@ -89,10 +89,16 @@ Kernel <- R6Class("Kernel",
       self$start()
       # log_out("*** RKernel started ***")
       private$frontend_present <- TRUE
-      rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
+      rkernel_poll_timeout <- getOption("rkernel_poll_timeout",1000L)
       continue <- TRUE
+      globalCallingHandlers(error=function(...) {
+        private$show_error_traceback()
+        tryInvokeRestart("abort")
+      })
       while(continue) {
-        continue <- self$poll_and_respond(rkernel_poll_timeout)
+        continue <- withRestarts(
+                      self$poll_and_respond(rkernel_poll_timeout),
+                      abort = function(...) TRUE)
       }
       # log_out("*** RKernel shut down ***")
     },
@@ -462,33 +468,14 @@ Kernel <- R6Class("Kernel",
                                                args = s$args)
             }
           }
-          r <- tryCatch(private$run_code_cell(code),
-            error = function(e) structure("errored", message = conditionMessage(e)), 
-            interrupt = function(e) "interrupted"
-          )
-          # log_out(r, use.print = TRUE)
+          withRestarts(private$run_code_cell(code),
+                       abort = function(...) invisible())
           payload <- NULL
           if (!self$r_session$is_alive()) {
             clear_queue <- TRUE
             self$stderr("\nR session ended - restarting ... ")
             self$restart()
             self$stderr("done.\n")
-            clear_queue <- TRUE
-          } else if (is.character(r)) {
-            r_msg <- attr(r, "message")
-            if (length(r_msg)) {
-              log_error(r_msg)
-              self$stderr(r_msg)
-            } else {
-              log_error(r, traceback = FALSE)
-              self$stderr(r)
-            }
-            content <- list(
-              status = "error",
-              ename = r,
-              evalue = r_msg,
-              execution_count = execution_count 
-            )
             clear_queue <- TRUE
           } else if (self$errored) {
             if(length(private$err_msg)) {
@@ -766,8 +753,7 @@ Kernel <- R6Class("Kernel",
       private$send_busy(private$parent$shell)
       # do_stuff ...
       private$clear_queue_requested <- FALSE
-      r <- tryCatch(
-        switch(msg_type,
+      switch(msg_type,
              execute_request = private$handle_execute_request(msg),
              is_complete_request = private$is_complete_reply(msg),
              kernel_info_request = private$kernel_info_reply(msg),
@@ -777,10 +763,7 @@ Kernel <- R6Class("Kernel",
              comm_open = private$handle_comm_open(msg),
              comm_msg = private$handle_comm_msg(msg),
              comm_close = private$handle_comm_close(msg)
-             ),
-             error = function(e) conditionMessage(e)
-      )
-      if(is.character(r)) log_error(r, traceback = FALSE)
+             )
       private$send_idle(private$parent$shell)
       if (private$clear_queue_requested) private$clear_shell_queue()
       if (debug) log_out("done")
@@ -1249,6 +1232,31 @@ Kernel <- R6Class("Kernel",
     handle_yield = function(timeout) {
       self$poll_and_respond(timeout,
                             drop="execute_request")
+    },
+
+    show_error_traceback = function() {
+        msg <- geterrmessage()
+        out <- function(...) {
+          msg <- paste(...)
+          if(private$frontend_present) {
+            self$stderr(msg)
+          } else {
+            cat(msg, file = stderr())
+          }
+          log_error(msg)
+        }
+        out("-------------------------------\n")
+        out("Error: ",msg,"\n", sep = "")
+        calls <- sys.calls()
+        calls <- limitedLabels(calls)
+        calls <- tail(calls, -5)
+        calls <- head(calls, -2)
+        n <- length(calls)
+        calls <- paste(1:n,calls, sep = ": ")
+        calls <- paste(calls, collapse = "\n")
+        out("Traceback: \n")
+        out(calls,"\n")
+        out("-------------------------------\n")
     }
   )
 )
