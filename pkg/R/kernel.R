@@ -88,6 +88,7 @@ Kernel <- R6Class("Kernel",
     run = function(){
       self$start()
       # log_out("*** RKernel started ***")
+      private$frontend_present <- TRUE
       rkernel_poll_timeout <- getOption("rkernel_poll_timeout",10L)
       continue <- TRUE
       while(continue) {
@@ -131,12 +132,18 @@ Kernel <- R6Class("Kernel",
     #' @param text Text to be sent to the frontend
     #' @param stream A string to select the stream -- either "stout" or "stderr"
     stream = function(text,stream){
-      private$send_message(type="stream",
-                           parent=private$parent$shell,
-                           socket_name="iopub",
-                           content=list(
-                             name=stream,
-                             text=text))
+
+      if(private$frontend_present) {
+        private$send_message(type="stream",
+                            parent=private$parent$shell,
+                            socket_name="iopub",
+                            content=list(
+                              name=stream,
+                              text=text))
+      } else {
+        outfile <- switch(stream, stdout=stdout(), stderr=stderr())
+        cat(text, file = outfile)
+      }
     },
     #' @description
     #' Stream text to the frontend via 'stdout' stream.
@@ -348,6 +355,9 @@ Kernel <- R6Class("Kernel",
   ),
 
   private = list(
+
+    frontend_present = FALSE,
+
     start_r_session = function(){
       self$r_session <- RKernelSession$new()
       log_print(self$r_session)
@@ -830,30 +840,33 @@ Kernel <- R6Class("Kernel",
 
     send_message = function(type,parent,socket_name,debug=FALSE,content,
                             metadata=emptyNamedList,buffers=NULL){
-      if(self$is_child()) return(NULL)
       msg <- private$msg_new(type,parent,content,metadata)
-      if(debug) {
-         msg_body <- msg[c("header","parent_header","metadata","content")]
-         msg_body <- to_json(msg_body,auto_unbox=TRUE)
-         log_out(prettify(msg_body))
-         # log_out(buffers,use.print=TRUE)
-       }
-      socket <- private$sockets[[socket_name]]
-      wire_out <- private$wire_pack(msg)
-      wire_out <- append(wire_out,buffers)
-      #zmq.send.multipart(socket,wire_out,serialize=FALSE)
-      # if(debug) cat("\nSending message to socket", socket_name)
-      l <- length(wire_out)
-      for(i in 1:l){
-        flag <- if(i < l) private$.pbd_env$ZMQ.SR$SNDMORE 
-                else private$.pbd_env$ZMQ.SR$BLOCK
-        # if(debug) {
-        #   cat("\n i =",i)
-        #   print(wire_out[[i]])
-        # }
-        zmq.msg.send(wire_out[[i]],socket,flag=flag,serialize=FALSE)
+      if(private$frontend_present) {
+        if(debug) {
+          msg_body <- msg[c("header","parent_header","metadata","content")]
+          msg_body <- to_json(msg_body,auto_unbox=TRUE)
+          log_out(prettify(msg_body))
+          # log_out(buffers,use.print=TRUE)
+        }
+        socket <- private$sockets[[socket_name]]
+        wire_out <- private$wire_pack(msg)
+        wire_out <- append(wire_out,buffers)
+        #zmq.send.multipart(socket,wire_out,serialize=FALSE)
+        # if(debug) cat("\nSending message to socket", socket_name)
+        l <- length(wire_out)
+        for(i in 1:l){
+          flag <- if(i < l) private$.pbd_env$ZMQ.SR$SNDMORE 
+                  else private$.pbd_env$ZMQ.SR$BLOCK
+          # if(debug) {
+          #   cat("\n i =",i)
+          #   print(wire_out[[i]])
+          # }
+          zmq.msg.send(wire_out[[i]],socket,flag=flag,serialize=FALSE)
+        }
+        # if(debug) cat("\nSent message to socket", socket_name)
+      } else {
+        str(msg)
       }
-      # if(debug) cat("\nSent message to socket", socket_name)
     },
 
     wire_unpack = function(wire_in){
