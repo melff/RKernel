@@ -23,7 +23,6 @@ An object of this class handles the low-level communication with
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Kernel-new}{\code{Kernel$new()}}
-\item \href{#method-Kernel-start_r_session}{\code{Kernel$start_r_session()}}
 \item \href{#method-Kernel-start}{\code{Kernel$start()}}
 \item \href{#method-Kernel-run}{\code{Kernel$run()}}
 \item \href{#method-Kernel-poll_and_respond}{\code{Kernel$poll_and_respond()}}
@@ -47,6 +46,9 @@ An object of this class handles the low-level communication with
 \item \href{#method-Kernel-handle_r_msg}{\code{Kernel$handle_r_msg()}}
 \item \href{#method-Kernel-save_shell_parent}{\code{Kernel$save_shell_parent()}}
 \item \href{#method-Kernel-restore_shell_parent}{\code{Kernel$restore_shell_parent()}}
+\item \href{#method-Kernel-shutdown}{\code{Kernel$shutdown()}}
+\item \href{#method-Kernel-restart}{\code{Kernel$restart()}}
+\item \href{#method-Kernel-restore_execute_parent}{\code{Kernel$restore_execute_parent()}}
 \item \href{#method-Kernel-clone}{\code{Kernel$clone()}}
 }
 }
@@ -66,15 +68,6 @@ Initialize the kernel
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Kernel-start_r_session"></a>}}
-\if{latex}{\out{\hypertarget{method-Kernel-start_r_session}{}}}
-\subsection{Method \code{start_r_session()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Kernel$start_r_session()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Kernel-start"></a>}}
@@ -395,6 +388,33 @@ Handle a generic message sent from the R Session
 \subsection{Method \code{restore_shell_parent()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$restore_shell_parent(saved_parent)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-shutdown"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-shutdown}{}}}
+\subsection{Method \code{shutdown()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$shutdown()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-restart"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-restart}{}}}
+\subsection{Method \code{restart()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$restart()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-restore_execute_parent"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-restore_execute_parent}{}}}
+\subsection{Method \code{restore_execute_parent()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$restore_execute_parent()}\if{html}{\out{</div>}}
 }
 
 }

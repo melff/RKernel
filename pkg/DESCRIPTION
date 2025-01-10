@@ -89,6 +89,7 @@ Collate:
     'output.R'
     'proto.R'
     'scrolling-table.R'
+    'session-runner.R'
     'session.R'
     'sharedHelp.R'
     'startup.R'
