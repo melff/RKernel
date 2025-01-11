@@ -85,6 +85,7 @@ RSessionBase <- R6Class("RSessionBase",
     },
     receive_all_output = function(timeout = 1){
       # log_out("receive_all_output")
+      while(!self$sleeping()) Sys.sleep(.001)
       poll_res <- self$poll_io(timeout)
       resp <- list()
       while (any(poll_res == "ready")) {
@@ -106,7 +107,7 @@ RSessionBase <- R6Class("RSessionBase",
       }
       return(resp)
     },
-    send_receive = function(text, timeout = 100) {
+    send_receive = function(text, timeout = 1) {
       self$send_input(text)
       self$receive_all_output(timeout = timeout)
     }
