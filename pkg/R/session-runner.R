@@ -23,7 +23,6 @@ RSessionRunner <- R6Class("RSessionRunner",
         browser_callback = private$handle_browser,
         input_callback =   private$readline)
       kernel <- self$kernel
-      private$shell_parent <- kernel$save_shell_parent()
       self$session$start()
       private$start_graphics()
       private$stdout_filter <- MessageFilter$new(
@@ -48,6 +47,7 @@ RSessionRunner <- R6Class("RSessionRunner",
       private$display_changed_graphics()
     },
     set_shell_parent = function(msg) {
+      if(!length(msg)) stop("Empty parent message in set_shell_parent()")
       private$shell_parent = msg
     },
     stdout = function(txt) {

@@ -59,7 +59,6 @@ Kernel <- R6Class("Kernel",
     start = function(){
       runner <- RSessionRunner$new(self, self$stream)
       runner$start()
-      log_out("Runner started")
       self$runner <- runner
       self$session <- runner$session
       self$repl <- runner$repl
@@ -310,6 +309,7 @@ Kernel <- R6Class("Kernel",
       private$parent$shell
     },
     restore_shell_parent = function(saved_parent) {
+      if(!length(saved_parent)) stop("Empty parent message in restore_shell_parent()")
       private$parent$shell <- saved_parent
     },
     stop_on_error = TRUE,
@@ -350,6 +350,7 @@ Kernel <- R6Class("Kernel",
         }
       }
       private$execute_parent <- private$parent$shell
+      self$runner$set_shell_parent(private$execute_parent)
       execution_count <- private$execution_count
       private$send_message(
         type = "execute_input",
@@ -658,13 +659,13 @@ Kernel <- R6Class("Kernel",
     respond_control = function(req, debug = FALSE){
       # log_out("respond_control")
       msg <- private$get_message("control")
-      private$send_busy(private$parent$control)
       if(!length(msg)) return(TRUE)
       if (debug) {
         log_out("respond_control")
         log_out(paste("Got a", msg$header$msg_type, "request ..."))
       }
       private$parent$control <- msg
+      private$send_busy(private$parent$control)
       continue <- TRUE
       if(msg$header$msg_type=="shutdown_request"){
         # log_out("shutdown_request received")
@@ -781,16 +782,17 @@ Kernel <- R6Class("Kernel",
       msg <- private$msg_new(type,parent,content,metadata)
       if(private$frontend_present) {
         if(debug) {
-          msg_body <- msg[c("header","parent_header","metadata","content")]
-          msg_body <- to_json(msg_body,auto_unbox=TRUE)
-          log_out(prettify(msg_body))
+          #msg_body <- msg[c("header","parent_header","metadata","content")]
+          #msg_body <- to_json(msg_body,auto_unbox=TRUE)
+          msg_json <- to_json(msg,auto_unbox=TRUE)
+          log_out(prettify(msg_json))
           # log_out(buffers,use.print=TRUE)
         }
         socket <- private$sockets[[socket_name]]
         wire_out <- private$wire_pack(msg)
         wire_out <- append(wire_out,buffers)
         #zmq.send.multipart(socket,wire_out,serialize=FALSE)
-        # if(debug) cat("\nSending message to socket", socket_name)
+        # if(debug) log_out("\nSending message to socket", socket_name)
         l <- length(wire_out)
         for(i in 1:l){
           flag <- if(i < l) private$.pbd_env$ZMQ.SR$SNDMORE 
@@ -801,7 +803,7 @@ Kernel <- R6Class("Kernel",
           # }
           zmq.msg.send(wire_out[[i]],socket,flag=flag,serialize=FALSE)
         }
-        # if(debug) cat("\nSent message to socket", socket_name)
+        # if(debug) log_out("\nSent message to socket", socket_name)
       } else {
         str(msg)
       }
@@ -872,6 +874,7 @@ Kernel <- R6Class("Kernel",
         identities <- parent$identities
       }
       else {
+        if(private$frontend_present) stop("Empty parent message")
         parent_header <- emptyNamedList
         session <- private$session
         username <- private$username

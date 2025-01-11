@@ -21,7 +21,7 @@ RSessionBase <- R6Class("RSessionBase",
                             env = c(R_CLI_NUM_COLORS="16777216")),
                           prompt = "> "
                           ) {
-      log_out("Starting session ...")
+      # log_out("Starting session ...")
       super$initialize(
         options = options,
         wait = FALSE
@@ -32,7 +32,7 @@ RSessionBase <- R6Class("RSessionBase",
       banner <- unlist(banner)[1]
       banner <- remove_prefix(banner,"\n") |> remove_suffix("\n")
       self$banner <- banner
-      log_out("Done.")
+      # log_out("Done.")
     },
     sleeping = function() {
       self$get_status() == "sleeping"
@@ -107,7 +107,7 @@ RSessionBase <- R6Class("RSessionBase",
       }
       return(resp)
     },
-    send_receive = function(text, timeout = 1) {
+    send_receive = function(text, timeout = 100) {
       self$send_input(text)
       self$receive_all_output(timeout = timeout)
     }
