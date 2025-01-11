@@ -11,9 +11,11 @@ An object of this class handles the low-level communication with
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{r_session}}{See \code{\link{RKernelSession}}.}
+\item{\code{session}}{See \code{\link{RKernelSession}}.}
 
-\item{\code{r_repl}}{An RSessionAdapter for handling input and output}
+\item{\code{repl}}{An RSessionAdapter for handling input and output}
+
+\item{\code{runner}}{An RSessionRunner}
 
 \item{\code{DAPServer}}{The current DAP server}
 }
@@ -24,6 +26,7 @@ An object of this class handles the low-level communication with
 \itemize{
 \item \href{#method-Kernel-new}{\code{Kernel$new()}}
 \item \href{#method-Kernel-start}{\code{Kernel$start()}}
+\item \href{#method-Kernel-run_code}{\code{Kernel$run_code()}}
 \item \href{#method-Kernel-run}{\code{Kernel$run()}}
 \item \href{#method-Kernel-poll_and_respond}{\code{Kernel$poll_and_respond()}}
 \item \href{#method-Kernel-clear_output}{\code{Kernel$clear_output()}}
@@ -41,14 +44,12 @@ An object of this class handles the low-level communication with
 \item \href{#method-Kernel-input_request}{\code{Kernel$input_request()}}
 \item \href{#method-Kernel-read_stdin}{\code{Kernel$read_stdin()}}
 \item \href{#method-Kernel-send_debug_event}{\code{Kernel$send_debug_event()}}
-\item \href{#method-Kernel-handle_r_stdout}{\code{Kernel$handle_r_stdout()}}
-\item \href{#method-Kernel-handle_r_stderr}{\code{Kernel$handle_r_stderr()}}
-\item \href{#method-Kernel-handle_r_msg}{\code{Kernel$handle_r_msg()}}
 \item \href{#method-Kernel-save_shell_parent}{\code{Kernel$save_shell_parent()}}
 \item \href{#method-Kernel-restore_shell_parent}{\code{Kernel$restore_shell_parent()}}
 \item \href{#method-Kernel-shutdown}{\code{Kernel$shutdown()}}
 \item \href{#method-Kernel-restart}{\code{Kernel$restart()}}
 \item \href{#method-Kernel-restore_execute_parent}{\code{Kernel$restore_execute_parent()}}
+\item \href{#method-Kernel-handle_yield}{\code{Kernel$handle_yield()}}
 \item \href{#method-Kernel-clone}{\code{Kernel$clone()}}
 }
 }
@@ -77,6 +78,23 @@ Initialize the kernel
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$start()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-run_code"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-run_code}{}}}
+\subsection{Method \code{run_code()}}{
+Run some code (for testing purposes)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$run_code(code)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{code}}{Some code}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Kernel-run"></a>}}
@@ -339,41 +357,6 @@ Send a debug event to the frontend
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Kernel-handle_r_stdout"></a>}}
-\if{latex}{\out{\hypertarget{method-Kernel-handle_r_stdout}{}}}
-\subsection{Method \code{handle_r_stdout()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Kernel$handle_r_stdout(text)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Kernel-handle_r_stderr"></a>}}
-\if{latex}{\out{\hypertarget{method-Kernel-handle_r_stderr}{}}}
-\subsection{Method \code{handle_r_stderr()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Kernel$handle_r_stderr(text)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Kernel-handle_r_msg"></a>}}
-\if{latex}{\out{\hypertarget{method-Kernel-handle_r_msg}{}}}
-\subsection{Method \code{handle_r_msg()}}{
-Handle a generic message sent from the R Session
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Kernel$handle_r_msg(msg, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{msg}}{The message, a list}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Kernel-save_shell_parent"></a>}}
 \if{latex}{\out{\hypertarget{method-Kernel-save_shell_parent}{}}}
 \subsection{Method \code{save_shell_parent()}}{
@@ -415,6 +398,15 @@ Handle a generic message sent from the R Session
 \subsection{Method \code{restore_execute_parent()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$restore_execute_parent()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-handle_yield"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-handle_yield}{}}}
+\subsection{Method \code{handle_yield()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$handle_yield(timeout)}\if{html}{\out{</div>}}
 }
 
 }

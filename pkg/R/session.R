@@ -143,7 +143,6 @@ RKernelSession <- R6Class("RKernelSession",
       self$send_input("RKernel::start_graphics()")
       self$send_input("httpgd::hgd()")
       self$receive_all_output(timeout = 1000)
-      log_print(re)
       gd <- self$send_receive("dput(httpgd::hgd_details())")
       gd <- drop_echo(gd$stdout) |> drop_prompt(prompt=self$prompt)
       gd <- str2expression(gd)

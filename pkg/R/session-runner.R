@@ -7,10 +7,15 @@ RSessionRunner <- R6Class("RSessionRunner",
                           stream = kernel$stream) {
       self$kernel <- kernel
       private$kernel_stream <- stream
+      self$install_msg_handlers(
+        menu = private$handle_menu_request,
+        event = private$handle_event_msg
+      )
     },
     start = function() {
       self$session <- RKernelSession$new()
-      self$session$connect(kernel = kernel,yield = NULL)
+      self$session$connect(kernel = kernel,
+                           yield = kernel$handle_yield)
       self$repl <- RSessionAdapter$new(
         session = self$session,
         stdout_callback =  private$handle_stdout,
@@ -40,6 +45,7 @@ RSessionRunner <- R6Class("RSessionRunner",
     },
     run = function(code, ..., new_graphics_display = FALSE) {
       self$repl$run_code(code,...)
+      private$display_changed_graphics()
     },
     set_shell_parent = function(msg) {
       private$shell_parent = msg
@@ -56,10 +62,10 @@ RSessionRunner <- R6Class("RSessionRunner",
       private$kernel_stream(txt,stream)
       private$display_changed_graphics()
     },
-    send_display = function(d) {
+    display_send = function(d) {
       kernel <- self$kernel
       kernel$restore_shell_parent(private$shell_parent)
-      kernel$send_display(d)
+      kernel$display_send(d)
     },
     install_msg_handlers = function(...) {
       l <- list(...)
@@ -80,7 +86,8 @@ RSessionRunner <- R6Class("RSessionRunner",
     },
     set_callback = function(name, FUN) {
       assign(name, FUN, envir = private$callbacks)
-    }
+    },
+    graphics = NULL
   ),
   private = list(
 
@@ -160,14 +167,19 @@ RSessionRunner <- R6Class("RSessionRunner",
       self$kernel$readline(prompt=prompt)
     },
     start_graphics = function(...) {
+      add_sync_options(c(
+          "jupyter.plot.width",
+          "jupyter.plot.height",
+          "jupyter.plot.res",
+          "jupyter.plot.formats",
+          "jupyter.update.graphics"))
       gdetails <- self$session$start_graphics()
-      private$graphics = GraphicsObserver$new(gdetails)
+      self$graphics = GraphicsObserver$new(gdetails)
     },
     stdout_filter = NULL,
     stderr_filter = NULL,
     shell_parent = NULL,
 
-    graphics = NULL,
     handle_new_plot = function(plot_id) {
       # log_out("handle_new_plot")
       if(length(private$graphics_plot_id) &&
@@ -189,7 +201,7 @@ RSessionRunner <- R6Class("RSessionRunner",
       } else {
         display_id <- UUIDgenerate()
       }
-      d <- private$graphics$display_data(plot_id,
+      d <- self$graphics$display_data(plot_id,
                                           display_id = display_id,
                                           update = update)
       self$display_send(d)
@@ -200,8 +212,8 @@ RSessionRunner <- R6Class("RSessionRunner",
     display_changed_graphics = function() {
       # log_out("display_changed_graphics")
       if(self$session$sleeping()) {
-        plot_id <- as.character(private$graphics$active_id())
-        poll_res <- private$graphics$poll()
+        plot_id <- as.character(self$graphics$active_id())
+        poll_res <- self$graphics$poll()
         if(poll_res["active"]) {
           if(poll_res[2]) { # New plot
             # log_out("New plot")

@@ -57,32 +57,44 @@ Kernel <- R6Class("Kernel",
       config$use_widgets <- FALSE
     },
     start = function(){
-      private$start_r_session()
+      runner <- RSessionRunner$new(self, self$stream)
+      runner$start()
+      log_out("Runner started")
+      self$runner <- runner
+      self$session <- runner$session
+      self$repl <- runner$repl
       private$install_r_handlers()
       self$DAPServer <- DAPServer$new(
-        r_session = self$r_session,
+        r_session = self$session,
         send_debug_event = self$send_debug_event,
         r_send_request = private$r_send_request,
         r_send_cmd = private$r_send_cmd,
-        r_send_input = self$r_session$send_input
+        r_send_input = self$session$send_input
       )
       set_config(browser_in_condition = FALSE)
       msg_env$send <- self$handle_r_msg
-      private$stdout_filter <- MessageFilter$new(
-                                    text_handler = self$stdout,
-                                    msg_handler = self$handle_r_msg
-                                  )
-      private$stderr_filter <- MessageFilter$new(
-                                    text_handler = self$stderr,
-                                    msg_handler = self$handle_r_msg
-                                  )
+      assign("session",self$session,envir=private$sandbox)
+      assign("repl",self$repl,envir=private$sandbox)
+      register_magic_handler("plots",function(...){
+        frm <- IFrame(url = self$runner$graphics$live_url(),
+                      width="7in",
+                      height="5in")
+        self$display_send(frm)
+      })
     },
-    #' @field r_session See \code{\link{RKernelSession}}.
-    r_session = list(),
-    #' @field r_repl An RSessionAdapter for handling input and output
-    r_repl = list(),
+    #' @field session See \code{\link{RKernelSession}}.
+    session = list(),
+    #' @field repl An RSessionAdapter for handling input and output
+    repl = list(),
+    #' @field runner An RSessionRunner
+    runner = list(),
     #' @field DAPServer The current DAP server
     DAPServer = NULL,
+    #' @description Run some code (for testing purposes)
+    #' @param code Some code
+    run_code = function(code) {
+      self$runner$run(code)
+    },
     #' @description
     #' Run the kernel.
     run = function(){
@@ -93,12 +105,13 @@ Kernel <- R6Class("Kernel",
       continue <- TRUE
       globalCallingHandlers(error=function(...) {
         private$show_error_traceback()
-        tryInvokeRestart("abort")
+        tryInvokeRestart("continue")
       })
       while(continue) {
         continue <- withRestarts(
                       self$poll_and_respond(rkernel_poll_timeout),
-                      abort = function(...) TRUE)
+                      abort = function(...) FALSE,
+                      continue = function(...) TRUE)
       }
       # log_out("*** RKernel shut down ***")
     },
@@ -290,52 +303,6 @@ Kernel <- R6Class("Kernel",
                            socket="iopub",
                            content=content)
     },
-    handle_r_stdout = function(text) {
-      # log_out("=========================================================")
-      # log_out("handle_r_stdout")
-      private$stdout_filter$process(text)
-      # log_out("filtering done")
-      private$display_changed_graphics()
-    },
-    handle_r_stderr = function(text){
-      # log_out("=========================================================")
-      # log_out("handle_r_stderr")
-      # log_out(text)
-      private$stderr_filter$process(text)
-    },
-    #' @description
-    #' Handle a generic message sent from the R Session
-    #' @param msg The message, a list 
-    handle_r_msg = function(msg, ...){
-      # log_out("handle_r_msg")
-      # log_out(msg, use.str = TRUE)
-      if(!is.list(msg)) {
-        err_msg <- "R session sent an invalid message - not a list"
-        self$stderr(err_msg)
-        log_error(err_msg, traceback = FALSE)
-        dep_msg <- deparse0(msg)
-        self$stderr("\n")
-        self$stderr(dep_msg)
-        self$stderr("\n")
-        log_error(dep_msg, traceback = FALSE)
-        return(NULL)
-      }
-      msg_type <- msg$type
-      # log_out(msg_type)
-      msg_handler <- private$r_msg_handlers[[msg_type]]
-      if(is.function(msg_handler)){
-        msg_handler(msg)
-      } else {
-        err_msg <- sprintf("R session sent message of unknown type '%s'", msg_type)
-        # log_out(msg_handler, use.str = TRUE)
-        self$stderr(err_msg)
-        dep_msg <- deparse0(msg)
-        self$stderr("\n")
-        self$stderr(dep_msg)
-        self$stderr("\n")
-        log_error(paste(err_msg,dep_msg,sep=":\n "))
-      }
-    },
     errored = FALSE,
     save_shell_parent = function() {
       # log_out("save_shell_parent")
@@ -348,15 +315,21 @@ Kernel <- R6Class("Kernel",
     stop_on_error = TRUE,
 
     shutdown = function() {
+      self$session$close()
       invokeRestart("abort")
     },
     restart = function() {
-      self$r_session$close()
+      self$session$close()
       private$clear_shell_queue()
-      private$start_r_session()
+      self$start()
     },
     restore_execute_parent = function() {
       self$restore_shell_parent(private$execute_parent)
+    },
+
+    handle_yield = function(timeout) {
+      self$poll_and_respond(timeout,
+                            drop="execute_request")
     }
   ),
 
@@ -364,24 +337,6 @@ Kernel <- R6Class("Kernel",
 
     frontend_present = FALSE,
 
-    start_r_session = function(){
-      self$r_session <- RKernelSession$new()
-      log_print(self$r_session)
-      self$r_session$connect(yield = private$handle_yield,
-                             kernel = self)
-      self$r_session$start()
-      # log_out(self$r_session, use.print = TRUE)
-      private$r_start_graphics()
-      assign("session",self$r_session,envir=private$sandbox)
-      self$r_repl <- RSessionAdapter$new(
-        session = self$r_session,
-        stdout_callback = self$handle_r_stdout,
-        stderr_callback = self$handle_r_stderr,
-        browser_callback = private$handle_r_browser,
-        input_callback = private$r_get_input
-      )
-      assign("repl",self$r_repl,envir=private$sandbox)
-    },
     pid = 0,
     execution_count = 1,
     execute_parent = NULL,
@@ -407,7 +362,7 @@ Kernel <- R6Class("Kernel",
       )
       self$errored <- FALSE
       self$stop_on_error <- (msg$content$stop_on_error &&
-                             self$r_repl$getOption("rkernel_stop_on_error",TRUE))
+                             self$repl$getOption("rkernel_stop_on_error",TRUE))
       clear_queue <- FALSE
       code <- msg$content$code
 
@@ -469,9 +424,9 @@ Kernel <- R6Class("Kernel",
             }
           }
           withRestarts(private$run_code_cell(code),
-                       abort = function(...) invisible())
+                       continue = function(...) invisible())
           payload <- NULL
-          if (!self$r_session$is_alive()) {
+          if (!self$session$is_alive()) {
             clear_queue <- TRUE
             self$stderr("\nR session ended - restarting ... ")
             self$restart()
@@ -811,11 +766,11 @@ Kernel <- R6Class("Kernel",
       # log_out("msg:")
       # log_out(msg,use.str=TRUE)
       # self$cat("Got message from socket", socket_name)
-      if(!length(private$session)){
+      if(!length(private$frontend_session)){
         header <- msg$header
-        private$session <- header$session
+        private$frontend_session <- header$frontend_session
         private$username <- header$username
-        # cat("Session:",private$session,"\n")
+        # cat("Session:",private$frontend_session,"\n")
         # cat("User:",private$username,"\n")
       }
       return(msg)
@@ -904,7 +859,7 @@ Kernel <- R6Class("Kernel",
       hmac(private$conn_info$key,msg,"sha256")
     },
 
-    session = character(0),
+    frontend_session = character(0),
     username = character(0),
 
     msg_new = function(type,parent,content,metadata=emptyNamedList){
@@ -912,13 +867,13 @@ Kernel <- R6Class("Kernel",
         metadata = emptyNamedList
       if(length(parent) && "header" %in% names(parent)){
         parent_header <- parent$header
-        session <- parent_header$session
+        session <- parent_header$frontend_session
         username <- parent_header$username
         identities <- parent$identities
       }
       else {
         parent_header <- emptyNamedList
-        session <- private$session
+        session <- private$frontend_session
         username <- private$username
         identities <- NULL
       }
@@ -969,42 +924,19 @@ Kernel <- R6Class("Kernel",
         private$parent$shell <- save_parent
     },
 
-    logfile = NULL,
-
-    r_graphics_observer = NULL,
-    r_start_graphics = function(){
-      # log_out("Starting graphics ...")
-      add_sync_options(c(
-          "jupyter.plot.width",
-          "jupyter.plot.height",
-          "jupyter.plot.res",
-          "jupyter.plot.formats",
-          "jupyter.update.graphics"))
-      gdetails <- self$r_session$start_graphics()
-      # log_out(gdetails, use.str = TRUE)
-      private$r_graphics_observer = GraphicsObserver$new(gdetails)
-      # log_out(private$r_graphics_observer, use.str = TRUE)
-      # log_out("done.")
-      register_magic_handler("plots",function(...){
-        frm <- IFrame(url = private$r_graphics_observer$live_url(),
-                      width="7in",
-                      height="5in")
-        self$display_send(frm)
-      })
-    },
     stdout_filter = NULL,
     stderr_filter = NULL,
     r_msg_handlers = list(),
     install_r_handlers = function(){
-      private$r_msg_handlers$display_data <- self$display_send
-      private$r_msg_handlers$update_display_data <- self$display_send
-      private$r_msg_handlers$test <- function(msg) self$stdout(msg$content)
-      private$r_msg_handlers$options <- private$handle_options_msg
-      private$r_msg_handlers$menu <- private$handle_menu_request
-      for(msg_type in c("comm_msg", "comm_open", "comm_close"))
-        private$r_msg_handlers[[msg_type]] <- self$send_comm
-      private$r_msg_handlers$condition <- private$handle_condition_msg
-      private$r_msg_handlers$event <- private$handle_event_msg
+      self$runner$install_msg_handlers(
+        display_data = self$display_send,
+        update_display_data = self$display_send,
+        options = private$handle_options_msg,
+        comm_msg = self$send_comm,
+        comm_open = self$send_comm,
+        comm_close = self$send_comm,
+        condition = private$handle_condition_msg
+      )
     },
     input_suspended = TRUE,
     r_get_input = function(prompt = ""){
@@ -1021,7 +953,7 @@ Kernel <- R6Class("Kernel",
       # log_out("r_send_request")
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
-      resp <- self$r_repl$run_cmd(cmd)
+      resp <- self$session$send_receive(cmd)
       # log_out("Response:")
       # log_out(resp, use.print = TRUE)
       resp <- remove_prefix(resp$stdout, DLE) |> remove_suffix(DLE)
@@ -1034,11 +966,11 @@ Kernel <- R6Class("Kernel",
       # log_out("r_send_request_noreply")
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
-      self$r_repl$run_code(cmd)
+      self$session$send_receive(cmd)
       return(invisible())
     },
     r_send_cmd = function(cmd) {
-      resp <- self$r_repl$run_cmd(cmd)
+      resp <- self$session$send_receive(cmd)
       msg <- msg_extract(resp$stdout)
       msg_unwrap(msg)
     },
@@ -1054,16 +986,6 @@ Kernel <- R6Class("Kernel",
     },
 
     sandbox = NULL,
-    handle_r_browser = function(prompt) {
-      saved_parent <- private$parent$shell
-      dbgConsole(session = self$r_session,
-                 prompt = prompt,
-                 use_widgets = config$use_widgets)
-      if(get_config("browser_in_condition"))
-        self$r_repl$process_output(until_prompt=TRUE)
-      private$parent$shell <- saved_parent
-      return(TRUE)
-    },
 
     err_msg = NULL,
     handle_condition_msg = function(msg) {
@@ -1093,88 +1015,7 @@ Kernel <- R6Class("Kernel",
       }
     },
 
-    handle_event_msg = function(msg) {
-      # log_out("handle_event_msg")
-      # log_str(msg)
-      event <- msg$content$event
-      plot_id <- msg$content$plot_id
-      switch(event,
-             recover = ,
-             debugger = set_config(browser_in_condition = TRUE),
-             "recover-finished" = ,
-             "debugger-finished" = set_config(browser_in_condition = FALSE),
-             new_plot = private$handle_new_plot(plot_id = plot_id)
-             )
-    },
-
-    handle_new_plot = function(plot_id) {
-      # log_out("handle_new_plot")
-      if(length(private$graphics_plot_id) &&
-         plot_id == private$graphics_plot_id) {
-        private$display_changed_graphics()
-      }
-      else {
-        private$graphics_display(plot_id)
-      }
-    },
-
-    graphics_display_id = character(0),
-    graphics_plot_id = NULL,
-    graphics_display = function(plot_id, 
-                                update = FALSE,
-                                force_new_display = FALSE) {
-      # log_out("graphics_display")
-      update <- update && !force_new_display
-      if(update) {
-        display_id <- private$graphics_display_id
-      } else {
-        display_id <- UUIDgenerate()
-      }
-      d <- private$r_graphics_observer$display_data(plot_id,
-                                          display_id = display_id,
-                                          update = update)
-      self$display_send(d)
-      private$graphics_plot_id <- plot_id
-      private$graphics_display_id <- display_id
-    },
-
     graphics_new_cell = FALSE,
-    display_changed_graphics = function() {
-      # log_out("display_changed_graphics")
-      if(self$r_session$sleeping()) {
-        plot_id <- as.character(private$r_graphics_observer$active_id())
-        poll_res <- private$r_graphics_observer$poll()
-        if(poll_res["active"]) {
-          # log_print(poll_res)
-          # log_out(sprintf("private$graphics_new_cell = %s",private$graphics_new_cell))
-          force_new_display <- private$graphics_new_cell && 
-                                !getOption("jupyter.update.graphics",TRUE)
-          # log_out(sprintf("force_new_display = %s",force_new_display))
-          if(poll_res[2]) { # New plot
-            # log_out("New plot")
-            private$graphics_display(plot_id)
-          }
-          else if(poll_res[3]) { # Plot update
-            # log_out("Plot update")
-            if(plot_id != private$graphics_plot_id) {
-              log_warn("We seem to have lost a plot ...")
-            }
-            private$graphics_display(plot_id,
-                                    update = TRUE,
-                                    force_new_display = force_new_display)
-          }
-          private$graphics_new_cell <- FALSE
-        }
-      }
-    },
-
-    handle_menu_request = function(msg) {
-      saved_parent <- private$parent$shell
-      Menu(kernel = self,
-           args = msg$content)
-      private$parent$shell <- saved_parent
-      return(TRUE)
-    },
 
     run_code_cell = function(code) {
       # log_out("= run_code_cell ========================")
@@ -1196,12 +1037,11 @@ Kernel <- R6Class("Kernel",
         else {
           for(line in code_lines) {
             self$errored <- FALSE 
-            self$r_repl$run_code( 
+            self$runner$run( 
                               line, 
                               io_timeout=10, 
                               echo = TRUE,
                               prompt_callback = function() {
-                                    private$display_changed_graphics()
                                     self$stdout("> ")
                                     return(TRUE)
                               }
@@ -1218,20 +1058,14 @@ Kernel <- R6Class("Kernel",
           self$errored <- FALSE 
           # log_out("- run code block ----")
           # log_out(block, use.str=TRUE)
-          self$r_repl$run_code(block,io_timeout=10)
+          self$runner$run(block,io_timeout=10)
           # log_out("- done running code block ----")
           # log_out(sprintf("kernel$errored: %s",self$errored))
           if(self$errored) {
             if(self$stop_on_error) break
           }
-          private$display_changed_graphics()
         }
       }
-    },
-
-    handle_yield = function(timeout) {
-      self$poll_and_respond(timeout,
-                            drop="execute_request")
     },
 
     show_error_traceback = function() {
