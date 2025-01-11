@@ -28,7 +28,7 @@ setup_session <- function(help_port) {
   install_sleep()
   install_browseURL()
   set_config(use_widgets = FALSE)
-  set_help_port(help_pot)
+  set_help_port(help_port)
   set_help_displayed(TRUE)
   install_output_hooks()
   install_safe_q()
