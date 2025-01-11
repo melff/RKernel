@@ -944,8 +944,12 @@ Kernel <- R6Class("Kernel",
         if(config$use_widgets) {
           widget_readline(self, prompt)
         } else {
-          self$input_request(prompt = prompt)
-          self$read_stdin()
+          if(private$frontend_present) {
+            self$input_request(prompt = prompt)
+            self$read_stdin()
+          } else {
+            readline(prompt=prompt)
+          }
         }
       }
     },
