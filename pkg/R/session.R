@@ -21,6 +21,7 @@ RSessionBase <- R6Class("RSessionBase",
                             env = c(R_CLI_NUM_COLORS="16777216")),
                           prompt = "> "
                           ) {
+      log_out("Starting session ...")
       super$initialize(
         options = options,
         wait = FALSE
@@ -31,6 +32,7 @@ RSessionBase <- R6Class("RSessionBase",
       banner <- unlist(banner)[1]
       banner <- remove_prefix(banner,"\n") |> remove_suffix("\n")
       self$banner <- banner
+      log_out("Done.")
     },
     sleeping = function() {
       self$get_status() == "sleeping"
@@ -119,24 +121,12 @@ RKernelSession <- R6Class("RKernelSession",
       self$kernel <- kernel
     },
     start = function() {
+      log_out("Setting up the session ...")
       self$send_input("RKernel::startup()")
-      self$send_input("options(error=NULL)") # Undo callr's setting to enable traceback
-      self$send_input("RKernel::inject_send_options()")
-      self$send_input("suppressWarnings(rm(.pbd_env))")
-      self$send_input("RKernel:::install_sleep()")
-      self$send_input("RKernel:::install_browseURL()")
-      self$send_input("RKernel:::set_config(use_widgets = FALSE)")
       self$help_port <- random_open_port()
-      self$send_input(sprintf("RKernel::set_help_port(%d)",self$help_port))
-      self$send_input("RKernel::set_help_displayed(TRUE)")
-      self$send_input("RKernel::install_output_hooks()")
-      self$send_input("RKernel::install_safe_q()")
-      self$send_input("RKernel::install_menu()")
-      self$send_input("RKernel::set_help_displayed")
-      self$send_input("RKernel::install_httpd_handlers()")
-      self$send_input("RKernel:::install_globalCallingHandlers()")
-      self$send_input("RKernel:::install_debugging()")
+      self$send_input(sprintf("RKernel::setup_session(%d)",self$help_port))
       self$receive_all_output(timeout = 1000)
+      log_out("Done.")
   },
   help_port = NULL,
   start_graphics = function() {
