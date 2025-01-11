@@ -150,7 +150,6 @@ Kernel <- R6Class("Kernel",
     #' @param text Text to be sent to the frontend
     #' @param stream A string to select the stream -- either "stout" or "stderr"
     stream = function(text,stream){
-
       if(private$frontend_present) {
         private$send_message(type="stream",
                             parent=private$parent$shell,
@@ -1040,10 +1039,7 @@ Kernel <- R6Class("Kernel",
         trace_interactive <- getOption("trace_interactive",TRUE)
         code_lines <- split_lines1(code)
         if(trace_interactive && config$use_widgets ) {
-          tracer <- CellTracer$new(kernel = self, 
-                                   repl = self$repl,
-                                   callback = private$display_changed_graphics
-                                   )
+          tracer <- CellTracer$new(self$runner)
           tracer$run(code_lines)
         }
         else {
