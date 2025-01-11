@@ -71,7 +71,7 @@ Kernel <- R6Class("Kernel",
         r_send_input = self$session$send_input
       )
       set_config(browser_in_condition = FALSE)
-      msg_env$send <- self$handle_r_msg
+      msg_env$send <- self$runner$handle_msg
       assign("session",self$session,envir=private$sandbox)
       assign("repl",self$repl,envir=private$sandbox)
       register_magic_handler("plots",function(...){
