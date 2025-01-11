@@ -14,6 +14,7 @@ RSessionRunner <- R6Class("RSessionRunner",
     },
     start = function() {
       self$session <- RKernelSession$new()
+      kernel <- self$kernel
       self$session$connect(kernel = kernel,
                            yield = kernel$handle_yield)
       self$repl <- RSessionAdapter$new(
@@ -27,11 +28,11 @@ RSessionRunner <- R6Class("RSessionRunner",
       private$start_graphics()
       private$stdout_filter <- MessageFilter$new(
           text_handler = self$stdout,
-          msg_handler  = private$handle_msg
+          msg_handler  = self$handle_msg
         )
       private$stderr_filter <- MessageFilter$new(
           text_handler = self$stderr,
-          msg_handler  = private$handle_msg
+          msg_handler  = self$handle_msg
         )
     },
     stop = function() {
@@ -95,21 +96,9 @@ RSessionRunner <- R6Class("RSessionRunner",
     set_callback = function(name, FUN) {
       assign(name, FUN, envir = private$callbacks)
     },
-    graphics = NULL
-  ),
-  private = list(
+    graphics = NULL,
 
-    kernel_stream = NULL,
-    handle_stdout = function(text) {
-      private$stdout_filter$process(text)
-    },
-    handle_stderr = function(text) {
-      private$stderr_filter$process(text)
-    },
-    msg_handlers = new.env(),
-    settings = new.env(),
-
-    handle_msg = function(msg) {
+     handle_msg = function(msg) {
       if(!is.list(msg)) {
         err_msg <- "R session sent an invalid message - not a list"
         self$stderr(err_msg)
@@ -136,7 +125,21 @@ RSessionRunner <- R6Class("RSessionRunner",
         self$stderr("\n")
         log_warning(paste(w_msg,dep_msg,sep=":\n "))
       }
+    }
+
+  ),
+  private = list(
+
+    kernel_stream = NULL,
+    handle_stdout = function(text) {
+      private$stdout_filter$process(text)
     },
+    handle_stderr = function(text) {
+      private$stderr_filter$process(text)
+    },
+    msg_handlers = new.env(),
+    settings = new.env(),
+
     handle_browser = function(prompt) {
       dbgConsole(session = self$session,
                  prompt = prompt,
