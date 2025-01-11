@@ -78,8 +78,16 @@ RSessionRunner <- R6Class("RSessionRunner",
         private$msg_handlers[[n]] <- l[[n]]
       }
     },
-    settings_set = function(name,value) {
-      assign(name, value, envir = private$settings)
+    settings_set = function(...) {
+      l <- list(...)
+      nms <- names(l)
+      if(length(l) == 1 && !length(nms)) {
+        l <- l[[1]]
+      }
+      for(name in nms) {
+        value <- l[[name]]
+        assign(name, value, envir = private$settings)
+      }
     },
     settings_get = function(name, default = NULL) {
       get0(name, envir = private$settings, ifnotfound = default)
@@ -224,9 +232,10 @@ RSessionRunner <- R6Class("RSessionRunner",
             if(plot_id != private$graphics_plot_id) {
               log_warn("We seem to have lost a plot ...")
             }
-            update <- self$get_setting("reuse_graphics_display",TRUE)
+            update <- !self$settings_get("force_new_graphics_display",FALSE)
             private$graphics_display(plot_id,
                                     update = update)
+            self$settings_set(force_new_graphics_display=FALSE)
           }
         }
       }

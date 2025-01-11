@@ -1031,6 +1031,10 @@ Kernel <- R6Class("Kernel",
       private$input_suspended <- FALSE
       exec_parent <- private$parent$shell
       on.exit(private$input_suspended <- TRUE)
+      self$runner$settings_set(
+        force_new_graphics_display = !getOption("jupyter.update.graphics",TRUE)
+        # Will be reset to FALSE afer graphics update
+        )
       if(getOption("trace_cell",FALSE)) {
         sleep_duration <- getOption("trace_sleep",1)
         trace_interactive <- getOption("trace_interactive",TRUE)
