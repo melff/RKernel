@@ -766,11 +766,11 @@ Kernel <- R6Class("Kernel",
       # log_out("msg:")
       # log_out(msg,use.str=TRUE)
       # self$cat("Got message from socket", socket_name)
-      if(!length(private$frontend_session)){
+      if(!length(private$wire_session)){
         header <- msg$header
-        private$frontend_session <- header$frontend_session
+        private$wire_session <- header$session
         private$username <- header$username
-        # cat("Session:",private$frontend_session,"\n")
+        # cat("Session:",private$wire_session,"\n")
         # cat("User:",private$username,"\n")
       }
       return(msg)
@@ -859,7 +859,7 @@ Kernel <- R6Class("Kernel",
       hmac(private$conn_info$key,msg,"sha256")
     },
 
-    frontend_session = character(0),
+    wire_session = character(0),
     username = character(0),
 
     msg_new = function(type,parent,content,metadata=emptyNamedList){
@@ -867,13 +867,13 @@ Kernel <- R6Class("Kernel",
         metadata = emptyNamedList
       if(length(parent) && "header" %in% names(parent)){
         parent_header <- parent$header
-        session <- parent_header$frontend_session
+        session <- parent_header$session
         username <- parent_header$username
         identities <- parent$identities
       }
       else {
         parent_header <- emptyNamedList
-        session <- private$frontend_session
+        session <- private$session
         username <- private$username
         identities <- NULL
       }
