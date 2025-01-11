@@ -80,7 +80,7 @@ MenuWidgetClass <- R6Class("MenuWidget",
             d_id <- display_id(d)
             kernel$display_send(d)
             while(self$continue_loop) {
-                kernel$r_session$yield(1000)
+                kernel$session$yield(1000)
             }
             self$listbox$disabled <- TRUE
             if(any(self$index > 0L)) {
