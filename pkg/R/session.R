@@ -122,12 +122,12 @@ RKernelSession <- R6Class("RKernelSession",
       self$kernel <- kernel
     },
     start = function() {
-      log_out("Setting up the session ...")
+      # log_out("Setting up the session ...")
       self$send_input("RKernel::startup()")
       self$help_port <- random_open_port()
-      self$send_input(sprintf("RKernel::setup_session(%d)",self$help_port))
+      self$send_input(sprintf("RKernel:::setup_session(%d)",self$help_port))
       self$receive_all_output(timeout = 1000)
-      log_out("Done.")
+      # log_out("Done.")
   },
   help_port = NULL,
   start_graphics = function() {
@@ -312,14 +312,14 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         self$found_prompt <- FALSE
         while(!output_complete){
           loop_count <- loop_count + 1
-          resp <- session$receive_output(timeout = io_timeout)
-          if(!length(resp) && run_timeout > 0) {
-            while(session$get_status() == "running") {
+          if(run_timeout > 0) {
+            while(!session$sleeping()) {
                 Sys.sleep(run_timeout/1000)
                 if(is.function(wait_callback))
                     wait_callback()
             } 
           }
+          resp <- session$receive_output(timeout = io_timeout)
           if(!length(resp) && session$waiting && !self$suspended) {
             # log_out("Session waiting for input(?)")
             if(is.function(input_callback)) {
@@ -356,12 +356,13 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                 resp$stdout <- remove_suffix(resp$stdout, XOFF)
               } else {
                 self$suspended <- FALSE
-                # log_out("Outrun_codeput restarted")
+                # log_out("Input waiting restarted")
               }
               resp$stdout <- remove_prefix(resp$stdout, XON)
             }
             else if(endsWith(resp$stdout,XOFF)) {
               self$suspended <- TRUE
+              # log_out("Input waiting suspended")
               resp$stdout <- remove_suffix(resp$stdout, XOFF)
             } 
             if (grepl(self$browse_prompt, resp$stdout)) {
