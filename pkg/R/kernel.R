@@ -496,7 +496,7 @@ Kernel <- R6Class("Kernel",
                          mimetype = "text/x-r-source",
                          file_extension = ".R",
                          version = rversion),
-                       banner = self$r_session$banner,
+                       banner = self$session$banner,
                        debugger = FALSE)
       private$send_message(type="kernel_info_reply",
                            parent=private$parent$shell,
@@ -556,7 +556,7 @@ Kernel <- R6Class("Kernel",
       target <- msg$content$target_name
       if(target == "jupyter.widget") {
         config$use_widgets <- TRUE
-        self$r_repl$run_cmd("RKernel:::set_config(use_widgets=TRUE)")
+        self$repl$run_cmd("RKernel:::set_config(use_widgets=TRUE)")
       }
       reply <- private$r_send_request(list(
         type = "comm_info_request",
@@ -579,7 +579,7 @@ Kernel <- R6Class("Kernel",
       target <- msg$content$target_name
       if(target == "jupyter.widget.control") {
         config$use_widgets <- TRUE
-        self$r_repl$run_cmd("RKernel:::set_config(use_widgets=TRUE)")
+        self$repl$run_cmd("RKernel:::set_config(use_widgets=TRUE)")
       }
       private$r_send_request_noreply(list(
         type = "comm_open",
@@ -632,7 +632,7 @@ Kernel <- R6Class("Kernel",
       req$interrupt <- identical(r[1L],"SIGINT") 
       if(req$interrupt) {
         # log_out("Interrupt!!")
-        self$r_repl$interrupt()
+        self$repl$interrupt()
       } else {
         for(i in seq_along(sock_names)){
           if(bitwAnd(zmq.poll.get.revents(i),POLLIN)){
@@ -670,7 +670,7 @@ Kernel <- R6Class("Kernel",
         # log_out("shutdown_request received")
         # log_out(msg$content)
         restart <- msg$content$restart
-        self$r_session$close()
+        self$session$close()
         response <- list(
           status = "ok",
           restart = restart
@@ -1029,7 +1029,7 @@ Kernel <- R6Class("Kernel",
         code_lines <- split_lines1(code)
         if(trace_interactive && config$use_widgets ) {
           tracer <- CellTracer$new(kernel = self, 
-                                   repl = self$r_repl,
+                                   repl = self$repl,
                                    callback = private$display_changed_graphics
                                    )
           tracer$run(code_lines)
