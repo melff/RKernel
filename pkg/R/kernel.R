@@ -957,9 +957,9 @@ Kernel <- R6Class("Kernel",
       # log_out("r_send_request")
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
-      resp <- self$session$send_receive(cmd)
+      resp <- self$repl$run_cmd(cmd)
       # log_out("Response:")
-      # log_out(resp, use.print = TRUE)
+      # log_out(resp$stdout)
       resp <- remove_prefix(resp$stdout, DLE) |> remove_suffix(DLE)
       # log_out(resp)
       resp <- remove_prefix(resp, MSG_BEGIN) |> remove_suffix(MSG_END)
@@ -970,11 +970,11 @@ Kernel <- R6Class("Kernel",
       # log_out("r_send_request_noreply")
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
-      self$session$send_receive(cmd)
+      self$repl$run_cmd(cmd)
       return(invisible())
     },
     r_send_cmd = function(cmd) {
-      resp <- self$session$send_receive(cmd)
+      resp <- self$repl$run_cmd(cmd)
       msg <- msg_extract(resp$stdout)
       msg_unwrap(msg)
     },
