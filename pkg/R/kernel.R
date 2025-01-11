@@ -309,7 +309,8 @@ Kernel <- R6Class("Kernel",
       private$parent$shell
     },
     restore_shell_parent = function(saved_parent) {
-      if(!length(saved_parent)) stop("Empty parent message in restore_shell_parent()")
+      if(!length(saved_parent) && 
+         private$frontend_present) stop("Empty parent message in restore_shell_parent()")
       private$parent$shell <- saved_parent
     },
     stop_on_error = TRUE,
