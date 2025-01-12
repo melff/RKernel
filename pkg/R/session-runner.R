@@ -185,10 +185,7 @@ RSessionRunner <- R6Class("RSessionRunner",
              debugger = self$settings_set(browser_in_condition = TRUE),
              "recover-finished" = ,
              "debugger-finished" = self$settings_set(browser_in_condition = FALSE),
-             new_plot = private$handle_new_plot(plot_id = plot_id),
-             XON = private$handle_XON(),
-             XOFF = private$handle_XOFF(),
-             self$stderr(sprintf("Unknown event type '%s'\n",event))
+             new_plot = private$handle_new_plot(plot_id = plot_id)
              )
     },
 
@@ -246,12 +243,6 @@ RSessionRunner <- R6Class("RSessionRunner",
       self$display_send(d)
       private$graphics_plot_id <- plot_id
       private$graphics_display_id <- display_id
-    },
-    handle_XON = function() {
-      self$repl$suspended <- FALSE
-    },
-    handle_XOFF = function() {
-      self$repl$suspended <- TRUE
     }
   )
 )

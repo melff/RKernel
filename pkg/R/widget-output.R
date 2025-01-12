@@ -199,7 +199,7 @@ with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear
     expr <- substitute(expr)
     ctx$start_graphics()
     envir$display <- widget$display
-    msg_send(list(type="event",content=list(event="XOFF")))
+    cat(XOFF)
     if(expr[[1]] == as.symbol("{")) {
         expr <- expr[-1]
         for(e in as.list(expr)) {
@@ -212,7 +212,7 @@ with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear
         widget$send_state("outputs")
         ctx$process_graphics()
     }
-    msg_send(list(type="event",content=list(event="XON")))
+    cat(XON)
     ctx$stop_graphics()
     invisible(r)
 }
