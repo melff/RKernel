@@ -60,7 +60,6 @@ RSessionRunner <- R6Class("RSessionRunner",
       kernel <- self$kernel
       kernel$restore_shell_parent(private$shell_parent)
       private$kernel_stream(txt,stream)
-      self$display_changed_graphics()
     },
     display_send = function(d) {
       kernel <- self$kernel
@@ -127,9 +126,11 @@ RSessionRunner <- R6Class("RSessionRunner",
     },
     handle_stdout = function(text) {
       private$stdout_filter$process(text)
+      self$display_changed_graphics()
     },
     handle_stderr = function(text) {
       private$stderr_filter$process(text)
+      self$display_changed_graphics()
     },
 
     display_changed_graphics = function() {
@@ -216,9 +217,9 @@ RSessionRunner <- R6Class("RSessionRunner",
     shell_parent = NULL,
 
     handle_new_plot = function(plot_id) {
-      # log_out("handle_new_plot")
-      if(length(private$graphics_plot_id) &&
-         plot_id == private$graphics_plot_id) {
+      current_id <- as.integer(private$graphics_plot_id)
+      if(length(current_id) &&
+         plot_id == current_id) {
         self$display_changed_graphics()
       }
       else {
