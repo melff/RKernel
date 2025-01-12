@@ -19,8 +19,8 @@ RSessionRunner <- R6Class("RSessionRunner",
                            yield = kernel$handle_yield)
       self$repl <- RSessionAdapter$new(
         session = self$session,
-        stdout_callback =  private$handle_stdout,
-        stderr_callback =  private$handle_stderr,
+        stdout_callback =  self$handle_stdout,
+        stderr_callback =  self$handle_stderr,
         browser_callback = private$handle_browser,
         input_callback =   private$readline)
       kernel <- self$kernel
@@ -50,6 +50,9 @@ RSessionRunner <- R6Class("RSessionRunner",
     set_shell_parent = function(msg) {
       if(!length(msg)) stop("Empty parent message in set_shell_parent()")
       private$shell_parent = msg
+    },
+    get_shell_parent = function() {
+      private$shell_parent
     },
     stdout = function(txt) {
       self$stream(txt, stream = "stdout")
@@ -125,28 +128,28 @@ RSessionRunner <- R6Class("RSessionRunner",
         self$stderr("\n")
         log_warning(paste(w_msg,dep_msg,sep=":\n "))
       }
+    },
+    handle_stdout = function(text) {
+      private$stdout_filter$process(text)
+    },
+    handle_stderr = function(text) {
+      private$stderr_filter$process(text)
     }
 
   ),
   private = list(
 
     kernel_stream = NULL,
-    handle_stdout = function(text) {
-      private$stdout_filter$process(text)
-    },
-    handle_stderr = function(text) {
-      private$stderr_filter$process(text)
-    },
     msg_handlers = new.env(),
     settings = new.env(),
 
     handle_browser = function(prompt) {
-      dbgConsole(session = self$session,
+      dbgConsole(runner = self,
                  prompt = prompt,
-                 use_widgets = self$settings_get("use_widgets"))
-      if(self$settings_get("browser_in_condition"))
+                 use_widgets = get_config("use_widgets"))
+      if(self$settings_get("browser_in_condition",FALSE))
         self$repl$process_output(until_prompt=TRUE)
-      self$kernel$restore_shell_parent(self$shell_parent)
+      self$kernel$restore_shell_parent(self$get_shell_parent())
       return(TRUE)
     },
 
@@ -157,9 +160,9 @@ RSessionRunner <- R6Class("RSessionRunner",
       plot_id <- msg$content$plot_id
       switch(event,
              recover = ,
-             debugger = set_config(browser_in_condition = TRUE),
+             debugger = self$settings_set(browser_in_condition = TRUE),
              "recover-finished" = ,
-             "debugger-finished" = set_config(browser_in_condition = FALSE),
+             "debugger-finished" = self$settings_set(browser_in_condition = FALSE),
              new_plot = private$handle_new_plot(plot_id = plot_id)
              )
     },

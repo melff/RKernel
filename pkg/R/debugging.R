@@ -36,17 +36,19 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
         session = NULL,
         kernel = NULL,
         repl = NULL,
+        runner = NULL,
         input = NULL,
         output = NULL,
         env_browser = NULL,
         button_box = NULL,
         continue_loop = TRUE,
         show_prompt = TRUE,
-        initialize = function(session) {
+        initialize = function(runner) {
+            self$runner <- runner
+            session <- runner$session
             self$session <- session
             self$style <- HTML(dbgConsole_style)
-            self$kernel <- session$kernel
-            self$parent_msg <- self$kernel$save_shell_parent()
+            self$kernel <- runner$kernel
             self$env_browser <- HTML("")
             self$continue_loop <- TRUE
 
@@ -63,14 +65,16 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
         parent_msg = NULL,
         stdout_callback = function(text) {
             saved_parent <- self$kernel$save_shell_parent()
-            self$kernel$restore_shell_parent(self$parent_msg)
-            self$kernel$handle_r_stdout(text)
+            runner_parent <- self$runner$get_shell_parent()
+            self$kernel$restore_shell_parent(runner_parent)
+            self$runner$handle_stdout(text)
             self$kernel$restore_shell_parent(saved_parent)
         },
         stderr_callback = function(text) {
             saved_parent <- self$kernel$save_shell_parent()
-            self$kernel$restore_shell_parent(self$parent_msg)
-            self$kernel$handle_r_stderr(text)
+            runner_parent <- self$runner$get_shell_parent()
+            self$kernel$restore_shell_parent(runner_parent)
+            self$runner$handle_stderr(text)
             self$kernel$restore_shell_parent(saved_parent)
         },
         in_browser = FALSE,
@@ -175,7 +179,8 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             self$display_id <- display_id(d)
             # log_out(display_id(d))
             saved_parent <- kernel$save_shell_parent()
-            kernel$restore_shell_parent(self$parent_msg)
+            runner_parent <- self$runner$get_shell_parent()
+            kernel$restore_shell_parent(runner_parent)
             kernel$display_send(d)
             kernel$restore_shell_parent(saved_parent)
         },
@@ -197,7 +202,8 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
                               update = TRUE)
             # log_out(display_id(d))
             kernel <- self$session$kernel
-            kernel$restore_shell_parent(self$parent_msg)
+            runner_parent <- self$runner$get_shell_parent()
+            kernel$restore_shell_parent(runner_parent)
             kernel$display_send(d)
             # log_out("dbgConsole$run - finished")
         }
@@ -206,17 +212,16 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
 
 dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
     public = list(
-        session = NULL,
+        runner = NULL,
         repl = NULL,
         continue_loop = TRUE,
-        initialize = function(session) {
-            kernel <- session$kernel
-            self$session <- session
+        initialize = function(runner) {
+            self$runner <- runner
             self$continue_loop <- TRUE
             self$repl <- RSessionAdapter$new(
-                session = session,
-                stdout_callback = kernel$stdout,
-                stderr_callback = kernel$stderr,
+                session = runner$session,
+                stdout_callback = runner$handle_stdout,
+                stderr_callback = runner$handle_stderr,
                 browser_callback = self$browser_callback,
                 prompt_callback = self$prompt_callback,
                 echo = TRUE
@@ -231,11 +236,11 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
             return(TRUE)
         },
         run = function(prompt) {
-            kernel <- self$session$kernel
+            kernel <- self$runner$kernel
             while(self$continue_loop) {
                 kernel$input_request(prompt = prompt)
                 input <- kernel$read_stdin()
-                r <- try(self$repl$run_code(input, echo = TRUE))
+                r <- try(self$runner$run(input, echo = TRUE))
                 if(inherits(r,"try-error")) {
                     kernel$stderr(unclass(r))
                 }
@@ -247,7 +252,7 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
 debugging_state <- new.env()
 debugging_state$depth <- 0L
 
-dbgConsole <- function(session, prompt, use_widgets = TRUE) {
+dbgConsole <- function(runner, prompt, use_widgets = TRUE) {
     debugging_state$depth <- debugging_state$depth + 1L
     # log_out("dbgConsole")
     # log_out(sprintf("Depth: %d",debugging_state$depth))
@@ -255,12 +260,12 @@ dbgConsole <- function(session, prompt, use_widgets = TRUE) {
     # log_out(use_widgets)
     if(use_widgets) {
         # log_out("creating a dbgConsoleWidgetClass object")
-        cons <- dbgConsoleWidgetClass$new(session)
+        cons <- dbgConsoleWidgetClass$new(runner)
         cons$display()
     }
     else {
         # log_out("creating a dbgSimpleConsoleClass object")
-        cons <- dbgSimpleConsoleClass$new(session)
+        cons <- dbgSimpleConsoleClass$new(runner)
     }
     cons$run(prompt)
     debugging_state$depth <- debugging_state$depth - 1L
