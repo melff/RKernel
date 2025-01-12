@@ -1,6 +1,6 @@
 widget_readline <- function(kernel,prompt="") {
-  session <- kernel$r_session
-  repl <- kernel$r_repl
+  session <- kernel$session
+  repl <- kernel$repl
   parent <- kernel$save_shell_parent()
   input <- TextWidget(
                 placeholder="Enter line or hit the quit button to abort/interrupt",
@@ -21,7 +21,7 @@ widget_readline <- function(kernel,prompt="") {
   quit_action <- function() {
       self$retval <- ""
       self$continue_loop <- FALSE
-      kernel$r_repl$interrupt()
+      kernel$repl$interrupt()
   }
   submit_action <- function() {
       self$retval <- input$value

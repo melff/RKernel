@@ -8,7 +8,7 @@ Menu <- function(kernel, args, ...) {
   } else {
     log_warning("Menu from within browser not supported yet")
     # TODO: Provide support for this ...
-    kernel$r_session$send_input("0L", drop_echo = TRUE)
+    kernel$session$send_input("0L", drop_echo = TRUE)
   }
 }
 
@@ -94,7 +94,7 @@ MenuWidgetClass <- R6Class("MenuWidget",
                               update = TRUE)
             kernel$display_send(d)
             res <- deparse(self$index)
-            kernel$r_session$send_input(res, drop_echo = TRUE)
+            kernel$session$send_input(res, drop_echo = TRUE)
         }
     )
 )
