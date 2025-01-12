@@ -55,6 +55,10 @@ getMatch <- function(x,match){
     res
 }
 
+get_match <- function(x, pattern) {
+  getMatch(x,regexec(pattern,x))
+}
+
 parse_magic_args <- function(perc_line){
    line_match <- getMatch(perc_line,regexec("^%%[a-zA-Z0-9]+\\s*(.*?)\n",perc_line))
    if(length(line_match)>1){

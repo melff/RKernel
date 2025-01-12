@@ -1090,18 +1090,23 @@ Kernel <- R6Class("Kernel",
           }
           log_error(msg)
         }
-        out("-------------------------------\n")
+        out("------------------------------------------------\n")
         out("Error: ",msg,"\n", sep = "")
         calls <- sys.calls()
         calls <- limitedLabels(calls)
         calls <- tail(calls, -5)
         calls <- head(calls, -2)
         n <- length(calls)
-        calls <- paste(1:n,calls, sep = ": ")
+        last_call <- calls[n]
+        s <- get_match(last_call, "#[0-9]+: ")
+        last_call <- strsplit(last_call, "#[0-9]+: ")[[1]]
+        last_call <- paste0(last_call[1], s, "<-- Error likely to have occurred here.")
+        calls[n] <- last_call
+        calls <- paste(1:n, calls, sep = ": ")
         calls <- paste(calls, collapse = "\n")
         out("Traceback: \n")
         out(calls,"\n")
-        out("-------------------------------\n")
+        out("------------------------------------------------\n")
     }
   )
 )
