@@ -111,7 +111,9 @@ GraphicsObserver <- R6Class("GraphicsObserver",
                                 height = height,
                                 resolution = resolution,
                                 zoom = zoom)
-        data <- curl_fetch_memory(gurl)
+        data <- tryCatch(curl_fetch_memory(gurl),
+                         error = function(e) invokeRestart("continue"),
+                         interrupt = function(e) invokeRestart("continue"))
       }
       ii <- match(format, self$formats)
       if(self$binary_formats[ii]) {
