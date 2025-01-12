@@ -43,10 +43,6 @@ RSessionRunner <- R6Class("RSessionRunner",
       self$stop()
       self$start()
     },
-    run = function(code, ..., new_graphics_display = FALSE) {
-      self$repl$run_code(code,...)
-      private$display_changed_graphics()
-    },
     set_shell_parent = function(msg) {
       if(!length(msg)) stop("Empty parent message in set_shell_parent()")
       private$shell_parent = msg
@@ -64,7 +60,7 @@ RSessionRunner <- R6Class("RSessionRunner",
       kernel <- self$kernel
       kernel$restore_shell_parent(private$shell_parent)
       private$kernel_stream(txt,stream)
-      private$display_changed_graphics()
+      self$display_changed_graphics()
     },
     display_send = function(d) {
       kernel <- self$kernel
@@ -101,7 +97,7 @@ RSessionRunner <- R6Class("RSessionRunner",
     },
     graphics = NULL,
 
-     handle_msg = function(msg) {
+    handle_msg = function(msg) {
       if(!is.list(msg)) {
         err_msg <- "R session sent an invalid message - not a list"
         self$stderr(err_msg)
@@ -134,7 +130,32 @@ RSessionRunner <- R6Class("RSessionRunner",
     },
     handle_stderr = function(text) {
       private$stderr_filter$process(text)
+    },
+
+    display_changed_graphics = function() {
+      # log_out("display_changed_graphics")
+      if(self$session$sleeping()) {
+        plot_id <- as.character(self$graphics$active_id())
+        poll_res <- self$graphics$poll()
+        if(poll_res["active"]) {
+          if(poll_res[2]) { # New plot
+            # log_out("New plot")
+            private$graphics_display(plot_id)
+          }
+          else if(poll_res[3]) { # Plot update
+            # log_out("Plot update")
+            if(plot_id != private$graphics_plot_id) {
+              log_warn("We seem to have lost a plot ...")
+            }
+            update <- !self$settings_get("force_new_graphics_display",FALSE)
+            private$graphics_display(plot_id,
+                                    update = update)
+            self$settings_set(force_new_graphics_display=FALSE)
+          }
+        }
+      }
     }
+
 
   ),
   private = list(
@@ -198,7 +219,7 @@ RSessionRunner <- R6Class("RSessionRunner",
       # log_out("handle_new_plot")
       if(length(private$graphics_plot_id) &&
          plot_id == private$graphics_plot_id) {
-        private$display_changed_graphics()
+        self$display_changed_graphics()
       }
       else {
         private$graphics_display(plot_id)
@@ -221,30 +242,6 @@ RSessionRunner <- R6Class("RSessionRunner",
       self$display_send(d)
       private$graphics_plot_id <- plot_id
       private$graphics_display_id <- display_id
-    },
-
-    display_changed_graphics = function() {
-      # log_out("display_changed_graphics")
-      if(self$session$sleeping()) {
-        plot_id <- as.character(self$graphics$active_id())
-        poll_res <- self$graphics$poll()
-        if(poll_res["active"]) {
-          if(poll_res[2]) { # New plot
-            # log_out("New plot")
-            private$graphics_display(plot_id)
-          }
-          else if(poll_res[3]) { # Plot update
-            # log_out("Plot update")
-            if(plot_id != private$graphics_plot_id) {
-              log_warn("We seem to have lost a plot ...")
-            }
-            update <- !self$settings_get("force_new_graphics_display",FALSE)
-            private$graphics_display(plot_id,
-                                    update = update)
-            self$settings_set(force_new_graphics_display=FALSE)
-          }
-        }
-      }
     }
   )
 )

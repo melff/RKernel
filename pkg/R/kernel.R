@@ -92,7 +92,8 @@ Kernel <- R6Class("Kernel",
     #' @description Run some code (for testing purposes)
     #' @param code Some code
     run_code = function(code) {
-      self$runner$run(code)
+      self$repl$run_code(code)
+      self$runner$display_changed_graphics()
     },
     #' @description
     #' Run the kernel.
@@ -1045,7 +1046,7 @@ Kernel <- R6Class("Kernel",
         else {
           for(line in code_lines) {
             self$errored <- FALSE 
-            self$runner$run( 
+            self$repl$run_code( 
                               line, 
                               io_timeout=10, 
                               echo = TRUE,
@@ -1054,6 +1055,7 @@ Kernel <- R6Class("Kernel",
                                     return(TRUE)
                               }
                           )
+            self$runner$display_changed_graphics()
             if(self$errored && 
               self$stop_on_error) break
             Sys.sleep(sleep_duration)
@@ -1066,7 +1068,8 @@ Kernel <- R6Class("Kernel",
           self$errored <- FALSE 
           # log_out("- run code block ----")
           # log_out(block, use.str=TRUE)
-          self$runner$run(block,io_timeout=10)
+          self$repl$run_code(block,io_timeout=10)
+          self$runner$display_changed_graphics()
           # log_out("- done running code block ----")
           # log_out(sprintf("kernel$errored: %s",self$errored))
           if(self$errored) {

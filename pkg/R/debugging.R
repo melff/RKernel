@@ -454,14 +454,16 @@ CellTracer <- R6Class("CellTracer",
             runner <- self$runner
             session <- runner$session
             kernel <- runner$kernel
+            repl <- runner$repl
             parent_save <- kernel$save_shell_parent()
             kernel$restore_shell_parent(parent_save)
-            runner$run( 
+            repl$run_code( 
                             lines, 
                             io_timeout=10, 
                             echo = TRUE,
                             prompt_callback = self$prompt_callback
                         )
+            self$runner$display_changed_graphics()
             kernel$restore_shell_parent(parent_save)
         },
         prompt_callback = function() {
