@@ -11,10 +11,12 @@ RCHKIMG := kalibera-rchk-master-def.simg
 
 .PHONY: default
 
-default: install-quick installspec
+default: install-quick installspec 
+	date
 
 .PHONY: all
-all: roxygenize build install installspec
+all: roxygenize build install installspec 
+	date
 
 .PHONY: describe
 describe:
