@@ -240,10 +240,7 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
             while(self$continue_loop) {
                 kernel$input_request(prompt = prompt)
                 input <- kernel$read_stdin()
-                r <- try(self$runner$run(input, echo = TRUE))
-                if(inherits(r,"try-error")) {
-                    kernel$stderr(unclass(r))
-                }
+                self$repl$run_code(input, echo = TRUE)
             }
         }
     )
