@@ -391,6 +391,22 @@ Kernel <- R6Class("Kernel",
                       )
               if(self$errored)
                 clear_queue <- TRUE
+          } else if(magic == "detached") {
+            det_runner <- RSessionRunner$new(self, self$stream)
+            det_runner$set_shell_parent(private$execute_parent)
+            det_runner$stdout("Starting new detached session ...\n")
+            det_runner$start()
+            ses_info <- capture.output(print(det_runner$session))
+            ses_info <- paste0(ses_info,"\n")
+            det_runner$stdout(ses_info)
+            det_repl <- det_runner$repl
+            det_repl$run_code(code)
+            det_runner$display_changed_graphics()
+            det_runner$stop()
+            ses_info <- capture.output(print(det_runner$session))
+            ses_info <- paste0("\n",ses_info,"\n")
+            det_runner$stdout(ses_info)
+            det_runner$stdout("Detached session finished.\n")
           } else {
               d <- tryCatch(dispatch_magic_handler(magic,code,args),
                             error = function(e) structure("errored", 
