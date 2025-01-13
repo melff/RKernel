@@ -121,6 +121,7 @@ Kernel <- R6Class("Kernel",
       poll_timeout = getOption("rkernel_poll_timeout",10L),
       drop = NULL
       ){
+        private$run_services()
         # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
         # log_out("kernel$poll_request")
@@ -331,6 +332,12 @@ Kernel <- R6Class("Kernel",
     handle_yield = function(timeout) {
       self$poll_and_respond(timeout,
                             drop="execute_request")
+    },
+
+    add_service = function(FUN) {
+      if(is.function(FUN)) {
+        private$services <- append(private$services, FUN)
+      }
     }
   ),
 
@@ -1123,6 +1130,29 @@ Kernel <- R6Class("Kernel",
         out("Traceback: \n")
         out(calls,"\n")
         out("------------------------------------------------\n")
+    },
+
+    services = list(),
+    run_services = function() {
+      n <- length(private$services)
+      if(n > 0) {
+        to_keep <- logical(n)
+        to_keep[] <- TRUE
+        for(i in 1:n) {
+          service <- private$services[[i]]
+          if(is.function(service)) {
+            r <- tryCatch(service(),
+                          error = function(e) {
+                            log_error(conditionMessage(e))
+                            return(FALSE)
+                          })
+            to_keep[i] <- isTRUE(r)
+          } else {
+            to_keep[i] <- FALSE
+          }
+        }
+        private$services <- private$services[to_keep]
+      }
     }
   )
 )
