@@ -336,7 +336,9 @@ Kernel <- R6Class("Kernel",
 
     add_service = function(FUN) {
       if(is.function(FUN)) {
-        private$services <- append(private$services, FUN)
+        n <- length(private$services) + 1
+        private$services[[n]] <- FUN
+        private$service_parents[[n]] <- self$save_shell_parent()
       }
     }
   ),
@@ -1133,14 +1135,17 @@ Kernel <- R6Class("Kernel",
     },
 
     services = list(),
+    service_parents = list(),
     run_services = function() {
       n <- length(private$services)
       if(n > 0) {
         to_keep <- logical(n)
         to_keep[] <- TRUE
+        saved_parent <- self$save_shell_parent()
         for(i in 1:n) {
           service <- private$services[[i]]
           if(is.function(service)) {
+            self$restore_shell_parent(private$service_parents[[i]])
             r <- tryCatch(service(),
                           error = function(e) {
                             log_error(conditionMessage(e))
@@ -1151,7 +1156,9 @@ Kernel <- R6Class("Kernel",
             to_keep[i] <- FALSE
           }
         }
+        self$restore_shell_parent(saved_parent)
         private$services <- private$services[to_keep]
+        private$service_parents <- private$service_parents[to_keep]
       }
     }
   )
