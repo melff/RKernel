@@ -401,33 +401,7 @@ Kernel <- R6Class("Kernel",
               if(self$errored)
                 clear_queue <- TRUE
           } else if(magic == "detached") {
-            det_runner <- RSessionRunner$new(self, self$stream)
-            det_runner$set_shell_parent(private$execute_parent)
-            det_runner$stdout("Starting new detached session ...\n")
-            det_runner$start()
-            ses_info <- capture.output(print(det_runner$session))
-            ses_info <- paste0(ses_info,"\n")
-            det_runner$stdout(ses_info)
-            det_repl <- det_runner$repl
-            det_runner$session$send_input(code)
-            det_env <- new.env()
-            det_env$iter <- 1
-            self$add_service(function(){
-              if(det_env$iter == 1) de <- TRUE
-              else de <- FALSE
-              det_env$iter <- det_env$iter + 1
-              resp <- det_repl$process_output(drop_echo=de)
-              if(det_repl$found_prompt) {
-                det_runner$stop()
-                ses_info <- capture.output(print(det_runner$session))
-                ses_info <- paste0("\n",ses_info,"\n")
-                det_runner$stdout(ses_info)
-                continue <- FALSE
-              } else {
-                continue <- TRUE
-              }
-              return(continue)
-            })
+              private$run_code_detached(code)
           } else {
               d <- tryCatch(dispatch_magic_handler(magic,code,args),
                             error = function(e) structure("errored", 
@@ -1172,6 +1146,36 @@ Kernel <- R6Class("Kernel",
         private$services <- private$services[to_keep]
         private$service_parents <- private$service_parents[to_keep]
       }
+    },
+
+    run_code_detached = function(code) {
+      runner <- RSessionRunner$new(self, self$stream)
+      runner$set_shell_parent(private$execute_parent)
+      runner$stdout("Starting new detached session ...\n")
+      runner$start()
+      ses_info <- capture.output(print(runner$session))
+      ses_info <- paste0(ses_info,"\n")
+      runner$stdout(ses_info)
+      repl <- runner$repl
+      runner$session$send_input(code)
+      env <- new.env()
+      env$iter <- 1
+      self$add_service(function(){
+        if(env$iter == 1) de <- TRUE
+        else de <- FALSE
+        env$iter <- env$iter + 1
+        resp <- repl$process_output(drop_echo=de)
+        if(repl$found_prompt) {
+          runner$stop()
+          ses_info <- capture.output(print(runner$session))
+          ses_info <- paste0("\n",ses_info,"\n")
+          runner$stdout(ses_info)
+          continue <- FALSE
+        } else {
+          continue <- TRUE
+        }
+        return(continue)
+      })
     }
   )
 )
