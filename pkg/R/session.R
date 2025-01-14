@@ -153,6 +153,8 @@ drop_echo <- function(txt, n = 1) {
       out_lines <- split_lines1(txt)
       ii <- 1:n
       out_lines <- out_lines[-ii]
+      drop <- startsWith(out_lines, "+")
+      out_lines <- out_lines[!drop]
       txt <- paste(out_lines, collapse = "\n")
   }
   txt
@@ -167,6 +169,8 @@ drop_prompt <- function(txt, prompt="> ") {
 
 XON <- '\x11'
 XOFF <- '\x13'
+XOFFXON <- paste0(XOFF,XON)
+
 
 #' @export
 RSessionAdapter <- R6Class("RSessionAdapter",
@@ -292,6 +296,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       }
     },
     found_prompt = FALSE,
+    found_browse_prompt = FALSE,
     process_output = function(
         io_timeout = 1,
         run_timeout = 100,
@@ -406,6 +411,69 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             }
           }
         }
+    },
+    process_output_ = function(
+        io_timeout = 1,
+        run_timeout = 100,
+        wait_callback = NULL,
+        stdout_callback = self$stdout_callback,
+        stderr_callback = self$stderr_callback,
+        browser_callback = self$browser_callback,
+        prompt_callback = self$prompt_callback,
+        drop_echo = FALSE
+      ) {
+        stopifnot(is.function(stdout_callback))
+        stopifnot(is.function(stderr_callback))
+        session <- self$session
+        resp <- session$receive_output(timeout = io_timeout)
+        if (!is.null(resp$stderr) 
+              && nzchar(resp$stderr)
+              && grepl('\\S',resp$stderr)) {
+              stderr_callback(resp$stderr)
+        }
+        if (!is.null(resp$stdout)) {
+          if(startsWith(resp$stdout,XON)) { 
+            if(endsWith(resp$stdout,XOFF)) {
+              resp$stdout <- remove_suffix(resp$stdout, XOFF)
+            } else {
+              self$suspended <- FALSE
+              # log_out("Input waiting restarted")
+            }
+            resp$stdout <- remove_prefix(resp$stdout, XON)
+          }
+          else if(endsWith(resp$stdout,XOFF)) {
+            self$suspended <- TRUE
+            # log_out("Input waiting suspended")
+            resp$stdout <- remove_suffix(resp$stdout, XOFF)
+          } 
+          if(grepl(XOFFXON, resp$stdout)) {
+            resp$stdout <- gsub(XOFFXON, "", resp$stdout)
+          }
+          browse_prompt <- ""
+          if(grepl(self$browse_prompt, resp$stdout)) {
+            # log_out("Found browser prompt")
+            browse_prompt <- getlastmatch(self$browse_prompt, resp$stdout)
+            self$found_browse_prompt <- TRUE
+            resp$stdout <- gsub(self$browse_prompt,"",resp$stdout)
+          } else if (endsWith(resp$stdout, self$prompt)) {
+            # log_out("Found main prompt")
+            # log_out(self$status)
+            self$found_prompt <- TRUE
+            resp$stdout <- remove_suffix(resp$stdout, self$prompt)
+          } 
+          if(drop_echo) {
+            resp$stdout <- drop_echo(resp$stdout)
+          }
+          if(nzchar(resp$stdout)) {
+            stdout_callback(resp$stdout)
+          }
+          if(self$found_browse_prompt) {
+            if (is.function(browser_callback)) {
+              browser_callback(prompt=prompt)
+            } else session$send_input("Q")
+          }
+        }
+        return(resp)
     },
     run_cmd = function(cmd) {
       # Runs a one-line command without checking(!) and returns the 
