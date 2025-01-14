@@ -409,13 +409,25 @@ Kernel <- R6Class("Kernel",
             ses_info <- paste0(ses_info,"\n")
             det_runner$stdout(ses_info)
             det_repl <- det_runner$repl
-            det_repl$run_code(code)
-            det_runner$display_changed_graphics()
-            det_runner$stop()
-            ses_info <- capture.output(print(det_runner$session))
-            ses_info <- paste0("\n",ses_info,"\n")
-            det_runner$stdout(ses_info)
-            det_runner$stdout("Detached session finished.\n")
+            det_runner$session$send_input(code)
+            det_env <- new.env()
+            det_env$iter <- 1
+            self$add_service(function(){
+              if(det_env$iter == 1) de <- TRUE
+              else de <- FALSE
+              det_env$iter <- det_env$iter + 1
+              resp <- det_repl$process_output(drop_echo=de)
+              if(det_repl$found_prompt) {
+                det_runner$stop()
+                ses_info <- capture.output(print(det_runner$session))
+                ses_info <- paste0("\n",ses_info,"\n")
+                det_runner$stdout(ses_info)
+                continue <- FALSE
+              } else {
+                continue <- TRUE
+              }
+              return(continue)
+            })
           } else {
               d <- tryCatch(dispatch_magic_handler(magic,code,args),
                             error = function(e) structure("errored", 
