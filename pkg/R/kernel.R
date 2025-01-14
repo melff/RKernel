@@ -401,7 +401,9 @@ Kernel <- R6Class("Kernel",
               if(self$errored)
                 clear_queue <- TRUE
           } else if(magic == "detached") {
-              private$run_code_detached(code)
+              private$run_code_detached(code, args)
+          } else if(magic == "stop") {
+              private$stop_detached(code, args)
           } else {
               d <- tryCatch(dispatch_magic_handler(magic,code,args),
                             error = function(e) structure("errored", 
@@ -1148,10 +1150,27 @@ Kernel <- R6Class("Kernel",
       }
     },
 
-    run_code_detached = function(code) {
+    detached_cells = list(),
+
+    run_code_detached = function(code, args) {
+
+      has_name <- FALSE
+      name <- character()
+      if(length(args) && "name" %in% names(args)) {
+        name <- args$name
+        has_name <- TRUE
+      }
+
       runner <- RSessionRunner$new(self, self$stream)
       runner$set_shell_parent(private$execute_parent)
-      runner$stdout("Starting new detached session ...\n")
+      if(has_name) {
+       runner$stdout(
+        sprintf("Starting new detached session with name '%s'\n",
+                name))
+        private$detached_cells[[name]] <- runner
+      } else {
+        runner$stdout("Starting new detached session ...\n")
+      }
       runner$start()
       ses_info <- capture.output(print(runner$session))
       ses_info <- paste0(ses_info,"\n")
@@ -1161,6 +1180,7 @@ Kernel <- R6Class("Kernel",
       env <- new.env()
       env$iter <- 1
       self$add_service(function(){
+        if(!runner$session$is_alive()) return(FALSE)
         if(env$iter == 1) de <- TRUE
         else de <- FALSE
         env$iter <- env$iter + 1
@@ -1176,6 +1196,25 @@ Kernel <- R6Class("Kernel",
         }
         return(continue)
       })
+    },
+
+    stop_detached = function(code, args) {
+      if(length(args)) {
+        saved_parent <- self$save_shell_parent()
+        if("name" %in% names(args)) {
+          name <- args$name
+        } else {
+          name <- names(args)[1]
+        }
+        runner <- private$detached_cells[[name]]
+        runner$stop()
+        ses_info <- capture.output(print(runner$session))
+        ses_info <- paste0("\n",ses_info,"\n")
+        runner$stdout(ses_info)
+        self$restore_shell_parent(saved_parent)
+        self$stdout(sprintf("Stopped detached session with name '%s'\n",
+                      name))
+      }
     }
   )
 )
