@@ -41,6 +41,7 @@ RSessionBase <- R6Class("RSessionBase",
     last_input = "",
     send_input = function(text, drop_echo = FALSE) {
       if(!length(text) || !is.character(text)) return(invisible())
+      if(length(text) > 1) text <- paste(text,collapse="\n")
       if(!endsWith(text, "\n")) text <- paste0(text, "\n")
       self$drop_last_input <- drop_echo
       if(drop_echo) {

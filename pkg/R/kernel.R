@@ -1176,22 +1176,40 @@ Kernel <- R6Class("Kernel",
       ses_info <- paste0(ses_info,"\n")
       runner$stdout(ses_info)
       repl <- runner$repl
-      runner$session$send_input(code)
-      env <- new.env()
-      env$iter <- 1
+      
+      this <- new.env()
+      this$iter <- 0L
+      this$cur_blk <- 1L
+      this$code_blocks <- preproc_code(code)      
+
       self$add_service(function(){
+        continue <- FALSE
         if(!runner$session$is_alive()) return(FALSE)
-        if(env$iter == 1) de <- TRUE
-        else de <- FALSE
-        env$iter <- env$iter + 1
-        resp <- repl$process_output(drop_echo=de)
-        if(repl$found_prompt) {
-          runner$stop()
-          ses_info <- capture.output(print(runner$session))
-          ses_info <- paste0("\n",ses_info,"\n")
-          runner$stdout(ses_info)
-          continue <- FALSE
+        if(this$iter == 0L) {
+          if(this$cur_blk <= length(this$code_blocks)) {
+            block <- this$code_blocks[[this$cur_blk]]
+            runner$session$send_input(block)
+            this$cur_blk <- this$cur_blk + 1L
+            this$iter <- 1
+            continue <- TRUE
+          } else {
+            runner$stop()
+            ses_info <- capture.output(print(runner$session))
+            ses_info <- paste0("\n",ses_info,"\n")
+            runner$stdout(ses_info)
+            continue <- FALSE
+          }
         } else {
+          if(this$iter == 1) de <- TRUE
+          else de <- FALSE
+          repl$found_prompt <- FALSE
+          resp <- repl$process_output(drop_echo=de)
+          if(repl$found_prompt) {
+            log_out("Found prompt")
+            this$iter <- 0
+          } else {
+            this$iter <- this$iter + 1
+          }
           continue <- TRUE
         }
         return(continue)
