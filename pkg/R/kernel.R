@@ -318,10 +318,12 @@ Kernel <- R6Class("Kernel",
 
     shutdown = function() {
       self$session$close()
+      private$stop_all_detached()
       invokeRestart("abort")
     },
     restart = function() {
       self$session$close()
+      private$stop_all_detached()
       private$clear_shell_queue()
       self$start()
     },
