@@ -404,6 +404,8 @@ Kernel <- R6Class("Kernel",
               private$run_code_detached(code, args)
           } else if(magic == "stop") {
               private$stop_detached(code, args)
+          } else if(magic == "stopall") {
+              private$stop_all_detached()
           } else {
               d <- tryCatch(dispatch_magic_handler(magic,code,args),
                             error = function(e) structure("errored", 
@@ -1155,18 +1157,37 @@ Kernel <- R6Class("Kernel",
     run_code_detached = function(code, args) {
 
       has_name <- FALSE
-      name <- character()
       if(length(args) && "name" %in% names(args)) {
         name <- args$name
         has_name <- TRUE
+      } else {
+        name <- format(Sys.time())
+        has_name <- TRUE
+      }
+      
+      if(name %in% names(private$detached_cells)) {
+        runner <- private$detached_cells[[name]]
+        runner$stop()
+        ses_info <- capture.output(print(runner$session))
+        ses_info <- paste0("\n",ses_info,"\n")
+        runner$stdout(ses_info)
+        msg <- sprintf("Stopped existing detached session with name '%s'\n",
+                      name)
+        runner$stdout(msg)
+        log_out(msg)
+        ses_info <- capture.output(print(runner$session))
+        ses_info <- paste0("\n",ses_info,"\n")
+        runner$stdout(ses_info)
+        log_out(ses_info)
       }
 
       runner <- RSessionRunner$new(self, self$stream)
       runner$set_shell_parent(private$execute_parent)
       if(has_name) {
-       runner$stdout(
-        sprintf("Starting new detached session with name '%s'\n",
-                name))
+       msg <- sprintf("Starting new detached session with name '%s'\n",
+                name)
+       runner$stdout(msg)
+       log_out(msg)
         private$detached_cells[[name]] <- runner
       } else {
         runner$stdout("Starting new detached session ...\n")
@@ -1217,21 +1238,43 @@ Kernel <- R6Class("Kernel",
     },
 
     stop_detached = function(code, args) {
-      if(length(args)) {
-        saved_parent <- self$save_shell_parent()
-        if("name" %in% names(args)) {
-          name <- args$name
-        } else {
-          name <- names(args)[1]
-        }
+      runner <- NULL
+      if(!length(args)) {
+        args <- list(latest=NULL)
+      }
+      saved_parent <- self$save_shell_parent()
+      if("name" %in% names(args)) {
+        name <- args$name
+      } else {
+        name <- names(args)[1]
+      }
+      if(name == 'latest' && (!'latest' %in% names(private$detached_cells))) {
+        i <- length(private$detached_cells)
+        if(i == 0) return(NULL)
+        runner <- private$detached_cells[[i]]
+        msg <- "Stopped latest detached session\n"
+      }
+      else {
+        runner <- private$detached_cells[[name]]
+        msg <- sprintf("Stopped detached session with name '%s'\n",
+                    name)
+      }
+      runner$stop()
+      ses_info <- capture.output(print(runner$session))
+      ses_info <- paste0("\n",ses_info,"\n")
+      runner$stdout(ses_info)
+      # log_out(ses_info)
+      self$restore_shell_parent(saved_parent)
+      self$stdout(msg)
+      # log_out(msg)
+    },
+
+    stop_all_detached = function(...) {
+      for(name in names(private$detached_cells)) {
         runner <- private$detached_cells[[name]]
         runner$stop()
-        ses_info <- capture.output(print(runner$session))
-        ses_info <- paste0("\n",ses_info,"\n")
-        runner$stdout(ses_info)
-        self$restore_shell_parent(saved_parent)
-        self$stdout(sprintf("Stopped detached session with name '%s'\n",
-                      name))
+        msg <- sprintf("Stopped detached session with name '%s'\n", name)
+        self$stdout(msg)
       }
     }
   )
