@@ -12,7 +12,7 @@ RSessionRunner <- R6Class("RSessionRunner",
         event = private$handle_event_msg
       )
     },
-    start = function() {
+    start = function(bare = FALSE) {
       self$session <- RKernelSession$new()
       kernel <- self$kernel
       self$session$connect(kernel = kernel,
@@ -24,7 +24,9 @@ RSessionRunner <- R6Class("RSessionRunner",
         browser_callback = private$handle_browser,
         input_callback =   private$readline)
       kernel <- self$kernel
-      self$session$start()
+      if(!bare) {
+        self$session$setup()
+      }
       private$start_graphics()
       private$stdout_filter <- MessageFilter$new(
           text_handler = self$stdout,

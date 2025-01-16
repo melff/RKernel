@@ -1166,7 +1166,7 @@ Kernel <- R6Class("Kernel",
         name <- format(Sys.time())
         has_name <- TRUE
       }
-      
+
       if(name %in% names(private$detached_cells)) {
         runner <- private$detached_cells[[name]]
         runner$stop()
@@ -1182,8 +1182,19 @@ Kernel <- R6Class("Kernel",
         runner$stdout(ses_info)
         log_out(ses_info)
       }
+      
+      bare <- FALSE
+      if(length(args) && "bare" %in% names(args)) {
+        bare <- TRUE
+      }
 
-      runner <- RSessionRunner$new(self, self$stream)
+      if(length(args) && "silent" %in% names(args)) {
+        stream <- function(...) NULL
+      } else {
+        stream <- self$stream
+      }
+
+      runner <- RSessionRunner$new(self, stream)
       runner$set_shell_parent(private$execute_parent)
       if(has_name) {
        msg <- sprintf("Starting new detached session with name '%s'\n",
@@ -1194,11 +1205,14 @@ Kernel <- R6Class("Kernel",
       } else {
         runner$stdout("Starting new detached session ...\n")
       }
-      runner$start()
+      runner$start(bare = bare)
       ses_info <- capture.output(print(runner$session))
       ses_info <- paste0(ses_info,"\n")
       runner$stdout(ses_info)
       repl <- runner$repl
+      if(bare) {
+        repl$run_cmd("RKernel:::install_browseURL()")
+      }
       
       this <- new.env()
       this$iter <- 0L

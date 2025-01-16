@@ -122,7 +122,7 @@ RKernelSession <- R6Class("RKernelSession",
       self$yield <- yield
       self$kernel <- kernel
     },
-    start = function() {
+    setup = function() {
       # log_out("Setting up the session ...")
       self$help_port <- random_open_port()
       self$send_input(sprintf("RKernel:::setup_session(%d)",self$help_port))
