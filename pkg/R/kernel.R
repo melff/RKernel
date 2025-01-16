@@ -91,9 +91,16 @@ Kernel <- R6Class("Kernel",
     DAPServer = NULL,
     #' @description Run some code (for testing purposes)
     #' @param code Some code
-    run_code = function(code) {
-      self$repl$run_code(code)
-      self$runner$display_changed_graphics()
+    run_code = function(code, debug = FALSE) {
+      # self$repl$run_code(code)
+      # self$runner$display_changed_graphics()
+      if(debug) {
+        debug(private$run_code_cell)
+      }
+      else {
+        suppressWarnings(undebug(private$run_code_cell))
+      }
+      private$run_code_cell(code)
     },
     #' @description
     #' Run the kernel.
