@@ -239,33 +239,27 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         until_prompt = FALSE,
         echo = self$echo
       ) {
-        if(length(code) == 1 && grepl('\n',code)) {
-          lines <- split_lines1(code)
-        } else {
-          lines <- code
+      if(!is.character(code) || 
+         length(code) < 1) return()
+      if(length(code) > 1) {
+        code <- paste(code, collapse="\n")
+      }
+      self$session$send_input(code)
+      tryCatch(self$process_all_output(
+                      io_timeout = io_timeout,
+                      run_timeout = run_timeout,
+                      stdout_callback = stdout_callback,
+                      stderr_callback = stderr_callback,
+                      wait_callback = wait_callback,
+                      browser_callback = browser_callback,
+                      prompt_callback = prompt_callback,
+                      input_callback = input_callback,
+                      until_prompt = until_prompt,
+                      echo = echo),
+        interrupt = function(e) {
+          self$interrupt()
         }
-        n_lines <- length(lines)
-        for (i in 1:n_lines) {
-          line <- lines[i]
-          if(!length(line) || !is.character(line) || is.na(line)) break
-          # log_out(sprintf("Sending line '%s'",line))
-          self$session$send_input(line)
-          tryCatch(self$process_all_output(
-                          io_timeout = io_timeout,
-                          run_timeout = run_timeout,
-                          stdout_callback = stdout_callback,
-                          stderr_callback = stderr_callback,
-                          wait_callback = wait_callback,
-                          browser_callback = browser_callback,
-                          prompt_callback = prompt_callback,
-                          input_callback = input_callback,
-                          until_prompt = until_prompt,
-                          echo = echo),
-            interrupt = function(e) {
-              self$interrupt()
-            }
-          )
-        }
+      )
     },
     interrupt = function() {
       # log_out("REPL interrupt")
@@ -334,17 +328,26 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                           browser_callback = browser_callback,
                           prompt_callback = prompt_callback,
                           drop_echo = drop_echo)
-          if(self$found_prompt) output_complete <- TRUE
-          if(!length(resp) && session$waiting && !self$suspended) {
-            # log_out("Session waiting for input(?)")
-            if(is.function(input_callback)) {
-              inp <- input_callback()
-              if(session$is_alive()) {
-                # Because the callback might have restarted the session
-                session$send_input(inp, drop_echo = TRUE)
-              } else {
-                output_complete <- TRUE
-                break
+          if(self$found_prompt) {
+            if(is.function(prompt_callback)) {
+              output_complete <- prompt_callback()
+            } else {
+              output_complete <- TRUE
+            }
+          } else if(!until_prompt) {
+            output_complete <- TRUE
+          } else {
+            if(!length(resp) && session$waiting && !self$suspended) {
+              # log_out("Session waiting for input(?)")
+              if(is.function(input_callback)) {
+                inp <- input_callback()
+                if(session$is_alive()) {
+                  # Because the callback might have restarted the session
+                  session$send_input(inp, drop_echo = TRUE)
+                } else {
+                  output_complete <- TRUE
+                  break
+                }
               }
             }
           }
