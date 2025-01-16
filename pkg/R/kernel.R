@@ -1250,7 +1250,11 @@ Kernel <- R6Class("Kernel",
       } else {
         name <- names(args)[1]
       }
-      if(name == 'latest' && (!'latest' %in% names(private$detached_cells))) {
+      if(name == 'all') {
+        return(
+          private$stop_all_detached()
+        )
+      } else if(name == 'latest' && (!'latest' %in% names(private$detached_cells))) {
         i <- length(private$detached_cells)
         if(i == 0) return(NULL)
         runner <- private$detached_cells[[i]]
