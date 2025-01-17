@@ -1125,8 +1125,8 @@ Kernel <- R6Class("Kernel",
         out("Error: ",msg,"\n", sep = "")
         calls <- sys.calls()
         calls <- limitedLabels(calls)
-        calls <- tail(calls, -5)
-        calls <- head(calls, -2)
+        calls <- tail(calls, -9)
+        calls <- head(calls, -3)
         n <- length(calls)
         last_call <- calls[n]
         s <- get_match(last_call, "#[0-9]+: ")
