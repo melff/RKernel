@@ -22,7 +22,7 @@ RSessionRunner <- R6Class("RSessionRunner",
         stdout_callback =  self$handle_stdout,
         stderr_callback =  self$handle_stderr,
         browser_callback = private$handle_browser,
-        input_callback =   private$readline)
+        input_callback =   self$readline)
       kernel <- self$kernel
       if(!bare) {
         self$session$setup()
@@ -158,8 +158,11 @@ RSessionRunner <- R6Class("RSessionRunner",
           }
         }
       }
-    }
+    },
 
+    readline = function(prompt="") {
+      self$kernel$readline(prompt=prompt)
+    }
 
   ),
   private = list(
@@ -202,9 +205,6 @@ RSessionRunner <- R6Class("RSessionRunner",
       return(TRUE)
     },
 
-    readline = function(prompt="") {
-      self$kernel$readline(prompt=prompt)
-    },
     start_graphics = function(...) {
       add_sync_options(c(
           "jupyter.plot.width",
