@@ -1089,7 +1089,12 @@ Kernel <- R6Class("Kernel",
         }
       }
       else {
-        code_blocks <- preproc_code(code)
+        code_blocks <- tryCatch(preproc_code(code),
+                                error = function(e) {
+                                  msg <- conditionMessage(e)
+                                  self$stderr(msg)
+                                  invokeRestart("continue")
+                                })
         for(block in code_blocks) {
           self$errored <- FALSE 
           # log_out("- run code block ----")
@@ -1226,7 +1231,12 @@ Kernel <- R6Class("Kernel",
       this <- new.env()
       this$iter <- 0L
       this$cur_blk <- 1L
-      this$code_blocks <- preproc_code(code)      
+      this$code_blocks <- tryCatch(preproc_code(code),
+                                    error = function(e) {
+                                      msg <- conditionMessage(e)
+                                      self$stderr(msg)
+                                      invokeRestart("continue")
+                                    })
 
       self$add_service(function(){
         continue <- FALSE
