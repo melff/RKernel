@@ -436,6 +436,7 @@ CellTracer <- R6Class("CellTracer",
         quit_btn = NULL,
         button_box = NULL,
         on_next_btn = function() {
+            if(self$line_no == 1) self$runner$stdout("> ")
             line <- self$code_lines[self$line_no]
             n_lines <- length(self$code_lines)
             self$run_(line)
@@ -443,6 +444,8 @@ CellTracer <- R6Class("CellTracer",
             if(self$line_no > n_lines) self$continue_loop <- FALSE
         },
         on_continue_btn = function() {
+            if(self$line_no == 1) self$runner$stdout("> ")
+            line <- self$code_lines[self$line_no]
             n_lines <- length(self$code_lines)
             ii <- seq(from=self$line_no,to=n_lines)
             lines <- self$code_lines[ii]
