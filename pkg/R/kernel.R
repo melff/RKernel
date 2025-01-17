@@ -1076,6 +1076,7 @@ Kernel <- R6Class("Kernel",
                               line, 
                               io_timeout=10, 
                               echo = TRUE,
+                              until_prompt = FALSE,
                               prompt_callback = function() {
                                     self$stdout("> ")
                                     return(TRUE)

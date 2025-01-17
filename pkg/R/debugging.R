@@ -463,6 +463,7 @@ CellTracer <- R6Class("CellTracer",
                             lines, 
                             io_timeout=10, 
                             echo = TRUE,
+                            until_prompt = FALSE,
                             prompt_callback = self$prompt_callback
                         )
             self$runner$display_changed_graphics()

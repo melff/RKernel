@@ -351,7 +351,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         self$found_prompt <- FALSE
         output_complete <- FALSE
         if(!length(resp)) {
-          if(session$waiting && !self$suspended) {
+          if(until_prompt && session$waiting && !self$suspended) {
             # log_out("Session waiting for input(?)")
             if(is.function(input_callback)) {
               inp <- input_callback()
