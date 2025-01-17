@@ -360,6 +360,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                 session$send_input(inp, drop_echo = TRUE)
               } 
             } else {
+              log_error("Session waiting for input, but no input_callback given")
               stop("Session waiting for input, but no input_callback given")
             }
           }

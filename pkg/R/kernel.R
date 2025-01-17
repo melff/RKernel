@@ -981,6 +981,8 @@ Kernel <- R6Class("Kernel",
             readline(prompt=prompt)
           }
         }
+      } else {
+        return("")
       }
     },
     r_send_request = function(msg){
@@ -1241,7 +1243,9 @@ Kernel <- R6Class("Kernel",
                                     })
 
       self$add_service(function(){
-        continue <- FALSE
+      #  private$input_suspended <- FALSE
+      #  on.exit(private$input_suspended <- TRUE)
+       continue <- FALSE
         if(!runner$session$is_alive()) return(FALSE)
         if(this$iter == 0L) {
           if(this$cur_blk <= length(this$code_blocks)) {
