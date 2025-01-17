@@ -244,7 +244,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       if(length(code) > 1) {
         code <- paste(code, collapse="\n")
       }
-      log_out(sprintf("Sending input '%s'",code))
+      # log_out(sprintf("Sending input '%s'",code))
       self$session$send_input(code)
       tryCatch(self$process_all_output(
                       io_timeout = io_timeout,
@@ -389,12 +389,12 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             resp$stdout <- gsub(XOFFXON, "", resp$stdout)
           }
           if(grepl(self$browse_prompt, resp$stdout)) {
-            log_out("Found browser prompt")
+            # log_out("Found browser prompt")
             self$found_browse_prompt <- getlastmatch(self$browse_prompt, 
                                                      resp$stdout)
             resp$stdout <- gsub(self$browse_prompt,"",resp$stdout)
           } else if (endsWith(resp$stdout, self$prompt)) {
-            log_out("Found main prompt")
+            # log_out("Found main prompt")
             # log_out(self$status)
             self$found_prompt <- TRUE
             resp$stdout <- remove_suffix(resp$stdout, self$prompt)
