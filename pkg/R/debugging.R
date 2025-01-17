@@ -224,6 +224,7 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
                 stderr_callback = runner$handle_stderr,
                 browser_callback = self$browser_callback,
                 prompt_callback = self$prompt_callback,
+                input_callback = runner$readline,
                 echo = TRUE
                 )
         },
@@ -237,6 +238,7 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
         },
         run = function(prompt) {
             kernel <- self$runner$kernel
+            kernel$stdout("\n")
             while(self$continue_loop) {
                 kernel$input_request(prompt = prompt)
                 input <- kernel$read_stdin()
