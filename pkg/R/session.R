@@ -236,7 +236,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         browser_callback = self$browser_callback,
         prompt_callback = self$prompt_callback,
         input_callback = self$input_callback,
-        until_prompt = FALSE,
+        until_prompt = TRUE,
         echo = self$echo
       ) {
       if(!is.character(code) || 
@@ -244,6 +244,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       if(length(code) > 1) {
         code <- paste(code, collapse="\n")
       }
+      log_out(sprintf("Sending input '%s'",code))
       self$session$send_input(code)
       tryCatch(self$process_all_output(
                       io_timeout = io_timeout,
@@ -290,7 +291,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       }
     },
     found_prompt = FALSE,
-    found_browse_prompt = FALSE,
     process_all_output = function(
         io_timeout = 1,
         run_timeout = 100,
@@ -308,8 +308,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         session <- self$session
         output_complete <- FALSE
         loop_count <- 0
-        self$found_prompt <- FALSE
-        self$found_browse_prompt <- FALSE
         while(!output_complete){
           loop_count <- loop_count + 1
           if(run_timeout > 0) {
@@ -320,53 +318,53 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             } 
           }
           drop_echo <- (!echo && loop_count == 1) 
-          resp <- self$process_output(
-                          io_timeout = io_timeout,
-                          run_timeout = run_timeout,
-                          stdout_callback = stdout_callback,
-                          stderr_callback = stderr_callback,
-                          browser_callback = browser_callback,
-                          prompt_callback = prompt_callback,
-                          drop_echo = drop_echo)
-          if(self$found_prompt) {
-            if(is.function(prompt_callback)) {
-              output_complete <- prompt_callback()
-            } else {
-              output_complete <- TRUE
-            }
-          } else if(!until_prompt) {
-            output_complete <- TRUE
-          } else {
-            if(!length(resp) && session$waiting && !self$suspended) {
-              # log_out("Session waiting for input(?)")
-              if(is.function(input_callback)) {
-                inp <- input_callback()
-                if(session$is_alive()) {
-                  # Because the callback might have restarted the session
-                  session$send_input(inp, drop_echo = TRUE)
-                } else {
-                  output_complete <- TRUE
-                  break
-                }
-              }
-            }
-          }
+          output_complete <- self$process_output(
+                              io_timeout = io_timeout,
+                              run_timeout = run_timeout,
+                              stdout_callback = stdout_callback,
+                              stderr_callback = stderr_callback,
+                              browser_callback = browser_callback,
+                              input_callback = input_callback,
+                              prompt_callback = prompt_callback,
+                              until_prompt = until_prompt,
+                              drop_echo = drop_echo)
         }
     },
-    process_output = function(
+   found_browse_prompt = character(0),
+   process_output = function(
         io_timeout = 1,
         run_timeout = 100,
         wait_callback = NULL,
         stdout_callback = self$stdout_callback,
         stderr_callback = self$stderr_callback,
         browser_callback = self$browser_callback,
+        input_callback = self$input_callback,
         prompt_callback = self$prompt_callback,
+        until_prompt = TRUE,
         drop_echo = FALSE
       ) {
         stopifnot(is.function(stdout_callback))
         stopifnot(is.function(stderr_callback))
         session <- self$session
         resp <- session$receive_output(timeout = io_timeout)
+        self$found_browse_prompt <- character(0)
+        self$found_prompt <- FALSE
+        output_complete <- FALSE
+        if(!length(resp)) {
+          if(session$waiting && !self$suspended) {
+            # log_out("Session waiting for input(?)")
+            if(is.function(input_callback)) {
+              inp <- input_callback()
+              if(session$is_alive()) {
+                # Because the callback might have restarted the session
+                session$send_input(inp, drop_echo = TRUE)
+              } 
+            } else {
+              stop("Session waiting for input, but no input_callback given")
+            }
+          }
+          output_complete <- !until_prompt
+        }
         if (!is.null(resp$stderr) 
               && nzchar(resp$stderr)
               && grepl('\\S',resp$stderr)) {
@@ -390,14 +388,13 @@ RSessionAdapter <- R6Class("RSessionAdapter",
           if(grepl(XOFFXON, resp$stdout)) {
             resp$stdout <- gsub(XOFFXON, "", resp$stdout)
           }
-          browse_prompt <- ""
           if(grepl(self$browse_prompt, resp$stdout)) {
-            # log_out("Found browser prompt")
-            browse_prompt <- getlastmatch(self$browse_prompt, resp$stdout)
-            self$found_browse_prompt <- TRUE
+            log_out("Found browser prompt")
+            self$found_browse_prompt <- getlastmatch(self$browse_prompt, 
+                                                     resp$stdout)
             resp$stdout <- gsub(self$browse_prompt,"",resp$stdout)
           } else if (endsWith(resp$stdout, self$prompt)) {
-            # log_out("Found main prompt")
+            log_out("Found main prompt")
             # log_out(self$status)
             self$found_prompt <- TRUE
             resp$stdout <- remove_suffix(resp$stdout, self$prompt)
@@ -407,14 +404,23 @@ RSessionAdapter <- R6Class("RSessionAdapter",
           }
           if(nzchar(resp$stdout)) {
             stdout_callback(resp$stdout)
-          }
-          if(self$found_browse_prompt) {
+          } 
+          if(self$found_prompt) {
+            if(is.function(prompt_callback)) {
+              output_complete <- prompt_callback()
+            } else {
+              output_complete <- TRUE
+            }
+          } else if(length(self$found_browse_prompt)) {
             if (is.function(browser_callback)) {
-              browser_callback(prompt=prompt)
-            } else session$send_input("Q")
+              output_complete <- browser_callback(prompt=self$found_browse_prompt)
+            } else {
+              session$send_input("Q")
+              output_complete <- !until_prompt
+            }
           }
         }
-        return(resp)
+        return(output_complete)
     },
     run_cmd = function(cmd) {
       # Runs a one-line command without checking(!) and returns the 
