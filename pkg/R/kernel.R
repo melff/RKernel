@@ -457,6 +457,8 @@ Kernel <- R6Class("Kernel",
             self$stderr("\nR session ended - restarting ... ")
             self$restart()
             self$stderr("done.\n")
+            content <- list(status = "ok",
+                            execution_count = execution_count)
             clear_queue <- TRUE
           } else if (self$errored) {
             if(length(private$err_msg)) {
