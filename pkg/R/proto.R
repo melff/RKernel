@@ -24,7 +24,7 @@ handle_request <- function(msg){
   } else {
     response <- request_default_handler(msq,env)
   }
-  if (length(response)) {
+  if (length(response) && is.list(response)) {
     tryCatch(
       msg_send(response),
       error = function(e) {

@@ -19,10 +19,14 @@ MSG_BEGIN <- JSON_BEGIN
 MSG_END <- JSON_END
 
 json_send <- function(msg, file=stdout()){
-    # log_out("msg_send\n")
+    if(!is.list(msg)) {
+        log_out("Non-list argument to 'json_send()'")
+        calls <- sys.calls()
+        calls <- limitedLabels(calls)
+        log_print(calls)
+    }
     # log_out(msg,use.print=TRUE)
     msg <- to_json(msg)
-    # log_out(msg)
     cat(DLE,JSON_BEGIN,msg,JSON_END,DLE,sep="",file=file)
 }
 
