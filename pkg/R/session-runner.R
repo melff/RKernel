@@ -102,12 +102,12 @@ RSessionRunner <- R6Class("RSessionRunner",
     handle_msg = function(msg) {
       if(!is.list(msg)) {
         err_msg <- "R session sent an invalid message - not a list"
-        self$stderr(err_msg)
+        # self$stderr(err_msg)
         log_error(err_msg, traceback = FALSE)
         dep_msg <- deparse0(msg)
-        self$stderr("\n")
-        self$stderr(dep_msg)
-        self$stderr("\n")
+        # self$stderr("\n")
+        # self$stderr(dep_msg)
+        # self$stderr("\n")
         log_error(dep_msg, traceback = FALSE)
         return(NULL)
       }
@@ -119,11 +119,11 @@ RSessionRunner <- R6Class("RSessionRunner",
       } else {
         w_msg <- sprintf("R session sent message of unknown type '%s'", msg_type)
         # log_out(msg_handler, use.str = TRUE)
-        self$stderr(w_msg)
+        # self$stderr(w_msg)
         dep_msg <- deparse0(msg)
-        self$stderr("\n")
-        self$stderr(dep_msg)
-        self$stderr("\n")
+        # self$stderr("\n")
+        # self$stderr(dep_msg)
+        # self$stderr("\n")
         log_warning(paste(w_msg,dep_msg,sep=":\n "))
       }
     },
