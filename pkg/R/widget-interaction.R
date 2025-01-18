@@ -230,6 +230,8 @@ interactive_output <- function(FUN,
                                clear=FALSE,
                                mime_type="text/plain"
                               ){
+    this <- new.env()
+    here <- environment()
     run <- function(...) {
         if(clear) out$clear_output()
         with(out,{
@@ -239,7 +241,7 @@ interactive_output <- function(FUN,
                 d$data <- d$data[mime_type]
                 d
             }
-        })
+        }, envir = this, enclos = here)
     }
     if(autorun){
         for(cntrl in controls){
