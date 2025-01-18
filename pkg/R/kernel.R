@@ -129,6 +129,9 @@ Kernel <- R6Class("Kernel",
       drop = NULL
       ){
         private$run_services()
+        if(self$session$is_alive()) {
+          self$repl$process_output(until_prompt = FALSE)
+        }
         # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
         # log_out("kernel$poll_request")
@@ -144,6 +147,7 @@ Kernel <- R6Class("Kernel",
                hb=private$respond_hb(req),
                control=private$respond_control(req),
                shell=private$respond_shell(req, drop = drop))
+        return(TRUE)
     },
     #' @description
     #' Clear the current output cell in the frontend.
@@ -1002,7 +1006,8 @@ Kernel <- R6Class("Kernel",
       # log_out("r_send_request_noreply")
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
-      self$repl$run_cmd(cmd)
+      #self$repl$send_cmd(cmd)
+      self$repl$run_code(cmd, echo = FALSE, until_prompt = FALSE)
       return(invisible())
     },
     r_send_cmd = function(cmd) {
