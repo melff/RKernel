@@ -315,6 +315,9 @@ update_list <- function(l1, l2) {
 
 rkernel_urlbrowser <- function(url) {
     if(jupyter_gui()) {
+      if(startsWith(url,"/")) {
+        url <- paste0("file://",url)
+      }
       if(startsWith(url, "file://")) {
         data <- curl_fetch_memory(url)
         text_html <- rawToChar(data$content)
