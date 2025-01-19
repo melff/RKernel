@@ -359,7 +359,7 @@ div.datatable-navigation div.widget-html-content {
                 self$w <- self$iframe #VBox(self$nrows_control,self$iframe)
             }
             self$scrollY <- (nlines + 1) * 24 #+ nlines%/%2
-            self$height <- self$scrollY + 64 + 12
+            self$height <- paste0(self$scrollY + 64 + 12,"px")
             self$dt <- datatable_page(obj,size=size,scrollY=self$scrollY,...)
             self$obj <- obj
             self$draw()
@@ -436,7 +436,7 @@ div.datatable-navigation div.widget-html-content {
         },
         set_nlines = function(nlines) {
             self$scrollY <- (nlines + 1) * 24 #+ nlines%/%2
-            self$height <- self$scrollY + 64 + 12
+            self$height <- paste0(self$scrollY + 64 + 12,"px")
             self$dt <- datatable_page(self$obj,size=self$size,page_num=self$page,scrollY=self$scrollY)
             self$draw()
         },
