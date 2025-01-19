@@ -40,6 +40,8 @@ truncate_log <- function(){
 
 is_kernel <- function() !is.null(kernel$current)
 
+#' @importFrom crayon green red yellow
+
 log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
   dcl <- deparse0(match.call())
   tryCatch({
@@ -52,7 +54,7 @@ log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
         message <- paste0("\n",paste0(capture.output(str(message)),collapse="\n"))
     }
     else message <- paste(message,...,collapse="")
-    message <- paste(crayon::green(format(Sys.time()),"\t",message,"\n"))
+    message <- paste(green(format(Sys.time()),"\t",message,"\n"))
     message <- paste("INFO:", message)
     if (is_kernel()) 
       message <- paste("R KERNEL -", message)
@@ -75,7 +77,7 @@ log_str <- function(x,...) log_out(x, use.str = TRUE)
 #' Show a warning in the Jupyter server log
 #' @param message A string to be shown in the log
 log_warning <- function(message){
-  message <- paste(crayon::yellow(format(Sys.time()),"\t",message,"\n"))
+  message <- paste(yellow(format(Sys.time()),"\t",message,"\n"))
   message <- paste("R WARNING:",message)
   if (is_kernel()) 
     message <- paste("R KERNEL -", message)
@@ -87,7 +89,7 @@ log_warning <- function(message){
 #' Show an error message in the Jupyter server log
 #' @param message A string to be shown in the log
 log_error <- function(message, traceback = FALSE){
-  message <- crayon::red(format(Sys.time()),"\t",message,"\n")
+  message <- red(format(Sys.time()),"\t",message,"\n")
   message <- paste("ERROR:",message)
   if (is_kernel()) {
     message <- paste("R KERNEL -", message)
