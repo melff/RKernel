@@ -138,6 +138,7 @@ replace_in_package <- function(pkg_name,name,value,update.env=FALSE){
 #' @param resize Logical; should the iframe be resizeable?
 #' @param width The intended width of the iframe, a string or a number
 #' @param aspect_ratio The intended aspect ratio of the iframe, a string
+#' @param height The intended height, a string. Overrides the aspect ratio if given.
 #' @param class The DOM class attribute the iframe, a string
 #' @param style The CSS style attribte of the iframe, a string
 #' @param ... Other arguments, ignored.
@@ -145,6 +146,7 @@ str2iframe <- function(code,
                       resize = FALSE,
                       width = "100%",
                       aspect_ratio = "16 / 10",
+                      height = character(0),
                       class = "rkernel-iframe",
                       style = "border-style:none",
                       ...){
@@ -156,7 +158,7 @@ str2iframe <- function(code,
 
     url <- dataURI(charToRaw(code),mime="text/html")
 
-    url2iframe(url,resize,width,aspect_ratio,class,style,...)
+    url2iframe(url,resize,width,aspect_ratio,height,class,style,...)
 }
 
 #' @description
@@ -165,6 +167,7 @@ str2iframe <- function(code,
 #' @param resize Logical; should the iframe be resizeable?
 #' @param width The intended width of the iframe, a string or a number
 #' @param aspect_ratio The intended aspect ratio of the iframe, a string
+#' @param height The intended height, a string. Overrides the aspect ratio if given.
 #' @param class The DOM class attribute the iframe, a string
 #' @param style The CSS style attribte of the iframe, a string
 #' @param ... Other arguments, ignored.
@@ -172,6 +175,7 @@ url2iframe <- function(url,
                       resize = FALSE,
                       width = "100%",
                       aspect_ratio = "16 / 10",
+                      height = character(0),
                       class = "rkernel-iframe",
                       style = "border-style:none",
                       ...){
@@ -186,7 +190,11 @@ url2iframe <- function(url,
     </style>
     "
 
-    style <- sprintf("width:%s;aspect-ratio:%s;%s",width,aspect_ratio,style)
+    if(length(height)) {
+      style <- sprintf("width:%s;height:%s;%s",width,height,style)
+    } else {
+      style <- sprintf("width:%s;aspect-ratio:%s;%s",width,aspect_ratio,style)
+    }
 
     if(isTRUE(resize) || resize == "both") {
       if_tmpl <- "<div class=\"resizer\">
