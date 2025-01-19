@@ -42,36 +42,13 @@ scrolling_table <- function(x,id=UUIDgenerate(),
                        wrap_cells=NULL,
                        max_lines=getOption("view_max_lines", 100),
                        max_columns=getOption("view_max_columns",20)){
-    x <- as.data.frame(x)
-    nr <- nrow(x)
-    nc <- ncol(x)
-    if(nr > max_lines) {
-        lns <- c(seq.int(max_lines), nr)
-        x <- x[lns,]
-    }
-    if(nc > max_columns) {
-        cls <- c(seq.int(max_columns), nc)
-        x <- x[,cls]
-    }
-    rn <- row.names(x)
-    nms <- names(x)
-    x <- format(x)
-    x <- as.matrix(x)
-    if(nr > max_lines + 1) {
-        x <- rbind(x[-max_lines,],"\u22EE",x[max_lines,])
-        rn <- c(rn[-max_lines],"\u22EE",rn[max_lines])
-    }
-    if(nc > max_columns + 1) {
-        x <- cbind(x[,-max_columns],"\u22EF",x[,max_columns])
-        nms <- c(nms[-max_columns],"\u22EF",nms[max_columns])
-    }
-    if(nr > max_lines + 1 && nc > max_columns + 1) {
-        x[max_lines, max_columns] <- "\u22F1"
-    }
-    if(use.rownames){
-        x <- cbind(rn,x)
-        nms <- c("",nms)
-    }
+    
+    x <- prep_data_frame(x,
+                         max_lines = max_lines,
+                         max_columns = max_columns,
+                         use.rownames = use.rownames)
+    nms <- x[1,]
+    x <- x[-1,]
 
     tbody <- array("",dim=dim(x))
     # tbody[,1] <- paste0("<td class='firstCol'>",x[,1],"</td>")

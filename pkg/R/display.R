@@ -413,12 +413,12 @@ display_data.data.frame <- function(x,...,
 
     mime_data <- list()
 
-    mdata_text <- capture.output(print(x))
-    mdata_text <- paste(mdata_text, collapse = "\n")
-    mime_data[["text/plain"]] <- mdata_text
+    mime_data[["text/plain"]] <- mime_plain.data.frame(x)
 
     mdata_html <- scrolling_table(x)$data[["text/html"]]
     mime_data[["text/html"]] <- mdata_html
+
+    mime_data[["text/latex"]] <- mime_latex.data.frame(x)
 
     d <- list(data=mime_data)
     d$metadata <- metadata
@@ -427,6 +427,125 @@ display_data.data.frame <- function(x,...,
     else cl <- "display_data"
     structure(d,class=cl)
 }
+
+prep_data_frame <- function(x,
+                       max_lines=getOption("view_max_lines", 100),
+                       max_columns=getOption("view_max_columns",20),
+                       vdots="\u22EE",
+                       hdots="\u22EF",
+                       ddots="\u22F1",
+                       use.rownames=TRUE) {
+    x <- as.data.frame(x)
+    nr <- nrow(x)
+    nc <- ncol(x)
+    if(nr > max_lines) {
+        lns <- c(seq.int(max_lines), nr)
+        x <- x[lns,]
+    }
+    if(nc > max_columns) {
+        cls <- c(seq.int(max_columns), nc)
+        x <- x[,cls]
+    }
+    rn <- row.names(x)
+    nms <- names(x)
+    x <- format(x, justify = "right")
+    x <- as.matrix(x)
+    rn <- format(rn, justify = "right")
+
+    nnr <- nrow(x)
+    if(nr > max_lines + 1) {
+        x <- rbind(x[-nnr,],vdots,x[nnr,])
+        rn <- c(rn[-nnr],vdots,rn[nnr])
+    }
+    if(nc > max_columns + 1) {
+        x <- cbind(x[,-max_columns],hdots,x[,max_columns])
+        nms <- c(nms[-max_columns],hdots,nms[max_columns])
+    }
+    if(nr > max_lines + 1 && nc > max_columns + 1) {
+        x[max_lines, max_columns] <- ddots
+    }
+    if(use.rownames){
+        x <- cbind(rn,x)
+        nms <- c("",nms)
+    }
+    x <- rbind(nms,x)
+    x <- format(x, justify = "centre")
+    structure(as.matrix(x),dimnames=NULL)
+}
+
+#' @importFrom crayon bold
+
+mime_plain.data.frame <- function(x,
+                       max_lines = getOption("view_max_lines", 100),
+                       max_columns = getOption("view_max_columns", 20),
+                       use_crayon = getOption("display_use_crayon", TRUE),
+                       use.rownames = TRUE) {
+    x <- prep_data_frame(x,
+                         max_lines = max_lines,
+                         max_columns = max_columns,
+                         use.rownames = use.rownames)
+    if(use_crayon) {
+        x[,1] <- crayon::bold(x[,1])
+        x[1,] <- crayon::bold(x[1,])
+    }
+    x <- apply(x,1,paste,collapse=" ")
+    x <- paste(x, collapse="\n")
+    paste0(x, '\n')    
+}
+
+mime_latex.data.frame <- function(x,
+                       max_lines = getOption("view_max_lines", 100),
+                       max_columns = getOption("view_max_columns", 20),
+                       dcolumn = getOption("view_dcolumn", TRUE),
+                       booktabs = getOption("view_booktabs", TRUE),
+                       use.rownames = TRUE) {
+    colclasses <- sapply(x, class)
+    x <- prep_data_frame(x,
+                         max_lines = max_lines,
+                         max_columns = max_columns,
+                         use.rownames = use.rownames,
+                         vdots="$\\vdots$",
+                         hdots="$\\ldots$",
+                         ddots="$\\ddots$")
+    factor_spec <- "c"
+    character_spec <- "c"
+    rowname_spec <- "r"
+    numeric_spec <- if(dcolumn) "D{.}{.}{-1}" else "r"
+    colspec <- character(length(colclasses))
+    colspec[colclasses=="numeric"] <- numeric_spec
+    colspec[colclasses=="factor"] <- factor_spec
+    colspec[colclasses=="character"] <- character_spec
+    colspec <- c(rowname_spec, colspec)
+    colspec <- paste(colspec, collapse = "")
+
+    nms <- trimws(x[1,-1])
+    nms <- gsub("_","{\\textunderscore}",nms, fixed=TRUE)
+    x <- x[-1,]
+
+    thead <- sprintf("\\multicolumn{1}{c}{%s}",nms)
+    thead <- paste(c("", thead), collapse = " & ")
+    tbody <- apply(x, 1, paste, collapse = " & ")
+    table <- c(thead,tbody)
+    table <- paste0(table,"\\\\")
+
+    toprule <- if(booktabs) "\\toprule" else "\\hline\\hline"
+    midrule <- if(booktabs) "\\midrule" else "\\hline"
+    bottomrule <- if(booktabs) "\\bottomrule" else "\\hline\\hline"
+
+    table_begin <- sprintf("\\begin{tabular}{%s}", colspec)
+    table_end <- "\\end{tabular}"
+    
+    table <- c(table_begin, 
+               toprule, 
+               table[1], 
+               midrule, 
+               table[-1], 
+               bottomrule,
+               table_end,
+               "")
+    paste(table, collapse = "\n")
+}
+
 
 #' @describeIn display_data S3 method for matrices
 #' @export
