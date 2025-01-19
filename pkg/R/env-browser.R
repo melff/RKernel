@@ -190,7 +190,6 @@ env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FA
     html <- paste(result,collapse="\n")
     css <- env_browser_css()
     html <- paste(css,html,sep="\n")
-    }
     html
 }
 
