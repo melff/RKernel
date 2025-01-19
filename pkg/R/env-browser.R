@@ -54,12 +54,6 @@ env_browser_css <- function(scoped=FALSE){
         paste("<style>",env_browser_css,"</style>",sep="\n")
 }
 
-init_env_browser <- function(){
-    raw_html(env_browser_css())
-}
-
-.env_browser_table <- new.env()
-.env_browser_table$inited <- FALSE
 
 env_matrix <- function(pos = -1, name, envir, parent=NULL, all.names = FALSE, pattern = NULL, 
     mode = "any") {
@@ -113,7 +107,7 @@ session_env_matrix <- function(repl,
 }
 
 env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FALSE, pattern = NULL, 
-    mode = "any", id=NULL, include_css = TRUE, repl = NULL, title = NULL){
+    mode = "any", id=NULL, repl = NULL, title = NULL){
     if(inherits(repl, "RSessionAdapter")) {
         if(!missing(name)) {
             em <- session_env_matrix(repl=repl,envname=name)
@@ -194,10 +188,8 @@ env_browser_table <- function(pos = -1, name, envir, parent=NULL, all.names = FA
                     result,
                     "</div>")
     html <- paste(result,collapse="\n")
-    if(!.env_browser_table$inited || include_css){
-        css <- env_browser_css()
-        html <- paste(css,html,sep="\n")
-        .env_browser_table$inited <- TRUE
+    css <- env_browser_css()
+    html <- paste(css,html,sep="\n")
     }
     html
 }
