@@ -46,7 +46,6 @@ display_data <- function(x,...) {
 #' @param update A logical value, whether a new display item should be created
 #'               or an existing one should be updated
 #' 
-#' @importFrom repr mime2repr
 #' @importFrom uuid UUIDgenerate
 #' @export
 display_data.default <- function(x,...,
@@ -64,20 +63,6 @@ display_data.default <- function(x,...,
     else if(length(dim(x))==2) {
         x <- as.data.frame(x)
         return(display_data(x))
-    }
-    else {
-        rkernel_mime_types <- getOption("rkernel_mime_types",
-                                        c("text/plain",
-                                          "text/html",
-                                          "text/latex",
-                                          "text/markdown"))
-        mime_data <- list()
-        for(mime_type in rkernel_mime_types){
-            repr_func <- mime2repr[[mime_type]]
-            repr_result <- repr_func(x,...)
-            mime_data[[mime_type]] <- repr_result
-        }
-        d <- list(data=mime_data)
     }
     if(!length(metadata))
         metadata <- emptyNamedList
@@ -416,7 +401,6 @@ raw_html <- function(text,id=UUIDgenerate(),update=FALSE){
 }
 
 #' @describeIn display_data S3 method for class 'data.frame'
-#' @importFrom repr mime2repr
 #' @importFrom uuid UUIDgenerate
 #' @export
 display_data.data.frame <- function(x,...,
@@ -424,23 +408,15 @@ display_data.data.frame <- function(x,...,
                             id=UUIDgenerate(),
                             update=FALSE){
 
-    rkernel_mime_types <- getOption("rkernel_mime_types",
-                                    c("text/plain",
-                                      "text/html",
-                                      "text/latex",
-                                      "text/markdown"))
     mime_data <- list()
-    for(mime_type in rkernel_mime_types){
-        if(mime_type=="text/html"){
-            r_html <- scrolling_table(x)$data[["text/html"]]
-            mime_data[[mime_type]] <- r_html
-        }
-        else{
-            repr_func <- mime2repr[[mime_type]]
-            repr_result <- repr_func(x,...)
-            mime_data[[mime_type]] <- repr_result
-        }
-    }
+
+    mdata_text <- capture.output(print(x))
+    mdata_text <- paste(mdata_text, collapse = "\n")
+    mime_data[["text/plain"]] <- mdata_text
+
+    mdata_html <- scrolling_table(x)$data[["text/html"]]
+    mime_data[["text/html"]] <- mdata_html
+
     d <- list(data=mime_data)
     d$metadata <- metadata
     d$transient <- list(display_id=id)

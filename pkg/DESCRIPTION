@@ -21,7 +21,6 @@ Imports:
     digest,
     R6,
     svglite,
-    repr,
     htmltools,
     htmlwidgets,
     base64enc,
