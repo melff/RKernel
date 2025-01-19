@@ -63,6 +63,9 @@ display_data.default <- function(x,...,
     else if(length(dim(x))==2) {
         x <- as.data.frame(x)
         return(display_data(x))
+    } else {
+        d <- capture.output(print(x))
+        d <- display_data("text/plain"=d)
     }
     if(!length(metadata))
         metadata <- emptyNamedList
