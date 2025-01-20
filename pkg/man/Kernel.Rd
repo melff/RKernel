@@ -50,6 +50,7 @@ An object of this class handles the low-level communication with
 \item \href{#method-Kernel-restart}{\code{Kernel$restart()}}
 \item \href{#method-Kernel-restore_execute_parent}{\code{Kernel$restore_execute_parent()}}
 \item \href{#method-Kernel-handle_yield}{\code{Kernel$handle_yield()}}
+\item \href{#method-Kernel-add_service}{\code{Kernel$add_service()}}
 \item \href{#method-Kernel-clone}{\code{Kernel$clone()}}
 }
 }
@@ -85,7 +86,7 @@ Initialize the kernel
 \subsection{Method \code{run_code()}}{
 Run some code (for testing purposes)
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Kernel$run_code(code)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$run_code(code, debug = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -407,6 +408,15 @@ Send a debug event to the frontend
 \subsection{Method \code{handle_yield()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$handle_yield(timeout)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Kernel-add_service"></a>}}
+\if{latex}{\out{\hypertarget{method-Kernel-add_service}{}}}
+\subsection{Method \code{add_service()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Kernel$add_service(FUN)}\if{html}{\out{</div>}}
 }
 
 }

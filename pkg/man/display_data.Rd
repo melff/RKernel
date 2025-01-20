@@ -7,6 +7,7 @@
 \alias{display_data.htmlwidget}
 \alias{display_data.display_data}
 \alias{display_data.update_display_data}
+\alias{display_data.svg}
 \alias{update.display_data}
 \alias{display_data.data.frame}
 \alias{display_data.matrix}
@@ -44,6 +45,8 @@ display_data(x, ...)
 \method{display_data}{display_data}(x, ...)
 
 \method{display_data}{update_display_data}(x, ...)
+
+\method{display_data}{svg}(x, ...)
 
 \method{update}{display_data}(object, ...)
 
@@ -155,6 +158,8 @@ A generic function that prepares R objects for display using \code{display()}
 \item \code{display_data(display_data)}: S3 method for "display_data" objects
 
 \item \code{display_data(update_display_data)}: S3 method for "update_display_data" objects
+
+\item \code{display_data(svg)}: S3 method for "svg" objects
 
 \item \code{display_data(data.frame)}: S3 method for class 'data.frame'
 

@@ -45,5 +45,6 @@ install_output_hooks <- function() {
     add_displayed_classes("tableHTML")
     add_displayed_classes("dataTable")
     add_displayed_classes("htmlwidget")
+    add_displayed_classes("svg")
 }
 

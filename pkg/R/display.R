@@ -171,6 +171,16 @@ display_data.display_data <- function(x,...) x
 #' @export
 display_data.update_display_data <- function(x,...) x
 
+#' @describeIn display_data S3 method for "svg" objects
+#' @export
+display_data.svg <- function(x,
+                            ...) {
+    r <- as.character(x)
+    display_data.default(
+            "text/plain" = r,
+            "image/svg+xml" = r
+       )
+}
 
 #' Get the id of an object display
 #'
