@@ -271,17 +271,18 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         # log_out("interrupt sent")
         self$session$send_input("")
         # log_out("receiving output")
-        res <- self$session$receive_all_output()
+        res <- try(self$session$receive_all_output(),silent=TRUE)
         if(length(res)) {
           # log_out(res, use.print = TRUE)
           # log_out("finished ...")
           return(TRUE)
         }
         counter <- counter + 1
-        if(counter > 5) {
+        if(counter > 15) {
           kernel <- self$session$kernel
           # self$session$close()
           kernel$restore_execute_parent()
+          log_warning("R process cannot be interrupted, restarting ...\n")
           kernel$stderr("R process cannot be interrupted, restarting ...\n")
           kernel$restart()
           kernel$stderr("Restart done.")
