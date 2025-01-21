@@ -245,22 +245,36 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         code <- paste(code, collapse="\n")
       }
       # log_out(sprintf("Sending input '%s'",code))
-      self$session$send_input(code)
-      tryCatch(self$process_all_output(
-                      io_timeout = io_timeout,
-                      run_timeout = run_timeout,
-                      stdout_callback = stdout_callback,
-                      stderr_callback = stderr_callback,
-                      wait_callback = wait_callback,
-                      browser_callback = browser_callback,
-                      prompt_callback = prompt_callback,
-                      input_callback = input_callback,
-                      until_prompt = until_prompt,
-                      echo = echo),
-        interrupt = function(e) {
-          self$interrupt()
-        }
-      )
+      code_lines <- split_lines1(code) 
+      for(line in code_lines) {
+        self$session$send_input(line)
+        self$process_output(
+                              io_timeout = 1,
+                              run_timeout = run_timeout,
+                              stdout_callback = self$aggreg_stdout,
+                              stderr_callback = self$aggreg_stderr,
+                              browser_callback = browser_callback,
+                              input_callback = input_callback,
+                              prompt_callback = prompt_callback,
+                              until_prompt = FALSE,
+                              drop_echo = !echo)
+        output <- self$collect()
+        stderr_callback(output$stderr)
+        stdout_callback(output$stdout)
+      }
+      output_complete <- self$found_prompt
+      while(!output_complete){
+          output_complete <- self$process_output(
+                              io_timeout = io_timeout,
+                              run_timeout = run_timeout,
+                              stdout_callback = stdout_callback,
+                              stderr_callback = stderr_callback,
+                              browser_callback = browser_callback,
+                              input_callback = input_callback,
+                              prompt_callback = prompt_callback,
+                              until_prompt = until_prompt,
+                              drop_echo = FALSE)
+      }
     },
     interrupt = function() {
       # log_out("REPL interrupt")
@@ -366,6 +380,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               stderr_callback(resp$stderr)
         }
         if (!is.null(resp$stdout)) {
+          # log_out("======== process_output ==========")
+          # log_out(resp$stdout)
           if(startsWith(resp$stdout,XON)) { 
             if(endsWith(resp$stdout,XOFF)) {
               resp$stdout <- remove_suffix(resp$stdout, XOFF)

@@ -1077,7 +1077,6 @@ Kernel <- R6Class("Kernel",
           tracer$run(code_lines)
         }
         else {
-          self$stdout("> ") 
           for(line in code_lines) {
             self$errored <- FALSE 
             self$repl$run_code( 
