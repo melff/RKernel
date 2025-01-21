@@ -311,13 +311,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         loop_count <- 0
         while(!output_complete){
           loop_count <- loop_count + 1
-          if(run_timeout > 0) {
-            while(!session$sleeping()) {
-                Sys.sleep(run_timeout/1000)
-                if(is.function(wait_callback))
-                    wait_callback()
-            } 
-          }
           drop_echo <- (!echo && loop_count == 1) 
           output_complete <- self$process_output(
                               io_timeout = io_timeout,
