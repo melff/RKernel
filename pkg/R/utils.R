@@ -120,17 +120,25 @@ log_check <- function(...){
 }
 
 replace_in_package <- function(pkg_name,name,value,update.env=FALSE){
+  # This changes only the exported bit
   env_name <- paste0("package:",pkg_name)
-  if(env_name %in% search())
+  if(env_name %in% search()) {
     env <- as.environment(env_name)
-  else
-    env <- getNamespace(pkg_name)
-  .BaseNamespaceEnv$unlockBinding(name, env)
-  if(update.env){
-      environment(value) <- env
+    .BaseNamespaceEnv$unlockBinding(name, env)
+    assign(name, value, envir = env)
+    .BaseNamespaceEnv$lockBinding(name, env)
   }
-  assign(name, value, env)
-  .BaseNamespaceEnv$lockBinding(name, env)
+  if(pkg_name != "base") { # Base is liberal
+    # This additional dark magic is necessary to change the func *inside* the namespace ...
+    ns <- getNamespace(pkg_name) 
+    .BaseNamespaceEnv$unlockBinding(name, ns)
+    assign(name, value, envir = ns)
+    .BaseNamespaceEnv$lockBinding(name, ns)
+    if(update.env){
+      environment(value) <- ns
+    }
+    # Now menu(), utils::menu(), and utils:::menu() do the same :)
+  }
 }
 
 
@@ -247,6 +255,21 @@ install_safe_q <- function(){
     replace_in_package("base","quit",q_defunct)
 }
 
+ENQ <- '\x05'
+
+#' @export
+readline_orig <- getFromNamespace("readline","base")
+
+readline <- function(prompt = "") {
+  prompt <- paste0(prompt,ENQ)
+  readline_orig(prompt = prompt)
+}
+
+#' @export
+install_readline <- function(){
+    replace_in_package("base", "readline", readline)
+}
+
 read_asset <- function(path) {
   path <- system.file(path,package="RKernel")
   paste(readLines(path),collapse="\n")
@@ -294,17 +317,6 @@ pasteCR <- function(x) {
   paste0(x,"\n", collapse="")
 }
 
-Sys.sleep.orig <- getFromNamespace("Sys.sleep","base")
-
-Sys_sleep <- function(time) {
-  cat(XOFF)
-  Sys.sleep.orig(time)
-  cat(XON)
-}
-
-install_sleep <- function(){
-    replace_in_package("base", "Sys.sleep", Sys_sleep)
-}
 
 update_list <- function(l1, l2) {
   n <- names(l2)

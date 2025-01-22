@@ -176,7 +176,6 @@ XOFFXON <- paste0(XOFF,XON)
 RSessionAdapter <- R6Class("RSessionAdapter",
  public = list(
     session = NULL,
-    suspended = FALSE,
     prompt = NULL,
     browse_prompt = "Browse\\[([0-9]+)\\]> $",
     co_prompt = NULL,
@@ -276,7 +275,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       counter <- 1
       repeat {
         self$session$interrupt()
-        self$suspended <- FALSE
         # log_out("interrupt sent")
         self$session$send_input("")
         # log_out("receiving output")
@@ -320,19 +318,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         self$found_prompt <- FALSE
         output_complete <- FALSE
         if(!length(resp)) {
-          if(until_prompt && session$waiting && !self$suspended) {
-            # log_out("Session waiting for input(?)")
-            if(is.function(input_callback)) {
-              inp <- input_callback()
-              if(session$is_alive()) {
-                # Because the callback might have restarted the session
-                session$send_input(inp, drop_echo = TRUE)
-              } 
-            } else {
-              log_error("Session waiting for input, but no input_callback given")
-              stop("Session waiting for input, but no input_callback given")
-            }
-          }
           output_complete <- !until_prompt
         }
         if (!is.null(resp$stderr) 
@@ -343,23 +328,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         if (!is.null(resp$stdout)) {
           # log_out("======== process_output ==========")
           # log_out(resp$stdout)
-          if(startsWith(resp$stdout,XON)) { 
-            if(endsWith(resp$stdout,XOFF)) {
-              resp$stdout <- remove_suffix(resp$stdout, XOFF)
-            } else {
-              self$suspended <- FALSE
-              # log_out("Input waiting restarted")
-            }
-            resp$stdout <- remove_prefix(resp$stdout, XON)
-          }
-          else if(endsWith(resp$stdout,XOFF)) {
-            self$suspended <- TRUE
-            # log_out("Input waiting suspended")
-            resp$stdout <- remove_suffix(resp$stdout, XOFF)
-          } 
-          if(grepl(XOFFXON, resp$stdout)) {
-            resp$stdout <- gsub(XOFFXON, "", resp$stdout)
-          }
           if(grepl(self$browse_prompt, resp$stdout)) {
             # log_out("Found browser prompt")
             self$found_browse_prompt <- getlastmatch(self$browse_prompt, 
@@ -370,7 +338,17 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             # log_out(self$status)
             self$found_prompt <- TRUE
             resp$stdout <- remove_suffix(resp$stdout, self$prompt)
-          } 
+          } else if (endsWith(resp$stdout, ENQ)) {
+              log_out("Found readline prompt")
+              # log_out(self$status)
+              resp$stdout <- remove_suffix(resp$stdout, ENQ)
+              if (is.function(input_callback)) {
+                # log_out("Calling readline callback")
+                inp <- input_callback(prompt = resp$stdout)
+                session$send_input(inp)
+              }
+              else session$send_input("")
+          }
           if(drop_echo) {
             resp$stdout <- drop_echo(resp$stdout)
           }

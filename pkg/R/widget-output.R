@@ -76,8 +76,6 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             if(length(text) > 1) {
                 text <- paste(text, collapse="\n")
             }
-            text <- gsub(XON,'',text)
-            text <- gsub(XOFF,'',text)
             if(!nzchar(text)) return()
             # text <- paste0(text,"\n")
             private$sync_suspended <- TRUE
@@ -199,7 +197,6 @@ with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear
     expr <- substitute(expr)
     ctx$start_graphics()
     envir$display <- widget$display
-    cat(XOFF)
     if(expr[[1]] == as.symbol("{")) {
         expr <- expr[-1]
         for(e in as.list(expr)) {
@@ -212,7 +209,6 @@ with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear
         widget$send_state("outputs")
         ctx$process_graphics()
     }
-    cat(XON)
     ctx$stop_graphics()
     invisible(r)
 }

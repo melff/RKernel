@@ -59,7 +59,6 @@ RSessionRunner <- R6Class("RSessionRunner",
       self$stream(txt, stream = "stderr")
     },
     stream = function(txt, stream) {
-      if(txt %in% c(XON,XOFF)) return(invisible())
       kernel <- self$kernel
       kernel$restore_shell_parent(private$shell_parent)
       private$kernel_stream(txt,stream)

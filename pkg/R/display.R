@@ -121,7 +121,6 @@ display_data.htmlwidget <- function(x,...,
         file_url <- paste0("file://",getwd(),"/",htmlfile)
     }
 
-    cat(XOFF)
     saveWidget(x,
                file=htmlfile,
                selfcontained=selfcontained,
@@ -161,7 +160,6 @@ display_data.htmlwidget <- function(x,...,
     d$transient <- list(display_id=id)
     if(update) cl <- "update_display_data"
     else cl <- "display_data"
-    cat(XON)
     structure(d,class=cl)
 }
 
