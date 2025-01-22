@@ -78,10 +78,12 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             self$kernel$restore_shell_parent(saved_parent)
         },
         in_browser = FALSE,
+        bprompt = character(0),
         browser_callback = function(prompt) {
             # log_out("dbgConsoleWidgetClass$browser_callback")
             if(self$show_prompt) self$stdout_callback(prompt)
             self$in_browser <- TRUE
+            self$bprompt <- prompt
             return(TRUE)
         },
         prompt_callback = function(...) {
@@ -95,14 +97,8 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
                 txt <- ""
             }
             # log_out(sprintf("txt='%s'",txt))
-            if(get_config("browser_in_condition") && 
-                txt %in% c("","c","n","Q")) {
-                # Do not wait for output ...
-                r <- try(self$session$send_input(txt))
-                self$continue_loop <- FALSE
-            } else {
-                r <- try(self$repl$run_code(txt, echo = TRUE))
-            }
+            r <- try(self$repl$run_code(txt, echo = TRUE,
+                                            until_prompt = FALSE))
             if(inherits(r,"try-error")) {
                 log_error(r)
                 kernel <- self$session$kernel
@@ -126,7 +122,7 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
         },
         on_click_next = function() {
             # log_out("on_click_next")
-            self$handle_input("")
+            self$handle_input("n")
             if(self$in_browser) self$update_env_browser()
             invisible()
         },
@@ -146,17 +142,15 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
         display = function() {
             # log_out("dbgConsoleWidget$display()")
             kernel <- self$session$kernel
-            if(!get_config("browser_in_condition"))  {
-                next_btn <- Button(icon="play",style=ButtonStyle(font_size="70%"))
-                continue_btn <- Button(icon="forward",style=ButtonStyle(font_size="70%"))
-                quit_btn <- Button(icon="stop",style=ButtonStyle(font_size="70%"))
-                next_btn$on_click(self$on_click_next)
-                continue_btn$on_click(self$on_click_continue)
-                quit_btn$on_click(self$on_click_quit)
-                self$button_box <- HBox(next_btn,continue_btn,quit_btn)
-            }
+            next_btn <- Button(icon="play",style=ButtonStyle(font_size="70%"))
+            continue_btn <- Button(icon="forward",style=ButtonStyle(font_size="70%"))
+            quit_btn <- Button(icon="stop",style=ButtonStyle(font_size="70%"))
+            next_btn$on_click(self$on_click_next)
+            continue_btn$on_click(self$on_click_continue)
+            quit_btn$on_click(self$on_click_quit)
+            self$button_box <- HBox(next_btn,continue_btn,quit_btn)
             self$input <- TextWidget(
-                placeholder="Enter expression, 'c', 'n', 'Q' or hit <enter>",
+                placeholder="Enter expression, a debugging command, or 'help' for available commands ",
                 continuous_update = TRUE
             )
             self$input$add_class("monospace")
@@ -229,20 +223,26 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
                 )
         },
         browser_callback = function(prompt) {
-            # log_out("browser_callback")
+            # log_out("dbgSimpleConsoleClass: browser_callback")
+            # log_out(sprintf("prompt = '%s'",prompt))
+            self$bprompt <- prompt
             return(TRUE)
         },
         prompt_callback = function(...) {
+            # log_out("dbgSimpleConsoleClass: prompt_callback")
             self$continue_loop <- FALSE
             return(TRUE)
         },
+        bprompt = character(),
         run = function(prompt) {
             kernel <- self$runner$kernel
             kernel$stdout("\n")
+            self$bprompt <- prompt
             while(self$continue_loop) {
-                kernel$input_request(prompt = prompt)
+                kernel$input_request(prompt = self$bprompt)
                 input <- kernel$read_stdin()
-                self$repl$run_code(input, echo = TRUE)
+                self$repl$run_code(input, echo = TRUE,
+                                   until_prompt = FALSE)
             }
         }
     )
@@ -268,6 +268,8 @@ dbgConsole <- function(runner, prompt, use_widgets = TRUE) {
     }
     cons$run(prompt)
     debugging_state$depth <- debugging_state$depth - 1L
+    # log_out("dbConsole done")
+    return(TRUE)
 }
 
 

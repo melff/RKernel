@@ -244,25 +244,25 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       if(length(code) > 1) {
         code <- paste(code, collapse="\n")
       }
-      # log_out(sprintf("Sending input '%s'",code))
       code_lines <- split_lines1(code) 
+      output_complete <- TRUE
       for(line in code_lines) {
+        # log_out(sprintf("Sending input '%s'",line))
         self$session$send_input(line)
-        self$process_output(
+        output_complete <- self$process_output(
                               io_timeout = 1,
                               run_timeout = run_timeout,
-                              stdout_callback = self$aggreg_stdout,
-                              stderr_callback = self$aggreg_stderr,
+                              stdout_callback = stdout_callback,
+                              stderr_callback = stderr_callback,
                               browser_callback = browser_callback,
                               input_callback = input_callback,
                               prompt_callback = prompt_callback,
                               until_prompt = FALSE,
                               drop_echo = !echo)
-        output <- self$collect()
-        stderr_callback(output$stderr)
-        stdout_callback(output$stdout)
+        #output <- self$collect()
+        #stderr_callback(output$stderr)
+        #stdout_callback(output$stdout)
       }
-      output_complete <- self$found_prompt
       while(!output_complete){
           output_complete <- self$process_output(
                               io_timeout = io_timeout,

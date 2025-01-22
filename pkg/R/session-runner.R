@@ -175,8 +175,8 @@ RSessionRunner <- R6Class("RSessionRunner",
       dbgConsole(runner = self,
                  prompt = prompt,
                  use_widgets = get_config("use_widgets"))
-      if(self$settings_get("browser_in_condition",FALSE))
-        self$repl$process_all_output(until_prompt=TRUE)
+      # if(self$settings_get("browser_in_condition",FALSE))
+      #   self$repl$process_all_output(until_prompt=TRUE)
       self$kernel$restore_shell_parent(self$get_shell_parent())
       return(TRUE)
     },
