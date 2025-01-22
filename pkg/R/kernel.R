@@ -1005,8 +1005,7 @@ Kernel <- R6Class("Kernel",
       # log_out("r_send_request_noreply")
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
-      #self$repl$send_cmd(cmd)
-      self$repl$run_code(cmd, echo = FALSE, until_prompt = FALSE)
+      self$repl$run_code(cmd, echo = FALSE, until_prompt = TRUE)
       return(invisible())
     },
     r_send_cmd = function(cmd) {
