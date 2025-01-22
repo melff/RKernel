@@ -60,7 +60,6 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
                 prompt_callback = self$prompt_callback,
                 echo = TRUE
                 )
-            if(get_config("browser_in_condition")) self$show_prompt <- FALSE
         },
         parent_msg = NULL,
         stdout_callback = function(text) {
@@ -328,7 +327,6 @@ debugger_ <- function(dump = last.dump) {
         browser()
     }
     if(get_config("use_widgets")) {
-        msg_send(list(type="event",content=list(event="debugger")))
         if (!inherits(dump, "dump.frames")) { #adapted from utils::debugger
         cat(gettextf("'dump' is not an object of class %s\n", 
             dQuote("dump.frames")))
@@ -352,8 +350,6 @@ debugger_ <- function(dump = last.dump) {
             }
             else break
         }
-        # log_out("debug iter done")
-        msg_send(list(type="event",content=list(event="debugger-finished")))
     } else {
         debugger_orig(dump)
     }
@@ -362,7 +358,6 @@ debugger_ <- function(dump = last.dump) {
 recover_ <- function() {
     # log_out("recover_")
     if(get_config("use_widgets")) {
-        msg_send(list(type="event",content=list(event="recover")))
         calls <- sys.calls()
         call_labels <- limitedLabels(head(calls,-1))
         recover_look <- function(index, title)  {
@@ -380,7 +375,6 @@ recover_ <- function() {
             } 
             else break
         }
-        msg_send(list(type="event",content=list(event="recover-finished")))
     } else {
         recover_orig()
     }

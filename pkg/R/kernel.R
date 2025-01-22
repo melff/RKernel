@@ -385,8 +385,7 @@ Kernel <- R6Class("Kernel",
         )
       )
       self$errored <- FALSE
-      self$stop_on_error <- (msg$content$stop_on_error &&
-                             self$repl$getOption("rkernel_stop_on_error",TRUE))
+      self$stop_on_error <- msg$content$stop_on_error
       clear_queue <- FALSE
       code <- msg$content$code
 

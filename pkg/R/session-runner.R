@@ -175,8 +175,6 @@ RSessionRunner <- R6Class("RSessionRunner",
       dbgConsole(runner = self,
                  prompt = prompt,
                  use_widgets = get_config("use_widgets"))
-      # if(self$settings_get("browser_in_condition",FALSE))
-      #   self$repl$process_all_output(until_prompt=TRUE)
       self$kernel$restore_shell_parent(self$get_shell_parent())
       return(TRUE)
     },
@@ -187,10 +185,6 @@ RSessionRunner <- R6Class("RSessionRunner",
       event <- msg$content$event
       plot_id <- msg$content$plot_id
       switch(event,
-             recover = ,
-             debugger = self$settings_set(browser_in_condition = TRUE),
-             "recover-finished" = ,
-             "debugger-finished" = self$settings_set(browser_in_condition = FALSE),
              new_plot = private$handle_new_plot(plot_id = plot_id)
              )
     },

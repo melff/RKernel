@@ -180,7 +180,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
     prompt = NULL,
     browse_prompt = "Browse\\[([0-9]+)\\]> $",
     co_prompt = NULL,
-    run_timeout = 0,
     io_timeout = 0,
     stdout = character(0),
     stderr = character(0),
@@ -229,8 +228,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
     run_code = function(
         code,
         io_timeout = 1,
-        run_timeout = 10,
-        wait_callback = NULL,
         stdout_callback = self$stdout_callback,
         stderr_callback = self$stderr_callback,
         browser_callback = self$browser_callback,
@@ -251,7 +248,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         self$session$send_input(line)
         output_complete <- self$process_output(
                               io_timeout = 1,
-                              run_timeout = run_timeout,
                               stdout_callback = stdout_callback,
                               stderr_callback = stderr_callback,
                               browser_callback = browser_callback,
@@ -266,7 +262,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       while(!output_complete){
           output_complete <- self$process_output(
                               io_timeout = io_timeout,
-                              run_timeout = run_timeout,
                               stdout_callback = stdout_callback,
                               stderr_callback = stderr_callback,
                               browser_callback = browser_callback,
@@ -306,43 +301,9 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       }
     },
     found_prompt = FALSE,
-    process_all_output = function(
-        io_timeout = 1,
-        run_timeout = 100,
-        wait_callback = NULL,
-        stdout_callback = self$stdout_callback,
-        stderr_callback = self$stderr_callback,
-        browser_callback = self$browser_callback,
-        input_callback = self$input_callback,
-        prompt_callback = self$prompt_callback,
-        until_prompt = TRUE,
-        echo = FALSE
-      ) {
-        stopifnot(is.function(stdout_callback))
-        stopifnot(is.function(stderr_callback))
-        session <- self$session
-        output_complete <- FALSE
-        loop_count <- 0
-        while(!output_complete){
-          loop_count <- loop_count + 1
-          drop_echo <- (!echo && loop_count == 1) 
-          output_complete <- self$process_output(
-                              io_timeout = io_timeout,
-                              run_timeout = run_timeout,
-                              stdout_callback = stdout_callback,
-                              stderr_callback = stderr_callback,
-                              browser_callback = browser_callback,
-                              input_callback = input_callback,
-                              prompt_callback = prompt_callback,
-                              until_prompt = until_prompt,
-                              drop_echo = drop_echo)
-        }
-    },
    found_browse_prompt = character(0),
    process_output = function(
         io_timeout = 1,
-        run_timeout = 100,
-        wait_callback = NULL,
         stdout_callback = self$stdout_callback,
         stderr_callback = self$stderr_callback,
         browser_callback = self$browser_callback,
@@ -439,10 +400,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       # log_out(sprintf("Run cmd '%s'",cmd))
       self$run_code(cmd,
                     io_timeout = 1,
-                    run_timeout = 0,
                     stdout_callback = self$aggreg_stdout,
                     stderr_callback = self$aggreg_stderr,
-                    wait_callback = NULL,
                     browser_callback = TrueFunc,
                     input_callback = NULL,
                     until_prompt = TRUE,
