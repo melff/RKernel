@@ -117,7 +117,7 @@ request_menu_widget <- function(choices,
       buttons = buttons,
       multiple = multiple)
   )
-  log_out(msg,use.str=TRUE)
+  # log_out(msg,use.str=TRUE)
   msg_send(msg, file=file)
   ind <- readline()
   eval(str2expression(ind))
