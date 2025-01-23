@@ -328,6 +328,11 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         if (!is.null(resp$stdout)) {
           # log_out("======== process_output ==========")
           # log_out(resp$stdout)
+          if(grepl(BEL, resp$stdout)) {
+            resp$stdout <- self$handle_BEL(resp$stdout,
+                                           input_callback,
+                                           stdout_callback)
+          }
           if(grepl(self$browse_prompt, resp$stdout)) {
             # log_out("Found browser prompt")
             self$found_browse_prompt <- getlastmatch(self$browse_prompt, 
@@ -339,15 +344,15 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             self$found_prompt <- TRUE
             resp$stdout <- remove_suffix(resp$stdout, self$prompt)
           } else if (endsWith(resp$stdout, ENQ)) {
-              log_out("Found readline prompt")
-              # log_out(self$status)
-              resp$stdout <- remove_suffix(resp$stdout, ENQ)
-              if (is.function(input_callback)) {
-                # log_out("Calling readline callback")
-                inp <- input_callback(prompt = resp$stdout)
-                session$send_input(inp)
-              }
-              else session$send_input("")
+            log_out("Found readline prompt")
+            # log_out(self$status)
+            resp$stdout <- remove_suffix(resp$stdout, ENQ)
+            if (is.function(input_callback)) {
+              # log_out("Calling readline callback")
+              inp <- input_callback(prompt = resp$stdout)
+              session$send_input(inp)
+            }
+            else session$send_input("")
           }
           if(drop_echo) {
             resp$stdout <- drop_echo(resp$stdout)
@@ -438,7 +443,50 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       names(opt) <- n
       do.call("options", opt)
     },
-    errored = FALSE
+    errored = FALSE,
+    handle_BEL = function(txt,
+                          input_callback,
+                          stdout_callback) {
+      if(grepl(SCAN_BEGIN, txt)) {
+        self$handle_scan(txt,
+                         input_callback,
+                         stdout_callback)
+      }
+    },
+    handle_scan = function(txt, input_callback, stdout_callback) {
+      # log_out("handle_scan")
+      # log_print(txt)
+      session <- self$session
+      txt <- split_string1(txt, SCAN_BEGIN)
+      # log_print(txt)
+      stdout_callback(txt[1])
+      if(length(txt) > 1) {
+        prompt <- txt[2]
+      } else {
+        resp <- session$receive_output(1)
+        prompt <- resp$stdout
+      }
+      repeat {
+        # log_out(prompt)
+        inp <- input_callback(prompt = prompt)
+        # log_out(inp)
+        session$send_input(inp, drop_echo = TRUE)
+        resp <- session$receive_output(1)
+        # log_print(resp)
+        txt <- resp$stdout
+        if(grepl(SCAN_END, txt)) {
+          txt <- split_string1(txt, SCAN_END)
+          stdout_callback(txt[1])
+          if(length(txt) > 1) {
+            return(txt[2]) 
+          } else {
+            return("")
+          }
+        } else {
+          prompt <- txt
+        }
+      }
+    } 
  )) 
 
 TrueFunc <- function(...) TRUE

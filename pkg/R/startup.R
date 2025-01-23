@@ -32,6 +32,7 @@ setup_session <- function(help_port) {
   install_output_hooks()
   install_safe_q()
   install_readline()
+  install_scan()
   log_check(install_menu())
   set_help_displayed()
   install_httpd_handlers()

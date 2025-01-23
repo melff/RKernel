@@ -354,3 +354,28 @@ install_browseURL <- function(){
       options(browser=rkernel_urlbrowser)
     }
 }
+
+#' @export
+scan_orig <- getFromNamespace("scan","base")
+
+BEL <- '\x07'
+SO <- '\x0E'
+SI <- '\x0F'
+
+SCAN_BEGIN <- paste0(SO,"SCAN_BEGIN",SI,BEL)
+SCAN_END <- paste0(SO,"SCAN_END",SI,BEL)
+
+scan <- function(file = "", ...) {
+    if(is.character(file) && file=="") {
+      cat(SCAN_BEGIN)
+      r <- scan_orig(file=file, ...)
+      cat(SCAN_END)  
+      r
+    }
+    else scan_orig(file=file, ...)
+}
+
+#' @export
+install_scan <- function(){
+    replace_in_package("base", "scan", scan)
+}
