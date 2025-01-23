@@ -299,8 +299,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       }
     },
     found_prompt = FALSE,
-   found_browse_prompt = character(0),
-   process_output = function(
+    found_browse_prompt = character(0),
+    process_output = function(
         io_timeout = 1,
         stdout_callback = self$stdout_callback,
         stderr_callback = self$stderr_callback,
@@ -328,10 +328,14 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         if (!is.null(resp$stdout)) {
           # log_out("======== process_output ==========")
           # log_out(resp$stdout)
+          if(drop_echo) {
+            resp$stdout <- drop_echo(resp$stdout)
+          }
           if(grepl(BEL, resp$stdout)) {
             resp$stdout <- self$handle_BEL(resp$stdout,
                                            input_callback,
-                                           stdout_callback)
+                                           stdout_callback,
+                                           stderr_callback)
           }
           if(grepl(self$browse_prompt, resp$stdout)) {
             # log_out("Found browser prompt")
@@ -343,20 +347,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             # log_out(self$status)
             self$found_prompt <- TRUE
             resp$stdout <- remove_suffix(resp$stdout, self$prompt)
-          } else if (endsWith(resp$stdout, ENQ)) {
-            log_out("Found readline prompt")
-            # log_out(self$status)
-            resp$stdout <- remove_suffix(resp$stdout, ENQ)
-            if (is.function(input_callback)) {
-              # log_out("Calling readline callback")
-              inp <- input_callback(prompt = resp$stdout)
-              session$send_input(inp)
-            }
-            else session$send_input("")
-          }
-          if(drop_echo) {
-            resp$stdout <- drop_echo(resp$stdout)
-          }
+          } 
           if(nzchar(resp$stdout)) {
             stdout_callback(resp$stdout)
           } 
@@ -446,19 +437,37 @@ RSessionAdapter <- R6Class("RSessionAdapter",
     errored = FALSE,
     handle_BEL = function(txt,
                           input_callback,
-                          stdout_callback) {
-      if(grepl(SCAN_BEGIN, txt)) {
+                          stdout_callback,
+                          stderr_callback) {
+      if(endsWith(txt, READLINE_PROMPT)) {
+        self$handle_readline(txt,
+                         input_callback,
+                         stdout_callback,
+                         stderr_callback)
+      } else if(grepl(SCAN_BEGIN, txt)) {
         self$handle_scan(txt,
                          input_callback,
-                         stdout_callback)
+                         stdout_callback,
+                         stderr_callback)
       }
     },
-    handle_scan = function(txt, input_callback, stdout_callback) {
-      # log_out("handle_scan")
-      # log_print(txt)
+    handle_readline = function(txt, 
+                           input_callback, 
+                           stdout_callback,
+                           stderr_callback) {
+        # log_out("Found readline prompt")
+        # log_out(self$status)
+        txt <- remove_suffix(txt, READLINE_PROMPT)
+        inp <- input_callback(prompt = txt)
+        self$session$send_input(inp, drop_echo = TRUE)
+        return("")
+    },
+    handle_scan = function(txt, 
+                           input_callback, 
+                           stdout_callback,
+                           stderr_callback) {
       session <- self$session
       txt <- split_string1(txt, SCAN_BEGIN)
-      # log_print(txt)
       stdout_callback(txt[1])
       if(length(txt) > 1) {
         prompt <- txt[2]
@@ -467,18 +476,22 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         prompt <- resp$stdout
       }
       repeat {
-        # log_out(prompt)
         inp <- input_callback(prompt = prompt)
-        # log_out(inp)
         session$send_input(inp, drop_echo = TRUE)
         resp <- session$receive_output(1)
-        # log_print(resp)
         txt <- resp$stdout
+        mes <- resp$stderr
+        if(length(mes)) stderr_callback(mes)
         if(grepl(SCAN_END, txt)) {
           txt <- split_string1(txt, SCAN_END)
-          stdout_callback(txt[1])
+          if(nzchar(txt[1])) stdout_callback(txt[1])
           if(length(txt) > 1) {
-            return(txt[2]) 
+            ret <- split_string1(txt[2],"> ")
+            if(length(ret) > 1) {
+              ret <- tail(ret, 1)
+            }
+            ret <- paste0(ret, "> ")
+            return(ret) 
           } else {
             return("")
           }

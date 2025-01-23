@@ -129,9 +129,9 @@ Kernel <- R6Class("Kernel",
       drop = NULL
       ){
         private$run_services()
-        if(self$session$is_alive()) {
-          self$repl$process_output(until_prompt = FALSE)
-        }
+        # if(self$session$is_alive()) {
+        #   self$repl$process_output(until_prompt = FALSE)
+        # }
         # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
         # log_out("kernel$poll_request")
@@ -974,15 +974,15 @@ Kernel <- R6Class("Kernel",
     input_suspended = TRUE,
     r_get_input = function(prompt = ""){
       if(!private$input_suspended) {
-        if(config$use_widgets) {
-          widget_readline(self, prompt)
+        # if(config$use_widgets) {
+        #   widget_readline(self, prompt)
+        # } else {
+        # }
+        if(private$frontend_present) {
+          self$input_request(prompt = prompt)
+          self$read_stdin()
         } else {
-          if(private$frontend_present) {
-            self$input_request(prompt = prompt)
-            self$read_stdin()
-          } else {
-            readline(prompt=prompt)
-          }
+          readline(prompt=prompt)
         }
       } else {
         return("")

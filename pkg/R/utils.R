@@ -255,13 +255,20 @@ install_safe_q <- function(){
     replace_in_package("base","quit",q_defunct)
 }
 
-ENQ <- '\x05'
+
+BEL <- '\x07'
+SO <- '\x0E'
+SI <- '\x0F'
+READLINE_PROMPT <- paste0(SO,"READLINE",SI,BEL)
+SCAN_BEGIN <- paste0(SO,"SCAN_BEGIN",SI,BEL)
+SCAN_END <- paste0(SO,"SCAN_END",SI,BEL)
+
 
 #' @export
 readline_orig <- getFromNamespace("readline","base")
 
 readline <- function(prompt = "") {
-  prompt <- paste0(prompt,ENQ)
+  prompt <- paste0(prompt,READLINE_PROMPT)
   readline_orig(prompt = prompt)
 }
 
@@ -356,23 +363,16 @@ install_browseURL <- function(){
 }
 
 #' @export
-scan_orig <- getFromNamespace("scan","base")
-
-BEL <- '\x07'
-SO <- '\x0E'
-SI <- '\x0F'
-
-SCAN_BEGIN <- paste0(SO,"SCAN_BEGIN",SI,BEL)
-SCAN_END <- paste0(SO,"SCAN_END",SI,BEL)
+scan_ <- getFromNamespace("scan","base")
 
 scan <- function(file = "", ...) {
     if(is.character(file) && file=="") {
       cat(SCAN_BEGIN)
-      r <- scan_orig(file=file, ...)
-      cat(SCAN_END)  
+      on.exit(cat(SCAN_END))
+      r <- scan_(file=file, ...)
       r
     }
-    else scan_orig(file=file, ...)
+    else scan_(file=file, ...)
 }
 
 #' @export
