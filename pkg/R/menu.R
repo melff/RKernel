@@ -119,7 +119,7 @@ request_menu_widget <- function(choices,
   )
   # log_out(msg,use.str=TRUE)
   msg_send(msg, file=file)
-  ind <- readline()
+  ind <- readline_orig()
   eval(str2expression(ind))
 }
 
