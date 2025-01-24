@@ -86,6 +86,7 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             return(TRUE)
         },
         prompt_callback = function(...) {
+            # log_out("dbgConsoleWidgetClass$prompt_callback")
             self$continue_loop <- FALSE
             self$in_browser <- FALSE
             return(TRUE)
@@ -247,13 +248,9 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
     )
 )
 
-debugging_state <- new.env()
-debugging_state$depth <- 0L
-
 dbgConsole <- function(runner, prompt, use_widgets = TRUE) {
-    debugging_state$depth <- debugging_state$depth + 1L
     # log_out("dbgConsole")
-    # log_out(sprintf("Depth: %d",debugging_state$depth))
+    # log_out("dbgConsole")
     # log_out(prompt)
     # log_out(use_widgets)
     if(use_widgets) {
@@ -266,7 +263,6 @@ dbgConsole <- function(runner, prompt, use_widgets = TRUE) {
         cons <- dbgSimpleConsoleClass$new(runner)
     }
     cons$run(prompt)
-    debugging_state$depth <- debugging_state$depth - 1L
     # log_out("dbConsole done")
     return(TRUE)
 }
@@ -356,7 +352,7 @@ debugger_ <- function(dump = last.dump) {
 }
 
 recover_ <- function() {
-    # log_out("recover_")
+    # log_out("======= recover_ ===========")
     if(get_config("use_widgets")) {
         calls <- sys.calls()
         call_labels <- limitedLabels(head(calls,-1))
@@ -369,9 +365,11 @@ recover_ <- function() {
                                     title = "Select a frame",
                                     buttons = c("Select","Quit"),
                                     file=stderr())
+            # log_out(sprintf("ind = %d",ind))
             if(ind > 0L) {
                 title <- paste("Variables in frame of call",call_labels[ind])
                 recover_look(ind,title)
+                # log_out("returned from 'recover_look()'")
             } 
             else break
         }

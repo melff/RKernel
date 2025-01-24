@@ -1,15 +1,9 @@
 Menu <- function(kernel, args, ...) {
+  # log_out("Menu")
   # log_out("Menu with args:")
   # log_out(args,use.str=TRUE)
-  # log_out(sprintf("debugging_state$depth = %d",debugging_state$depth))
-  if(debugging_state$depth == 0L) {
-    m <- MenuWidgetClass$new(kernel, args, ...)
-    m$run()
-  } else {
-    log_warning("Menu from within browser not supported yet")
-    # TODO: Provide support for this ...
-    kernel$session$send_input("0L", drop_echo = TRUE)
-  }
+  m <- MenuWidgetClass$new(kernel, args, ...)
+  m$run()
 }
 
 MenuWidgetClass <- R6Class("MenuWidget",
