@@ -326,8 +326,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               stderr_callback(resp$stderr)
         }
         if (!is.null(resp$stdout)) {
-          # log_out("======== process_output ==========")
-          # log_out(resp$stdout)
+          log_out("======== process_output ==========")
+          log_out(resp$stdout)
           if(drop_echo) {
             resp$stdout <- drop_echo(resp$stdout)
           }
@@ -439,7 +439,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                           input_callback,
                           stdout_callback,
                           stderr_callback) {
-      if(endsWith(txt, READLINE_PROMPT)) {
+      if(grepl(READLINE_PROMPT,txt)) {
         self$handle_readline(txt,
                          input_callback,
                          stdout_callback,
@@ -457,8 +457,12 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                            stderr_callback) {
         # log_out("Found readline prompt")
         # log_out(self$status)
-        txt <- remove_suffix(txt, READLINE_PROMPT)
-        inp <- input_callback(prompt = txt)
+        txt <- remove_suffix(txt, BEL)
+        splt <- split_string1(txt, READLINE_PROMPT)
+        prefix <- splt[1]
+        stdout_callback(prefix)
+        prompt <- splt[2]
+        inp <- input_callback(prompt = prompt)
         self$session$send_input(inp, drop_echo = TRUE)
         return("")
     },

@@ -259,7 +259,7 @@ install_safe_q <- function(){
 BEL <- '\x07'
 SO <- '\x0E'
 SI <- '\x0F'
-READLINE_PROMPT <- paste0(SO,"READLINE",SI,BEL)
+READLINE_PROMPT <- paste0(SO,"READLINE",SI)
 SCAN_BEGIN <- paste0(SO,"SCAN_BEGIN",SI,BEL)
 SCAN_END <- paste0(SO,"SCAN_END",SI,BEL)
 
@@ -268,7 +268,7 @@ SCAN_END <- paste0(SO,"SCAN_END",SI,BEL)
 readline_orig <- getFromNamespace("readline","base")
 
 readline <- function(prompt = "") {
-  prompt <- paste0(prompt,READLINE_PROMPT)
+  prompt <- paste0(READLINE_PROMPT,prompt,BEL)
   readline_orig(prompt = prompt)
 }
 
