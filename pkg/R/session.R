@@ -326,8 +326,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               stderr_callback(resp$stderr)
         }
         if (!is.null(resp$stdout)) {
-          log_out("======== process_output ==========")
-          log_out(resp$stdout)
+          # log_out("======== process_output ==========")
+          # log_out(resp$stdout)
           if(drop_echo) {
             resp$stdout <- drop_echo(resp$stdout)
           }
@@ -460,8 +460,12 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         txt <- remove_suffix(txt, BEL)
         splt <- split_string1(txt, READLINE_PROMPT)
         prefix <- splt[1]
-        stdout_callback(prefix)
-        prompt <- splt[2]
+        if(nzchar(prefix)) stdout_callback(prefix)
+        if(length(splt) > 1) {
+          prompt <- splt[2]
+        } else {
+          prompt <- ""
+        }
         inp <- input_callback(prompt = prompt)
         self$session$send_input(inp, drop_echo = TRUE)
         return("")
