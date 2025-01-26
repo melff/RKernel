@@ -143,11 +143,11 @@ Kernel <- R6Class("Kernel",
         }
         # print(req$socket_name)
         if(!length(req$socket_name)) return(TRUE)
-        switch(req$socket_name,
-               hb=private$respond_hb(req),
-               control=private$respond_control(req),
-               shell=private$respond_shell(req, drop = drop))
-        return(TRUE)
+        continue <- switch(req$socket_name,
+                            hb=private$respond_hb(req),
+                            control=private$respond_control(req),
+                            shell=private$respond_shell(req, drop = drop))
+        return(continue)
     },
     #' @description
     #' Clear the current output cell in the frontend.
