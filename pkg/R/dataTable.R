@@ -197,7 +197,6 @@ mk_tab_hdr <- function(obj){
 
 datatable_page <- function(obj,
                          id=UUIDgenerate(),
-                         scrollY=400,
                          size=50,
                          page_num=1){
     url <- httpd_url()
@@ -217,7 +216,8 @@ datatable_page <- function(obj,
     code <- fill_tmpl(html_page_tmpl,
                         head=fill_tmpl(dt_head_tmpl,url=url),
                         table=fill_tmpl(dt_table_tmpl,id=id,header=mk_tab_hdr(obj)),
-                        script=fill_tmpl(dt_tmpl,url=url,name=id,id=id,scrollY=scrollY)
+                        script=fill_tmpl(dt_tmpl,url=url,name=id,id=id,
+                                         scrollY="'calc(100vh - 75px)'")
                    )    
     code
 }
@@ -279,23 +279,15 @@ dataTableClass <- R6Class("dataTable",{
         style = NULL,
         #' @field navigator A container widget that contains the navigator buttons
         navigator = NULL,
-        #' @field scrollY The vertical scroll amount
-        scrollY = NULL,
-        #' @field height The height of the iframe
-        height = NULL,
-        # #' @field nlines_control A widget to control the number of rows being shown
-        # nrows_control = NULL,
         # #' @field ncols_control A widget to control the number of cols being shown
         # ncols_control = NULL,
         #' @description
         #' Initialize the DataTable
         #' @param obj The object to be displayed
         #' @param size An integer, the number of columns pre-formatted on each page.
-        #' @param nlines An integer, the approximate number of rows of each page
         #' @param ... Other arguments, ignored
         initialize = function(obj,
                               size=50,
-                              nlines=min(nrow(obj),getOption("dataTable_lines",20)),
                               ...){
             self$size <- size
             self$m <- ncol(obj)%/%size
@@ -305,12 +297,6 @@ dataTableClass <- R6Class("dataTable",{
             self$b_first <- Button(description="<<")
             self$b_last <- Button(description=">>")
             self$iframe <- HTML()
-            # self$nrows_control <- BoundedIntText(value=nlines,
-            #                                       min=1L,max=nrow(obj),
-            #                                       description="Rows",
-            #                                       description_tooltip = 
-            #                                       "Number of rows being shown")
-            # self$nrows_control$on_change(self$update_nlines)
             # self$ncols_control <- BoundedIntText(value=size,
             #                                     min=1L,max=ncol(obj),
             #                                     description="Columns",
@@ -329,9 +315,11 @@ button.datatable-navigation-button {
   background: unset;
   padding: 0;
   line-height: 15px;
+  font-size: small;
 }
 div.datatable-navigation div.widget-html-content {
   line-height: 15px;
+  font-size: small;
 }
 </style>"
                 self$b_left$add_class("datatable-navigation-button")
@@ -351,16 +339,13 @@ div.datatable-navigation div.widget-html-content {
                                        self$b_last)
                 self$navigator$add_class("datatable-navigation")
                 self$w <- VBox(self$style,
-                               #self$nrows_control,
                                self$navigator,
                                self$iframe)
             }
             else {
-                self$w <- self$iframe #VBox(self$nrows_control,self$iframe)
+                self$w <- self$iframe 
             }
-            self$scrollY <- (nlines + 1) * 24 #+ nlines%/%2
-            self$height <- paste0(self$scrollY + 64 + 12,"px")
-            self$dt <- datatable_page(obj,size=size,scrollY=self$scrollY,...)
+            self$dt <- datatable_page(obj,size=size,...)
             self$obj <- obj
             self$draw()
             self$show_columns()
@@ -381,7 +366,7 @@ div.datatable-navigation div.widget-html-content {
         page_left = function(){
             page <- max(1,self$page - 1)
             if(page < self$page){
-                self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
+                self$dt <- datatable_page(self$obj,size=self$size,page_num=page)
                 self$draw()
                 self$page <- page
                 self$show_columns()
@@ -397,7 +382,7 @@ div.datatable-navigation div.widget-html-content {
                 else page <- self$m
             }
             if(page > self$page){
-                self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
+                self$dt <- datatable_page(self$obj,size=self$size,page_num=page)
                 self$draw()
                 self$page <- page
                 self$show_columns()
@@ -409,7 +394,7 @@ div.datatable-navigation div.widget-html-content {
         page_first = function(){
             page <- 1
             if(page < self$page){
-                self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
+                self$dt <- datatable_page(self$obj,size=self$size,page_num=page)
                 self$draw()
                 self$page <- page
                 self$show_columns()
@@ -422,7 +407,7 @@ div.datatable-navigation div.widget-html-content {
             if(self$r > 0) page <- self$m + 1
             else page <- self$m
             if(page > self$page){
-                self$dt <- datatable_page(self$obj,size=self$size,page_num=page,scrollY=self$scrollY)
+                self$dt <- datatable_page(self$obj,size=self$size,page_num=page)
                 self$draw()
                 self$page <- page
                 self$show_columns()
@@ -431,18 +416,10 @@ div.datatable-navigation div.widget-html-content {
         },
         draw = function() {
             self$iframe$value <- str2iframe(self$dt,
+                                            resize="vertical",
                                             #style="width:100%;height:100%;",
-                                            height=self$height)
-        },
-        set_nlines = function(nlines) {
-            self$scrollY <- (nlines + 1) * 24 #+ nlines%/%2
-            self$height <- paste0(self$scrollY + 64 + 12,"px")
-            self$dt <- datatable_page(self$obj,size=self$size,page_num=self$page,scrollY=self$scrollY)
-            self$draw()
-        },
-        update_nlines = function(...){
-            nlines <- self$nrows_control$value
-            self$set_nlines(nlines)
+                                            height="300px"
+                                            )
         }
     )
 })
