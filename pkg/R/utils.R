@@ -200,39 +200,53 @@ url2iframe <- function(url,
     </style>
     "
 
-    if(length(height)) {
-      style <- sprintf("width:%s;height:%s;%s",width,height,style)
-    } else {
-      style <- sprintf("width:%s;aspect-ratio:%s;%s",width,aspect_ratio,style)
-    }
+      if(length(height)) {
+        dimens <- fill_tmpl("width:(( width ));height:(( height ))",
+                           width=width,height=height)
+      } else if(resize == "vertical") {
+        dimens <- fill_tmpl("width(( width ));height:300px")
+      } else {
+        dimens <- fill_tmpl("width(( width ));aspect-ratio:(( aspect_ratio ))",
+                            width=width,aspect_ratio=aspect_ratio)
+      }
 
     if(isTRUE(resize) || resize == "both") {
-      if_tmpl <- "<div class=\"resizer\">
-                  <iframe src=\"%s\" class=\"%s resized\" style=\"%s\">
+      style <- paste0("width:100%;height:100%;",style)
+      if_tmpl <- "<div class='resizer' style= '(( dimens ))'>
+                  <iframe src='(( url ))' class='(( class )) resized' style='(( style ))'>
                   </iframe>
                   </div>
                 "
+      iframe <- fill_tmpl(if_tmpl, 
+                          url = url, class = class, dimens = dimens, style = style)
     } 
     else if(resize == "vertical") {
-      if_tmpl <- "<div class=\"vresizer\">
-                  <iframe src=\"%s\" class=\"%s resized\" style=\"%s\">
+      style <- paste0("width:100%;height:100%;",style)
+      if_tmpl <- "<div class='vresizer' style= '(( dimens ))'>
+                  <iframe src='(( url ))' class='(( class )) resized' style='(( style ))'>
                   </iframe>
                   </div>
                 "
+      iframe <- fill_tmpl(if_tmpl, 
+                          url = url, class = class, dimens = dimens, style = style)
     }
     else if(resize == "horizontal") {
-      if_tmpl <- "<div class=\"hresizer\">
-                  <iframe src=\"%s\" class=\"%s resized\" style=\"%s\">
+      style <- paste0("width:100%;height:100%;",style)
+      if_tmpl <- "<div class='hresizer' style= '(( dimens ))'>
+                  <iframe src='(( url ))' class='(( class )) resized' style='(( style ))'>
                   </iframe>
                   </div>
                 "
+      iframe <- fill_tmpl(if_tmpl, 
+                          url = url, class = class, dimens = dimens, style = style)
     }
     else {
-      if_tmpl <- "<iframe src=\"%s\" class=\"%s\" style=\"%s\">
+      style <- paste0(dimens,";",style)
+      if_tmpl <- "<iframe src='(( url ))' class='(( class ))' style='(( style ))'>
                 </iframe>
                 "
+      iframe <- fill_tmpl(if_tmpl, url = url, class = class, style = style)
     }
-    iframe <- sprintf(if_tmpl,url,class,style)
 
     iframe
 }
