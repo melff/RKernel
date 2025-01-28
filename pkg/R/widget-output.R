@@ -54,8 +54,14 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             private$sync_suspended <- FALSE
             self$send_state("outputs")
         },
+        #' @description Handle output via stdout stream
+        #' @param text A character string being output
         stdout = function(text) private$stream(text,"stdout"),
+        #' @description Handle output via stderr stream
+        #' @param text A character string being output
         stderr = function(text) private$stream(text,"stderr"),
+        #' @description Handle a (JSON) message sent to the output
+        #' @param msg The message, a list
         handle_msg = function(msg) {
             if(!is.list(msg)) return(NULL)
             if (msg$type %in% c("display_data", "update_display_data")) {

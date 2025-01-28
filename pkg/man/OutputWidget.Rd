@@ -157,28 +157,52 @@ the output.}
 \if{html}{\out{<a id="method-OutputWidget-stdout"></a>}}
 \if{latex}{\out{\hypertarget{method-OutputWidget-stdout}{}}}
 \subsection{Method \code{stdout()}}{
+Handle output via stdout stream
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{OutputWidgetClass$stdout(text)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text}}{A character string being output}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OutputWidget-stderr"></a>}}
 \if{latex}{\out{\hypertarget{method-OutputWidget-stderr}{}}}
 \subsection{Method \code{stderr()}}{
+Handle output via stderr stream
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{OutputWidgetClass$stderr(text)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text}}{A character string being output}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OutputWidget-handle_msg"></a>}}
 \if{latex}{\out{\hypertarget{method-OutputWidget-handle_msg}{}}}
 \subsection{Method \code{handle_msg()}}{
+Handle a (JSON) message sent to the output
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{OutputWidgetClass$handle_msg(msg)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{msg}}{The message, a list}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OutputWidget-clone"></a>}}
