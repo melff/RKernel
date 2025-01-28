@@ -87,10 +87,6 @@ Objects of class "dataTable" provide HTML tables with interactive
 \item{\code{style}}{A string with CSS styling}
 
 \item{\code{navigator}}{A container widget that contains the navigator buttons}
-
-\item{\code{scrollY}}{The vertical scroll amount}
-
-\item{\code{height}}{The height of the iframe}
 }
 \if{html}{\out{</div>}}
 }
@@ -104,8 +100,6 @@ Objects of class "dataTable" provide HTML tables with interactive
 \item \href{#method-dataTable-page_first}{\code{dataTableClass$page_first()}}
 \item \href{#method-dataTable-page_last}{\code{dataTableClass$page_last()}}
 \item \href{#method-dataTable-draw}{\code{dataTableClass$draw()}}
-\item \href{#method-dataTable-set_nlines}{\code{dataTableClass$set_nlines()}}
-\item \href{#method-dataTable-update_nlines}{\code{dataTableClass$update_nlines()}}
 \item \href{#method-dataTable-clone}{\code{dataTableClass$clone()}}
 }
 }
@@ -115,12 +109,7 @@ Objects of class "dataTable" provide HTML tables with interactive
 \subsection{Method \code{new()}}{
 Initialize the DataTable
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataTableClass$new(
-  obj,
-  size = 50,
-  nlines = min(nrow(obj), getOption("dataTable_lines", 20)),
-  ...
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{dataTableClass$new(obj, size = 50, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -129,8 +118,6 @@ Initialize the DataTable
 \item{\code{obj}}{The object to be displayed}
 
 \item{\code{size}}{An integer, the number of columns pre-formatted on each page.}
-
-\item{\code{nlines}}{An integer, the approximate number of rows of each page}
 
 \item{\code{...}}{Other arguments, ignored}
 }
@@ -191,26 +178,9 @@ Go to the last page (to the right)
 \if{html}{\out{<a id="method-dataTable-draw"></a>}}
 \if{latex}{\out{\hypertarget{method-dataTable-draw}{}}}
 \subsection{Method \code{draw()}}{
+Draw the iframe with the data table contents
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{dataTableClass$draw()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-dataTable-set_nlines"></a>}}
-\if{latex}{\out{\hypertarget{method-dataTable-set_nlines}{}}}
-\subsection{Method \code{set_nlines()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataTableClass$set_nlines(nlines)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-dataTable-update_nlines"></a>}}
-\if{latex}{\out{\hypertarget{method-dataTable-update_nlines}{}}}
-\subsection{Method \code{update_nlines()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{dataTableClass$update_nlines(...)}\if{html}{\out{</div>}}
 }
 
 }
