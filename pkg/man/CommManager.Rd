@@ -217,10 +217,19 @@ Handle a comm message from the frontend
 \if{html}{\out{<a id="method-CommManager-has"></a>}}
 \if{latex}{\out{\hypertarget{method-CommManager-has}{}}}
 \subsection{Method \code{has()}}{
+Check whether the comm manager has info 
+about comm with an id
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CommManagerClass$has(id)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{id}}{A string, possibly a comm id}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-CommManager-send"></a>}}

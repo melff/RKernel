@@ -101,6 +101,10 @@ CommManagerClass <- R6Class("CommManager",
             if("msg" %in% names(handlers))
                 handlers$msg(comm,data)
         },
+        #' @description 
+        #' Check whether the comm manager has info 
+        #' about comm with an id
+        #' @param id A string, possibly a comm id
         has = function(id) {
             id %in% names(self$comms)
         },
