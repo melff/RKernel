@@ -101,7 +101,7 @@ get_atomic_type <- function(x){
 }
 get_atomic_val <- function(x){
   if(is.array(x)) {
-    paste("dim:", paste(dim(x), collapse = " × "))
+    paste("dim:", paste(dim(x), collapse = " \u00d7 "))
   } else if(length(x) > 1) {
     paste(
       capture.output(
