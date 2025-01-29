@@ -41,7 +41,7 @@ truncate_log <- function(){
 is_kernel <- function() !is.null(kernel$current)
 
 #' @importFrom crayon green red yellow
-
+#' @importFrom utils capture.output
 log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
   dcl <- deparse0(match.call())
   tryCatch({
@@ -83,6 +83,7 @@ log_warning <- function(message){
   cat(message,file=log_fn(),append=TRUE)
 }
 
+#' @importFrom utils limitedLabels
 log_error <- function(message, traceback = FALSE){
   message <- red(format(Sys.time()),"\t",message,"\n")
   message <- paste("ERROR:",message)
@@ -294,6 +295,7 @@ deparse0 <- function(expr, width.cutoff = 500L) {
         collapse = "\n")
 }
 
+#' @importFrom utils head limitedLabels
 send_error_condition <- function(e) {
   # log_out("send_error_condition")
   calls <- head(limitedLabels(sys.calls()),-2)

@@ -6,8 +6,7 @@ get2 <- function(nm,env,parent=NULL){
     else if(is.environment(parent) && exists(nm,envir=parent)) get(nm,envir=parent)
 }
 
-#' @importFrom utils str
-
+#' @importFrom utils str capture.output
 str_str <- function(nm,envir,parent=NULL){
     res <- tryCatch(capture.output(str(get2(nm,envir,parent))),
                     error=function(e)e)

@@ -1,3 +1,4 @@
+#' @importFrom utils capture.output help
 inspect_reply <- function(code,cursor_pos,detail_level=0){
     # log_out("inspect_reply")
     word <- find_word_at(code,cursor_pos)
@@ -11,7 +12,7 @@ inspect_reply <- function(code,cursor_pos,detail_level=0){
 
         obj <- get0(word,envir=.GlobalEnv)
         if(!is.null(obj)){
-            result_text <- capture.output(str_(obj))
+            result_text <- capture.output(str(obj))
             result_text <- paste(result_text,collapse="\n")
             result_text <- paste(word,result_text,sep=": ")
             d <- list(
@@ -50,7 +51,7 @@ inspect_reply <- function(code,cursor_pos,detail_level=0){
             if(length(FUN) > 0){
                 result_text <- paste0(word,": ")
                 result_text <- c(result_text,
-                                 capture.output(print_(FUN)))
+                                 capture.output(print_orig(FUN)))
                 result_text <- paste(result_text,collapse="\n")
                 found <- TRUE
             }
@@ -60,7 +61,7 @@ inspect_reply <- function(code,cursor_pos,detail_level=0){
                     result_text <- paste0(word,": ")
 
                     result_text <- c(result_text,
-                                     capture.output(str_(obj)))
+                                     capture.output(str(obj)))
                     result_text <- paste(result_text,collapse="\n")
                     found <- TRUE
                 }

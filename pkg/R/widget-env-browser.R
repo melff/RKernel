@@ -25,8 +25,7 @@ envBrowserClass <- R6Class_("envBrowser",
                                        parent=parent,
                                        all.names=all.names,
                                        pattern=pattern,
-                                       mode=mode,
-                                       include_css=TRUE)
+                                       mode=mode)
             text_html <- paste(
                 table,
                 sep="\n")
@@ -44,8 +43,7 @@ envBrowserClass <- R6Class_("envBrowser",
                                        parent=self$parent,
                                        all.names=self$all.names,
                                        pattern=self$pattern,
-                                       mode=self$mode,
-                                       include_css=TRUE)
+                                       mode=self$mode)
             text_html <- paste(
                 table,
                 sep="\n")

@@ -6,6 +6,7 @@ has_http_handler <- function(name) {
   exists(name, envir = tools:::.httpd.handlers.env)
 }
 
+#' @importFrom utils capture.output
 http_echo <- function(path, query, ...){
   payload <- list(path=path, query=query,...)
   payload[[4]] <- rawToChar(payload[[4]])
@@ -18,6 +19,7 @@ http_echo <- function(path, query, ...){
   )
 }
 
+#' @importFrom utils capture.output
 http_eval <- function(path, query, ...){
     payload <- ""
     if(length(query)) {
@@ -58,6 +60,7 @@ get_range <- function(x){
         0
 }
 
+#' @importFrom utils capture.output
 http_data <- function(path, query, ...){
     content_type <- "text/plain"
     fmt <- if("format" %in% names(query)) query["format"]

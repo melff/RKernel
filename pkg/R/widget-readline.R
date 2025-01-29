@@ -37,7 +37,7 @@ widget_readline <- function(kernel,prompt="") {
   }
   # log_out("Exited")
   kernel$restore_shell_parent(parent)
-  d <- update(d, "text/plain"="", "text/html"="")
+  d <- update.display_data(d, "text/plain"="", "text/html"="")
   kernel$display_send(d)
   return(self$retval)
 }

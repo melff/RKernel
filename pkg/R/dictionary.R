@@ -65,7 +65,7 @@ print.dictionary <- function(x,force=FALSE,...){
             }
             for(k in keys){
                 cat(paste0(k,":\n"))
-                print_(x[k],...)
+                print_orig(x[k],...)
             }
             
         }

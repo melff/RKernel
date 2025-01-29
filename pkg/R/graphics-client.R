@@ -260,7 +260,7 @@ start_graphics <- function(){
           "jupyter.update.graphics"))
 }
 
-
+#' @importFrom graphics par
 plot_new_hook <- function() {
   if(par("page")) send_new_plot()
 }
@@ -287,7 +287,7 @@ send_before_new_plot <- function() {
   }
 }
 
-
+#' @importFrom grDevices dev.cur
 dev_is_unigd <- function(which = dev.cur()) {
   names(which) == "unigd"
 }

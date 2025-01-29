@@ -351,6 +351,7 @@ debugger_ <- function(dump = last.dump) {
     }
 }
 
+#' @importFrom utils head limitedLabels
 recover_ <- function() {
     # log_out("======= recover_ ===========")
     if(get_config("use_widgets")) {
@@ -419,7 +420,7 @@ CellTracer <- R6Class("CellTracer",
                 session$yield(1000)
                 if(kernel$errored && kernel$stop_on_error) break
             }
-            d <- update(d,"text/plain"="",
+            d <- update.display.data(d,"text/plain"="",
                           "text/html"="")
             kernel$restore_shell_parent(save_parent)
             kernel$display_send(d)

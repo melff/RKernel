@@ -5,6 +5,7 @@ completions$inited <- FALSE
 #' @param code A character string with code to be checked for
 #'    completions.
 #' @param cursor_pos An integer, the current position of the cursor.
+#' @importFrom utils head
 get_completions <- function(code,cursor_pos){
     if(!completions$inited) 
         init_completions()

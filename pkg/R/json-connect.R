@@ -18,6 +18,7 @@ JSON_END <- SI
 MSG_BEGIN <- JSON_BEGIN
 MSG_END <- JSON_END
 
+#' @importFrom utils limitedLabels
 json_send <- function(msg, file=stdout()){
     if(!is.list(msg)) {
         log_out("Non-list argument to 'json_send()'")

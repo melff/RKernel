@@ -80,6 +80,7 @@ inspect_helper_types <- c(
   "character" = "str"
 )
 
+#' @importFrom utils capture.output
 get_atomic_type <- function(x){
   tp <- typeof(x)
   if (length(x) <= 1 && tp %in% names(inspect_helper_types)) {
@@ -92,7 +93,7 @@ get_atomic_type <- function(x){
     type <- paste(
       gsub(
         "NULL ...", "",
-        capture.output(str_(x, vec.len = 0L, give.attr = FALSE))
+        capture.output(str(x, vec.len = 0L, give.attr = FALSE))
       ),
       collapse = "\n"
     )
@@ -104,7 +105,7 @@ get_atomic_val <- function(x){
   } else if(length(x) > 1) {
     paste(
       capture.output(
-        str_(x, 
+        str(x, 
              give.attr = FALSE, 
              give.length =FALSE, 
              give.head=FALSE)),
@@ -115,9 +116,10 @@ get_atomic_val <- function(x){
   }
 }
 
+#' @importFrom utils capture.output
 get_function_val <- function(x) {
   res <- paste(
-    capture.output(str_(x, give.attr = FALSE)),
+    capture.output(str(x, give.attr = FALSE)),
     collapse = "\n"
   )
   sub("function ", "\\", res, fixed = TRUE)
@@ -125,9 +127,10 @@ get_function_val <- function(x) {
 
 get_structured_val <- function(x) UseMethod("get_structured_val")
 
+#' @importFrom utils capture.output
 get_structured_val.default <- function(x){
   if(is.language(x)) paste(deparse(x), collapse=" ")
-  else capture.output(str_(x, give.attr = FALSE, list.len = 0))[1]
+  else capture.output(str(x, give.attr = FALSE, list.len = 0))[1]
 }
 
 get_structured_val.list <- function(x) {
@@ -158,6 +161,7 @@ ref2children <- function(ref, envir = parent.frame()) {
   else msg_send(response)
 }
 
+#' @importFrom methods slotNames
 get_children <- function(obj, ename, envir) {
   # log_out("get_children")
   # log_out(ename)
@@ -384,9 +388,10 @@ has_nontriv_attribs <- function(x) {
   length(nontriv_attribs(x)) > 0
 }
 
+#' @importFrom utils capture.output
 str_minimal <- function(x){
   capture.output(
-    str_(
+    str(
       x,
       give.head = FALSE, 
       give.length = FALSE, 

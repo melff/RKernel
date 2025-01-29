@@ -108,7 +108,7 @@ popout_button <- '<form class="help-popout-button" action="%s" method="get" targ
 
 #' @describeIn display_data S3 method for help pages
 #' @importFrom uuid UUIDgenerate
-#' @importFrom utils URLencode
+#' @importFrom utils URLencode capture.output
 #' @importFrom tools Rd2HTML Rd2txt Rd2latex
 #' @export 
 display_data.help_files_with_topic <- function(x,...,
@@ -356,6 +356,7 @@ my_example2html <- function(topic, package, Rhome = "", env = NULL){
     "Not yet implemented"
 }
 
+#' @importFrom utils capture.output example
 example_html <- function(topic,package = NULL,...) {
     # log_out("====== example_html ======")
     e <- capture.output(example(topic,package,local=TRUE,
@@ -396,6 +397,7 @@ example_html <- function(topic,package = NULL,...) {
     return(list(payload=r))
 }
 
+#' @importFrom utils capture.output demo
 demo_html <- function(topic,package = NULL,...) {
     e <- capture.output(demo(topic=topic,package,ask=FALSE,character.only=TRUE))
     e <- paste(e,collapse="\n")

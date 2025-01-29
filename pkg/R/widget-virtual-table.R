@@ -311,7 +311,7 @@ virtable_widget <- function(x,
     row_plus_button$on_click(row_pagesize_increase)
     row_minus_button$on_click(row_pagesize_decrease)
      
-    display(get_grid_table_css())
+    display(raw_html(get_grid_table_css()))
     display(get_virtable_widget_css())
 
     toggle_page_controls()

@@ -1,5 +1,12 @@
 #' @importFrom uuid UUIDgenerate
 
+get_grid_table_css <- function() {
+    grid_table_css <- readLines(system.file("css/grid-table.css",
+                                            package="RKernel"))
+    grid_table_css <- paste0(grid_table_css,collapse="\n")
+    paste("<style>",grid_table_css,"</style>",sep="\n")
+}
+
 grid_table <- function(x,id=UUIDgenerate(),
                        use.rownames=TRUE,
                        html_class="gridTable", 
@@ -27,10 +34,7 @@ grid_table <- function(x,id=UUIDgenerate(),
                       ">"),
                thead,tbody,"</table>")
     html <- paste0(table,collapse="\n")
-    grid_table_css <- readLines(system.file("css/grid-table.css",
-                                            package="RKernel"))
-    grid_table_css <- paste0(grid_table_css,collapse="\n")
-    grid_table_css <- paste("<style>",grid_table_css,"</style>",sep="\n")
+    grid_table_css <- get_grid_table_css()
     html <- paste(grid_table_css,html,sep="\n")
     raw_html(html,id=id)   
 }

@@ -47,6 +47,7 @@ display_data <- function(x,...) {
 #'               or an existing one should be updated
 #' 
 #' @importFrom uuid UUIDgenerate
+#' @importFrom utils capture.output
 #' @export
 display_data.default <- function(x,...,
                                  data,
