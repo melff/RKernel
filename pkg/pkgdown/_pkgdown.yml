@@ -113,3 +113,6 @@ reference:
   - sharedHelpServer
   - to_json
   - virtable_widget
+  - get_completions
+  - str2iframe
+  - url2iframe
