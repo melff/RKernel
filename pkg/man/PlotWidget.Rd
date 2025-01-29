@@ -84,7 +84,7 @@ Class and constructors show graphics created by code
 \subsection{Method \code{new()}}{
 Initialize the object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SVGWidgetClass$new(..., width = NULL, height = NULL, envir = new.env())}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{SVGWidgetClass$new(..., width = NULL, height = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -95,8 +95,6 @@ Initialize the object
 \item{\code{width}}{A character string, giving the width as a CSS property}
 
 \item{\code{height}}{A character string, giving the height as a CSS property}
-
-\item{\code{envir}}{An optional environment within which expressions are evaluated}
 }
 \if{html}{\out{</div>}}
 }
@@ -105,6 +103,7 @@ Initialize the object
 \if{html}{\out{<a id="method-SVGWidget-activate"></a>}}
 \if{latex}{\out{\hypertarget{method-SVGWidget-activate}{}}}
 \subsection{Method \code{activate()}}{
+Activate widget as graphics device
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SVGWidgetClass$activate()}\if{html}{\out{</div>}}
 }
@@ -114,6 +113,7 @@ Initialize the object
 \if{html}{\out{<a id="method-SVGWidget-suspend"></a>}}
 \if{latex}{\out{\hypertarget{method-SVGWidget-suspend}{}}}
 \subsection{Method \code{suspend()}}{
+Suspend widget as graphics device
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SVGWidgetClass$suspend()}\if{html}{\out{</div>}}
 }
@@ -123,6 +123,7 @@ Initialize the object
 \if{html}{\out{<a id="method-SVGWidget-render"></a>}}
 \if{latex}{\out{\hypertarget{method-SVGWidget-render}{}}}
 \subsection{Method \code{render()}}{
+Render contents of graphics device as SVG
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{SVGWidgetClass$render()}\if{html}{\out{</div>}}
 }

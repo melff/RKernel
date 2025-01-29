@@ -1,7 +1,6 @@
 completions <- new.env()
 completions$inited <- FALSE
 
-#' @description
 #' Provide completion for code given at point.
 #' @param code A character string with code to be checked for
 #'    completions.

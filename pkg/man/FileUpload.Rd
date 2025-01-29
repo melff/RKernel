@@ -44,15 +44,15 @@ If empty, all files are accepted.}
 \item{\code{error}}{A string with an error message, if applicable.}
 
 \item{\code{value}}{The uploaded data.}
-
-\item{\code{names}}{of the uploaded files}
 }
 \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{names}}{of the uploaded files}
+\item{\code{filename}}{A character string, the name of the uploaded file.}
+
+\item{\code{contents}}{A raw vector with the contents of the uploaded file}
 }
 \if{html}{\out{</div>}}
 }

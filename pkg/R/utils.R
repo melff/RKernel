@@ -73,9 +73,6 @@ log_print <- function(x,...) log_out(x, use.print = TRUE)
 log_str <- function(x,...) log_out(x, use.str = TRUE)
 
 
-#' @description
-#' Show a warning in the Jupyter server log
-#' @param message A string to be shown in the log
 log_warning <- function(message){
   message <- paste(yellow(format(Sys.time()),"\t",message,"\n"))
   message <- paste("R WARNING:",message)
@@ -85,9 +82,7 @@ log_warning <- function(message){
     message <- paste("          R SESSION -", message)
   cat(message,file=log_fn(),append=TRUE)
 }
-#' @description
-#' Show an error message in the Jupyter server log
-#' @param message A string to be shown in the log
+
 log_error <- function(message, traceback = FALSE){
   message <- red(format(Sys.time()),"\t",message,"\n")
   message <- paste("ERROR:",message)
@@ -142,7 +137,6 @@ replace_in_package <- function(pkg_name,name,value,update.env=FALSE){
 }
 
 
-#' @description
 #' Create an HTML iframe tag that refers to some (usually HTML) code
 #' @param code The code to be shown in the iframe
 #' @param resize Logical; should the iframe be resizeable?
@@ -171,7 +165,6 @@ str2iframe <- function(code,
     url2iframe(url,resize,width,aspect_ratio,height,class,style,...)
 }
 
-#' @description
 #' Create an HTML iframe tag that refers to some (usually HTML) code
 #' @param code The code to be shown in the iframe
 #' @param resize Logical; should the iframe be resizeable?

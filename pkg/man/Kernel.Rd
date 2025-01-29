@@ -18,6 +18,11 @@ An object of this class handles the low-level communication with
 \item{\code{runner}}{An RSessionRunner}
 
 \item{\code{DAPServer}}{The current DAP server}
+
+\item{\code{errored}}{Logical, whether an error occurred in the R session}
+
+\item{\code{stop_on_error}}{Logical, whether running a notebook should be
+stopped in case of an error in the R session.}
 }
 \if{html}{\out{</div>}}
 }
@@ -75,6 +80,7 @@ Initialize the kernel
 \if{html}{\out{<a id="method-Kernel-start"></a>}}
 \if{latex}{\out{\hypertarget{method-Kernel-start}{}}}
 \subsection{Method \code{start()}}{
+Start the R session and other components
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$start()}\if{html}{\out{</div>}}
 }
@@ -93,6 +99,9 @@ Run some code (for testing purposes)
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{code}}{Some code}
+
+\item{\code{debug}}{Logical, whether running a code cell should
+occur under debugging conditions}
 }
 \if{html}{\out{</div>}}
 }
@@ -119,6 +128,15 @@ A single iteration of the kernel loop
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{poll_timeout}}{An integer}
+
+\item{\code{drop}}{Logical, whether execute requests should be dropped}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Kernel-clear_output"></a>}}
@@ -168,7 +186,7 @@ Stream text to the frontend via 'stdout' stream.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{text}}{Text to be sent to the frontend}
+\item{\code{text}}{Text to be sent to the frontend.}
 }
 \if{html}{\out{</div>}}
 }
@@ -185,7 +203,7 @@ Stream text to the frontend via 'stderr' stream.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{text}}{Text to be sent to the frontend}
+\item{\code{text}}{Text to be sent to the frontend.}
 }
 \if{html}{\out{</div>}}
 }
@@ -194,10 +212,18 @@ Stream text to the frontend via 'stderr' stream.
 \if{html}{\out{<a id="method-Kernel-readline"></a>}}
 \if{latex}{\out{\hypertarget{method-Kernel-readline}{}}}
 \subsection{Method \code{readline()}}{
+Ask the frontend for a line of text input.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$readline(prompt = "")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{prompt}}{The prompt, a character string.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Kernel-execute_result"></a>}}
@@ -361,6 +387,7 @@ Send a debug event to the frontend
 \if{html}{\out{<a id="method-Kernel-save_shell_parent"></a>}}
 \if{latex}{\out{\hypertarget{method-Kernel-save_shell_parent}{}}}
 \subsection{Method \code{save_shell_parent()}}{
+Save the parent message on the shell channel
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$save_shell_parent()}\if{html}{\out{</div>}}
 }
@@ -370,15 +397,25 @@ Send a debug event to the frontend
 \if{html}{\out{<a id="method-Kernel-restore_shell_parent"></a>}}
 \if{latex}{\out{\hypertarget{method-Kernel-restore_shell_parent}{}}}
 \subsection{Method \code{restore_shell_parent()}}{
+Restore a saved parent message on the shell channel.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$restore_shell_parent(saved_parent)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{saved_parent}}{A saved parent message, a list.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Kernel-shutdown"></a>}}
 \if{latex}{\out{\hypertarget{method-Kernel-shutdown}{}}}
 \subsection{Method \code{shutdown()}}{
+Shut down the kernel and all associated sub-process
+ i.e. the R session and all detached-cell processes.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$shutdown()}\if{html}{\out{</div>}}
 }
@@ -388,6 +425,7 @@ Send a debug event to the frontend
 \if{html}{\out{<a id="method-Kernel-restart"></a>}}
 \if{latex}{\out{\hypertarget{method-Kernel-restart}{}}}
 \subsection{Method \code{restart()}}{
+Restart the R session
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$restart()}\if{html}{\out{</div>}}
 }
@@ -397,6 +435,7 @@ Send a debug event to the frontend
 \if{html}{\out{<a id="method-Kernel-restore_execute_parent"></a>}}
 \if{latex}{\out{\hypertarget{method-Kernel-restore_execute_parent}{}}}
 \subsection{Method \code{restore_execute_parent()}}{
+Restore parent message of last execute_request.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$restore_execute_parent()}\if{html}{\out{</div>}}
 }
@@ -406,19 +445,37 @@ Send a debug event to the frontend
 \if{html}{\out{<a id="method-Kernel-handle_yield"></a>}}
 \if{latex}{\out{\hypertarget{method-Kernel-handle_yield}{}}}
 \subsection{Method \code{handle_yield()}}{
+Handle R session's yielding to allow servicing
+ frontend requests
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$handle_yield(timeout)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{timeout}}{Number of milliseconds to wait for a frontend request}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Kernel-add_service"></a>}}
 \if{latex}{\out{\hypertarget{method-Kernel-add_service}{}}}
 \subsection{Method \code{add_service()}}{
+Add a function as a service to be run each iteration
+ of the kernel loop.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Kernel$add_service(FUN)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{FUN}}{A function.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Kernel-clone"></a>}}

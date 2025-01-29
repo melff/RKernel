@@ -56,6 +56,7 @@ Kernel <- R6Class("Kernel",
       assign("kernel",self,envir=private$sandbox)
       config$use_widgets <- FALSE
     },
+    #' @description Start the R session and other components 
     start = function(){
       runner <- RSessionRunner$new(self, self$stream)
       runner$start()
@@ -91,6 +92,8 @@ Kernel <- R6Class("Kernel",
     DAPServer = NULL,
     #' @description Run some code (for testing purposes)
     #' @param code Some code
+    #' @param debug Logical, whether running a code cell should
+    #'  occur under debugging conditions
     run_code = function(code, debug = FALSE) {
       # self$repl$run_code(code)
       # self$runner$display_changed_graphics()
@@ -124,6 +127,8 @@ Kernel <- R6Class("Kernel",
     },
     #' @description
     #' A single iteration of the kernel loop
+    #' @param poll_timeout An integer
+    #' @param drop Logical, whether execute requests should be dropped
     poll_and_respond = function(
       poll_timeout = getOption("rkernel_poll_timeout",10L),
       drop = NULL
@@ -177,16 +182,19 @@ Kernel <- R6Class("Kernel",
     },
     #' @description
     #' Stream text to the frontend via 'stdout' stream.
-    #' @param text Text to be sent to the frontend
+    #' @param text Text to be sent to the frontend.
     stdout = function(text) {
       self$stream(text,stream="stdout")
     },
     #' @description
     #' Stream text to the frontend via 'stderr' stream.
-    #' @param text Text to be sent to the frontend
+    #' @param text Text to be sent to the frontend.
     stderr = function(text) {
       self$stream(text,stream="stderr")
     },
+    #' @description
+    #' Ask the frontend for a line of text input.
+    #' @param prompt The prompt, a character string.
     readline = function(prompt="") {
       private$r_get_input(prompt=prompt)
     },
@@ -314,39 +322,52 @@ Kernel <- R6Class("Kernel",
                            socket="iopub",
                            content=content)
     },
+    #' @field errored Logical, whether an error occurred in the R session
     errored = FALSE,
+    #' @description Save the parent message on the shell channel
     save_shell_parent = function() {
       # log_out("save_shell_parent")
       # log_out(private$parent$shell$header$msg_id)
       private$parent$shell
     },
+    #' @description Restore a saved parent message on the shell channel.
+    #' @param saved_parent A saved parent message, a list.
     restore_shell_parent = function(saved_parent) {
       if(!length(saved_parent) && 
          private$frontend_present) stop("Empty parent message in restore_shell_parent()")
       private$parent$shell <- saved_parent
     },
+    #' @field stop_on_error Logical, whether running a notebook should be
+    #'  stopped in case of an error in the R session.
     stop_on_error = TRUE,
-
+    #' @description Shut down the kernel and all associated sub-process
+    #'  i.e. the R session and all detached-cell processes.
     shutdown = function() {
       self$session$close()
       private$stop_all_detached()
       invokeRestart("abort")
     },
+    #' @description Restart the R session
     restart = function() {
       self$session$close()
       private$stop_all_detached()
       private$clear_shell_queue()
       self$start()
     },
+    #' @description Restore parent message of last execute_request.
     restore_execute_parent = function() {
       self$restore_shell_parent(private$execute_parent)
     },
-
+    #' @description Handle R session's yielding to allow servicing
+    #'  frontend requests
+    #' @param timeout Number of milliseconds to wait for a frontend request
     handle_yield = function(timeout) {
       self$poll_and_respond(timeout,
                             drop="execute_request")
     },
-
+    #' @description Add a function as a service to be run each iteration
+    #'  of the kernel loop.
+    #' @param FUN A function.
     add_service = function(FUN) {
       if(is.function(FUN)) {
         n <- length(private$services) + 1

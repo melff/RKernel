@@ -66,7 +66,7 @@ FileUploadClass <- R6Class_("FileUpload",
        }
    ),
    active = list(
-       #' @field names of the uploaded files
+       #' @field filename A character string, the name of the uploaded file.
        filename = function(value){
            if(missing(value)) {
                if(length(self$value)) return(sapply(self$value,"[[","name"))
@@ -74,6 +74,7 @@ FileUploadClass <- R6Class_("FileUpload",
            }
            else stop("file names cannot be changed")
        },
+       #' @field contents A raw vector with the contents of the uploaded file
        contents = function(value){
            if(missing(value)) {
                if(length(self$value)) {

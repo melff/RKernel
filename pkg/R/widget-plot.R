@@ -18,13 +18,10 @@ SVGWidgetClass <- R6Class_(
         #' @param ... Arguments passed to the superclass initializer
         #' @param width A character string, giving the width as a CSS property
         #' @param height A character string, giving the height as a CSS property
-        #' @param envir An optional environment within which expressions are evaluated
         initialize = function(...,
                               width=NULL,
-                              height=NULL,
-                              envir = new.env()){
+                              height=NULL){
             super$initialize(...)
-            self$envir <- envir
             style <- character(0)
             if(length(width)){
                 style <- c(style,paste0("width:",width))
@@ -41,14 +38,17 @@ SVGWidgetClass <- R6Class_(
             private$dev_num <- dev.cur()
             dev.set(private$dev_num_other)
         },
+        #' @description Activate widget as graphics device
         activate = function(){
             private$dev_num_other <- dev.cur()
             dev.set(private$dev_num)
         },
+        #' @description Suspend widget as graphics device
         suspend = function(){
             if(private$dev_num_other > 1)
                 dev.set(private$dev_num_other)
         },
+        #' @description Render contents of graphics device as SVG
         render = function(){
             string <- private$svg_string()
             if(length(string)>1){
@@ -56,8 +56,7 @@ SVGWidgetClass <- R6Class_(
             }
             string <- private$set_dims(string)
             self$value <- string
-        },
-        envir = NULL
+        }
     ),
     private = list(
         style = NULL,
