@@ -67,6 +67,15 @@
 <dd><p>The current DAP server</p></dd>
 
 
+<dt><code>errored</code></dt>
+<dd><p>Logical, whether an error occurred in the R session</p></dd>
+
+
+<dt><code>stop_on_error</code></dt>
+<dd><p>Logical, whether running a notebook should be
+stopped in case of an error in the R session.</p></dd>
+
+
 </dl><p></p></div>
     </div>
     <div class="section level2">
@@ -121,8 +130,7 @@
 
 </div><p></p><hr><a id="method-Kernel-start"></a><div class="section">
 <h3 id="method-start-">Method <code><a href="https://rdrr.io/r/stats/start.html" class="external-link">start()</a></code><a class="anchor" aria-label="anchor" href="#method-start-"></a></h3>
-
-<div class="section">
+<p>Start the R session and other components</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">start</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -139,6 +147,11 @@
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>code</code></dt>
 <dd><p>Some code</p></dd>
+
+
+<dt><code>debug</code></dt>
+<dd><p>Logical, whether running a code cell should
+occur under debugging conditions</p></dd>
 
 
 </dl><p></p></div>
@@ -162,6 +175,18 @@
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>poll_timeout</code></dt>
+<dd><p>An integer</p></dd>
+
+
+<dt><code>drop</code></dt>
+<dd><p>Logical, whether execute requests should be dropped</p></dd>
+
+
+</dl><p></p></div>
+</div>
 
 </div><p></p><hr><a id="method-Kernel-clear_output"></a><div class="section">
 <h3 id="method-clear-output-">Method <code>clear_output()</code><a class="anchor" aria-label="anchor" href="#method-clear-output-"></a></h3>
@@ -171,7 +196,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>wait</code></dt>
 <dd><p>Logical value, whether to wait until output is cleared.</p></dd>
 
@@ -187,7 +212,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>text</code></dt>
 <dd><p>Text to be sent to the frontend</p></dd>
 
@@ -207,9 +232,9 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>text</code></dt>
-<dd><p>Text to be sent to the frontend</p></dd>
+<dd><p>Text to be sent to the frontend.</p></dd>
 
 
 </dl><p></p></div>
@@ -223,9 +248,9 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>text</code></dt>
-<dd><p>Text to be sent to the frontend</p></dd>
+<dd><p>Text to be sent to the frontend.</p></dd>
 
 
 </dl><p></p></div>
@@ -233,12 +258,19 @@
 
 </div><p></p><hr><a id="method-Kernel-readline"></a><div class="section">
 <h3 id="method-readline-">Method <code><a href="https://rdrr.io/r/base/readline.html" class="external-link">readline()</a></code><a class="anchor" aria-label="anchor" href="#method-readline-"></a></h3>
-
-<div class="section">
+<p>Ask the frontend for a line of text input.</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">readline</span><span class="op">(</span>prompt <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>prompt</code></dt>
+<dd><p>The prompt, a character string.</p></dd>
+
+
+</dl><p></p></div>
+</div>
 
 </div><p></p><hr><a id="method-Kernel-execute_result"></a><div class="section">
 <h3 id="method-execute-result-">Method <code>execute_result()</code><a class="anchor" aria-label="anchor" href="#method-execute-result-"></a></h3>
@@ -248,7 +280,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>data</code></dt>
 <dd><p>Execution result in rich format</p></dd>
 
@@ -268,7 +300,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>msg</code></dt>
 <dd><p>A list with the appropriate structure. [TODO]</p></dd>
 
@@ -284,7 +316,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
+<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>name</code></dt>
 <dd><p>A string, the error name.</p></dd>
 
@@ -308,7 +340,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
+<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>msg</code></dt>
 <dd><p>A list containing a comm message.</p></dd>
 
@@ -324,7 +356,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
+<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>channel</code></dt>
 <dd><p>A string, the relevant input channel.</p></dd>
 
@@ -356,7 +388,7 @@
 </div>
 
 <div class="section">
-<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
+<h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>prompt</code></dt>
 <dd><p>A prompt string</p></dd>
 
@@ -385,7 +417,7 @@ password dialog</p></dd>
 </div>
 
 <div class="section">
-<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
+<h4 id="arguments-14">Arguments<a class="anchor" aria-label="anchor" href="#arguments-14"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>content</code></dt>
 <dd><p>A list, content provided by the debug adapter</p></dd>
 
@@ -395,8 +427,7 @@ password dialog</p></dd>
 
 </div><p></p><hr><a id="method-Kernel-save_shell_parent"></a><div class="section">
 <h3 id="method-save-shell-parent-">Method <code>save_shell_parent()</code><a class="anchor" aria-label="anchor" href="#method-save-shell-parent-"></a></h3>
-
-<div class="section">
+<p>Save the parent message on the shell channel</p><div class="section">
 <h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">save_shell_parent</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -404,17 +435,24 @@ password dialog</p></dd>
 
 </div><p></p><hr><a id="method-Kernel-restore_shell_parent"></a><div class="section">
 <h3 id="method-restore-shell-parent-">Method <code>restore_shell_parent()</code><a class="anchor" aria-label="anchor" href="#method-restore-shell-parent-"></a></h3>
-
-<div class="section">
+<p>Restore a saved parent message on the shell channel.</p><div class="section">
 <h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">restore_shell_parent</span><span class="op">(</span><span class="va">saved_parent</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="arguments-15">Arguments<a class="anchor" aria-label="anchor" href="#arguments-15"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>saved_parent</code></dt>
+<dd><p>A saved parent message, a list.</p></dd>
+
+
+</dl><p></p></div>
+</div>
 
 </div><p></p><hr><a id="method-Kernel-shutdown"></a><div class="section">
 <h3 id="method-shutdown-">Method <code>shutdown()</code><a class="anchor" aria-label="anchor" href="#method-shutdown-"></a></h3>
-
-<div class="section">
+<p>Shut down the kernel and all associated sub-process
+ i.e. the R session and all detached-cell processes.</p><div class="section">
 <h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">shutdown</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -422,8 +460,7 @@ password dialog</p></dd>
 
 </div><p></p><hr><a id="method-Kernel-restart"></a><div class="section">
 <h3 id="method-restart-">Method <code>restart()</code><a class="anchor" aria-label="anchor" href="#method-restart-"></a></h3>
-
-<div class="section">
+<p>Restart the R session</p><div class="section">
 <h4 id="usage-23">Usage<a class="anchor" aria-label="anchor" href="#usage-23"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">restart</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -431,8 +468,7 @@ password dialog</p></dd>
 
 </div><p></p><hr><a id="method-Kernel-restore_execute_parent"></a><div class="section">
 <h3 id="method-restore-execute-parent-">Method <code>restore_execute_parent()</code><a class="anchor" aria-label="anchor" href="#method-restore-execute-parent-"></a></h3>
-
-<div class="section">
+<p>Restore parent message of last execute_request.</p><div class="section">
 <h4 id="usage-24">Usage<a class="anchor" aria-label="anchor" href="#usage-24"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">restore_execute_parent</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -440,21 +476,37 @@ password dialog</p></dd>
 
 </div><p></p><hr><a id="method-Kernel-handle_yield"></a><div class="section">
 <h3 id="method-handle-yield-">Method <code>handle_yield()</code><a class="anchor" aria-label="anchor" href="#method-handle-yield-"></a></h3>
-
-<div class="section">
+<p>Handle R session's yielding to allow servicing
+ frontend requests</p><div class="section">
 <h4 id="usage-25">Usage<a class="anchor" aria-label="anchor" href="#usage-25"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">handle_yield</span><span class="op">(</span><span class="va">timeout</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="arguments-16">Arguments<a class="anchor" aria-label="anchor" href="#arguments-16"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>timeout</code></dt>
+<dd><p>Number of milliseconds to wait for a frontend request</p></dd>
+
+
+</dl><p></p></div>
+</div>
 
 </div><p></p><hr><a id="method-Kernel-add_service"></a><div class="section">
 <h3 id="method-add-service-">Method <code>add_service()</code><a class="anchor" aria-label="anchor" href="#method-add-service-"></a></h3>
-
-<div class="section">
+<p>Add a function as a service to be run each iteration
+ of the kernel loop.</p><div class="section">
 <h4 id="usage-26">Usage<a class="anchor" aria-label="anchor" href="#usage-26"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Kernel</span><span class="op">$</span><span class="fu">add_service</span><span class="op">(</span><span class="va">FUN</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="arguments-17">Arguments<a class="anchor" aria-label="anchor" href="#arguments-17"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>FUN</code></dt>
+<dd><p>A function.</p></dd>
+
+
+</dl><p></p></div>
+</div>
 
 </div><p></p><hr><a id="method-Kernel-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
@@ -464,7 +516,7 @@ password dialog</p></dd>
 </div>
 
 <div class="section">
-<h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
+<h4 id="arguments-18">Arguments<a class="anchor" aria-label="anchor" href="#arguments-18"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

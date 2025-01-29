@@ -85,6 +85,7 @@
 <url><loc>https://melff.github.io/RKernel/reference/display_data.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/display_id.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/envBrowser.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/get_completions.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/help.start.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/index.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/install.html</loc></url>
@@ -97,7 +98,9 @@
 <url><loc>https://melff.github.io/RKernel/reference/remove_displayed_classes.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/remove_paged_classes.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/sharedHelpServer.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/str2iframe.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/to_json.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/url2iframe.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/virtable_widget.html</loc></url>
 </urlset>
 
