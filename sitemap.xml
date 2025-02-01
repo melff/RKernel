@@ -56,6 +56,9 @@
 <url><loc>https://melff.github.io/RKernel/reference/R6Class_.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/R6Instance.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/R6TraitClass.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/RKernelSession.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/RSessionAdapter.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/RSessionBase.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/ResizeableWidget.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/SelectionContainer.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/SelectionWidget.html</loc></url>
@@ -87,6 +90,9 @@
 <url><loc>https://melff.github.io/RKernel/reference/envBrowser.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/get_completions.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/help.start.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/http_get.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/httpd_port.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/httpd_url.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/index.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/install.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/interaction.html</loc></url>
