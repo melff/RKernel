@@ -106,6 +106,9 @@ reference:
   - R6Class_
   - R6Instance
   - R6TraitClass
+  - RSessionBase
+  - RKernelSession
+  - RSessionAdapter
   - display_id
   - install
   - main
@@ -116,3 +119,6 @@ reference:
   - get_completions
   - str2iframe
   - url2iframe
+  - http_get
+  - httpd_port
+  - httpd_url
