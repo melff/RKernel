@@ -23,6 +23,8 @@ GridBox(..., layout = NULL)
 \arguments{
 \item{...}{Arguments passed to the superclass constructor}
 
+\item{layout}{An optional layout widget}
+
 \item{wrap}{Logical value, whether lines of widgets should be wrapped?}
 }
 \description{

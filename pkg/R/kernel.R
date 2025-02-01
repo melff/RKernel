@@ -1012,7 +1012,7 @@ Kernel <- R6Class("Kernel",
     r_send_request = function(msg){
       # log_out("r_send_request")
       msg_dput <- wrap_dput(msg)
-      cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
+      cmd <- paste0("RKernel:::handle_request(", msg_dput, ")")
       resp <- self$repl$run_cmd(cmd)
       # log_out("Response:")
       # log_out(resp$stdout)
@@ -1025,7 +1025,7 @@ Kernel <- R6Class("Kernel",
     r_send_request_noreply = function(msg){
       # log_out("r_send_request_noreply")
       msg_dput <- wrap_dput(msg)
-      cmd <- paste0("RKernel::handle_request(", msg_dput, ")")
+      cmd <- paste0("RKernel:::handle_request(", msg_dput, ")")
       self$repl$run_code(cmd, echo = FALSE, until_prompt = TRUE)
       return(invisible())
     },

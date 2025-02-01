@@ -16,6 +16,8 @@ url2iframe(
 )
 }
 \arguments{
+\item{url}{The URL of the page to be shown in the iframe (can also be a data URI)}
+
 \item{resize}{Logical; should the iframe be resizeable?}
 
 \item{width}{The intended width of the iframe, a string or a number}
@@ -29,8 +31,6 @@ url2iframe(
 \item{style}{The CSS style attribte of the iframe, a string}
 
 \item{...}{Other arguments, ignored.}
-
-\item{code}{The code to be shown in the iframe}
 }
 \description{
 Create an HTML iframe tag that refers to some (usually HTML) code

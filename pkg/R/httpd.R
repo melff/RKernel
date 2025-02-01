@@ -1,9 +1,11 @@
+http_handlers_env <- getFromNamespace(".httpd.handlers.env","tools")
+
 add_http_handler <- function(name, handler){
-  assign(name, handler, tools:::.httpd.handlers.env)
+  assign(name, handler, http_handlers_env)
 }
 
 has_http_handler <- function(name) {
-  exists(name, envir = tools:::.httpd.handlers.env)
+  exists(name, envir = http_handlers_env)
 }
 
 #' @importFrom utils capture.output
@@ -116,7 +118,6 @@ http_data <- function(path, query, ...){
 
 # httpd_env <- new.env()
 
-#' @export
 install_httpd_handlers <- function() {
   add_http_handler("echo",http_echo)
   add_http_handler("eval",http_eval)
@@ -124,14 +125,19 @@ install_httpd_handlers <- function() {
   #suppressMessages(httpd_env$port <- tools::startDynamicHelp(start=NA))
 }
 
+#' Get the help port of the R session.
 #' @export
 httpd_port <- function() get_help_port()
 #httpd_port <- function() get0("port",httpd_env)
 
+#' Get the URL of the http server of the R session, including
+#' the "/custom/" path component.
 #' @export 
 httpd_url <- function() paste0(get_help_url(),"/custom/")
 #httpd_url <- function() paste0("http://localhost:",httpd_port(),"/")
 
+#' Send a http request to an URL and return the response.
+#' @param x A character string containing the URL.
 #' @export
 http_get <- function(x) {
   con <- url(x)

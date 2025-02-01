@@ -245,7 +245,6 @@ GraphicsObserver <- R6Class("GraphicsObserver",
   ))
 
 
-#' @export
 start_graphics <- function(){
     options(device=httpgd::hgd)
     setHook('plot.new', plot_new_hook)

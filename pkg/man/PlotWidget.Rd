@@ -21,6 +21,8 @@ PlotWidget(...)
 \item{expr}{An expression to evaluate, or a sequence of expression, 
 encapsulated by curly braces.}
 
+\item{envir}{An environment or a list within which `expr` is evaluated.}
+
 \item{enclos}{An enclosing environment.}
 }
 \description{

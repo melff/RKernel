@@ -1,6 +1,5 @@
 variables_helper <- new.env()
 
-#' @export
 inspect_variables <- function(envir = parent.frame()){
   # log_out("inspect_variables")
   var_names <- ls(envir = envir)

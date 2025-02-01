@@ -180,8 +180,6 @@ select_list <- function(choices, preselect = NULL, multiple = FALSE, title = NUL
     return(value)
 }
 
-
-#' @export
 install_menu <- function(){
     replace_in_package("utils", "menu", menu_)
     replace_in_package("utils", "select.list", select_list)

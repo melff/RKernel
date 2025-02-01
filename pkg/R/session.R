@@ -1,14 +1,27 @@
+#' The R Session Base Class
+#'
+#' @description An object of this class handles the lower-level communication with
+#'   an R process. Objects of class \code{\link{RKernelSession}} inherit from
+#'   this class.
 #' @importFrom callr r_session_options r_session
 #' @importFrom processx poll conn_read_chars
 #' @importFrom crayon red
-
 #' @export
 RSessionBase <- R6Class("RSessionBase",
   inherit = r_session,
   public = list(
+    #' @field prompt The command prompt
     prompt = "> ",
+    #' @field banner The R startup message used as a session banner in 
+    #'    the terminal and info box.
     banner = "",
+    #' @field waiting A logical value, whether the R session is waiting 
+    #'    for input.
     waiting = FALSE,
+    #' @description Initialize the object and start the session
+    #' @param options R session objects, see \code{\link[callr]{r_session_options}}.
+    #' @param env A character vector with environment variables for the R process
+    #' @param prompt The expected prompt string of the R session
     initialize = function(options = r_session_options(
                             stdout = "|",
                             stderr = "|",
@@ -34,11 +47,20 @@ RSessionBase <- R6Class("RSessionBase",
       self$banner <- banner
       # log_out("Done.")
     },
+    #' @description Returns a logical value, indicating whether the R process is sleeping.
     sleeping = function() {
       self$get_status() == "sleeping"
     },
+    #' @field drop_last_input A logical value, whether to drop the echo of
+    #'    the last input
     drop_last_input = FALSE,
+    #' @field last_input A character string, the last input sent to the
+    #'    R session. Needed to filter out the echo of the input.
     last_input = "",
+    #' @description Send input text to the R process
+    #' @param text A character string
+    #' @param drop_echo A logical value, whether to drop the echo from
+    #'    stdout.
     send_input = function(text, drop_echo = FALSE) {
       if(!length(text) || !is.character(text)) return(invisible())
       if(length(text) > 1) text <- paste(text,collapse="\n")
@@ -54,6 +76,9 @@ RSessionBase <- R6Class("RSessionBase",
         } 
       }
     },
+    #' @description Read output from the R session and drop
+    #'    input echo if so requested
+    #' @param n The number of characters to read
     read_output = function(n = -1) {
       res <- super$read_output(n = n)
       if(self$drop_last_input) {
@@ -63,6 +88,8 @@ RSessionBase <- R6Class("RSessionBase",
       }
       res
     },
+    #' @description Poll R process for output and read it
+    #' @param timeout A number, the polling timeout in microseconds
     receive_output = function(timeout = 1){
       self$waiting <- FALSE
       sleeping <- self$get_status() == "sleeping"
@@ -84,6 +111,8 @@ RSessionBase <- R6Class("RSessionBase",
         self$waiting <- TRUE
       return(res)
     },
+    #' @description Receive all output that is available
+    #' @param timeout A number, the polling timeout in microseconds
     receive_all_output = function(timeout = 1){
       # log_out("receive_all_output")
       while(!self$sleeping()) Sys.sleep(.001)
@@ -108,6 +137,10 @@ RSessionBase <- R6Class("RSessionBase",
       }
       return(resp)
     },
+    #' @description Send text to R process and receive all output from the
+    #'    process
+    #' @param text A character string
+    #' @param timeout An integer number, the polling timeout
     send_receive = function(text, timeout = 100) {
       self$send_input(text)
       self$receive_all_output(timeout = timeout)
@@ -115,13 +148,25 @@ RSessionBase <- R6Class("RSessionBase",
   )
 )
 
+#' The KernelSession Class
+#'
+#' @description An object of this class handles the communication with
+#'   an R process. There is usually one main session, but there may
+#'   also sessions for detached code cells.
+#' @export
 RKernelSession <- R6Class("RKernelSession",
   inherit = RSessionBase,
   public = list(
+    #' @description Connect the session with the main Kernel object
+    #' @param yield The function that is called when the session objects
+    #'   yields back control to the kernel object, for example in order
+    #'   to wait for comm message when a widget is active.
+    #' @param kernel The main kernel objectd
     connect = function(yield, kernel) {
       self$yield <- yield
       self$kernel <- kernel
     },
+    #' @description Set up the R session, by installing hooks etc.
     setup = function() {
       # log_out("Setting up the session ...")
       self$help_port <- random_open_port()
@@ -129,9 +174,12 @@ RKernelSession <- R6Class("RKernelSession",
       self$receive_all_output(timeout = 1000)
       # log_out("Done.")
   },
+  #' @field help_port The port number of HTML help.
   help_port = NULL,
+  #' @description Start a httpgd devide and make sure its contents
+  #'   are sent by the kernel to the frontend.
   start_graphics = function() {
-      self$send_input("RKernel::start_graphics()")
+      self$send_input("RKernel:::start_graphics()")
       self$send_input("httpgd::hgd()")
       self$receive_all_output(timeout = 1000)
       gd <- self$send_receive("dput(httpgd::hgd_details())")
@@ -139,15 +187,24 @@ RKernelSession <- R6Class("RKernelSession",
       gd <- str2expression(gd)
       eval(gd)
   },
-  yield = NULL, # Optional function to service kernel requests
-  kernel = NULL, # Reference to the controlling kernel
-  gdetails = NULL
+  #' @field yield An optional function to service kernel requests
+  yield = NULL, 
+  #' @field kernel The reference to the controlling kernel object
+  kernel = NULL
   )
 )
+
+# This is convenience form to split a single character
+# string and return a character vector (instead of a list).
 split_lines1 <- function(x) {
   unlist(strsplit(x, "\n", fixed = TRUE))
 }
 
+# A helper function to drop the echo of R expressions sent
+# to the R process.
+# @param txt A character string, the output from which the echo
+#     is to be dropped
+# @param n The number of lines to drop
 drop_echo <- function(txt, n = 1) {
   if(length(txt) && nzchar(txt)){
       out_lines <- split_lines1(txt)
@@ -160,6 +217,9 @@ drop_echo <- function(txt, n = 1) {
   txt
 }
 
+# Remove the command prompt from the output
+# @param txt A character string 
+# @param prompt A character string
 drop_prompt <- function(txt, prompt="> ") {
   if(endsWith(txt, prompt))
     txt <- remove_suffix(txt,prompt)
@@ -171,29 +231,64 @@ XON <- '\x11'
 XOFF <- '\x13'
 XOFFXON <- paste0(XOFF,XON)
 
-
+#' A Rich R Session Interface
+#' 
+#' @description
+#' Objects from this class handle the "higher-level" interaction 
+#' between the frontend and the R session. There can be more such 
+#' interfaces to a session. For example, for the main REPL 
+#' and for a REPL created by a call to browser().
 #' @export
 RSessionAdapter <- R6Class("RSessionAdapter",
  public = list(
+    #' @field session An RKernelSession object or `NULL`
     session = NULL,
+    #' @field prompt The R console prompt or NULL
     prompt = NULL,
+    #' @field browse_prompt The prompt created by a call to `browser()`
     browse_prompt = "Browse\\[([0-9]+)\\]> $",
-    co_prompt = NULL,
+    #' @field io_timeout An integer number a timeout in microseconds
     io_timeout = 0,
+    #' @field stdout Accumulated output via the stdout channel.
     stdout = character(0),
+    #' @field stderr Accumulated output via the stderr channel.
     stderr = character(0),
+    #' @field stdout_callback A function to be called with stdout text or NULL
     stdout_callback = NULL,
+    #' @field stderr_callback A function to be called with stderr text or NULL
     stderr_callback = NULL,
+    #' @field browser_callback A function to be called when a browser prompt
+    #'    is encountered or NULL
     browser_callback = NULL,
+    #' @field prompt_callback A function to be called when a command prompt
+    #'    is encountered or NULL
     prompt_callback = NULL,
+    #' @field input_callback A function to be called when input is required
+    #'    or NULL
     input_callback = NULL,
-    echo = FALSE,
+    #' @field echo A logical value, if TRUE code sent to the R process will
+    #'    be echoed
+    echo = FALSE, 
+    #' @description A potential "stdout_callback" function that aggregates
+    #'    output sent from the R process via "stdout" channel to the 
+    #'    eponymous "stdout" field
+    #' @param txt A character string
+    #' @param ... Other arguments, ignored
     aggreg_stdout = function(txt, ...) {
       self$stdout <- paste0(self$stdout,txt)
     },
+    #' @description A potential "stderr_callback" function that aggregates
+    #'    output sent from the R process via "stderr" channel to the 
+    #'    eponymous "stderr" field
+    #' @param txt A character string
+    #' @param ... Other arguments, ignored
     aggreg_stderr = function(txt, ...) {
       self$stderr <- paste0(self$stderr,txt)
     },
+    #' @description Collect the accumulated output from fields "stdout" and
+    #'    "stderr" into a list with two elements named "stdout" and "stderr".
+    #' @param clear A logical value, whether accumulated output should be
+    #'    cleared after being returned.
     collect = function(clear = TRUE) {
       res <- list(stdout = self$stdout,
                   stderr = self$stderr)
@@ -203,6 +298,15 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       }
       return(res)
     },
+    #' @description Initialize an object 
+    #' @param session An object from class "RKernelSession"
+    #' @param stdout_callback A callback function for "stdout" output
+    #' @param stderr_callback A callback function for "stderr" output
+    #' @param browser_callback A callback function for browser prompts (optional)
+    #' @param prompt_callback A callback function for command prompts encountered
+    #' @param input_callback A callback function for input requests (optional)
+    #' @param prompt A character string, the expected command prompt
+    #' @param echo A logical value, whether to echo input
     initialize = function(
       session,
       stdout_callback = self$aggreg_stdout,
@@ -211,12 +315,10 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       prompt_callback = NULL,
       input_callback = NULL,
       prompt = "> ",
-      co_prompt = "+ ",
       echo = FALSE
     ) {
       self$session <- session
       self$prompt <- prompt
-      self$co_prompt <- co_prompt
       self$stdout_callback <- stdout_callback
       self$stderr_callback <- stderr_callback
       self$browser_callback <- browser_callback
@@ -224,6 +326,17 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       self$input_callback <- input_callback
       self$echo <- echo
     },
+    #' @description Run code and pass output to callback functions
+    #' @param code A character string or character vector with code lines
+    #' @param io_timeout An integer value, the timeout of waiting for output
+    #' @param stdout_callback A callback function for "stdout" output
+    #' @param stderr_callback A callback function for "stderr" output
+    #' @param browser_callback A callback function for browser prompts (optional)
+    #' @param prompt_callback A callback function for command prompts encountered
+    #' @param input_callback A callback function for input requests (optional)
+    #' @param until_prompt A logical value, whether process and wait output
+    #'    until a command prompt is encountered.
+    #' @param echo A logical value, whether to echo input
     run_code = function(
         code,
         io_timeout = 1,
@@ -270,6 +383,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                               drop_echo = FALSE)
       }
     },
+    #' @description Send an interrupt signal (SIGINT) to the R process. This
+    #'    should stop what the R process is doing without killing it.
     interrupt = function() {
       # log_out("REPL interrupt")
       counter <- 1
@@ -298,9 +413,23 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         # log_out("trying again ...")
       }
     },
+    #' @field found_prompt A logical value, whether a prompt has been found
+    #'    in the output of the R process
     found_prompt = FALSE,
+    #' @field found_browse_prompt The latest instance of the browser prompt
+    #'    pattern found in the R process output
     found_browse_prompt = character(0),
-    process_output = function(
+    #' @description Process output created by commands sent to the R process
+    #' @param io_timeout An integer value, the timeout of waiting for output
+    #' @param stdout_callback A callback function for "stdout" output
+    #' @param stderr_callback A callback function for "stderr" output
+    #' @param browser_callback A callback function for browser prompts (optional)
+    #' @param input_callback A callback function for input requests (optional)
+    #' @param prompt_callback A callback function for command prompts encountered
+    #' @param until_prompt A logical value, whether process and wait output
+    #'    until a command prompt is encountered.
+    #' @param drop_echo A logical value, whether input echo be dropped
+   process_output = function(
         io_timeout = 1,
         stdout_callback = self$stdout_callback,
         stderr_callback = self$stderr_callback,
@@ -368,9 +497,10 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         }
         return(output_complete)
     },
+    #' @description Run a one-line command without checking and return the 
+    #'     output
+    #' @param cmd A command string
     run_cmd = function(cmd) {
-      # Runs a one-line command without checking(!) and returns the 
-      # output
       # log_out(sprintf("Run cmd '%s'",cmd))
       self$run_code(cmd,
                     io_timeout = 1,
@@ -384,6 +514,9 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       res <- self$collect()
       return(res)
     },
+    #' @description Get an option value from the R session
+    #' @param n A character string, the name of the requested option value
+    #' @param default A default value
     getOption = function(n, default = NULL) {
       cmd <- sprintf("dput(getOption(\"%s\",NULL))",n)
       res <- self$run_cmd(cmd)
@@ -391,11 +524,19 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       if(is.null(res)) res <- default
       res
     },
+    #' @description Evaluate an expression in the R session and return the
+    #'    result.
+    #' @param expr An expression
+    #' @param safe A logical value, whether errors should be caught
     eval = function(expr, safe = FALSE) {
       # log_out("session$eval()")
       code <- deparse(substitute(expr))
       self$eval_code(code, safe = safe)
     },
+    #' @description Evaluate some code in the R session and return the
+    #'    result.
+    #' @param code A character string of code
+    #' @param safe A logical value, whether errors should be caught
     eval_code = function(code, safe = FALSE) {
       if(safe) {
         code <- sprintf("try(dput(%s),silent=TRUE)",code)
@@ -408,33 +549,56 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       else 
         eval(str2expression(res$stdout))
     },
+    #' @description Run `ls()` in the R session and return the result.
     ls = function() {
       res <- self$run_cmd("dput(ls())")
       eval(str2expression(res$stdout))
     },
+    #' @description Get the value of a variable (named object) from the
+    #'    R session and return it.
+    #' @param n The name of the variable
     get = function(n) {
       cmd <- sprintf("dput(get0(\"%s\"))",n)
       res <- self$run_cmd(cmd)
       eval(str2expression(res$stdout))
     },
+    #' @description Assign a value to a variable in the R session
+    #' @param n A variable name
+    #' @param value The value that is assigned to the variable
     assign = function(n, value) {
       val <- paste(deparse(value), collapse = "\n")
       cmd <- paste(n,"<-",val)
       self$run_cmd(cmd)
       invisible(NULL)
     },
+    #' @description Set an option in the R session
+    #' @param n The name of the option
+    #' @param value The intended option value
     setOption = function(n, value) {
       val <- paste(deparse(value), collapse = "\n")
       cmd <- sprintf("options(%s = %s)", n, val)
       self$run_cmd(cmd)
       invisible(NULL)
     },
+    #' @description Import an option value from the R session to the 
+    #'    kernel
+    #' @param n The option value
     importOption = function(n) {
       opt <- list(self$getOption(n))
       names(opt) <- n
       do.call("options", opt)
     },
+    #' @field errored A logical value, whether an error occurred in the R
+    #'    session
     errored = FALSE,
+    #' @description Handle special output from the R session that starts 
+    #'    with BEL
+    #' @param txt Output string containing BEL
+    #' @param input_callback A function to request input from the frontend
+    #' @param stdout_callback A function to process output obtained from the
+    #'    R session via "stdout" channel
+    #' @param stderr_callback A function to process output obtained from the
+    #'    R session via "stderr" channel
     handle_BEL = function(txt,
                           input_callback,
                           stdout_callback,
@@ -451,6 +615,14 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                          stderr_callback)
       }
     },
+    #' @description Handle special an input request obtained from the 
+    #'    R session via output indicated with a special output string
+    #' @param txt Output string containing a special readline prompt
+    #' @param input_callback A function to request input from the frontend
+    #' @param stdout_callback A function to process output obtained from the
+    #'    R session via "stdout" channel
+    #' @param stderr_callback A function to process output obtained from the
+    #'    R session via "stderr" channel
     handle_readline = function(txt, 
                            input_callback, 
                            stdout_callback,
@@ -470,6 +642,14 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         self$session$send_input(inp, drop_echo = TRUE)
         return("")
     },
+    #' @description Handle input request created by the function `scan` the 
+    #'    in the R session
+    #' @param txt Output string containing a special readline prompt
+    #' @param input_callback A function to request input from the frontend
+    #' @param stdout_callback A function to process output obtained from the
+    #'    R session via "stdout" channel
+    #' @param stderr_callback A function to process output obtained from the
+    #'    R session via "stderr" channel
     handle_scan = function(txt, 
                            input_callback, 
                            stdout_callback,

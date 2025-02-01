@@ -91,6 +91,7 @@ SVGWidget <- function(...) SVGWidgetClass$new(...)
 #' @param data An "SVGWidget" object
 #' @param expr An expression to evaluate, or a sequence of expression, 
 #'    encapsulated by curly braces.
+#' @param envir An environment or a list within which `expr` is evaluated.
 #' @param enclos An enclosing environment.
 #' @export
 with.SVGWidget <- function(data,expr,envir=list(),enclos=parent.frame(),...){

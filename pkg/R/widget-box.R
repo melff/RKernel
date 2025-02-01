@@ -77,6 +77,7 @@ ContainerClass_new <- function(Class,layout=NULL,...){
 }
 
 #' @describeIn Boxes A baseline box constructor
+#' @param layout An optional layout widget
 #' @param ... Arguments passed to the superclass constructor
 #' @export
 Box <- function(...,layout=NULL) ContainerClass_new(Class=BoxClass,layout=layout,...)

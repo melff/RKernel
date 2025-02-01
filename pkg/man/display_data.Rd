@@ -140,6 +140,12 @@ or an existing one should be updated}
 \item{data}{A list with named elements, containing mime data}
 
 \item{object}{An object of class "display_data"}
+
+\item{embedded}{A logical value, whether the help page should be shown embedded
+in the Jupyter notebook}
+
+\item{include_button}{A logical value, whether to include a button that
+opens a new tab for the help page.}
 }
 \value{
 An object of class "display_data"

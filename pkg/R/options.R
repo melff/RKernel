@@ -6,7 +6,6 @@ add_sync_options <- function(n) {
     assign(n_,TRUE, envir = snc_opts)
 }
 
-#' @export
 send_options <- function(nms){
   n <- ls(snc_opts)
   n <- intersect(nms,n)
@@ -37,7 +36,6 @@ options_with_send <- function(...) {
   invisible(res)
 }
 
-#' @export
 inject_send_options <- function() {
   replace_in_package("base","options", options_with_send)
 }

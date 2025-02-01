@@ -26,6 +26,10 @@ AnyWidgetClass <- R6Class_("AnyWidget",
 
 #' A constructor function for a class that inherits from
 #'     'AnyWidget' (or 'AnyWidgetClass') 
+#' @param esm Character string, code for an ECMAscript (Javascript) moldue
+#' @param css Character string with CSS code
+#' @param anywidget_id Character string with a unique ID for the widget
+#' @param ... Other arguments which create additional components of the widget
 #' @examples
 #' \dontrun{ 
 #'   esm <- '
@@ -56,15 +60,15 @@ AnyWidgetClass <- R6Class_("AnyWidget",
 #'       .counter-widget button:hover { background-color: #9a3412; }
 #'   '
 #'   CountWidget <- AnyWidget(
-#'               `_esm` = esm,
-#'               `_css` = css,
-#'               `_anywidget_id` = "CountWidget",
+#'               esm = esm,
+#'               css = css,
+#'               anywidget_id = "CountWidget",
 #'               value = Integer(0)
 #'              )
 #'   CountWidget(value=42)
 #' }
 #' @export
-AnyWidget <- function(`_esm`,`_css`,`_anywidget_id`,...){
+AnyWidget <- function(esm, css, anywidget_id,...){
     args <- list(...)
     public <- list()
     for(n in names(args)){
@@ -73,12 +77,12 @@ AnyWidget <- function(`_esm`,`_css`,`_anywidget_id`,...){
         else
             public[[n]] <- args[[n]]
     }
-    `_esm` <- as.character(`_esm`)
-    public[["_esm"]] <- structure(Unicode(`_esm`),sync=TRUE)
-    `_anywidget_id` <- as.character(`_anywidget_id`)
-    public[["_anywidget_id"]] <- structure(Unicode(`_anywidget_id`),sync=TRUE)
-    if(!missing(`_css`))
-        public[["_css"]] <- structure(Unicode(`_css`),sync=TRUE)
+    esm <- as.character(esm)
+    public[["_esm"]] <- structure(Unicode(esm),sync=TRUE)
+    anywidget_id <- as.character(anywidget_id)
+    public[["_anywidget_id"]] <- structure(Unicode(anywidget_id),sync=TRUE)
+    if(!missing(css))
+        public[["_css"]] <- structure(Unicode(css),sync=TRUE)
     WidgetClass <- R6Class_(
         inherit = AnyWidgetClass,
         public = public

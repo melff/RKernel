@@ -46,7 +46,6 @@ HelpServer <- R6Class("HelpServer",
 
 help_server <- new.env()
 
-#' @export
 set_help_port <- function(port){
     help_server$current <- HelpServer$new(port)
     options(help.ports=port)
@@ -66,7 +65,6 @@ get_help_port <- function(){
 }
 
 
-#' @export
 set_help_displayed <- function(on=TRUE){
     if(on){
         add_displayed_classes("help_files_with_topic")
@@ -110,6 +108,10 @@ popout_button <- '<form class="help-popout-button" action="%s" method="get" targ
 #' @importFrom uuid UUIDgenerate
 #' @importFrom utils URLencode capture.output
 #' @importFrom tools Rd2HTML Rd2txt Rd2latex
+#' @param embedded A logical value, whether the help page should be shown embedded
+#'      in the Jupyter notebook
+#' @param include_button A logical value, whether to include a button that
+#'      opens a new tab for the help page.
 #' @export 
 display_data.help_files_with_topic <- function(x,...,
                                           id=UUIDgenerate(),

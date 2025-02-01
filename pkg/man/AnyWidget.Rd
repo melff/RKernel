@@ -5,7 +5,16 @@
 \title{A constructor function for a class that inherits from
     'AnyWidget' (or 'AnyWidgetClass')}
 \usage{
-AnyWidget(`_esm`, `_css`, `_anywidget_id`, ...)
+AnyWidget(esm, css, anywidget_id, ...)
+}
+\arguments{
+\item{esm}{Character string, code for an ECMAscript (Javascript) moldue}
+
+\item{css}{Character string with CSS code}
+
+\item{anywidget_id}{Character string with a unique ID for the widget}
+
+\item{...}{Other arguments which create additional components of the widget}
 }
 \description{
 A constructor function for a class that inherits from
@@ -41,9 +50,9 @@ A constructor function for a class that inherits from
       .counter-widget button:hover { background-color: #9a3412; }
   '
   CountWidget <- AnyWidget(
-              `_esm` = esm,
-              `_css` = css,
-              `_anywidget_id` = "CountWidget",
+              esm = esm,
+              css = css,
+              anywidget_id = "CountWidget",
               value = Integer(0)
              )
   CountWidget(value=42)

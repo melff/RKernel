@@ -167,7 +167,7 @@ str2iframe <- function(code,
 }
 
 #' Create an HTML iframe tag that refers to some (usually HTML) code
-#' @param code The code to be shown in the iframe
+#' @param url The URL of the page to be shown in the iframe (can also be a data URI)
 #' @param resize Logical; should the iframe be resizeable?
 #' @param width The intended width of the iframe, a string or a number
 #' @param aspect_ratio The intended aspect ratio of the iframe, a string
@@ -247,17 +247,14 @@ url2iframe <- function(url,
 
 
 
-#' @export
 q_orig <- getFromNamespace("q","base")
 
-#' @export
 q_defunct <- function(save = "default", status = 0, runLast = TRUE) {
     warning("\n'q()' and 'quit()' are deactivated for safety reasons.",
             "\nPlease use the Jupyter frontend to shut down the kernel.",
             call.=FALSE,immediate.=TRUE)
 }
 
-#' @export
 install_safe_q <- function(){
     replace_in_package("base","q",q_defunct)
     replace_in_package("base","quit",q_defunct)
@@ -272,7 +269,6 @@ SCAN_BEGIN <- paste0(SO,"SCAN_BEGIN",SI,BEL)
 SCAN_END <- paste0(SO,"SCAN_END",SI,BEL)
 
 
-#' @export
 readline_orig <- getFromNamespace("readline","base")
 
 readline <- function(prompt = "") {
@@ -280,7 +276,6 @@ readline <- function(prompt = "") {
   readline_orig(prompt = prompt)
 }
 
-#' @export
 install_readline <- function(){
     replace_in_package("base", "readline", readline)
 }
@@ -371,7 +366,6 @@ install_browseURL <- function(){
     }
 }
 
-#' @export
 scan_ <- getFromNamespace("scan","base")
 
 scan <- function(file = "", ...) {
@@ -384,7 +378,6 @@ scan <- function(file = "", ...) {
     else scan_(file=file, ...)
 }
 
-#' @export
 install_scan <- function(){
     replace_in_package("base", "scan", scan)
 }

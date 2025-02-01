@@ -37,8 +37,7 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             private$append_output <- append_output
         },
         #' @description A variant of \code{\link{display}} for output within a display widget.
-        #' @param ... Further arguments, passed on to the 'evaluate' method of the \code{\link{Context}}
-        #'            class,
+        #' @param ... Arguments passed to the function \code{\link{display_data}}.
         display = function(...){
             d <- display_data(...)
             private$display_send(d)
@@ -189,7 +188,10 @@ OutputWidget <- function(append_output=FALSE,...)
 #' @param data An "OutputWidget" object
 #' @param expr An expression to evaluate, or a sequence of expression, 
 #'    encapsulated by curly braces.
+#' @param envir An environment or a list within which `expr` is evaluated.
 #' @param enclos An enclosing environment.
+#' @param clear A logical value, whether clear the output before evaluating
+#'      `expr`
 #' @param ... Other arguments, ignored.
 #' @export
 with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear=TRUE,...){

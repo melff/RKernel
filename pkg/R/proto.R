@@ -6,7 +6,6 @@ ETX <- "\x03"
 
 request_handlers <- new.env()
 
-#'@export 
 handle_request <- function(msg){
   # log_out("handle_request")
   msg_type <- msg$type
@@ -35,10 +34,9 @@ handle_request <- function(msg){
   }
 }
 
-#' @export
 make_dput_request <- function(msg) {
   msg_dput <- wrap_dput(msg)
-  paste0("RKernel::handle_request(", msg_dput, ")")
+  paste0("RKernel:::handle_request(", msg_dput, ")")
 }
 
 wrap_dput <- function(msg) {
@@ -48,7 +46,6 @@ wrap_dput <- function(msg) {
   deparse0(msg)
 }
 
-#' @export
 send_dput_msg <- function(msg, file=stdout()) {
   msg_dput <- wrap_dput(msg)
   cat(DLE, STX, msg_dput, ETX, DLE, sep = "", file=file)

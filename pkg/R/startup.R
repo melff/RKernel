@@ -1,6 +1,5 @@
 config <- new.env()
 
-#' @export
 startup <- function(){
   home_dir <- Sys.getenv("HOME")
   jupyter_config <- file.path(home_dir, ".jupyter", "RKernel-config.R")
@@ -33,7 +32,7 @@ setup_session <- function(help_port) {
   install_safe_q()
   install_readline()
   install_scan()
-  log_check(install_menu())
+  install_menu()
   set_help_displayed()
   install_httpd_handlers()
   install_globalCallingHandlers()

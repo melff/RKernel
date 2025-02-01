@@ -21,7 +21,12 @@ output in the widget or the output is overwritten}
 \item{expr}{An expression to evaluate, or a sequence of expression, 
 encapsulated by curly braces.}
 
+\item{envir}{An environment or a list within which `expr` is evaluated.}
+
 \item{enclos}{An enclosing environment.}
+
+\item{clear}{A logical value, whether clear the output before evaluating
+`expr`}
 }
 \description{
 Classes and constructors to wrap output created by code
@@ -129,8 +134,7 @@ A variant of \code{\link{display}} for output within a display widget.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Further arguments, passed on to the 'evaluate' method of the \code{\link{Context}}
-class,}
+\item{\code{...}}{Arguments passed to the function \code{\link{display_data}}.}
 }
 \if{html}{\out{</div>}}
 }

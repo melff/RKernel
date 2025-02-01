@@ -32,7 +32,6 @@ message_stdout <- function (..., domain = NULL, appendLF = TRUE)
 }
 
 #' @include View.R
-#' @export
 install_output_hooks <- function() {
     replace_in_package("base","print",RKernel_print)
     replace_in_package("utils","View",View)    

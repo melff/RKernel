@@ -13,6 +13,8 @@ installspec(user = TRUE, prefix = NULL, single_blas = FALSE)
 \item{user}{Logical, whether to install the kernel in the user's home directory}
 
 \item{prefix}{NULL or a character string with a path prefix}
+
+\item{single_blas}{Logical, whether the kernel should use a single-threaded BLAS library.}
 }
 \description{
 install the R Kernel

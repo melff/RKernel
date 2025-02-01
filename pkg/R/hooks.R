@@ -1,4 +1,3 @@
-#' @export
 runHooks <- function(name){
     for(FUN in getHook(name)){
         if(is.character(FUN))
