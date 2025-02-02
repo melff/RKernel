@@ -193,6 +193,7 @@ GraphicsObserver <- R6Class("GraphicsObserver",
                             height = getOption("jupyter.plot.height",self$height),
                             resolution = getOption("jupyter.plot.resolution",288),
                             zoom = getOption("jupyter.plot.zoom",1)) {
+      formats <- intersect(formats, self$formats)
       renders <- lapply(formats,
                         self$render,
                         plot_id = plot_id,
