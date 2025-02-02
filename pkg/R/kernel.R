@@ -134,9 +134,9 @@ Kernel <- R6Class("Kernel",
       drop = NULL
       ){
         private$run_services()
-        # if(self$session$is_alive()) {
-        #   self$repl$process_output(until_prompt = FALSE)
-        # }
+        if(self$session$is_alive()) {
+          self$repl$process_output(until_prompt = FALSE)
+        }
         # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
         # log_out("kernel$poll_request")
