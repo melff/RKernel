@@ -36,6 +36,7 @@ build:
 	Rscript --vanilla -e 'roxygen2::roxygenize(package.dir="${SRCDIR}")'
 	echo "Building ${ARCHIVE}"
 	R CMD build $(SRCDIR)
+	date
 
 .PHONY: check-dir
 check-dir: 
