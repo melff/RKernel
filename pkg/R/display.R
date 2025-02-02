@@ -132,7 +132,11 @@ display_data.htmlwidget <- function(x,...,
         aspect_ratio <- getOption("htmlwidget_iframe_aspect_ratio","16 / 10")
         if(embed)
             url <- dataURI(mime="text/html",file=htmlfile)
-        iframe <- url2iframe(url,resize,width,aspect_ratio,class="htmlwidget-iframe")
+        iframe <- url2iframe(url,
+                             resize = resize,
+                             width = width,
+                             aspect_ratio = aspect_ratio,
+                             class="htmlwidget-iframe")
         res <- iframe
     }
     else {

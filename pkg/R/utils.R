@@ -195,17 +195,17 @@ url2iframe <- function(url,
     "
 
       if(length(height)) {
-        dimens <- fill_tmpl("width:(( width ));height:(( height ))",
+        dimens <- fill_tmpl("width:(( width )); height:(( height ))",
                            width=width,height=height)
       } else if(resize == "vertical") {
-        dimens <- fill_tmpl("width(( width ));height:300px")
+        dimens <- fill_tmpl("width:(( width )); height:300px")
       } else {
-        dimens <- fill_tmpl("width(( width ));aspect-ratio:(( aspect_ratio ))",
+        dimens <- fill_tmpl("width:(( width )); aspect-ratio:(( aspect_ratio ))",
                             width=width,aspect_ratio=aspect_ratio)
       }
 
     if(isTRUE(resize) || resize == "both") {
-      style <- paste0("width:100%;height:100%;",style)
+      style <- paste0("width:100%; height:100%;",style)
       if_tmpl <- "<div class='resizer' style= '(( dimens ))'>
                   <iframe src='(( url ))' class='(( class )) resized' style='(( style ))'>
                   </iframe>
@@ -215,7 +215,7 @@ url2iframe <- function(url,
                           url = url, class = class, dimens = dimens, style = style)
     } 
     else if(resize == "vertical") {
-      style <- paste0("width:100%;height:100%;",style)
+      style <- paste0("width:100%; height:100%;",style)
       if_tmpl <- "<div class='vresizer' style= '(( dimens ))'>
                   <iframe src='(( url ))' class='(( class )) resized' style='(( style ))'>
                   </iframe>
@@ -225,7 +225,7 @@ url2iframe <- function(url,
                           url = url, class = class, dimens = dimens, style = style)
     }
     else if(resize == "horizontal") {
-      style <- paste0("width:100%;height:100%;",style)
+      style <- paste0("width:100%; height:100%;",style)
       if_tmpl <- "<div class='hresizer' style= '(( dimens ))'>
                   <iframe src='(( url ))' class='(( class )) resized' style='(( style ))'>
                   </iframe>
