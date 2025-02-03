@@ -1,12 +1,11 @@
-http_handlers_env <- getFromNamespace(".httpd.handlers.env","tools")
-
 add_http_handler <- function(name, handler){
-  assign(name, handler, http_handlers_env)
+  assign(name, handler, tools:::.httpd.handlers.env)
 }
 
 has_http_handler <- function(name) {
-  exists(name, envir = http_handlers_env)
+  exists(name, envir = tools:::.httpd.handlers.env)
 }
+
 
 #' @importFrom utils capture.output
 http_echo <- function(path, query, ...){
