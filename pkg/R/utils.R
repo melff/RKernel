@@ -245,7 +245,85 @@ url2iframe <- function(url,
     iframe
 }
 
+srcdoc_iframe <- function(srcdoc,
+                      resize = FALSE,
+                      width = "100%",
+                      aspect_ratio = "16 / 10",
+                      height = character(0),
+                      class = "rkernel-iframe",
+                      style = "border-style:none",
+                      escaped = FALSE,
+                      ...){
 
+    resize_style <-"<style>
+    .resizer { display:flex; margin:0; padding:0; resize:both; overflow:hidden }
+    .vresizer { display:flex; margin:0; padding:0; resize:vertical; overflow:hidden }
+    .hresizer { display:flex; margin:0; padding:0; resize:horizontal; overflow:hidden }
+    .resizer > .resized,
+    .hresizer > .resized,
+    .vresizer > .resized { flex-grow:1; margin:0; padding:0; border:0 }
+    </style>
+    "
+
+    if(!escaped) {
+      srcdoc <- escape4srcdoc(srcdoc)
+    }
+
+    if(length(height)) {
+      dimens <- fill_tmpl("width:(( width ));height:(( height ))",
+                          width=width,height=height)
+    } else if(resize == "vertical") {
+      dimens <- fill_tmpl("width(( width ));height:300px")
+    } else {
+      dimens <- fill_tmpl("width(( width ));aspect-ratio:(( aspect_ratio ))",
+                          width=width,aspect_ratio=aspect_ratio)
+    }
+
+    if(isTRUE(resize) || resize == "both") {
+      style <- paste0("width:100%;height:100%;",style)
+      if_tmpl <- "<div class='resizer' style= '(( dimens ))'>
+                  <iframe srcdoc=\"(( srcdoc ))\" class='(( class )) resized' style='(( style ))'>
+                  </iframe>
+                  </div>
+                "
+      iframe <- fill_tmpl(if_tmpl, 
+                          srcdoc = srcdoc, class = class, dimens = dimens, style = style)
+    } 
+    else if(resize == "vertical") {
+      style <- paste0("width:100%;height:100%;",style)
+      if_tmpl <- "<div class='vresizer' style= '(( dimens ))'>
+                  <iframe srcdoc=\"(( srcdoc ))\" class='(( class )) resized' style='(( style ))'>
+                  </iframe>
+                  </div>
+                "
+      iframe <- fill_tmpl(if_tmpl, 
+                          srcdoc = srcdoc, class = class, dimens = dimens, style = style)
+    }
+    else if(resize == "horizontal") {
+      style <- paste0("width:100%;height:100%;",style)
+      if_tmpl <- "<div class='hresizer' style= '(( dimens ))'>
+                  <iframe srcdoc=\"(( srcdoc ))\" class='(( class )) resized' style='(( style ))'>
+                  </iframe>
+                  </div>
+                "
+      iframe <- fill_tmpl(if_tmpl, 
+                          srcdoc = srcdoc, class = class, dimens = dimens, style = style)
+    }
+    else {
+      style <- paste0(dimens,";",style)
+      if_tmpl <- "<iframe srcdoc=\"(( srcdoc ))\" class='(( class ))' style='(( style ))'>
+                </iframe>
+                "
+      iframe <- fill_tmpl(if_tmpl, srcdoc = srcdoc, class = class, style = style)
+    }
+
+    iframe
+}
+
+escape4srcdoc <- function(x) {
+  x <- gsub("&","&amp;amp;", x)
+  gsub("\"","&quot;", x)
+}
 
 q_orig <- getFromNamespace("q","base")
 

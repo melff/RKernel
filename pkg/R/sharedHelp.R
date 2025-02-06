@@ -30,7 +30,7 @@ sharedHelpServer <- R6Class("sharedHelpServer",
                                      self$log(e$message)
                                      return(0)
                                  })
-           self$log(sprintf("Obtained port: %s",help_ports))
+           self$log(sprintf("Obtained port: %s",help_port))
            if(use_proxy){
                url <- sprintf("/proxy/%d",help_port)
                if(nzchar(prefix)){

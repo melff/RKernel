@@ -34,7 +34,6 @@ setup_session <- function(help_port) {
   install_scan()
   install_menu()
   set_help_displayed()
-  install_httpd_handlers()
   install_globalCallingHandlers()
   install_debugging()
 }

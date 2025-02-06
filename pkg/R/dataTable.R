@@ -6,11 +6,11 @@ asset_fetcher <- function(path,...){
     # log_out('asset_fetcher:',path)
     split_path <- strsplit(path,"/",fixed=TRUE)[[1]]
     # log_out(split_path, use.print = TRUE)
-    pkgname <- split_path[4]
+    pkgname <- split_path[3]
     basename <- tail(split_path,1)
     # log_out(basename, use.print = TRUE)
-    # log_out(tail(split_path,-4), use.print = TRUE)
-    file_path <- as.list(tail(split_path,-4))
+    # log_out(tail(split_path,-3), use.print = TRUE)
+    file_path <- as.list(tail(split_path,-3))
     args <- c(file_path,list(package=pkgname,mustWork=TRUE))
     # log_out(args, use.print = TRUE)
     filename <- try(do.call("system.file",args))
@@ -55,7 +55,7 @@ dt_data_fetcher <- function(path,query,postBody,headers){
     start <- as.integer(postBody["start"])
     len <- as.integer(postBody["length"])
     split_path <- strsplit(path,"/",fixed=TRUE)[[1]]
-    name <- split_path[4]
+    name <- split_path[3]
     obj <- get(name,envir=dt_data)
     if(len < 0) len <- nrow(obj)
     from <- start + 1
@@ -89,7 +89,7 @@ fill_tmpl <- function(tmpl,...){
     res
 }
 
-dt_head_tmpl <- '<link rel="stylesheet" type="text/css" href="(( url ))assets/RKernel/css/datatables.min.css">
+dt_head_tmpl <- '<link rel="stylesheet" type="text/css" href="(( url ))/assets/RKernel/css/datatables.min.css">
 <style>
 table.dataTable tbody td {
     text-align: right;
@@ -141,9 +141,9 @@ table.dataTable.cell-border tbody tr td:first-child {
 }
 </style>
 <script type="text/javascript" charset="utf8" 
-        src="(( url ))assets/RKernel/js/jquery-3.6.0.min.js"></script>
+        src="(( url ))/assets/RKernel/js/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" charset="utf8" 
-        src="(( url ))assets/RKernel/js/datatables.min.js"></script>'
+        src="(( url ))/assets/RKernel/js/datatables.min.js"></script>'
 
 
 dt_tmpl <- '<script type="text/javascript" charset="utf8">
@@ -160,7 +160,7 @@ dt_tmpl <- '<script type="text/javascript" charset="utf8">
             scroller: true,
             deferRender: true,
             ajax: {
-              url: "(( url ))dt-data/(( name ))",
+              url: "(( url ))/dt-data/(( name ))",
               type: "POST"
             },
             "columnDefs": [
@@ -417,7 +417,7 @@ div.datatable-navigation div.widget-html-content {
         #' @description
         #' Draw the iframe with the data table contents
         draw = function() {
-            self$iframe$value <- str2iframe(self$dt,
+            self$iframe$value <- srcdoc_iframe(self$dt,
                                             resize="vertical",
                                             #style="width:100%;height:100%;",
                                             height="300px"

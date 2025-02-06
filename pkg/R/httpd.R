@@ -1,11 +1,114 @@
-http_handlers_env <- getFromNamespace(".httpd.handlers.env","tools")
+HTTPServer <- R6Class("HTTPServer",
+    public = list(
+        initialize = function(port = getOption("help.ports")[0]){
+            private$http_port <- port # Provided by the frontend
+        },
+        get_url = function(){
+            if(!length(private$http_url))
+                self$start()
+            return(private$http_url)
+        },
+        get_port = function(){
+            return(private$http_port)
+        },
+        start = function(){
+            options(help.ports = private$http_port)
+            suppressMessages(port <- tools::startDynamicHelp(NA))
+            if (private$http_port != port) {
+                warning(sprintf(
+                    "Changed help port from %d to %d",
+                    private$http_port,
+                    port
+                ))
+                options(http.port = port)
+                private$http_port <- port
+            }
+            jupyterhub_prefix <- Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")
+            if(nzchar(jupyterhub_prefix)) private$use_proxy <- TRUE
+            if(private$use_proxy){
+                http_url <- sprintf("/proxy/%d",port)
+                if(nzchar(jupyterhub_prefix)){
+                    http_url <- paste0(jupyterhub_prefix,http_url)
+                    http_url <- gsub("//","/",http_url,fixed=TRUE)
+                }
+            }
+            else {
+                http_url <- sprintf("http://localhost:%d",port)
+            }
+            private$http_url <- http_url
+            private$httpd_orig <- getFromNamespace("httpd","tools")
+            replace_in_package("tools","httpd",private$httpd)
+            self$add_http_handler("echo",http_echo)
+            self$add_http_handler("eval",http_eval)
+            self$add_http_handler("data",http_data)
+        },
+        add_http_handler = function(name, handler){
+            private$handlers[[name]] <- handler
+        },
+        has_http_handler = function(name) {
+            name %in% names(private$handlers)
+        }
+    ),
+    private = list(
+        http_url = NULL,
+        http_port = 0,
+        use_proxy = FALSE,
+        httpd_orig = NULL,
+        handlers = NULL,
+        httpd = function(path,query,...){
+            # log_out("httpd")
+            # log_out(path)
+            split_path <- strsplit(path,"/")[[1]]
+            response <- NULL
+            if(length(split_path) > 1){
+                slug <- split_path[2]
+                handler <- private$handlers[[slug]]
+                if(is.function(handler))
+                  response <- handler(path,query,...)
+            }
+            if(!length(response)){
+                response <- private$httpd_orig(path=path,query=query,...)
+                log_print(response)
+                payload <- response$payload
+                payload <- gsub("/doc/html/",paste0(httpd_url(),
+                                                    "/doc/html/"),payload,fixed=TRUE)
+                response$payload <- payload
+            }
+            # log_print(response)
+            return(response)
+        }
+    )
+)
 
-add_http_handler <- function(name, handler){
-  assign(name, handler, http_handlers_env)
+#' @export
+set_help_port <- function(port){
+    http_server$current <- HTTPServer$new(port)
+    options(help.ports=port)
+    replace_in_package("utils","help.start",help_start)
+    replace_in_package("tools","example2html",example_html)
+    replace_in_package("tools","demo2html",demo_html)
 }
 
+http_server <- new.env()
+
+httpd_url <- get_help_url <- function(){
+    url <- http_server$current$get_url()
+    return(url)
+}
+
+httpd_port <- get_help_port <- function(){
+    url <- http_server$current$get_port()
+    return(url)
+}
+
+#' @export
+add_http_handler <- function(name, handler) {
+    http_server$current$add_http_handler(name, handler)
+}
+
+#' @export
 has_http_handler <- function(name) {
-  exists(name, envir = http_handlers_env)
+    http_server$current$has_http_handler(name)
 }
 
 #' @importFrom utils capture.output
@@ -91,7 +194,7 @@ http_data <- function(path, query, ...){
           res <- dta[row_sel,col_sel]
         } else if (length(row_sel)) {
           res <- dta[row_sel,]
-        }else if (length(col_sel)) {
+        } else if (length(col_sel)) {
           res <- dta[,col_sel]
         } else 
           res <- dta
@@ -116,28 +219,6 @@ http_data <- function(path, query, ...){
   }
 
 
-# httpd_env <- new.env()
-
-install_httpd_handlers <- function() {
-  add_http_handler("echo",http_echo)
-  add_http_handler("eval",http_eval)
-  add_http_handler("data",http_data)
-  #suppressMessages(httpd_env$port <- tools::startDynamicHelp(start=NA))
-}
-
-#' Get the help port of the R session.
-#' @export
-httpd_port <- function() get_help_port()
-#httpd_port <- function() get0("port",httpd_env)
-
-#' Get the URL of the http server of the R session, including
-#' the "/custom/" path component.
-#' @export 
-httpd_url <- function() paste0(get_help_url(),"/custom/")
-#httpd_url <- function() paste0("http://localhost:",httpd_port(),"/")
-
-#' Send a http request to an URL and return the response.
-#' @param x A character string containing the URL.
 #' @export
 http_get <- function(x) {
   con <- url(x)
@@ -145,31 +226,4 @@ http_get <- function(x) {
   paste(readLines(con, warn = FALSE),collapse="\n")
 }
 
-http_req_handlers <- new.env()
 
-# #' @title Generalized http server
-# #' @description
-# #' A variant of 'tools:::httpd' that adapts the paths used in HTML-pages if 
-# #' the help system is proxied. Also allows to implement handlers
-# #' for specific URL patterns via the event mechanism (see \code{\link{EventManager}})
-# #' @param path The \emph{relative} url, e.g. "/doc/html/something/index.html"
-# #' @param query The query string (that appeared after '?' in the http request)
-# #' @param ... Any further arguments, passed on to specific handlers
-# httpd = function(path,query,...){
-#     split_path <- strsplit(path,"/")[[1]]
-#     response <- NULL
-#     if(length(split_path) > 1){
-#         slug <- split_path[2]
-#         handler <- get0(slug,http_req_handlers)
-#         if(is.function(handler))
-#         response <- handler(path,query,...)
-#     }
-#     if(!length(response)){
-#         response <- orig_httpd(path=path,query=query,...)
-#         payload <- response$payload
-#         payload <- gsub("/doc/html/",paste0(private$http_url,
-#                                             "/doc/html/"),payload,fixed=TRUE)
-#         response$payload <- payload
-#     }
-#     return(response)
-# }
