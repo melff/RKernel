@@ -417,10 +417,11 @@ div.datatable-navigation div.widget-html-content {
         #' @description
         #' Draw the iframe with the data table contents
         draw = function() {
-            self$iframe$value <- srcdoc_iframe(self$dt,
-                                            resize="vertical",
+            self$iframe$value <- str2iframe(self$dt,
+                                            resize = "vertical",
                                             #style="width:100%;height:100%;",
-                                            height="300px"
+                                            height = "300px",
+                                            use_srcdoc = http_is_proxied()
                                             )
         }
     )

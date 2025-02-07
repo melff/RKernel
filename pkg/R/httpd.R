@@ -47,6 +47,9 @@ HTTPServer <- R6Class("HTTPServer",
         },
         has_http_handler = function(name) {
             name %in% names(private$handlers)
+        },
+        proxied = function() {
+            private$use_proxy
         }
     ),
     private = list(
@@ -58,6 +61,7 @@ HTTPServer <- R6Class("HTTPServer",
         httpd = function(path,query,...){
             # log_out("httpd")
             # log_out(path)
+            # http_log(path)
             split_path <- strsplit(path,"/")[[1]]
             response <- NULL
             if(length(split_path) > 1){
@@ -68,7 +72,7 @@ HTTPServer <- R6Class("HTTPServer",
             }
             if(!length(response)){
                 response <- private$httpd_orig(path=path,query=query,...)
-                log_print(response)
+                #log_print(response)
                 payload <- response$payload
                 payload <- gsub("/doc/html/",paste0(httpd_url(),
                                                     "/doc/html/"),payload,fixed=TRUE)
@@ -109,6 +113,11 @@ add_http_handler <- function(name, handler) {
 #' @export
 has_http_handler <- function(name) {
     http_server$current$has_http_handler(name)
+}
+
+#' @export
+http_is_proxied <- function() {
+    http_server$current$proxied()
 }
 
 #' @importFrom utils capture.output
