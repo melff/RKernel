@@ -226,4 +226,21 @@ http_get <- function(x) {
   paste(readLines(con, warn = FALSE),collapse="\n")
 }
 
+#' @export
+http_log <- function(msg) {
+  msg <- c(format(Sys.time()),msg)
+  msg <- paste(msg, collapse = "\n")
+  if(!("log" %in% ls(http_server))) {
+    http_server$log <- msg
+  }
+  else {
+    http_server$log <- c(http_server$log, msg)
+  }
+}
 
+#' @export
+show_http_log <- function() {
+  for(msg in http_server$log) {
+    cat(msg, "\n")
+  }
+}
