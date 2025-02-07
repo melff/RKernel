@@ -12,6 +12,7 @@ str2iframe(
   height = character(0),
   class = "rkernel-iframe",
   style = "border-style:none",
+  use_srcdoc = FALSE,
   ...
 )
 }

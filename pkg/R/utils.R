@@ -154,6 +154,7 @@ str2iframe <- function(code,
                       height = character(0),
                       class = "rkernel-iframe",
                       style = "border-style:none",
+                      use_srcdoc = FALSE,
                       ...){
             # cl <- match.call()
             # log_out(deparse0(cl))
@@ -161,9 +162,20 @@ str2iframe <- function(code,
     # path <- paste0("/iframe/",id,"/")
     # url <- paste0(httpd_url(),path)
 
-    url <- dataURI(charToRaw(code),mime="text/html")
+    if(use_srcdoc) {
+      srcdoc_iframe(code,
+                    resize = resize,
+                    width = width,
+                    aspect_ratio = aspect_ratio,
+                    height = height,
+                    class = class,
+                    style = style,
+                    ...)
+    } else {
+      url <- dataURI(charToRaw(code),mime="text/html")
+      url2iframe(url,resize,width,aspect_ratio,height,class,style,...)
+    }
 
-    url2iframe(url,resize,width,aspect_ratio,height,class,style,...)
 }
 
 #' Create an HTML iframe tag that refers to some (usually HTML) code
