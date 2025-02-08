@@ -254,6 +254,10 @@ url2iframe <- function(url,
       iframe <- fill_tmpl(if_tmpl, url = url, class = class, style = style)
     }
 
+    if(!isFALSE(resize)) {
+      iframe <- paste(resize_style, iframe, sep="\n")
+    }
+
     iframe
 }
 
@@ -327,6 +331,10 @@ srcdoc_iframe <- function(srcdoc,
                 </iframe>
                 "
       iframe <- fill_tmpl(if_tmpl, srcdoc = srcdoc, class = class, style = style)
+    }
+
+    if(!isFALSE(resize)) {
+      iframe <- paste(resize_style, iframe, sep="\n")
     }
 
     iframe
