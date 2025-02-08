@@ -119,6 +119,3 @@ reference:
   - get_completions
   - str2iframe
   - url2iframe
-  - http_get
-  - httpd_port
-  - httpd_url
