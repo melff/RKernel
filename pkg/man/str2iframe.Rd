@@ -31,6 +31,9 @@ str2iframe(
 
 \item{style}{The CSS style attribte of the iframe, a string}
 
+\item{use_srcdoc}{A logical value, whether the 'srcdoc' attribute should
+be used to set the iframe content, rather than the 'src' attribute.}
+
 \item{...}{Other arguments, ignored.}
 }
 \description{

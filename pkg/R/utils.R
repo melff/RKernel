@@ -146,6 +146,8 @@ replace_in_package <- function(pkg_name,name,value,update.env=FALSE){
 #' @param height The intended height, a string. Overrides the aspect ratio if given.
 #' @param class The DOM class attribute the iframe, a string
 #' @param style The CSS style attribte of the iframe, a string
+#' @param use_srcdoc A logical value, whether the 'srcdoc' attribute should
+#'    be used to set the iframe content, rather than the 'src' attribute.
 #' @param ... Other arguments, ignored.
 str2iframe <- function(code,
                       resize = FALSE,

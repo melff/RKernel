@@ -1,4 +1,3 @@
-#' @export
 set_help_displayed <- function(on=TRUE){
     if(on){
         add_displayed_classes("help_files_with_topic")
