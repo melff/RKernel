@@ -119,3 +119,15 @@ reference:
   - get_completions
   - str2iframe
   - url2iframe
+  - add_http_handler
+  - has_http_handler
+  - http_data
+  - http_echo
+  - http_eval
+  - http_get
+  - http_is_proxied
+  - http_log
+  - httpd_port
+  - httpd_url
+  - set_help_port
+  - show_http_log
