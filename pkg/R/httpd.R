@@ -61,10 +61,13 @@ HTTPServer <- R6Class("HTTPServer",
         httpd = function(path,query,...){
             # log_out("httpd")
             # log_out(path)
-            # http_log(path)
-            split_path <- strsplit(path,"/")[[1]]
+            http_log(path)
+            split_path <- split_string1(path,"/")
             response <- NULL
-            if(length(split_path) > 1){
+            if(length(split_path) == 1) {
+              response <- redirect2docroot()
+            }
+            else if(length(split_path) > 1){
                 slug <- split_path[2]
                 handler <- private$handlers[[slug]]
                 if(is.function(handler))
@@ -289,6 +292,20 @@ http_data <- function(path, query, ...){
       )
   }
 
+redirect2docroot <- function() {
+    payload <- '<head>
+  <meta http-equiv="Refresh" content="0; URL=/doc/html/index.html" />
+</head>
+'
+    content_type <- "text/html"
+    list(
+      payload = paste0(payload,collapse="\n"),
+      "content-type" = content_type,
+      headers=NULL,
+      "status code" = 200L
+      )
+}
+
 #' Send a GET request to an URL and read the response.
 #' @param x A character string with an URL.
 #' @examples 
@@ -326,3 +343,4 @@ show_http_log <- function() {
     cat(msg, "\n")
   }
 }
+
