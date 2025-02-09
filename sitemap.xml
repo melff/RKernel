@@ -81,6 +81,7 @@
 <url><loc>https://melff.github.io/RKernel/reference/WidgetLink.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/Widgets.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/add_displayed_classes.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/add_http_handler.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/add_paged_classes.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/dataTable.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/dictionary.html</loc></url>
@@ -89,7 +90,16 @@
 <url><loc>https://melff.github.io/RKernel/reference/display_id.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/envBrowser.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/get_completions.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/has_http_handler.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/help.start.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/http_data.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/http_echo.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/http_eval.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/http_get.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/http_is_proxied.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/http_log.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/httpd_port.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/httpd_url.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/index.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/install.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/interaction.html</loc></url>
@@ -100,7 +110,9 @@
 <url><loc>https://melff.github.io/RKernel/reference/register_magic_handler.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/remove_displayed_classes.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/remove_paged_classes.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/set_help_port.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/sharedHelpServer.html</loc></url>
+<url><loc>https://melff.github.io/RKernel/reference/show_http_log.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/str2iframe.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/to_json.html</loc></url>
 <url><loc>https://melff.github.io/RKernel/reference/url2iframe.html</loc></url>
