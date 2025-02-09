@@ -549,7 +549,26 @@ Kernel <- R6Class("Kernel",
                          file_extension = ".R",
                          version = rversion),
                        banner = self$session$banner,
-                       debugger = FALSE)
+                       debugger = FALSE,
+                       help_links = list(
+                        list(text="The R Project", 
+                             url="http://www.r-project.org"),
+                        list(text="An Introduction to R", 
+                             url="https://cloud.r-project.org/doc/manuals/r-release/R-intro.html"),
+                        list(text="The R Language Definition", 
+                             url="https://cloud.r-project.org/doc/manuals/r-release/R-lang.html"),
+                        list(text="The Comprehensive R Archive Network", 
+                             url="https://cloud.r-project.org/"),
+                        list(text="Packages on CRAN by Name", 
+                             url="https://cloud.r-project.org/web/packages/available_packages_by_name.html"),
+                        list(text="Packages on CRAN by Date", 
+                             url="https://cloud.r-project.org/web/packages/available_packages_by_date.html"),
+                        list(text="CRAN Task Views", 
+                             url="https://cloud.r-project.org/web/views/"),
+                        list(text="RKernel Documentation", 
+                             url="https://melff.github.io/RKernel/")
+                       ))
+      # log_print(response$help_links)
       private$send_message(type="kernel_info_reply",
                            parent=private$parent$shell,
                            socket_name="shell",
