@@ -443,6 +443,38 @@ display_data.data.frame <- function(x,...,
     structure(d,class=cl)
 }
 
+#' @describeIn display_data S3 method for class 'data.set'
+#' @export
+display_data.data.set <- function(x,...,
+                            metadata=emptyNamedList,
+                            id=UUIDgenerate(),
+                            update=FALSE){
+    x <- format(x)
+    NextMethod("display_data")
+}
+
+#' @describeIn display_data S3 method for class 'importer'
+#' @export
+display_data.importer <- function(x,...,
+                            metadata=emptyNamedList,
+                            id=UUIDgenerate(),
+                            update=FALSE){
+    x <- description(x)
+    x <- as.data.frame(x)
+    NextMethod("display_data")
+}
+
+#' @describeIn display_data S3 method for class 'descriptions'
+#' @export
+display_data.descriptions <- function(x,...,
+                            metadata=emptyNamedList,
+                            id=UUIDgenerate(),
+                            update=FALSE){
+    x <- as.data.frame(x)
+    NextMethod("display_data")
+}
+
+
 prep_data_frame <- function(x,
                        max_lines=getOption("view_max_lines", 100),
                        max_columns=getOption("view_max_columns",20),

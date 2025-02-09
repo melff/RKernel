@@ -245,6 +245,17 @@ dataTable.default <- function(x,...) dataTable.data.frame(as.data.frame(x),...)
 dataTable.data.frame <- function(x,...) 
     dataTableClass$new(x,...)
 
+#' @describeIn dataTable data.set method 
+#' @export
+dataTable.data.set <- function(x,...) 
+    dataTableClass$new(x,...)
+
+#' @describeIn dataTable importer method 
+#' @export
+dataTable.importer <- function(x,...) 
+    dataTableClass$new(x,...)
+
+
 #' @rdname dataTable
 #' @export
 dataTableClass <- R6Class("dataTable",{

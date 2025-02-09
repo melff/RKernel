@@ -49,3 +49,26 @@ View.data.frame <- function(x,title=deparse(substitute(x)),...)
     )
 }
 
+#' @rdname View
+#' @param ... Other arguments, ignored.
+#' @export
+View.data.set <- function(x,title=deparse(substitute(x)),...)
+{
+    switch(getOption("View.backend",""),
+        widget=virtable_widget(x),
+        scrolling_table=scrolling_table(x),
+        dataTable=,dataTable(x)
+    )
+}
+
+#' @rdname View
+#' @param ... Other arguments, ignored.
+#' @export
+View.importer <- function(x,title=deparse(substitute(x)),...)
+{
+    switch(getOption("View.backend",""),
+        widget=virtable_widget(x),
+        scrolling_table=scrolling_table(x),
+        dataTable=,dataTable(x)
+    )
+}

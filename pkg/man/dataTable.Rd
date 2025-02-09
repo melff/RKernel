@@ -4,6 +4,8 @@
 \alias{dataTable}
 \alias{dataTable.default}
 \alias{dataTable.data.frame}
+\alias{dataTable.data.set}
+\alias{dataTable.importer}
 \alias{dataTableClass}
 \alias{display_data.dataTable}
 \title{HTML Tables with Interactive Controls}
@@ -13,6 +15,10 @@ dataTable(x, ...)
 \method{dataTable}{default}(x, ...)
 
 \method{dataTable}{data.frame}(x, ...)
+
+\method{dataTable}{data.set}(x, ...)
+
+\method{dataTable}{importer}(x, ...)
 
 \method{display_data}{dataTable}(
   x,
@@ -43,6 +49,10 @@ Objects of class "dataTable" provide HTML tables with interactive
 \item \code{dataTable(default)}: Default method
 
 \item \code{dataTable(data.frame)}: data.frame method
+
+\item \code{dataTable(data.set)}: data.set method
+
+\item \code{dataTable(importer)}: importer method
 
 }}
 \section{Methods (by generic)}{

@@ -10,6 +10,8 @@
 \alias{display_data.svg}
 \alias{update.display_data}
 \alias{display_data.data.frame}
+\alias{display_data.data.set}
+\alias{display_data.descriptions}
 \alias{display_data.matrix}
 \alias{display_data.html_elem}
 \alias{display_data.shiny.tag}
@@ -51,6 +53,22 @@ display_data(x, ...)
 \method{update}{display_data}(object, ...)
 
 \method{display_data}{data.frame}(
+  x,
+  ...,
+  metadata = emptyNamedList,
+  id = UUIDgenerate(),
+  update = FALSE
+)
+
+\method{display_data}{data.set}(
+  x,
+  ...,
+  metadata = emptyNamedList,
+  id = UUIDgenerate(),
+  update = FALSE
+)
+
+\method{display_data}{descriptions}(
   x,
   ...,
   metadata = emptyNamedList,
@@ -168,6 +186,10 @@ A generic function that prepares R objects for display using \code{display()}
 \item \code{display_data(svg)}: S3 method for "svg" objects
 
 \item \code{display_data(data.frame)}: S3 method for class 'data.frame'
+
+\item \code{display_data(data.set)}: S3 method for class 'data.set'
+
+\item \code{display_data(descriptions)}: S3 method for class 'descriptions'
 
 \item \code{display_data(matrix)}: S3 method for matrices
 

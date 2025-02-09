@@ -4,6 +4,8 @@
 \alias{View}
 \alias{View.default}
 \alias{View.data.frame}
+\alias{View.data.set}
+\alias{View.importer}
 \title{Invoke a Data Viewer}
 \usage{
 View(x, title = deparse(substitute(x)), ...)
@@ -11,6 +13,10 @@ View(x, title = deparse(substitute(x)), ...)
 \method{View}{default}(x, title = deparse(substitute(x)), ...)
 
 \method{View}{data.frame}(x, title = deparse(substitute(x)), ...)
+
+\method{View}{data.set}(x, title = deparse(substitute(x)), ...)
+
+\method{View}{importer}(x, title = deparse(substitute(x)), ...)
 }
 \arguments{
 \item{x}{An \R object which can be coerced to a data frame with non-zero numbers of rows and columns.}
