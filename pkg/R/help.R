@@ -294,15 +294,74 @@ my_example2html <- function(topic, package, Rhome = "", env = NULL){
 #' @importFrom utils capture.output example
 example_html <- function(topic,package = NULL,...) {
     # log_out("====== example_html ======")
+    ugd()
+    d <- dev.cur()
+    on.exit(ugd_close(d))
     e <- capture.output(example(topic,package,local=TRUE,
                                 character.only=TRUE))
     
     e <- paste(e,collapse="\n")
-    e <- strsplit(e,DLE,fixed=TRUE)[[1]]
+    e <- split_string1(e,DLE)
     
     r <- character()
+    msg_frag <- character(0)
+    msg_incomplete <- FALSE
+
+    handle_msg <- function(msg) {
+        # log_out("handle_msg")
+        # log_print(msg)
+        if(msg$type == "event") {
+            try(handle_event(msg$content))
+        }
+        else {
+            res <- capture.output(print(msg))
+            res <- paste(res, collapse = "\n")
+            paste0("<pre>",res,"\n</pre>")
+        }
+    }
+    handle_event <- function(content) {
+        # log_out("handle_event")
+        # log_print(content)
+        if(content$event == "new_plot") {
+            plot_id <- content$plot_id
+            r <- ugd_render(page = plot_id,
+                       width = 7 * 72, 
+                       height = 7 * 72, 
+                       as = "svgp")
+            r <- charToRaw(r)
+            r <- dataURI(data=r,mime="image/svg+xml",
+                         encoding=NULL)
+            sprintf("<img src=\"%s\">",r)
+        } else {
+            ""
+        }
+    }
     for(i in seq_along(e)){
-        r[i] <- paste0("<pre>",e[i],"\n</pre>")
+        r[i] <- ""
+        chunk <- e[i]
+        if(startsWith(chunk, MSG_BEGIN)) {
+            if(endsWith(chunk, MSG_END)) {
+                msg <- remove_prefix(chunk, MSG_BEGIN) |> remove_suffix(MSG_END)
+                msg <- msg_unwrap(msg)
+                r[i] <- handle_msg(msg)
+            } else {
+                msg_incomplete <- TRUE
+                msg_frag <- remove_prefix(chunk, MSG_BEGIN)
+            }
+        } else if(endsWith(chunk, MSG_END)) {
+          msg <- paste0(self$msg_frag, remove_suffix(chunk, MSG_END))
+          msg_incomplete <- FALSE
+          msg_frag <- ""
+          msg <- msg_unwrap(msg)
+          r[i] <- handle_msg(msg)
+        } else {
+            if(msg_incomplete) {
+                msg_frag <- paste(msg_frag, chunk)
+            }
+            else if(nzchar(chunk)) {
+                r[i] <- paste0("<pre>",chunk,"\n</pre>")
+            }
+        }
     }
     head <- c("<!DOCTYPE html>","<html>")
     style <- "<style>
@@ -329,6 +388,7 @@ example_html <- function(topic,package = NULL,...) {
     tail <- "</html>"
 
     r <- paste(c(head,body,tail),collapse="\n")
+    # log_out(r)
     return(list(payload=r))
 }
 
