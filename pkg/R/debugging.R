@@ -83,13 +83,11 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             if(self$show_prompt) self$stdout_callback(prompt)
             self$in_browser <- TRUE
             self$bprompt <- prompt
-            return(TRUE)
         },
         prompt_callback = function(...) {
             # log_out("dbgConsoleWidgetClass$prompt_callback")
             self$continue_loop <- FALSE
             self$in_browser <- FALSE
-            return(TRUE)
         },
         handle_input = function(txt) {
             # log_out("handle_input")
@@ -226,12 +224,10 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
             # log_out("dbgSimpleConsoleClass: browser_callback")
             # log_out(sprintf("prompt = '%s'",prompt))
             self$bprompt <- prompt
-            return(TRUE)
         },
         prompt_callback = function(...) {
             # log_out("dbgSimpleConsoleClass: prompt_callback")
             self$continue_loop <- FALSE
-            return(TRUE)
         },
         bprompt = character(),
         run = function(prompt) {
@@ -467,7 +463,6 @@ CellTracer <- R6Class("CellTracer",
         },
         prompt_callback = function() {
             self$runner$stdout("> ")
-            return(TRUE)
         }
     )
 )

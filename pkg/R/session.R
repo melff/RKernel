@@ -354,32 +354,29 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         code <- paste(code, collapse="\n")
       }
       code_lines <- split_lines1(code) 
-      output_complete <- TRUE
       for(line in code_lines) {
         # log_out(sprintf("Sending input '%s'",line))
         self$session$send_input(line)
-        output_complete <- self$process_output(
+        self$process_output(
                               io_timeout = 1,
                               stdout_callback = stdout_callback,
                               stderr_callback = stderr_callback,
                               browser_callback = browser_callback,
                               input_callback = input_callback,
                               prompt_callback = prompt_callback,
-                              until_prompt = FALSE,
                               drop_echo = !echo)
         #output <- self$collect()
         #stderr_callback(output$stderr)
         #stdout_callback(output$stdout)
       }
-      while(!output_complete){
-          output_complete <- self$process_output(
+      while(until_prompt && !self$found_prompt){
+          self$process_output(
                               io_timeout = io_timeout,
                               stdout_callback = stdout_callback,
                               stderr_callback = stderr_callback,
                               browser_callback = browser_callback,
                               input_callback = input_callback,
                               prompt_callback = prompt_callback,
-                              until_prompt = until_prompt,
                               drop_echo = FALSE)
       }
     },
@@ -436,7 +433,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         browser_callback = self$browser_callback,
         input_callback = self$input_callback,
         prompt_callback = self$prompt_callback,
-        until_prompt = TRUE,
         drop_echo = FALSE
       ) {
         stopifnot(is.function(stdout_callback))
@@ -445,10 +441,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         resp <- session$receive_output(timeout = io_timeout)
         self$found_browse_prompt <- character(0)
         self$found_prompt <- FALSE
-        output_complete <- FALSE
-        if(!length(resp)) {
-          output_complete <- !until_prompt
-        }
         if (!is.null(resp$stderr) 
               && nzchar(resp$stderr)
               && grepl('\\S',resp$stderr)) {
@@ -482,20 +474,16 @@ RSessionAdapter <- R6Class("RSessionAdapter",
           } 
           if(self$found_prompt) {
             if(is.function(prompt_callback)) {
-              output_complete <- prompt_callback()
-            } else {
-              output_complete <- TRUE
-            }
+              prompt_callback()
+            } 
           } else if(length(self$found_browse_prompt)) {
             if (is.function(browser_callback)) {
-              output_complete <- browser_callback(prompt=self$found_browse_prompt)
+              browser_callback(prompt=self$found_browse_prompt)
             } else {
               session$send_input("Q")
-              output_complete <- !until_prompt
             }
           }
         }
-        return(output_complete)
     },
     #' @description Run a one-line command without checking and return the 
     #'     output
