@@ -348,13 +348,16 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         until_prompt = TRUE,
         echo = self$echo
       ) {
+      # log_out("run_code()")
       if(!is.character(code) || 
          length(code) < 1) return()
       if(length(code) > 1) {
         code <- paste(code, collapse="\n")
       }
-      code_lines <- split_lines1(code) 
-      for(line in code_lines) {
+      if(nzchar(code)) {
+        code <- split_lines1(code) 
+      }
+      for(line in code) {
         # log_out(sprintf("Sending input '%s'",line))
         self$session$send_input(line)
         self$process_output(
@@ -478,7 +481,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             } 
           } else if(length(self$found_browse_prompt)) {
             if (is.function(browser_callback)) {
-              browser_callback(prompt=self$found_browse_prompt)
+              # log_out("Calling browser_callback")
+              self$found_prompt <- browser_callback(prompt=self$found_browse_prompt)
             } else {
               session$send_input("Q")
             }
