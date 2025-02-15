@@ -318,33 +318,35 @@ debugger_ <- function(dump = last.dump) {
         rm(.thing, .index, .this_dump)
         browser()
     }
-    if(get_config("use_widgets")) {
-        if (!inherits(dump, "dump.frames")) { #adapted from utils::debugger
+    if (!inherits(dump, "dump.frames")) { #adapted from utils::debugger
         cat(gettextf("'dump' is not an object of class %s\n", 
             dQuote("dump.frames")))
         return(invisible())
-        }
-        n <- length(dump)
-        if (!n) {
-            cat(gettextf("'dump' is empty\n"))
-            return(invisible())
-        }
-        err.action <- getOption("error")
-        on.exit(options(error = err.action))   
-        err_msg <- attr(dump, "error.message")
-        call_labels <- names(dump)
-        repeat {
-            ind <- request_menu_widget(call_labels,
-                                       title="Select a frame",
-                                       buttons = c("Select","Quit"))
-            if(ind > 0) {
-                debugger_look(ind)
-            }
-            else break
-        }
-    } else {
-        debugger_orig(dump)
     }
+    n <- length(dump)
+    if (!n) {
+        cat(gettextf("'dump' is empty\n"))
+        return(invisible())
+    }
+    err.action <- getOption("error")
+    on.exit(options(error = err.action))   
+    err_msg <- attr(dump, "error.message")
+    call_labels <- names(dump)
+    repeat {
+        if(get_config("use_widgets")) {
+            ind <- request_menu_widget(call_labels,
+                                        title="Enter an environment or quit",
+                                        buttons = c("Select","Quit"))
+        }
+        else {
+            ind <- menu(title=gettext("Enter an environment number, or 0 to exit"),
+                        choices = call_labels)
+        }
+        if(ind > 0) {
+            debugger_look(ind)
+        }
+        else break
+    } 
 }
 
 #' @importFrom utils head limitedLabels
@@ -359,7 +361,7 @@ recover_ <- function() {
         }
         repeat {
             ind <- request_menu_widget(call_labels,
-                                    title = "Select a frame",
+                                    title = "Enter an environment or quit",
                                     buttons = c("Select","Quit"),
                                     file=stderr())
             # log_out(sprintf("ind = %d",ind))
