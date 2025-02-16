@@ -1,8 +1,9 @@
-Menu <- function(kernel, args, ...) {
-  # log_out("Menu")
+Menu <- function(...) {
+  log_out("Menu")
   # log_out("Menu with args:")
   # log_out(args,use.str=TRUE)
-  m <- MenuWidgetClass$new(kernel, args, ...)
+  m <- MenuWidgetClass$new(...)
+  log_out("Menu widget created")
   m$run()
 }
 
@@ -17,27 +18,32 @@ MenuWidgetClass <- R6Class("MenuWidget",
         value = NULL,
         main_widget = NULL,
         listbox = NULL,
-        kernel = NULL,
         continue_loop = TRUE,
-        initialize = function(kernel, args) {
-            self$choices <- unlist(args$choices)
-            self$title <- args$title
-            self$kernel <- kernel
-            self$multiple <- args$multiple
-            self$preselect <- args$preselect
-            self$button_labels <- args$buttons
+        initialize = function(choices, 
+                              preselect=NULL,
+                              multiple=FALSE,
+                              title=NULL,
+                              buttons = c("OK","Cancel")
+                              ) {
+            self$choices <- unlist(choices)
+            self$title <- title
+            self$multiple <- multiple
+            self$preselect <- preselect
+            self$button_labels <- buttons
+            log_out("Menu widget inited")
         },
         on_ok = function() {
+            log_out("Menu: on_ok called")
             ind <- self$listbox$index + 1L # widget indices are zero-based
             self$continue_loop <- FALSE
             self$index <- ind
         },
         on_cancel = function() {
+            log_out("Menu: on_cancel called")
             self$continue_loop <- FALSE
             self$index <- 0L
         },
         run = function() {
-            kernel <- self$kernel
             choices <- self$choices
             nc <- length(choices)
             multiple <- self$multiple
@@ -72,10 +78,16 @@ MenuWidgetClass <- R6Class("MenuWidget",
             }
             d <- display_data(self$main_widget)
             d_id <- display_id(d)
-            kernel$display_send(d)
+            display(d)
+            log_out("Menu: entering loop")
             while(self$continue_loop) {
-                kernel$session$yield(1000)
+                log_out("#")
+                inp <- readline_orig("> ")
+                expr <- str2expression(inp)
+                eval(expr)
+                log_print(expr)
             }
+            log_out("Menu: loop done")
             self$listbox$disabled <- TRUE
             if(any(self$index > 0L)) {
               value <- paste(self$listbox$value, collapse=", ")
@@ -86,9 +98,8 @@ MenuWidgetClass <- R6Class("MenuWidget",
                               "text/html"="",
                               id = d_id,
                               update = TRUE)
-            kernel$display_send(d)
-            res <- deparse(self$index)
-            kernel$session$send_input(res, drop_echo = TRUE)
+            display(d)
+            return(self$index)
         }
     )
 )
@@ -102,19 +113,12 @@ request_menu_widget <- function(choices,
                                 file=stdout(),
                                 ...) {
   # log_out("request_menu_widget")
-  msg <- list(
-    type = "menu",
-    content = list(
+  Menu(
       choices = choices,
       preselect = preselect,
       title = title,
       buttons = buttons,
       multiple = multiple)
-  )
-  # log_out(msg,use.str=TRUE)
-  msg_send(msg, file=file)
-  ind <- readline_orig()
-  eval(str2expression(ind))
 }
 
 menu_orig <- getFromNamespace("menu","utils")

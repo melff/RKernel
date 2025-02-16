@@ -659,6 +659,8 @@ Kernel <- R6Class("Kernel",
     },
 
     handle_comm_msg = function(msg){
+      log_out("handle_comm_msg")
+      log_print(msg)
       cm <- get_comm_manager()
       id <- msg$content$comm_id
       if(cm$has(id)) {
@@ -1042,10 +1044,11 @@ Kernel <- R6Class("Kernel",
       msg_unwrap(resp)
     },
     r_send_request_noreply = function(msg){
-      # log_out("r_send_request_noreply")
+      log_out("r_send_request_noreply")
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel:::handle_request(", msg_dput, ")")
-      self$repl$run_code(cmd, echo = FALSE, until_prompt = TRUE)
+      self$repl$run_code(cmd, echo = FALSE, until_prompt = TRUE,
+                         debug = TRUE)
       return(invisible())
     },
     r_send_cmd = function(cmd) {
