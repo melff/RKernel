@@ -625,7 +625,7 @@ Kernel <- R6Class("Kernel",
       # return(NULL)
       # log_out("comm_info_reply")
       target <- msg$content$target_name
-      if(target == "jupyter.widget") {
+      if(target == "jupyter.widget" && !config$use_widgets) {
         config$use_widgets <- TRUE
         self$repl$run_cmd("RKernel:::set_config(use_widgets=TRUE)")
       }
@@ -648,7 +648,7 @@ Kernel <- R6Class("Kernel",
     handle_comm_open = function(msg){
       # return(NULL)
       target <- msg$content$target_name
-      if(target == "jupyter.widget.control") {
+      if(target == "jupyter.widget.control" && !config$use_widgets) {
         config$use_widgets <- TRUE
         self$repl$run_cmd("RKernel:::set_config(use_widgets=TRUE)")
       }
