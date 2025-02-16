@@ -83,6 +83,8 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             if(self$show_prompt) self$stdout_callback(prompt)
             self$in_browser <- TRUE
             self$bprompt <- prompt
+            self$enable_buttons()
+            return(TRUE)
         },
         prompt_callback = function(...) {
             # log_out("dbgConsoleWidgetClass$prompt_callback")
@@ -91,12 +93,13 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
         },
         handle_input = function(txt) {
             # log_out("handle_input")
+            self$disable_buttons()
             if(!length(txt)) {
                 txt <- ""
             }
             # log_out(sprintf("txt='%s'",txt))
             r <- try(self$repl$run_code(txt, echo = TRUE,
-                                            until_prompt = FALSE))
+                                             until_prompt = TRUE))
             if(inherits(r,"try-error")) {
                 log_error(r)
                 kernel <- self$session$kernel
@@ -136,17 +139,20 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             invisible()
         },
         main_widget = NULL,
+        next_btn = NULL,
+        continue_btn = NULL,
+        quit_btn = NULL,
         display_id = NULL,
         display = function() {
             # log_out("dbgConsoleWidget$display()")
             kernel <- self$session$kernel
-            next_btn <- Button(icon="play",style=ButtonStyle(font_size="70%"))
-            continue_btn <- Button(icon="forward",style=ButtonStyle(font_size="70%"))
-            quit_btn <- Button(icon="stop",style=ButtonStyle(font_size="70%"))
-            next_btn$on_click(self$on_click_next)
-            continue_btn$on_click(self$on_click_continue)
-            quit_btn$on_click(self$on_click_quit)
-            self$button_box <- HBox(next_btn,continue_btn,quit_btn)
+            self$next_btn <- Button(icon="play",style=ButtonStyle(font_size="70%"))
+            self$continue_btn <- Button(icon="forward",style=ButtonStyle(font_size="70%"))
+            self$quit_btn <- Button(icon="stop",style=ButtonStyle(font_size="70%"))
+            self$next_btn$on_click(self$on_click_next)
+            self$continue_btn$on_click(self$on_click_continue)
+            self$quit_btn$on_click(self$on_click_quit)
+            self$button_box <- HBox(self$next_btn,self$continue_btn,self$quit_btn)
             self$input <- TextWidget(
                 placeholder="Enter expression, a debugging command, or 'help' for available commands ",
                 continuous_update = TRUE
@@ -175,6 +181,18 @@ dbgConsoleWidgetClass <- R6Class("dbgConsoleWidget",
             kernel$restore_shell_parent(runner_parent)
             kernel$display_send(d)
             kernel$restore_shell_parent(saved_parent)
+        },
+        disable_buttons = function() {
+            self$next_btn$disabled <- TRUE
+            self$continue_btn$disabled <- TRUE
+            self$quit_btn$disabled <- TRUE
+            self$input$disabled <- TRUE
+        },
+        enable_buttons = function() {
+            self$next_btn$disabled <- FALSE
+            self$continue_btn$disabled <- FALSE
+            self$quit_btn$disabled <- FALSE
+            self$input$disabled <- FALSE
         },
         run = function(prompt) {
             # log_out("dbgConsole$run()")
@@ -247,7 +265,6 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
 
 dbgConsole <- function(runner, prompt, use_widgets = TRUE) {
     # log_out("dbgConsole")
-    # log_out("dbgConsole")
     # log_out(prompt)
     # log_out(use_widgets)
     if(use_widgets) {
@@ -310,6 +327,7 @@ recover_orig <- getFromNamespace("recover","utils")
 
 
 debugger_ <- function(dump = last.dump) {
+    #log_out("======= debugger_ ===========")
     debugger_look <- function(.index) { #adapted from utils::debugger
         .this_dump <- dump[[.index]]
         for (.thing in ls(envir = .this_dump, all.names = TRUE)) {
@@ -362,6 +380,7 @@ recover_ <- function() {
     }
     repeat {
         if(get_config("use_widgets")) {
+            # log_out("Requesting menu widget")
             ind <- request_menu_widget(call_labels,
                                     title = "Enter an environment or quit",
                                     buttons = c("Select","Quit"),
