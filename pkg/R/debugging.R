@@ -224,6 +224,7 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
             # log_out("dbgSimpleConsoleClass: browser_callback")
             # log_out(sprintf("prompt = '%s'",prompt))
             self$bprompt <- prompt
+            return(TRUE)
         },
         prompt_callback = function(...) {
             # log_out("dbgSimpleConsoleClass: prompt_callback")
@@ -238,7 +239,7 @@ dbgSimpleConsoleClass <- R6Class("dbgSimpleConsole",
                 kernel$input_request(prompt = self$bprompt)
                 input <- kernel$read_stdin()
                 self$repl$run_code(input, echo = TRUE,
-                                   until_prompt = FALSE)
+                                   until_prompt = TRUE)
             }
         }
     )
@@ -343,6 +344,7 @@ debugger_ <- function(dump = last.dump) {
                         choices = call_labels)
         }
         if(ind > 0) {
+            # log_out(sprintf("debugger_look(%d)", ind))
             debugger_look(ind)
         }
         else break
@@ -352,29 +354,32 @@ debugger_ <- function(dump = last.dump) {
 #' @importFrom utils head limitedLabels
 recover_ <- function() {
     # log_out("======= recover_ ===========")
-    if(get_config("use_widgets")) {
-        calls <- sys.calls()
-        call_labels <- limitedLabels(head(calls,-1))
-        recover_look <- function(index, title)  {
-            browser_call <- substitute(browser(text=title),list(title=title))
-            eval(browser_call,sys.frame(index))
-        }
-        repeat {
+    calls <- sys.calls()
+    call_labels <- limitedLabels(head(calls,-1))
+    recover_look <- function(index, title)  {
+        browser_call <- substitute(browser(text=title),list(title=title))
+        eval(browser_call,sys.frame(index))
+    }
+    repeat {
+        if(get_config("use_widgets")) {
             ind <- request_menu_widget(call_labels,
                                     title = "Enter an environment or quit",
                                     buttons = c("Select","Quit"),
                                     file=stderr())
-            # log_out(sprintf("ind = %d",ind))
-            if(ind > 0L) {
-                title <- paste("Variables in frame of call",call_labels[ind])
-                recover_look(ind,title)
-                # log_out("returned from 'recover_look()'")
-            } 
-            else break
         }
-    } else {
-        recover_orig()
+        else {
+            ind <- menu(title=gettext("Enter an environment number, or 0 to exit"),
+                        choices = call_labels)
+        }
+        # log_out(sprintf("ind = %d",ind))
+        if(ind > 0L) {
+            title <- paste("Variables in frame of call",call_labels[ind])
+            recover_look(ind,title)
+            # log_out("returned from 'recover_look()'")
+        } 
+        else break
     }
+    # log_out(" - recover finished ---")
 }
 
 install_debugging <- function() {

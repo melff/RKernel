@@ -348,7 +348,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         until_prompt = TRUE,
         echo = self$echo
       ) {
-      # log_out("run_code()")
+      log_out("run_code()")
       if(!is.character(code) || 
          length(code) < 1) return()
       if(length(code) > 1) {
@@ -358,7 +358,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         code <- split_lines1(code) 
       }
       for(line in code) {
-        # log_out(sprintf("Sending input '%s'",line))
+        log_out(sprintf("Sending input '%s'",line))
         self$session$send_input(line)
         self$process_output(
                               io_timeout = 1,
@@ -450,7 +450,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               stderr_callback(resp$stderr)
         }
         if (!is.null(resp$stdout)) {
-          # log_out("======== process_output ==========")
+          log_out("======== process_output ==========")
           # log_out(resp$stdout)
           if(drop_echo) {
             resp$stdout <- drop_echo(resp$stdout)
@@ -462,12 +462,12 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                                            stderr_callback)
           }
           if(grepl(self$browse_prompt, resp$stdout)) {
-            # log_out("Found browser prompt")
+            log_out("Found browser prompt")
             self$found_browse_prompt <- getlastmatch(self$browse_prompt, 
                                                      resp$stdout)
             resp$stdout <- gsub(self$browse_prompt,"",resp$stdout)
           } else if (endsWith(resp$stdout, self$prompt)) {
-            # log_out("Found main prompt")
+            log_out("Found main prompt")
             # log_out(self$status)
             self$found_prompt <- TRUE
             resp$stdout <- remove_suffix(resp$stdout, self$prompt)
@@ -481,7 +481,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             } 
           } else if(length(self$found_browse_prompt)) {
             if (is.function(browser_callback)) {
-              # log_out("Calling browser_callback")
+              log_out("Calling browser_callback")
               self$found_prompt <- browser_callback(prompt=self$found_browse_prompt)
             } else {
               session$send_input("Q")
