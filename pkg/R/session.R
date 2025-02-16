@@ -346,9 +346,10 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         prompt_callback = self$prompt_callback,
         input_callback = self$input_callback,
         until_prompt = TRUE,
-        echo = self$echo
+        echo = self$echo,
+        debug = FALSE
       ) {
-      log_out("run_code()")
+      if(debug) log_out("run_code()")
       if(!is.character(code) || 
          length(code) < 1) return()
       if(length(code) > 1) {
@@ -358,7 +359,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         code <- split_lines1(code) 
       }
       for(line in code) {
-        log_out(sprintf("Sending input '%s'",line))
+        if(debug) log_out(sprintf("Sending input '%s'",line))
         self$session$send_input(line)
         self$process_output(
                               io_timeout = 1,
@@ -367,7 +368,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                               browser_callback = browser_callback,
                               input_callback = input_callback,
                               prompt_callback = prompt_callback,
-                              drop_echo = !echo)
+                              drop_echo = !echo,
+                              debug = debug)
         #output <- self$collect()
         #stderr_callback(output$stderr)
         #stdout_callback(output$stdout)
@@ -380,7 +382,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                               browser_callback = browser_callback,
                               input_callback = input_callback,
                               prompt_callback = prompt_callback,
-                              drop_echo = FALSE)
+                              drop_echo = FALSE,
+                              debug = debug)
       }
     },
     #' @description Send an interrupt signal (SIGINT) to the R process. This
@@ -436,7 +439,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         browser_callback = self$browser_callback,
         input_callback = self$input_callback,
         prompt_callback = self$prompt_callback,
-        drop_echo = FALSE
+        drop_echo = FALSE,
+        debug = FALSE
       ) {
         stopifnot(is.function(stdout_callback))
         stopifnot(is.function(stderr_callback))
@@ -450,8 +454,10 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               stderr_callback(resp$stderr)
         }
         if (!is.null(resp$stdout)) {
-          log_out("======== process_output ==========")
-          # log_out(resp$stdout)
+          if(debug) {
+            log_out("======== process_output ==========")
+            log_out(resp$stdout)
+          }
           if(drop_echo) {
             resp$stdout <- drop_echo(resp$stdout)
           }
@@ -462,12 +468,12 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                                            stderr_callback)
           }
           if(grepl(self$browse_prompt, resp$stdout)) {
-            log_out("Found browser prompt")
+            if(debug) log_out("Found browser prompt")
             self$found_browse_prompt <- getlastmatch(self$browse_prompt, 
                                                      resp$stdout)
             resp$stdout <- gsub(self$browse_prompt,"",resp$stdout)
           } else if (endsWith(resp$stdout, self$prompt)) {
-            log_out("Found main prompt")
+            if(debug) log_out("Found main prompt")
             # log_out(self$status)
             self$found_prompt <- TRUE
             resp$stdout <- remove_suffix(resp$stdout, self$prompt)
@@ -481,7 +487,10 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             } 
           } else if(length(self$found_browse_prompt)) {
             if (is.function(browser_callback)) {
-              log_out("Calling browser_callback")
+              if(debug) {
+                log_out("Calling browser_callback")
+                log_print(browser_callback)
+              }
               self$found_prompt <- browser_callback(prompt=self$found_browse_prompt)
             } else {
               session$send_input("Q")
@@ -492,8 +501,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
     #' @description Run a one-line command without checking and return the 
     #'     output
     #' @param cmd A command string
-    run_cmd = function(cmd) {
-      # log_out(sprintf("Run cmd '%s'",cmd))
+    run_cmd = function(cmd, debug = FALSE) {
+      if(debug) log_out(sprintf("Run cmd '%s'",cmd))
       self$run_code(cmd,
                     io_timeout = 1,
                     stdout_callback = self$aggreg_stdout,
@@ -501,7 +510,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                     browser_callback = TrueFunc,
                     input_callback = NULL,
                     until_prompt = TRUE,
-                    echo = FALSE
+                    echo = FALSE,
+                    debug = debug
                     )
       res <- self$collect()
       return(res)
