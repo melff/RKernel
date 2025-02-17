@@ -353,9 +353,9 @@ debugger_ <- function(dump = last.dump) {
     call_labels <- names(dump)
     repeat {
         if(get_config("use_widgets")) {
-            ind <- request_menu_widget(call_labels,
-                                        title="Enter an environment or quit",
-                                        buttons = c("Select","Quit"))
+            ind <- Menu(call_labels,
+                        title="Enter an environment or quit",
+                        buttons = c("Select","Quit"))
         }
         else {
             ind <- menu(title=gettext("Enter an environment number, or 0 to exit"),
@@ -381,10 +381,9 @@ recover_ <- function() {
     repeat {
         if(get_config("use_widgets")) {
             # log_out("Requesting menu widget")
-            ind <- request_menu_widget(call_labels,
-                                    title = "Enter an environment or quit",
-                                    buttons = c("Select","Quit"),
-                                    file=stderr())
+            ind <- Menu(choices = call_labels,
+                        title = "Enter an environment or quit",
+                        buttons = c("Select","Quit"))
         }
         else {
             ind <- menu(title=gettext("Enter an environment number, or 0 to exit"),

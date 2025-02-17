@@ -128,7 +128,7 @@ menu_ <- function(choices,graphics=FALSE,title=NULL) {
       nc <- length(choices)
       labs <- formatC(1:nc,flag="0",format="d",digits=as.integer(nc>=10))
       choices <- paste(labs,choices,sep=": ")
-      ind <- request_menu_widget(choices,title=title)
+      ind <- Menu(choices,title=title)
     } else {
       ind <- menu__(choices,graphics=graphics,title=title)
     }
@@ -168,11 +168,11 @@ select_list_orig <- getFromNamespace("select.list","utils")
 select_list <- function(choices, preselect = NULL, multiple = FALSE, title = NULL, 
                          graphics = getOption("menu.graphics")) {
     if(get_config('use_widgets')) {
-      ind <- request_menu_widget(choices,
-                        preselect = preselect,
-                        multiple = multiple,
-                        title = title
-                        )
+      ind <- Menu(choices,
+                  preselect = preselect,
+                  multiple = multiple,
+                  title = title
+                  )
       value <- choices[ind]
     } else {
       value <- select_list_orig(choices,

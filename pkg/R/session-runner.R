@@ -188,16 +188,6 @@ RSessionRunner <- R6Class("RSessionRunner",
              )
     },
 
-    handle_menu_request = function(msg) {
-      
-      kernel <- self$kernel
-      saved_parent <- kernel$save_shell_parent()
-      Menu(kernel = kernel,
-           args = msg$content)
-      kernel$restore_shell_parent(saved_parent) 
-      return(TRUE)
-    },
-
     start_graphics = function(...) {
       add_sync_options(c(
           "jupyter.plot.width",
