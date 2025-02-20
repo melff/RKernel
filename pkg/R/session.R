@@ -197,7 +197,11 @@ RKernelSession <- R6Class("RKernelSession",
 # This is convenience form to split a single character
 # string and return a character vector (instead of a list).
 split_lines1 <- function(x) {
-  unlist(strsplit(x, "\n", fixed = TRUE))
+  y <- unlist(strsplit(x, "\n", fixed = TRUE))
+  if(endsWith(x,"\n")) {
+    y <- c(y,"")
+  }
+  y
 }
 
 # A helper function to drop the echo of R expressions sent
@@ -459,9 +463,11 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             log_out(resp$stdout)
           }
           if(drop_echo) {
+            log_out("dropping echo")
             resp$stdout <- drop_echo(resp$stdout)
           }
           if(grepl(BEL, resp$stdout)) {
+            if(debug) log_out("handling BEL")
             resp$stdout <- self$handle_BEL(resp$stdout,
                                            input_callback,
                                            stdout_callback,
@@ -479,6 +485,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             resp$stdout <- remove_suffix(resp$stdout, self$prompt)
           } 
           if(nzchar(resp$stdout)) {
+            log_out("Calling stdout_callback")
+            log_out(resp$stdout)
             stdout_callback(resp$stdout)
           } 
           if(self$found_prompt) {
