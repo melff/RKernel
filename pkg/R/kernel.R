@@ -64,13 +64,13 @@ Kernel <- R6Class("Kernel",
       self$session <- runner$session
       self$repl <- runner$repl
       private$install_r_handlers()
-      self$DAPServer <- DAPServer$new(
-        r_session = self$session,
-        send_debug_event = self$send_debug_event,
-        r_send_request = private$r_send_request,
-        r_send_cmd = private$r_send_cmd,
-        r_send_input = self$session$send_input
-      )
+      # self$DAPServer <- DAPServer$new(
+      #   r_session = self$session,
+      #   send_debug_event = self$send_debug_event,
+      #   r_send_request = private$r_send_request,
+      #   r_send_cmd = private$r_send_cmd,
+      #   r_send_input = self$session$send_input
+      # )
       set_config(browser_in_condition = FALSE)
       msg_env$send <- self$runner$handle_msg
       assign("session",self$session,envir=private$sandbox)
