@@ -403,7 +403,7 @@ send_error_condition <- function(e) {
       traceback = calls,
       options=list(
           rkernel_stop_on_error = getOption("rkernel_stop_on_error",TRUE),
-          rkernel_show_traceback = getOption("rkernel_show_traceback",TRUE)
+          rkernel_show_traceback = getOption("rkernel_show_traceback",FALSE)
       )
     )
   )
