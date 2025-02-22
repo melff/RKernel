@@ -89,6 +89,33 @@
 <span>  update <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'data.set'</span></span>
+<span><span class="fu">display_data</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  metadata <span class="op">=</span> <span class="va">emptyNamedList</span>,</span>
+<span>  id <span class="op">=</span> <span class="fu">UUIDgenerate</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  update <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'importer'</span></span>
+<span><span class="fu">display_data</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  metadata <span class="op">=</span> <span class="va">emptyNamedList</span>,</span>
+<span>  id <span class="op">=</span> <span class="fu">UUIDgenerate</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  update <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'descriptions'</span></span>
+<span><span class="fu">display_data</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  metadata <span class="op">=</span> <span class="va">emptyNamedList</span>,</span>
+<span>  id <span class="op">=</span> <span class="fu">UUIDgenerate</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  update <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for class 'matrix'</span></span>
 <span><span class="fu">display_data</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
@@ -223,6 +250,9 @@ opens a new tab for the help page.</p></dd>
 <li><p><code>display_data(update_display_data)</code>: S3 method for "update_display_data" objects</p></li>
 <li><p><code>display_data(svg)</code>: S3 method for "svg" objects</p></li>
 <li><p><code>display_data(data.frame)</code>: S3 method for class 'data.frame'</p></li>
+<li><p><code>display_data(data.set)</code>: S3 method for class 'data.set'</p></li>
+<li><p><code>display_data(importer)</code>: S3 method for class 'importer'</p></li>
+<li><p><code>display_data(descriptions)</code>: S3 method for class 'descriptions'</p></li>
 <li><p><code>display_data(matrix)</code>: S3 method for matrices</p></li>
 <li><p><code>display_data(html_elem)</code>: S3 method for "html_elem" objects (see <code><a href="https://melff.github.io/memisc/reference/html.html" class="external-link">html</a></code>)</p></li>
 <li><p><code>display_data(shiny.tag)</code>: S3 methods for "shiny.tab" objects</p></li>
