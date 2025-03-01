@@ -62,7 +62,9 @@ dt_data_fetcher <- function(path,query,postBody,headers){
     to <- min(nrow(obj),start + len)
     ii <- seq(from=from,to=to)
     data <- obj[ii,,drop=FALSE]
-    data <- cbind("row.names"=rownames(data),as.matrix(format(data)))
+    rown <- attr(data,"row.names")
+    if(is.integer(rown)) rown <- ii
+    data <- cbind("row.names"=rown,as.matrix(format(data)))
     # log_out(data,use.str=TRUE)
     payload <- to_json(list(
                      draw=draw,
