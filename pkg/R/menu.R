@@ -1,9 +1,9 @@
 Menu <- function(...) {
-  log_out("Menu")
+  # log_out("Menu")
   # log_out("Menu with args:")
   # log_out(args,use.str=TRUE)
   m <- MenuWidgetClass$new(...)
-  log_out("Menu widget created")
+  # log_out("Menu widget created")
   m$run()
 }
 
@@ -30,16 +30,16 @@ MenuWidgetClass <- R6Class("MenuWidget",
             self$multiple <- multiple
             self$preselect <- preselect
             self$button_labels <- buttons
-            log_out("Menu widget inited")
+            # log_out("Menu widget inited")
         },
         on_ok = function() {
-            log_out("Menu: on_ok called")
+            # log_out("Menu: on_ok called")
             ind <- self$listbox$index + 1L # widget indices are zero-based
             self$continue_loop <- FALSE
             self$index <- ind
         },
         on_cancel = function() {
-            log_out("Menu: on_cancel called")
+            # log_out("Menu: on_cancel called")
             self$continue_loop <- FALSE
             self$index <- 0L
         },
@@ -79,15 +79,15 @@ MenuWidgetClass <- R6Class("MenuWidget",
             d <- display_data(self$main_widget)
             d_id <- display_id(d)
             display(d)
-            log_out("Menu: entering loop")
+            # log_out("Menu: entering loop")
             while(self$continue_loop) {
-                log_out("#")
+                # log_out("#")
                 inp <- readline_orig("> ")
                 expr <- str2expression(inp)
                 eval(expr)
-                log_print(expr)
+                # log_print(expr)
             }
-            log_out("Menu: loop done")
+            # log_out("Menu: loop done")
             self$listbox$disabled <- TRUE
             if(any(self$index > 0L)) {
               value <- paste(self$listbox$value, collapse=", ")

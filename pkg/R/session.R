@@ -463,7 +463,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             log_out(resp$stdout)
           }
           if(drop_echo) {
-            log_out("dropping echo")
+            if(debug) log_out("dropping echo")
             resp$stdout <- drop_echo(resp$stdout)
           }
           if(grepl(BEL, resp$stdout)) {
@@ -503,6 +503,9 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             } else {
               session$send_input("Q")
             }
+          }
+          if(debug) {
+            log_out("= DONE = process_output ==========")
           }
         }
     },

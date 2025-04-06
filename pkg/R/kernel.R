@@ -660,8 +660,8 @@ Kernel <- R6Class("Kernel",
     },
 
     handle_comm_msg = function(msg){
-      log_out("handle_comm_msg")
-      log_print(msg)
+      # log_out("handle_comm_msg")
+      # log_print(msg)
       cm <- get_comm_manager()
       id <- msg$content$comm_id
       if(cm$has(id)) {
@@ -1045,7 +1045,7 @@ Kernel <- R6Class("Kernel",
       msg_unwrap(resp)
     },
     r_send_request_noreply = function(msg){
-      log_out("r_send_request_noreply")
+      # log_out("r_send_request_noreply")
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel:::handle_request(", msg_dput, ")")
       self$repl$run_code(cmd, echo = FALSE, until_prompt = TRUE,
@@ -1151,8 +1151,10 @@ Kernel <- R6Class("Kernel",
           # log_out("- run code block ----")
           # log_out(block, use.str=TRUE)
           self$repl$run_code(block,io_timeout=10)
-          self$runner$display_changed_graphics()
           # log_out("- done running code block ----")
+          #log_out("- checking for changed graphics ----")
+          self$runner$display_changed_graphics()
+          # log_out("- checking for changed graphics - done ---")
           # log_out(sprintf("kernel$errored: %s",self$errored))
           if(self$errored) {
             if(self$stop_on_error) break
@@ -1241,11 +1243,11 @@ Kernel <- R6Class("Kernel",
         msg <- sprintf("Stopped existing detached session with name '%s'\n",
                       name)
         runner$stdout(msg)
-        log_out(msg)
+        # log_out(msg)
         ses_info <- capture.output(print(runner$session))
         ses_info <- paste0("\n",ses_info,"\n")
         runner$stdout(ses_info)
-        log_out(ses_info)
+        # log_out(ses_info)
       }
       
       bare <- FALSE
@@ -1262,10 +1264,10 @@ Kernel <- R6Class("Kernel",
       runner <- RSessionRunner$new(self, stream)
       runner$set_shell_parent(private$execute_parent)
       if(has_name) {
-       msg <- sprintf("Starting new detached session with name '%s'\n",
+        msg <- sprintf("Starting new detached session with name '%s'\n",
                 name)
-       runner$stdout(msg)
-       log_out(msg)
+        runner$stdout(msg)
+        #  log_out(msg)
         private$detached_cells[[name]] <- runner
       } else {
         runner$stdout("Starting new detached session ...\n")
@@ -1314,7 +1316,7 @@ Kernel <- R6Class("Kernel",
           repl$found_prompt <- FALSE
           repl$process_output(drop_echo=de)
           if(repl$found_prompt) {
-            log_out("Found prompt")
+            # log_out("Found prompt")
             this$iter <- 0
           } else {
             this$iter <- this$iter + 1
@@ -1371,7 +1373,7 @@ Kernel <- R6Class("Kernel",
     },
 
     run_startup = function(...) {
-      log_out("run_startup()")
+      # log_out("run_startup()")
       home_dir <- Sys.getenv("HOME")
       jupyter_config <- file.path(home_dir, ".jupyter", "RKernel-config.R")
       if (file.exists(jupyter_config)) {
@@ -1389,7 +1391,7 @@ Kernel <- R6Class("Kernel",
           source(startup_file)
         }
       }
-      log_print(options())
+      # log_print(options())
     }
   )
 )
