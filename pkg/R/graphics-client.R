@@ -11,7 +11,8 @@ GraphicsObserver <- R6Class("GraphicsObserver",
     token = NULL,
     internal = FALSE,
     device = NULL,
-    initialize = function(details, internal = FALSE) {
+    session = NULL,
+    initialize = function(details, internal = FALSE, session=NULL) {
       self$internal <- internal
       if(internal) {
         self$device <- dev.cur()
@@ -19,6 +20,7 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         self$host <- details$host
         self$port <- details$port
         self$token <- details$token
+        self$session <- session
       }
       ur <- subset(ugd_renderers(),type=="plot")
       tikz <- which(ur$id == "tikz")
@@ -114,12 +116,21 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         data <- tryCatch(curl_fetch_memory(gurl),
                          error = function(e) invokeRestart("continue"),
                          interrupt = function(e) invokeRestart("continue"))
-      }
+        # data <- self$render_cmd(
+        #                         format = format,
+        #                         plot_id = plot_id,
+        #                         width = width,
+        #                         height = height,
+        #                         resolution = resolution,
+        #                         zoom = zoom)
+    }
       ii <- match(format, self$formats)
-      if(self$binary_formats[ii]) {
-        data$content <- base64_enc(data$content)
-      } else {
-        data$content <- rawToChar_(data$content)
+      if(is.raw(data$content)) {
+        if(self$binary_formats[ii]) {
+          data$content <- base64_enc(data$content)
+        } else {
+          data$content <- rawToChar_(data$content)
+        }
       }
       data$width <- width
       data$height <- height
@@ -155,6 +166,37 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         "width=", width,"&",
         "height=", height,"&",
         "zoom=",zoom)
+    },
+    render_cmd = function(format = "svgp", 
+                          plot_id = integer(0),
+                          width = getOption("jupyter.plot.width",self$width),
+                          height = getOption("jupyter.plot.height",self$height),
+                          resolution = getOption("jupyter.plot.resolution",self$dpi),
+                          zoom = getOption("jupyter.plot.zoom",1)) {
+      if(format %in% c("png", "tiff", "png-base64")) {
+        zoom <- resolution/self$dpi * zoom
+        width  <- width * resolution
+        height <- height * resolution
+      }
+      else {
+        width  <- width * self$dpi
+        height <- height * self$dpi
+      }
+      plot_id <- as.integer(plot_id)
+      cmd <- paste0("RKernel:::ugd_wrap(unigd::ugd_render(",
+                    if(length(plot_id)) paste0("page=",(plot_id - 1L),","),
+                    "as='", format,"',",
+                    "width=", width,",",
+                    "height=", height,",",
+                    "zoom=",zoom,"))")
+      session <- self$session
+      resp <- session$send_receive(cmd)
+      if(length(resp$stderr)) log_error(resp$stderr)
+      content <- drop_echo(resp$stdout) |> drop_prompt(prompt = session$prompt)
+      ii <- match(format,self$formats)
+      type <- self$mime_types[ii]
+      list(content = content,
+           type = type)
     },
     render_internal = function(format = "svgp", 
                           plot_id = integer(0),
@@ -193,6 +235,7 @@ GraphicsObserver <- R6Class("GraphicsObserver",
                             height = getOption("jupyter.plot.height",self$height),
                             resolution = getOption("jupyter.plot.resolution",288),
                             zoom = getOption("jupyter.plot.zoom",1)) {
+      
       formats <- intersect(formats, self$formats)
       renders <- lapply(formats,
                         self$render,
@@ -218,6 +261,7 @@ GraphicsObserver <- R6Class("GraphicsObserver",
       if(update) cl <- "update_display_data"
       else cl <- "display_data"
       self$store()
+      # log_str(d)
       structure(d,class=cl)
     },
     render_metadata = function(r, plot_id) {
@@ -296,4 +340,12 @@ rawToChar_ <- function(x) {
   if(is.raw(x)) rawToChar(x)
   else if(is.character(x)) x[1]
   else ""
+}
+
+#' @importFrom jsonlite base64_enc
+ugd_wrap <- function(x) {
+  log_out("ugd_wrap")
+  log_str(x)
+  if(is.raw(x)) cat(base64_enc(x))
+  else if(is.character(x)) cat(x)
 }
