@@ -11,6 +11,7 @@
 \alias{update.display_data}
 \alias{display_data.data.frame}
 \alias{display_data.data.set}
+\alias{display_data.importer}
 \alias{display_data.descriptions}
 \alias{display_data.matrix}
 \alias{display_data.html_elem}
@@ -61,6 +62,14 @@ display_data(x, ...)
 )
 
 \method{display_data}{data.set}(
+  x,
+  ...,
+  metadata = emptyNamedList,
+  id = UUIDgenerate(),
+  update = FALSE
+)
+
+\method{display_data}{importer}(
   x,
   ...,
   metadata = emptyNamedList,
@@ -188,6 +197,8 @@ A generic function that prepares R objects for display using \code{display()}
 \item \code{display_data(data.frame)}: S3 method for class 'data.frame'
 
 \item \code{display_data(data.set)}: S3 method for class 'data.set'
+
+\item \code{display_data(importer)}: S3 method for class 'importer'
 
 \item \code{display_data(descriptions)}: S3 method for class 'descriptions'
 

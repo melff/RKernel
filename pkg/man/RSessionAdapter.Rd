@@ -192,7 +192,8 @@ Run code and pass output to callback functions
   prompt_callback = self$prompt_callback,
   input_callback = self$input_callback,
   until_prompt = TRUE,
-  echo = self$echo
+  echo = self$echo,
+  debug = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -245,8 +246,8 @@ Process output created by commands sent to the R process
   browser_callback = self$browser_callback,
   input_callback = self$input_callback,
   prompt_callback = self$prompt_callback,
-  until_prompt = TRUE,
-  drop_echo = FALSE
+  drop_echo = FALSE,
+  debug = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -265,10 +266,10 @@ Process output created by commands sent to the R process
 
 \item{\code{prompt_callback}}{A callback function for command prompts encountered}
 
+\item{\code{drop_echo}}{A logical value, whether input echo be dropped}
+
 \item{\code{until_prompt}}{A logical value, whether process and wait output
 until a command prompt is encountered.}
-
-\item{\code{drop_echo}}{A logical value, whether input echo be dropped}
 }
 \if{html}{\out{</div>}}
 }
@@ -280,7 +281,7 @@ until a command prompt is encountered.}
 Run a one-line command without checking and return the 
     output
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RSessionAdapter$run_cmd(cmd)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RSessionAdapter$run_cmd(cmd, debug = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
