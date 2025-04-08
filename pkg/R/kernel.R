@@ -1049,7 +1049,7 @@ Kernel <- R6Class("Kernel",
       msg_dput <- wrap_dput(msg)
       cmd <- paste0("RKernel:::handle_request(", msg_dput, ")")
       self$repl$run_code(cmd, echo = FALSE, until_prompt = TRUE,
-                         debug = TRUE)
+                         debug = FALSE)
       return(invisible())
     },
     r_send_cmd = function(cmd) {

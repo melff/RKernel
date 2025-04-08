@@ -485,8 +485,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
             resp$stdout <- remove_suffix(resp$stdout, self$prompt)
           } 
           if(nzchar(resp$stdout)) {
-            log_out("Calling stdout_callback")
-            log_out(resp$stdout)
+            # log_out("Calling stdout_callback")
+            # log_out(resp$stdout)
             stdout_callback(resp$stdout)
           } 
           if(self$found_prompt) {
