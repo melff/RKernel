@@ -483,7 +483,7 @@ CellTracer <- R6Class("CellTracer",
                             until_prompt = FALSE,
                             prompt_callback = self$prompt_callback
                         )
-            self$runner$display_changed_graphics()
+            self$runner$process_graphics()
             kernel$restore_shell_parent(parent_save)
         },
         prompt_callback = function() {

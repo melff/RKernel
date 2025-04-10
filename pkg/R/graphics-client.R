@@ -114,13 +114,6 @@ GraphicsObserver <- R6Class("GraphicsObserver",
                                 height = height,
                                 resolution = resolution,
                                 zoom = zoom)
-        # data <- self$render_cmd(
-        #                         format = format,
-        #                         plot_id = plot_id,
-        #                         width = width,
-        #                         height = height,
-        #                         resolution = resolution,
-        #                         zoom = zoom)
     }
       ii <- match(format, self$formats)
       if(is.raw(data$content)) {
@@ -182,37 +175,6 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         "height=", height,"&",
         "zoom=",zoom)
     },
-    render_cmd = function(format = "svgp", 
-                          plot_id = integer(0),
-                          width = getOption("jupyter.plot.width",self$width),
-                          height = getOption("jupyter.plot.height",self$height),
-                          resolution = getOption("jupyter.plot.resolution",self$dpi),
-                          zoom = getOption("jupyter.plot.zoom",1)) {
-      if(format %in% c("png", "tiff", "png-base64")) {
-        zoom <- resolution/self$dpi * zoom
-        width  <- width * resolution
-        height <- height * resolution
-      }
-      else {
-        width  <- width * self$dpi
-        height <- height * self$dpi
-      }
-      plot_id <- as.integer(plot_id)
-      cmd <- paste0("RKernel:::ugd_wrap(unigd::ugd_render(",
-                    if(length(plot_id)) paste0("page=",(plot_id - 1L),","),
-                    "as='", format,"',",
-                    "width=", width,",",
-                    "height=", height,",",
-                    "zoom=",zoom,"))")
-      session <- self$session
-      resp <- session$send_receive(cmd)
-      if(length(resp$stderr)) log_error(resp$stderr)
-      content <- drop_echo(resp$stdout) |> drop_prompt(prompt = session$prompt)
-      ii <- match(format,self$formats)
-      type <- self$mime_types[ii]
-      list(content = content,
-           type = type)
-    },
     render_internal = function(format = "svgp", 
                           plot_id = integer(0),
                           width = getOption("jupyter.plot.width",self$width),
@@ -241,41 +203,64 @@ GraphicsObserver <- R6Class("GraphicsObserver",
       list(content = content,
            type = type)
     },
+    display_desc = list(),
+    displayed = logical(0),
+    current_display = character(0),
+    new_display = function(plot_id,
+                           width = getOption("jupyter.plot.width",self$width),
+                           height = getOption("jupyter.plot.height",self$height),
+                           resolution = getOption("jupyter.plot.resolution",288),
+                           zoom = getOption("jupyter.plot.zoom",1)) {
+          log_out("++ new_display")
+          display_id <- UUIDgenerate()
+          self$display_desc[[display_id]] <- list(
+            plot_id = plot_id,
+            width = width,
+            height = height,
+            resolution = resolution,
+            zoom = zoom
+          )
+          self$displayed[display_id] <- FALSE
+          self$current_display <- display_id
+          mime_data <- list("text/plain" = "")
+          d <- list(data = mime_data,
+                    metadata = emptyNamedList,
+                    transient = list(display_id = display_id))
+          class(d) <- "display_data"
+          return(d)
+    },
     display_res = 144,
-    display_data = function(plot_id = integer(0),
-                            display_id=UUIDgenerate(),
-                            empty = FALSE,
-                            update = FALSE,
-                            formats = getOption("jupyter.plot.formats",c("svgp","pdf")),
-                            width = getOption("jupyter.plot.width",self$width),
-                            height = getOption("jupyter.plot.height",self$height),
-                            resolution = getOption("jupyter.plot.resolution",288),
-                            zoom = getOption("jupyter.plot.zoom",1)) {
-      if(empty) {
-        mime_data <- list()
-        mime_metadata <- emptyNamedList
+    render_display = function(display_id,
+                            update = TRUE,
+                            formats = getOption("jupyter.plot.formats",c("png","svgp","pdf"))
+                            ) {
+      if(update) {
+        if(!display_id %in% names(self$display_desc)) stop("Unknown display id")
       }
       else {
-        formats <- intersect(formats, self$formats)
-        renders <- lapply(formats,
-                          self$render,
-                          plot_id = plot_id,
-                          width = width,
-                          height = height,
-                          resolution = resolution,
-                          zoom = zoom)
-        mime_data <- lapply(renders, "[[","content")
-        mime_types <- lapply(renders, "[[","type")
-        names(mime_data) <- mime_types
-        mime_metadata <- lapply(renders, self$render_metadata, plot_id)
-        names(mime_metadata) <- mime_types
-        mime_data[["text/plain"]] <- self$get_render_url(
-                                          plot_id = plot_id,
-                                          width = width,
-                                          height = height,
-                                          resolution = resolution,
-                                          zoom = zoom)
+        display_id <- UUIDgenerate()
       }
+      desc <- self$display_desc[[display_id]]
+      formats <- intersect(formats, self$formats)
+      plot_id <- desc$plot_id
+      renders <- lapply(formats,
+                        self$render,
+                        plot_id = plot_id,
+                        width = desc$width,
+                        height = desc$height,
+                        resolution = desc$resolution,
+                        zoom = desc$zoom)
+      mime_data <- lapply(renders, "[[","content")
+      mime_types <- lapply(renders, "[[","type")
+      names(mime_data) <- mime_types
+      mime_metadata <- lapply(renders, self$render_metadata, plot_id)
+      names(mime_metadata) <- mime_types
+      mime_data[["text/plain"]] <- self$get_render_url(
+                                        plot_id = plot_id,
+                                        width = desc$width,
+                                        height = desc$height,
+                                        resolution = desc$resolution,
+                                        zoom = desc$zoom)
       d <- list(data = mime_data,
                 metadata = mime_metadata)
       d$transient <- list(display_id=display_id)
