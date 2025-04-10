@@ -176,12 +176,21 @@ RKernelSession <- R6Class("RKernelSession",
   },
   #' @field help_port The port number of HTML help.
   help_port = NULL,
-  #' @description Start a httpgd devide and make sure its contents
-  #'   are sent by the kernel to the frontend.
+  #' @description Initialize graphics, start device and
+  #'    return details
   start_graphics = function() {
       self$send_input("RKernel:::start_graphics()")
+      self$dev_new()
+  },
+  #' @description Start a httpgd device and return the
+  #'    graphics details.
+  dev_new = function() {
       self$send_input("httpgd::hgd()")
       self$receive_all_output(timeout = 1000)
+  },
+  #' @description Return the
+  #'    graphics details.
+  graphics_details = function() {
       gd <- self$send_receive("dput(httpgd::hgd_details())")
       gd <- drop_echo(gd$stdout) |> drop_prompt(prompt=self$prompt)
       gd <- str2expression(gd)

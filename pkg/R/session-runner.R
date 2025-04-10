@@ -139,6 +139,11 @@ RSessionRunner <- R6Class("RSessionRunner",
       log_out("========== process_graphics")
       if(self$session$sleeping()) {
         log_out("Session is sleeping")
+        poll_res <- tryCatch(self$graphics$poll(),
+                      error = function(...){
+                        self$graphics$restart()
+                        self$graphics$poll()
+                      })
         current_display_id <- as.character(self$graphics$current_display)
         log_out(sprintf("current_display_id = %s", current_display_id))
         log_print(self$graphics$displayed)
@@ -150,7 +155,6 @@ RSessionRunner <- R6Class("RSessionRunner",
               self$graphics$displayed[display_id] <- TRUE
           } 
         }
-        poll_res <- self$graphics$poll()
         log_print(poll_res)
         if(poll_res["active"]) {
           if(poll_res[2]) { # New plot
@@ -205,8 +209,8 @@ RSessionRunner <- R6Class("RSessionRunner",
           "jupyter.plot.res",
           "jupyter.plot.formats",
           "jupyter.update.graphics"))
-      gdetails <- self$session$start_graphics()
-      self$graphics = GraphicsObserver$new(gdetails, session=self$session)
+      self$session$start_graphics()
+      self$graphics = GraphicsObserver$new(session=self$session)
     },
     stdout_filter = NULL,
     stderr_filter = NULL,

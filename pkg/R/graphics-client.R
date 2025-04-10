@@ -12,15 +12,18 @@ GraphicsObserver <- R6Class("GraphicsObserver",
     internal = FALSE,
     device = NULL,
     session = NULL,
-    initialize = function(details, internal = FALSE, session=NULL) {
+    initialize = function(internal = FALSE, session=NULL) {
       self$internal <- internal
       if(internal) {
         self$device <- dev.cur()
       } else {
+        log_out("graphics$initialize()")
+        self$session <- session
+        details <- session$graphics_details()
+        log_print(details)
         self$host <- details$host
         self$port <- details$port
         self$token <- details$token
-        self$session <- session
       }
       ur <- subset(ugd_renderers(),type=="plot")
       tikz <- which(ur$id == "tikz")
@@ -28,6 +31,23 @@ GraphicsObserver <- R6Class("GraphicsObserver",
       self$formats <- ur$id
       self$mime_types <- ur$mime
       self$binary_formats <- !ur$text
+    },
+    restart = function() {
+      if(self$internal) {
+        self$device <- dev.cur()
+      } else {
+        log_out("graphics$restart()")
+        details <- self$session$graphics_details()
+        if(!length(details)) {
+          self$session$dev_new()
+          details <- self$session$graphics_details()
+        }
+        log_print(details)
+        self$host <- details$host
+        self$port <- details$port
+        log_out(self$live_url())
+        self$token <- details$token
+      }
     },
     id = 0,
     upid = 0,
