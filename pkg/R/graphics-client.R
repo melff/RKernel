@@ -17,7 +17,7 @@ GraphicsObserver <- R6Class("GraphicsObserver",
       if(internal) {
         self$device <- dev.cur()
       } else {
-        log_out("graphics$initialize()")
+        # log_out("graphics$initialize()")
         self$session <- session
         details <- session$graphics_details()
         log_print(details)
@@ -36,7 +36,7 @@ GraphicsObserver <- R6Class("GraphicsObserver",
       if(self$internal) {
         self$device <- dev.cur()
       } else {
-        log_out("graphics$restart()")
+        # log_out("graphics$restart()")
         details <- self$session$graphics_details()
         if(!length(details)) {
           self$session$dev_new()
@@ -45,7 +45,7 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         log_print(details)
         self$host <- details$host
         self$port <- details$port
-        log_out(self$live_url())
+        # log_out(self$live_url())
         self$token <- details$token
       }
     },
@@ -231,7 +231,7 @@ GraphicsObserver <- R6Class("GraphicsObserver",
                            height = getOption("jupyter.plot.height",self$height),
                            resolution = getOption("jupyter.plot.resolution",288),
                            zoom = getOption("jupyter.plot.zoom",1)) {
-          log_out("++ new_display")
+          # log_out("++ new_display")
           display_id <- UUIDgenerate()
           self$display_desc[[display_id]] <- list(
             plot_id = plot_id,
@@ -370,8 +370,8 @@ rawToChar_ <- function(x) {
 
 #' @importFrom jsonlite base64_enc
 ugd_wrap <- function(x) {
-  log_out("ugd_wrap")
-  log_str(x)
+  # log_out("ugd_wrap")
+  # log_str(x)
   if(is.raw(x)) cat(base64_enc(x))
   else if(is.character(x)) cat(x)
 }

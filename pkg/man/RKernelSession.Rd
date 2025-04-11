@@ -28,6 +28,8 @@ An object of this class handles the communication with
 \item \href{#method-RKernelSession-connect}{\code{RKernelSession$connect()}}
 \item \href{#method-RKernelSession-setup}{\code{RKernelSession$setup()}}
 \item \href{#method-RKernelSession-start_graphics}{\code{RKernelSession$start_graphics()}}
+\item \href{#method-RKernelSession-dev_new}{\code{RKernelSession$dev_new()}}
+\item \href{#method-RKernelSession-graphics_details}{\code{RKernelSession$graphics_details()}}
 \item \href{#method-RKernelSession-clone}{\code{RKernelSession$clone()}}
 }
 }
@@ -138,10 +140,32 @@ Set up the R session, by installing hooks etc.
 \if{html}{\out{<a id="method-RKernelSession-start_graphics"></a>}}
 \if{latex}{\out{\hypertarget{method-RKernelSession-start_graphics}{}}}
 \subsection{Method \code{start_graphics()}}{
-Start a httpgd devide and make sure its contents
-  are sent by the kernel to the frontend.
+Initialize graphics, start device and
+   return details
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{RKernelSession$start_graphics()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RKernelSession-dev_new"></a>}}
+\if{latex}{\out{\hypertarget{method-RKernelSession-dev_new}{}}}
+\subsection{Method \code{dev_new()}}{
+Start a httpgd device and return the
+   graphics details.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RKernelSession$dev_new()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RKernelSession-graphics_details"></a>}}
+\if{latex}{\out{\hypertarget{method-RKernelSession-graphics_details}{}}}
+\subsection{Method \code{graphics_details()}}{
+Return the
+   graphics details.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RKernelSession$graphics_details()}\if{html}{\out{</div>}}
 }
 
 }

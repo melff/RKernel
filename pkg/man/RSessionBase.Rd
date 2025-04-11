@@ -223,7 +223,7 @@ Receive all output that is available
 Send text to R process and receive all output from the
    process
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RSessionBase$send_receive(text, timeout = 100, drop_echo = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RSessionBase$send_receive(text, timeout = 100)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -232,9 +232,6 @@ Send text to R process and receive all output from the
 \item{\code{text}}{A character string}
 
 \item{\code{timeout}}{An integer number, the polling timeout}
-
-\item{\code{drop_echo}}{A logical value, whether to drop the echo from
-stdout.}
 }
 \if{html}{\out{</div>}}
 }
