@@ -1085,7 +1085,7 @@ Kernel <- R6Class("Kernel",
             tb <- c("Traceback:",tb)
         }
         else {
-            tb <- NULL
+            tb <- list()
         }
         content <- list(ename="error",
                         evalue=msg_content$message,
