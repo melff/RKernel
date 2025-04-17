@@ -20,7 +20,7 @@ GraphicsObserver <- R6Class("GraphicsObserver",
         # log_out("graphics$initialize()")
         self$session <- session
         details <- session$graphics_details()
-        log_print(details)
+        # log_print(details)
         self$host <- details$host
         self$port <- details$port
         self$token <- details$token

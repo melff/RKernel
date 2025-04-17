@@ -222,7 +222,7 @@ RSessionRunner <- R6Class("RSessionRunner",
       d <- self$graphics$new_display(plot_id)
       # log_print(self$graphics$displayed)
       # log_print(self$graphics$display_desc)
-      log_str(d)
+      # log_str(d)
       self$display_send(d)
     },
 
