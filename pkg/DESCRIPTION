@@ -76,6 +76,7 @@ Collate:
     'events.R'
     'graphics-client.R'
     'help.R'
+    'history.R'
     'hooks.R'
     'inspect-reply.R'
     'install.R'

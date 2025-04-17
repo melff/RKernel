@@ -5,7 +5,7 @@
 #' @importFrom pbdZMQ ZMQ.MC random_open_port
 #' @importFrom digest hmac
 #' @importFrom uuid UUIDgenerate
-#' @importFrom jsonlite prettify
+#' @importFrom jsonlite prettify toJSON
 
 
 PROTOCOL_VERSION <- '5.3'
@@ -410,6 +410,13 @@ Kernel <- R6Class("Kernel",
       self$stop_on_error <- msg$content$stop_on_error
       clear_queue <- FALSE
       code <- msg$content$code
+      if(msg$content$store_history) {
+        history_record(
+          session = msg$header$session,
+          number = execution_count,
+          input = code
+        )
+      }
 
       mparsed <- parse_magic(code)
       if(length(mparsed) > 0){
@@ -622,6 +629,28 @@ Kernel <- R6Class("Kernel",
       )
     },
 
+    history_reply = function(msg) {
+      hist_access_type <- msg$content$hist_access_type
+      if(hist_access_type == "tail" &&
+          msg$content$raw && !msg$content$output) {
+        n <- msg$content$n
+        df <- history_load()
+        history <- unname(tail(df, n = n))
+        
+        private$send_message(
+          type = "history_reply",
+          parent = private$parent$shell,
+          socket_name = "shell",
+          content = list(
+            status = "ok",
+            history = history
+          )
+        )
+      } else {
+        log_warn("Unsupported history request parms")
+      }
+    },
+
     comm_info_reply = function(msg){
       # return(NULL)
       # log_out("comm_info_reply")
@@ -788,6 +817,7 @@ Kernel <- R6Class("Kernel",
              kernel_info_request = private$kernel_info_reply(msg),
              complete_request = private$complete_reply(msg),
              inspect_request = private$inspect_reply(msg),
+             history_request = private$history_reply(msg),
              comm_info_request = private$comm_info_reply(msg),
              comm_open = private$handle_comm_open(msg),
              comm_msg = private$handle_comm_msg(msg),
