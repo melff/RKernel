@@ -30,7 +30,8 @@ Imports:
     callr,
     processx,
     crayon,
-    curl
+    curl,
+    rappdirs
 Depends:
     R (>= 4.4)
 Suggests:

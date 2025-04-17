@@ -24,13 +24,14 @@ toRawJSON <- function(x,...){
 namedList <- function() structure(list(),names=character(0))
 emptyNamedList <- structure(list(),names=character(0))
 
-R.unsername <- function() {
-  Sys.info()["user"]
+#' @importFrom rappdirs user_log_dir
+log_fn <- function() {
+  log_dir <- user_log_dir()
+  if(!dir.exists(log_dir)) dir.create(log_dir, recursive = TRUE,
+                                      mode="700")
+  file.path(log_dir,"RKernel.log")
 }
 
-# log_fn <- "/tmp/RKernel.log"
-log_fn <- function() file.path(dirname(tempdir()),
-                               paste(R.unsername(),"RKernel.log",sep="-"))
 
 truncate_log <- function(){
   log_con <- file(log_fn(),open="wr")
