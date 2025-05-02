@@ -85,7 +85,7 @@ parse_magic <- function(code){
     } else NULL
 }
 
-special_regex <- "^#!([a-zA-Z0-9_]+):\\s*(\\S.*)?$"
+special_regex <- "(^|\n)#!([a-zA-Z0-9_]+):\\s*(\\S.*)?$"
 comment_handlers <- new.env()
 
 dispatch_special_comment_handler <- function(opcode,args) {
@@ -98,7 +98,7 @@ dispatch_special_comment_handler <- function(opcode,args) {
 
 get_special_comment1 <- function(line) {
     m <- getMatch(line,regexec(special_regex,line))
-    list(opcode=m[2], args=m[3])
+    list(opcode=m[3], args=m[4])
 }
 
 get_special_comments <- function(code) {
