@@ -1,8 +1,8 @@
 pandoc: 3.1.11
-pkgdown: 2.1.1
+pkgdown: 2.1.2
 pkgdown_sha: ~
 articles: {}
-last_built: 2025-04-18T10:29Z
+last_built: 2025-05-02T15:28Z
 urls:
   reference: https://melff.github.io/RKernel/reference
   article: https://melff.github.io/RKernel/articles
