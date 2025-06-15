@@ -1,4 +1,3 @@
-#' @import httpgd
 #' @importFrom jsonlite fromJSON
 #' @importFrom curl curl_fetch_memory
 #' @importFrom jsonlite base64_enc
@@ -317,7 +316,6 @@ GraphicsObserver <- R6Class("GraphicsObserver",
 
 
 start_graphics <- function(){
-    options(device=httpgd::hgd)
     setHook('plot.new', plot_new_hook)
     setHook('grid.newpage', send_new_plot)
     # setHook('before.plot.new', send_before_new_plot)

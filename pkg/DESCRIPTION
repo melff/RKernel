@@ -25,7 +25,6 @@ Imports:
     htmltools,
     htmlwidgets,
     base64enc,
-    httpgd (>= 2.0),
     unigd,
     callr,
     processx,
