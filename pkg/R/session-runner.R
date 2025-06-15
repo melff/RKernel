@@ -210,7 +210,7 @@ RSessionRunner <- R6Class("RSessionRunner",
           "jupyter.plot.formats",
           "jupyter.update.graphics"))
       self$session$start_graphics()
-      self$graphics = GraphicsObserver$new(session=self$session)
+      self$graphics = GraphicsClient$new(session=self$session)
     },
     stdout_filter = NULL,
     stderr_filter = NULL,

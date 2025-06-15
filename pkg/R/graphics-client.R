@@ -3,7 +3,7 @@
 #' @importFrom jsonlite base64_enc
 #' @import unigd
 
-GraphicsObserver <- R6Class("GraphicsObserver",
+GraphicsClient <- R6Class("GraphicsClient",
   public = list(
     host = NULL,
     port = NULL,

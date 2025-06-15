@@ -73,27 +73,27 @@ public=list(
     self$stderr_filter$process(serr)
     self$stdout_filter$process(sout)
   },
-  graphics_observer = NULL,
+  graphics = NULL,
   dev_num = 0,
   start_graphics = function() {
     ugd()
     self$dev_num <- dev.cur()
-    self$graphics_observer <- GraphicsObserver$new(internal=TRUE)
+    self$graphics <- GraphicsClient$new(internal=TRUE)
   },
   stop_graphics = function() {
-    self$graphics_observer <- NULL
+    self$graphics <- NULL
     ugd_close(self$dev_num)
   },
   g_display_id = NULL,
   process_graphics = function() {
-    poll_res <- self$graphics_observer$poll()
+    poll_res <- self$graphics$poll()
     d <- list()
     if(poll_res[1]) {
       if(poll_res[2]) {
-        d <- self$graphics_observer$display_data()
+        d <- self$graphics$display_data()
         g_display_id <- display_id(d)
       } else if(poll_res[3]) {
-        d <- self$graphics_observer$display_data(
+        d <- self$graphics$display_data(
           display_id = self$g_display_id,
           update = TRUE
         )
