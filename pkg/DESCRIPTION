@@ -39,7 +39,7 @@ Enhances:
     memisc, shiny
 SystemRequirements:
     jupyter
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Collate: 
     'View.R'
     'aa-versions.R'

@@ -14,7 +14,7 @@ An object of this class handles the communication with
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{help_port}}{The port number of HTML help.}
+\item{\code{http_port}}{The port number of HTML help.}
 
 \item{\code{yield}}{An optional function to service kernel requests}
 

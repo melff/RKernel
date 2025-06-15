@@ -20,13 +20,13 @@ startup <- function(){
   }
 }
 
-setup_session <- function(help_port) {
+setup_session <- function(http_port) {
   options(error=NULL)
   inject_send_options()
   suppressWarnings(rm(.pbd_env,envir=.GlobalEnv))
   install_browseURL()
   set_config(use_widgets = FALSE)
-  set_help_port(help_port)
+  set_http_port(http_port)
   set_help_displayed(TRUE)
   install_output_hooks()
   install_safe_q()

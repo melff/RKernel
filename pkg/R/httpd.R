@@ -90,7 +90,7 @@ HTTPServer <- R6Class("HTTPServer",
 #' Set the port the HTTP server listens to. For internal use only.
 #' @param port An integer
 #' @export
-set_help_port <- function(port){
+set_http_port <- function(port){
     http_server$current <- HTTPServer$new(port)
     options(help.ports=port)
     replace_in_package("utils","help.start",help_start)
@@ -109,7 +109,7 @@ httpd_url <- get_help_url <- function(){
 
 #' Get the URL of the HTTP server.
 #' @export
-httpd_port <- get_help_port <- function(){
+httpd_port <- get_http_port <- function(){
     url <- http_server$current$get_port()
     return(url)
 }
