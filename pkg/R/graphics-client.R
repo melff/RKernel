@@ -236,7 +236,13 @@ GraphicsClient <- R6Class("GraphicsClient",
           )
           self$displayed[display_id] <- FALSE
           self$current_display <- display_id
-          mime_data <- list("text/plain" = "")
+          gurl <- self$get_render_url(format = "svgp",
+                                plot_id = plot_id,
+                                width = width,
+                                height = height,
+                                resolution = resolution,
+                                zoom = zoom)
+          mime_data <- list("text/plain" = gurl)
           d <- list(data = mime_data,
                     metadata = emptyNamedList,
                     transient = list(display_id = display_id))
