@@ -21,6 +21,7 @@ startup <- function(){
 }
 
 setup_session <- function(http_port) {
+  # log_out("setup_session")
   options(error=NULL)
   inject_send_options()
   suppressWarnings(rm(.pbd_env,envir=.GlobalEnv))
@@ -36,4 +37,5 @@ setup_session <- function(http_port) {
   set_help_displayed()
   install_globalCallingHandlers()
   install_debugging()
+  # log_out("setup_session DONE")
 }

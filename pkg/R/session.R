@@ -168,11 +168,9 @@ RKernelSession <- R6Class("RKernelSession",
     },
     #' @description Set up the R session, by installing hooks etc.
     setup = function() {
-      # log_out("Setting up the session ...")
       self$http_port <- random_open_port()
       self$send_input(sprintf("RKernel:::setup_session(%d)",self$http_port))
       self$receive_all_output(timeout = 1000)
-      # log_out("Done.")
   },
   #' @field http_port The port number of HTML help.
   http_port = NULL,
@@ -190,7 +188,7 @@ RKernelSession <- R6Class("RKernelSession",
   #' @description Return the
   #'    graphics details.
   graphics_details = function() {
-      #gd <- self$send_receive("dput(httpgd::hgd_details())")
+      gd <- self$send_receive("dput(RKernel:::graphics_details())")
       gd <- drop_echo(gd$stdout) |> drop_prompt(prompt=self$prompt)
       gd <- str2expression(gd)
       eval(gd)

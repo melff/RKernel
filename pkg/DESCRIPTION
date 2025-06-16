@@ -1,7 +1,7 @@
 Package: RKernel
 Title: Yet another R kernel for Jupyter
-Version: 1.0
-Date: 2024-11-22
+Version: 1.1
+Date: 2025-06-16
 Authors@R: c(
     person('Martin', 'Elff', 
            email = 'martin@elff.eu',
@@ -74,6 +74,7 @@ Collate:
     'env-browser.R'
     'events.R'
     'graphics-client.R'
+    'graphics-server.R'
     'help.R'
     'history.R'
     'hooks.R'

@@ -41,6 +41,7 @@ HTTPServer <- R6Class("HTTPServer",
             self$add_http_handler("echo",http_echo)
             self$add_http_handler("eval",http_eval)
             self$add_http_handler("data",http_data)
+            self$add_http_handler("graphics",http_graphics)
         },
         add_http_handler = function(name, handler){
             private$handlers[[name]] <- handler
@@ -91,7 +92,9 @@ HTTPServer <- R6Class("HTTPServer",
 #' @param port An integer
 #' @export
 set_http_port <- function(port){
+    # log_out("set_http_port")
     http_server$current <- HTTPServer$new(port)
+    http_server$current$start()
     options(help.ports=port)
     replace_in_package("utils","help.start",help_start)
     replace_in_package("tools","example2html",example_html)

@@ -18,7 +18,8 @@ to_json.default <- function(x,auto_unbox=TRUE,...) {
         if(auto_unbox) structure("null",class="json")
         else  structure("[]",class="json")
     }
-    else toJSON(x,auto_unbox=auto_unbox,json_verbatim=TRUE,...)
+    else tryCatch(toJSON(x,auto_unbox=auto_unbox,json_verbatim=TRUE,...),
+                  error=toJSON(unclass(x),auto_unbox=auto_unbox,json_verbatim=TRUE,...))
 }
 
 #' @describeIn to_json S3 method for lists.

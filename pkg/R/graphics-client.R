@@ -18,11 +18,10 @@ GraphicsClient <- R6Class("GraphicsClient",
       } else {
         # log_out("graphics$initialize()")
         self$session <- session
-        details <- session$graphics_details()
+        # details <- session$graphics_details()
         # log_print(details)
-        self$host <- details$host
-        self$port <- details$port
-        self$token <- details$token
+        self$host <- "localhost"
+        self$port <- session$http_port
       }
       ur <- subset(ugd_renderers(),type=="plot")
       tikz <- which(ur$id == "tikz")
@@ -36,11 +35,7 @@ GraphicsClient <- R6Class("GraphicsClient",
         self$device <- dev.cur()
       } else {
         # log_out("graphics$restart()")
-        details <- self$session$graphics_details()
-        if(!length(details)) {
-          self$session$dev_new()
-          details <- self$session$graphics_details()
-        }
+        self$session$dev_new()
         log_print(details)
         self$host <- details$host
         self$port <- details$port
@@ -86,23 +81,18 @@ GraphicsClient <- R6Class("GraphicsClient",
                 "http://",
                 self$host,":",
                 self$port,"/",
-                "plots","?",
-                "token=",self$token)
+                "graphics/",
+                "state")
       con <- url(gurl)
-      plots_res <- readLines(con, warn = FALSE)
+      resp <- readLines(con, warn = FALSE)
       close(con)
-      plots_res <- fromJSON(plots_res)
-      hsize <- plots_res$state$hsize
-      if(hsize > 0) {
-        id <- as.integer(plots_res$plots$id[hsize]) + 1L
-      } else {
-        id <- 0L
-      }
+      resp <- fromJSON(resp)
+      state <- resp$state
       list(
-        active = plots_res$state$active,
-        hsize = hsize,
-        id = id,
-        upid = plots_res$state$upid
+        active = state$active,
+        hsize = state$hsize,
+        id = state$hsize,
+        upid = state$upid
       )
     },
     formats = character(0),
@@ -133,7 +123,7 @@ GraphicsClient <- R6Class("GraphicsClient",
                                 height = height,
                                 resolution = resolution,
                                 zoom = zoom)
-    }
+      } 
       ii <- match(format, self$formats)
       if(is.raw(data$content)) {
         if(self$binary_formats[ii]) {
@@ -162,9 +152,16 @@ GraphicsClient <- R6Class("GraphicsClient",
                                 height = height,
                                 resolution = resolution,
                                 zoom = zoom)
-        data <- tryCatch(curl_fetch_memory(gurl),
-                         error = function(e) invokeRestart("continue"),
-                         interrupt = function(e) invokeRestart("continue"))
+        con <- url(gurl)
+        resp <- readLines(con, warn = FALSE)
+        close(con)
+        # resp <- fromJSON(resp)
+        ii <- match(format,self$formats)
+        type <- self$mime_types[ii]
+        list(
+          content = paste(resp, collapse="\n"),
+          type = type
+        )
     },
     get_render_url = function(format = "svgp", 
                           plot_id = integer(0),
@@ -186,9 +183,9 @@ GraphicsClient <- R6Class("GraphicsClient",
         "http://",
         self$host,":",
         self$port,"/",
+        "graphics/",
         "plot","?",
         if(length(plot_id)) paste0("id=",(plot_id - 1L),"&"),
-        "token=", self$token,"&",
         "renderer=", format,"&",
         "width=", width,"&",
         "height=", height,"&",
@@ -286,7 +283,6 @@ GraphicsClient <- R6Class("GraphicsClient",
       if(update) cl <- "update_display_data"
       else cl <- "display_data"
       self$store()
-      # log_str(d)
       structure(d,class=cl)
     },
     render_metadata = function(r, plot_id) {
@@ -301,75 +297,6 @@ GraphicsClient <- R6Class("GraphicsClient",
         m$height <- r$height * f
       }
       m
-    },
-    live_url = function() {
-      if(self$internal) ""
-      else paste0(
-        "http://",
-        self$host,":",
-        self$port,"/",
-        "live","?",
-        "token=", self$token
-      )
     }
   ))
 
-
-start_graphics <- function(){
-    setHook('plot.new', plot_new_hook)
-    setHook('grid.newpage', send_new_plot)
-    # setHook('before.plot.new', send_before_new_plot)
-    # setHook('before.grid.newpage', send_before_new_plot)
-    add_sync_options(c(
-          "jupyter.plot.width",
-          "jupyter.plot.height",
-          "jupyter.plot.res",
-          "jupyter.plot.formats",
-          "jupyter.update.graphics"))
-}
-
-#' @importFrom graphics par
-plot_new_hook <- function() {
-  if(par("page")) send_new_plot()
-}
-
-send_new_plot <- function() {
-  # log_out("send_new_plot")
-  if(dev_is_unigd()){
-    id <- ugd_id()$id + 1L
-    msg <- list(type="event",
-                content = list(event = "new_plot", 
-                               plot_id = id))
-    msg_send(msg)
-  }
-}
-
-send_before_new_plot <- function() {
-  # log_out("before_send_new_plot")
-  if(dev_is_unigd()){
-    id <- ugd_id()$id
-    msg <- list(type="event",
-                content = list(event = "before_new_plot", 
-                               plot_id = id))
-    msg_send(msg)
-  }
-}
-
-#' @importFrom grDevices dev.cur
-dev_is_unigd <- function(which = dev.cur()) {
-  names(which) == "unigd"
-}
-
-rawToChar_ <- function(x) {
-  if(is.raw(x)) rawToChar(x)
-  else if(is.character(x)) x[1]
-  else ""
-}
-
-#' @importFrom jsonlite base64_enc
-ugd_wrap <- function(x) {
-  # log_out("ugd_wrap")
-  # log_str(x)
-  if(is.raw(x)) cat(base64_enc(x))
-  else if(is.character(x)) cat(x)
-}
