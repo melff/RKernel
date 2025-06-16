@@ -153,14 +153,12 @@ GraphicsClient <- R6Class("GraphicsClient",
                                 resolution = resolution,
                                 zoom = zoom)
         con <- url(gurl)
-        resp <- readLines(con, warn = FALSE)
-        close(con)
-        # resp <- fromJSON(resp)
-        ii <- match(format,self$formats)
-        type <- self$mime_types[ii]
+        resp <- tryCatch(curl_fetch_memory(gurl),
+                         error = function(e) invokeRestart("continue"),
+                         interrupt = function(e) invokeRestart("continue"))
         list(
-          content = paste(resp, collapse="\n"),
-          type = type
+          content = resp$content,
+          type = resp$type
         )
     },
     get_render_url = function(format = "svgp", 
