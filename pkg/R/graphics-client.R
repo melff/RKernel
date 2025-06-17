@@ -11,12 +11,15 @@ GraphicsClient <- R6Class("GraphicsClient",
     internal = FALSE,
     device = NULL,
     session = NULL,
-    initialize = function(internal = FALSE, session=NULL) {
+    interface = NULL,
+    initialize = function(interface = NULL, internal = FALSE) {
       self$internal <- internal
       if(internal) {
         self$device <- dev.cur()
       } else {
         # log_out("graphics$initialize()")
+        self$interface <- interface
+        session <- interface$session
         self$session <- session
         # details <- session$graphics_details()
         # log_print(details)
@@ -32,15 +35,11 @@ GraphicsClient <- R6Class("GraphicsClient",
     },
     restart = function() {
       if(self$internal) {
+        ugd()
         self$device <- dev.cur()
       } else {
         # log_out("graphics$restart()")
-        self$session$dev_new()
-        log_print(details)
-        self$host <- details$host
-        self$port <- details$port
-        # log_out(self$live_url())
-        self$token <- details$token
+        self$session$send_receive("ugd()")
       }
     },
     id = 0,
@@ -217,8 +216,7 @@ GraphicsClient <- R6Class("GraphicsClient",
       list(content = content,
            type = type)
     },
-    display_desc = list(),
-    displayed = logical(0),
+    display_obs = list(),
     current_display = character(0),
     new_display = function(plot_id,
                            width = getOption("jupyter.plot.width",self$width),
@@ -227,14 +225,16 @@ GraphicsClient <- R6Class("GraphicsClient",
                            zoom = getOption("jupyter.plot.zoom",1)) {
           # log_out("++ new_display")
           display_id <- UUIDgenerate()
-          self$display_desc[[display_id]] <- list(
+          gd <- GraphicsDisplay$new(
             plot_id = plot_id,
             width = width,
             height = height,
             resolution = resolution,
-            zoom = zoom
+            zoom = zoom,
+            manager = self,
+            display_id = display_id
           )
-          self$displayed[display_id] <- FALSE
+          self$display_obs[[display_id]] <- gd
           self$current_display <- display_id
           gurl <- self$get_render_url(format = "svgp",
                                 plot_id = plot_id,
@@ -247,20 +247,14 @@ GraphicsClient <- R6Class("GraphicsClient",
                     metadata = emptyNamedList,
                     transient = list(display_id = display_id))
           class(d) <- "display_data"
-          return(d)
+          self$interface$display_send(d)
     },
     display_res = 144,
     render_display = function(display_id,
                             update = TRUE,
                             formats = getOption("jupyter.plot.formats",c("png","svgp","pdf"))
                             ) {
-      if(update) {
-        if(!display_id %in% names(self$display_desc)) stop("Unknown display id")
-      }
-      else {
-        display_id <- UUIDgenerate()
-      }
-      desc <- self$display_desc[[display_id]]
+      desc <- self$display_obs[[display_id]]
       formats <- intersect(formats, self$formats)
       plot_id <- desc$plot_id
       renders <- lapply(formats,
@@ -286,7 +280,10 @@ GraphicsClient <- R6Class("GraphicsClient",
       d$transient <- list(display_id=display_id)
       if(update) cl <- "update_display_data"
       else cl <- "display_data"
-      self$store()
+      state <- self$get_current_state()
+      if(state$id == plot_id) {
+        desc$upid <- state$upid
+      }
       structure(d,class=cl)
     },
     render_metadata = function(r, plot_id) {
@@ -301,6 +298,47 @@ GraphicsClient <- R6Class("GraphicsClient",
         m$height <- r$height * f
       }
       m
+    },
+    update_displays = function() {
+      if(length(self$current_display) &&
+         self$needs_update(self$current_display)) {
+        d <- self$render_display(self$current_display)
+        self$interface$display_send(d)
+      }
+    },
+    needs_update = function(display_id) {
+      desc <- self$display_obs[[display_id]]
+      state <- self$get_current_state()
+      state$id != desc$plot_id || state$upid != desc$upid
     }
   ))
 
+GraphicsDisplay <- R6Class("GraphicsDisplay",
+  public = list(
+    plot_id = -1,
+    width = -1,
+    height = -1,
+    resolution = 300,
+    zoom = 1,
+    manager = NULL,
+    display_id = character(0),
+    upid = 0,
+    initialize = function(
+      plot_id,
+      width,
+      height,
+      resolution,
+      zoom,
+      manager,
+      display_id
+    ) {
+      self$plot_id <- plot_id
+      self$width <- width
+      self$height <- height
+      self$resolution <- resolution
+      self$zoom <- zoom
+      self$manager <- manager
+      self$display_id <- display_id
+    }
+  )
+)

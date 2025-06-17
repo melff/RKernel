@@ -137,39 +137,7 @@ RSessionRunner <- R6Class("RSessionRunner",
 
     process_graphics = function() {
       # log_out("========== process_graphics")
-      if(self$session$sleeping()) {
-        # log_out("Session is sleeping")
-        poll_res <- tryCatch(self$graphics$poll(),
-                      error = function(...){
-                        self$graphics$restart()
-                        self$graphics$poll()
-                      })
-        current_display_id <- as.character(self$graphics$current_display)
-        # log_out(sprintf("current_display_id = %s", current_display_id))
-        # log_print(self$graphics$displayed)
-        display_ids <- names(self$graphics$displayed)
-        for(display_id in display_ids) {
-          # log_out(sprintf("display_id = %s",display_id))
-            if(!self$graphics$displayed[display_id]) {
-              private$display_graphics(display_id)
-              self$graphics$displayed[display_id] <- TRUE
-          } 
-        }
-        # log_print(poll_res)
-        if(poll_res["active"]) {
-          if(poll_res[2]) { # New plot
-            # log_out("New plot")
-            private$display_graphics(display_id)
-          }
-          else if(poll_res[3]) { # Plot update
-            # log_out("Plot update")
-            force_new_display <- self$settings_get("force_new_graphics_display",FALSE)
-            private$display_graphics(display_id,
-                                      force_new_display = force_new_display)
-            self$settings_set(force_new_graphics_display=FALSE)
-          }
-        }
-      }
+        self$graphics$update_displays()
       # log_out("process_graphics -- done")
     },
 
@@ -210,33 +178,15 @@ RSessionRunner <- R6Class("RSessionRunner",
           "jupyter.plot.formats",
           "jupyter.update.graphics"))
       self$session$start_graphics()
-      self$graphics = GraphicsClient$new(session=self$session)
+      self$graphics = GraphicsClient$new(self)
     },
     stdout_filter = NULL,
     stderr_filter = NULL,
     shell_parent = NULL,
 
     handle_new_plot = function(content) {
-      # log_out("========== handle_new_plot")
       plot_id <- content$plot_id
-      d <- self$graphics$new_display(plot_id)
-      # log_print(self$graphics$displayed)
-      # log_print(self$graphics$display_desc)
-      # log_str(d)
-      self$display_send(d)
-    },
-
-    display_graphics = function(display_id, force_new_display = FALSE) {
-      # log_out("========== display_graphics")
-      plot_id <- self$graphics$display_desc[[display_id]]$plot_id
-      d <- self$graphics$render_display(display_id, 
-                                        update = !force_new_display)
-      display_id  <- d$transient$display_id
-      self$graphics$displayed[display_id] <- TRUE
-      # log_out(sprintf("Sending plot_id = %s, display_id = %s", 
-      #                 plot_id, display_id))
-      # log_str(d)
-      self$display_send(d)
+      self$graphics$new_display(plot_id)
     }
   )
 )
