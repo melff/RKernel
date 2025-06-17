@@ -71,7 +71,6 @@ start_graphics <- function(){
                                      names=ur$id)
     graphics$binary <- structure(!ur$text,
                                  names=ur$id)
-    log_print(graphics$mime_types)
 }
 
 #' @importFrom graphics par
