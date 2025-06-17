@@ -51,7 +51,7 @@ http_graphics_plot <- function(query) {
 }
 
 start_graphics <- function(){
-    setHook('plot.new', plot_new_hook)
+    setHook('plot.new', send_new_plot)
     setHook('grid.newpage', send_new_plot)
     # setHook('before.plot.new', send_before_new_plot)
     # setHook('before.grid.newpage', send_before_new_plot)
@@ -74,17 +74,15 @@ start_graphics <- function(){
 }
 
 #' @importFrom graphics par
-plot_new_hook <- function() {
-  if(par("page")) send_new_plot()
-}
-
 send_new_plot <- function() {
-  # log_out("send_new_plot")
   if(dev_is_unigd()){
     id <- ugd_id()$id + 1L
+    state <- ugd_state()
     msg <- list(type="event",
                 content = list(event = "new_plot", 
-                               plot_id = id))
+                               plot_id = id,
+                               state = state
+                               ))
     msg_send(msg)
   }
 }

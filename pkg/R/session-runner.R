@@ -186,7 +186,8 @@ RSessionRunner <- R6Class("RSessionRunner",
 
     handle_new_plot = function(content) {
       plot_id <- content$plot_id
-      self$graphics$new_display(plot_id)
+      state <- content$state
+      self$graphics$new_display(plot_id, state)
     }
   )
 )

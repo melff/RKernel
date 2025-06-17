@@ -218,38 +218,45 @@ GraphicsClient <- R6Class("GraphicsClient",
     },
     display_obs = list(),
     current_display = character(0),
+    current_state = list(),
     new_display = function(plot_id,
+                           state,
                            width = getOption("jupyter.plot.width",self$width),
                            height = getOption("jupyter.plot.height",self$height),
                            resolution = getOption("jupyter.plot.resolution",288),
                            zoom = getOption("jupyter.plot.zoom",1)) {
           # log_out("++ new_display")
-          display_id <- UUIDgenerate()
-          gd <- GraphicsDisplay$new(
-            plot_id = plot_id,
-            width = width,
-            height = height,
-            resolution = resolution,
-            zoom = zoom,
-            manager = self,
-            display_id = display_id
-          )
-          self$display_obs[[display_id]] <- gd
-          self$current_display <- display_id
-          gurl <- self$get_render_url(format = "svgp",
-                                plot_id = plot_id,
-                                width = width,
-                                height = height,
-                                resolution = resolution,
-                                zoom = zoom)
-          mime_data <- list("text/plain" = gurl)
-          svg_tmpl <- "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%d\" height=\"%d\"></svg>"
-          mime_data[["image/svg+xml"]] <- sprintf(svg_tmpl, width*self$dpi, height*self$dpi)
-          d <- list(data = mime_data,
-                    metadata = emptyNamedList,
-                    transient = list(display_id = display_id))
-          class(d) <- "display_data"
-          self$interface$display_send(d)
+          if(!length(self$current_state) || 
+            state$hsize > self$current_state$hsize
+          ) {
+              display_id <- UUIDgenerate()
+              gd <- GraphicsDisplay$new(
+                plot_id = plot_id,
+                width = width,
+                height = height,
+                resolution = resolution,
+                zoom = zoom,
+                manager = self,
+                display_id = display_id
+              )
+              self$display_obs[[display_id]] <- gd
+              self$current_display <- display_id
+              gurl <- self$get_render_url(format = "svgp",
+                                    plot_id = plot_id,
+                                    width = width,
+                                    height = height,
+                                    resolution = resolution,
+                                    zoom = zoom)
+              mime_data <- list("text/plain" = gurl)
+              svg_tmpl <- "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%d\" height=\"%d\"></svg>"
+              mime_data[["image/svg+xml"]] <- sprintf(svg_tmpl, width*self$dpi, height*self$dpi)
+              d <- list(data = mime_data,
+                        metadata = emptyNamedList,
+                        transient = list(display_id = display_id))
+              class(d) <- "display_data"
+              self$interface$display_send(d)
+          }
+        self$current_state <- state
     },
     display_res = 144,
     render_display = function(display_id,
