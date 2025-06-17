@@ -243,6 +243,8 @@ GraphicsClient <- R6Class("GraphicsClient",
                                 resolution = resolution,
                                 zoom = zoom)
           mime_data <- list("text/plain" = gurl)
+          svg_tmpl <- "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%d\" height=\"%d\"></svg>"
+          mime_data[["image/svg+xml"]] <- sprintf(svg_tmpl, width*self$dpi, height*self$dpi)
           d <- list(data = mime_data,
                     metadata = emptyNamedList,
                     transient = list(display_id = display_id))
