@@ -217,7 +217,6 @@ GraphicsClient <- R6Class("GraphicsClient",
            type = type)
     },
     display_obs = list(),
-    current_display = character(0),
     current_state = list(),
     new_display = function(plot_id,
                            state,
@@ -240,7 +239,6 @@ GraphicsClient <- R6Class("GraphicsClient",
                 display_id = display_id
               )
               self$display_obs[[display_id]] <- gd
-              self$current_display <- display_id
               gurl <- self$get_render_url(format = "svgp",
                                     plot_id = plot_id,
                                     width = width,
@@ -259,13 +257,13 @@ GraphicsClient <- R6Class("GraphicsClient",
         self$current_state <- state
     },
     display_res = 144,
-    render_display = function(display_id,
+    render_display = function(desc,
                             update = TRUE,
                             formats = getOption("jupyter.plot.formats",c("png","svgp","pdf"))
                             ) {
-      desc <- self$display_obs[[display_id]]
       formats <- intersect(formats, self$formats)
       plot_id <- desc$plot_id
+      display_id <- desc$display_id
       renders <- lapply(formats,
                         self$render,
                         plot_id = plot_id,
@@ -309,14 +307,17 @@ GraphicsClient <- R6Class("GraphicsClient",
       m
     },
     update_displays = function() {
-      if(length(self$current_display) &&
-        self$needs_update(self$current_display)) {
-        d <- self$render_display(self$current_display)
-        self$interface$display_send(d)
-      }
+      state <- self$get_current_state()
+      for(desc in self$display_obs) {
+        if(!desc$displayed ||
+           (state$id == desc$plot_id && state$upid != desc$upid)) {
+          d <- self$render_display(desc)
+          self$interface$display_send(d)
+          desc$displayed <- TRUE
+        }
+      } 
     },
-    needs_update = function(display_id) {
-      desc <- self$display_obs[[display_id]]
+    needs_update = function(desc) {
       state <- self$get_current_state()
       state$id != desc$plot_id || state$upid != desc$upid
     }
@@ -332,6 +333,7 @@ GraphicsDisplay <- R6Class("GraphicsDisplay",
     manager = NULL,
     display_id = character(0),
     upid = 0,
+    displayed = FALSE,
     initialize = function(
       plot_id,
       width,
