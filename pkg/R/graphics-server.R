@@ -27,7 +27,7 @@ http_graphics_plot <- function(query) {
   height <- query["height"]
   zoom <- query["zoom"]
   data <- ugd_render(
-    page = 0,
+    page = as.integer(plot_id),
     width = as.numeric(width),
     height = as.numeric(height),
     zoom = as.numeric(zoom),

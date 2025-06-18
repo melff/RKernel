@@ -182,7 +182,7 @@ GraphicsClient <- R6Class("GraphicsClient",
         self$port,"/",
         "graphics/",
         "plot","?",
-        if(length(plot_id)) paste0("id=",(plot_id - 1L),"&"),
+        if(length(plot_id)) paste0("id=",plot_id,"&"),
         "renderer=", format,"&",
         "width=", width,"&",
         "height=", height,"&",
@@ -310,7 +310,7 @@ GraphicsClient <- R6Class("GraphicsClient",
     },
     update_displays = function() {
       if(length(self$current_display) &&
-         self$needs_update(self$current_display)) {
+        self$needs_update(self$current_display)) {
         d <- self$render_display(self$current_display)
         self$interface$display_send(d)
       }
