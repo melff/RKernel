@@ -75,12 +75,6 @@ Kernel <- R6Class("Kernel",
       msg_env$send <- self$runner$handle_msg
       assign("session",self$session,envir=private$sandbox)
       assign("repl",self$repl,envir=private$sandbox)
-      register_magic_handler("plots",function(...){
-        frm <- IFrame(url = self$runner$graphics$live_url(),
-                      width="7in",
-                      height="5in")
-        self$display_send(frm)
-      })
       private$run_startup()
     },
     #' @field session See \code{\link{RKernelSession}}.
