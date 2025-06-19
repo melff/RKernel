@@ -75,7 +75,8 @@ start_graphics <- function(){
 
 #' @importFrom graphics par
 send_new_plot <- function() {
-  if(dev_is_unigd()){
+  # log_out("send_new_plot")
+  if(dev_is_main()){
     id <- ugd_id()$id + 1L
     state <- ugd_state()
     msg <- list(type="event",
@@ -89,7 +90,7 @@ send_new_plot <- function() {
 
 send_before_new_plot <- function() {
   # log_out("before_send_new_plot")
-  if(dev_is_unigd()){
+  if(dev_is_main()){
     id <- ugd_id()$id
     msg <- list(type="event",
                 content = list(event = "before_new_plot", 
@@ -102,6 +103,11 @@ send_before_new_plot <- function() {
 dev_is_unigd <- function(which = dev.cur()) {
   names(which) == "unigd"
 }
+
+dev_is_main <- function(which = dev.cur()) {
+  names(which) == "unigd" && which == graphics$device
+}
+
 
 rawToChar_ <- function(x) {
   if(is.raw(x)) rawToChar(x)

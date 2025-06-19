@@ -362,6 +362,19 @@ GraphicsClient <- R6Class("GraphicsClient",
           # log_out(sprintf("New display by force: '%s' ", self$current_display))
         }
       }
+    },
+    display_data = function(display_id = UUIDgenerate(),
+                            update = FALSE) {
+        state <- self$get_current_state()
+        display_ob <- GraphicsDisplay$new(
+            plot_id = state$id,
+            width = getOption("jupyter.plot.width",self$width),
+            height = getOption("jupyter.plot.height",self$height),
+            resolution = getOption("jupyter.plot.resolution",288),
+            zoom = getOption("jupyter.plot.zoom",1),
+            manager = self,
+            display_id = display_id)
+        self$render_display(display_ob, update = update)
     }
   ))
 

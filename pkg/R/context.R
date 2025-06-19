@@ -86,6 +86,7 @@ public=list(
   },
   g_display_id = NULL,
   process_graphics = function() {
+    # log_out("Context$process_graphics")
     poll_res <- self$graphics$poll()
     d <- list()
     if(poll_res[1]) {
