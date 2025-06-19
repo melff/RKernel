@@ -20,17 +20,40 @@ http_graphics_state <- function() {
       `status code`=200L)
 }
 
+from_query <- function(query, name, default) {
+  if(name %in% names(query)) {
+    query[name]
+  } else default
+}
+
 http_graphics_plot <- function(query) {
-  plot_id <- query["id"]
-  format <- query["renderer"]
-  width <- query["width"]
-  height <- query["height"]
-  zoom <- query["zoom"]
+  log_out("http_graphics_plot")
+  log_print(query)
+  dpi <- 72
+  plot_id <- as.integer(from_query(query, "id", 0))
+  format <- from_query(query, "renderer", "svgp")
+  width <- as.numeric(from_query(query, "width", 
+                      getOption("jupyter.plot.width",7)))
+  height <- as.numeric(from_query(query, "height", 
+                      getOption("jupyter.plot.height",7)))
+  zoom <- as.numeric(from_query(query, "zoom", 1))
+  resolution <- as.integer(from_query(query, "resolution", dpi))
+  
+  log_print(format)
+  if(format %in% c("png", "tiff", "png-base64")) {
+    zoom <- resolution/dpi * zoom
+    width  <- width * resolution
+    height <- height * resolution
+  }
+  else {
+    width  <- width * dpi
+    height <- height * dpi
+  }
   data <- ugd_render(
-    page = as.integer(plot_id),
-    width = as.numeric(width),
-    height = as.numeric(height),
-    zoom = as.numeric(zoom),
+    page = plot_id,
+    width = width,
+    height = height,
+    zoom = zoom,
     as = format,
     which = graphics$device
   )

@@ -165,16 +165,6 @@ GraphicsClient <- R6Class("GraphicsClient",
                           height = getOption("jupyter.plot.height",self$height),
                           resolution = getOption("jupyter.plot.resolution",self$dpi),
                           zoom = getOption("jupyter.plot.zoom",1)) {
-      if(format %in% c("png", "tiff", "png-base64")) {
-        zoom <- resolution/self$dpi * zoom
-        width  <- width * resolution
-        height <- height * resolution
-      }
-      else {
-        width  <- width * self$dpi
-        height <- height * self$dpi
-      }
-      plot_id <- as.integer(plot_id)
       paste0(
         "http://",
         self$host,":",
