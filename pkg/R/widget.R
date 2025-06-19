@@ -75,10 +75,6 @@ WidgetClass <- R6Class_("Widget",
         self$comm$handlers$msg <- self$handle_comm_msg
       } else print(self[["_model_id"]])
     },
-    #' @description Finalize the object
-    finalize = function(){
-      self$close()
-    },
     #' @description Close the connection to the frontend
     close = function(){
       if(!is.null(self$comm)){
@@ -300,6 +296,11 @@ WidgetClass <- R6Class_("Widget",
         supported <- supported && (before_v < v)
       }
       if(!supported) warning("Widget not supported by this version of ipywidgets - expect the unexpected.")
+    }
+  ),
+  private = list(
+    finalize = function(){
+      self$close()
     }
   ),
   active = list(
