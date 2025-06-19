@@ -1136,10 +1136,7 @@ Kernel <- R6Class("Kernel",
       private$input_suspended <- FALSE
       exec_parent <- private$parent$shell
       on.exit(private$input_suspended <- TRUE)
-      self$runner$settings_set(
-        force_new_graphics_display = !getOption("jupyter.update.graphics",TRUE)
-        # Will be reset to FALSE afer graphics update
-        )
+      self$runner$force_new_graphics_display <- !getOption("jupyter.update.graphics",TRUE)
       if(getOption("trace_cell",FALSE)) {
         sleep_duration <- getOption("trace_sleep",1)
         trace_interactive <- getOption("trace_interactive",TRUE)
@@ -1182,7 +1179,7 @@ Kernel <- R6Class("Kernel",
           # log_out(block, use.str=TRUE)
           self$repl$run_code(block,io_timeout=10)
           # log_out("- done running code block ----")
-          #log_out("- checking for changed graphics ----")
+          # log_out("- checking for changed graphics ----")
           self$runner$process_graphics()
           # log_out("- checking for changed graphics - done ---")
           # log_out(sprintf("kernel$errored: %s",self$errored))

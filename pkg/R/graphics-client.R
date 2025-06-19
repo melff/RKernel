@@ -7,7 +7,6 @@ GraphicsClient <- R6Class("GraphicsClient",
   public = list(
     host = NULL,
     port = NULL,
-    token = NULL,
     internal = FALSE,
     device = NULL,
     session = NULL,
@@ -218,17 +217,19 @@ GraphicsClient <- R6Class("GraphicsClient",
     },
     display_obs = list(),
     current_state = list(),
+    current_display = character(),
     new_display = function(plot_id,
                            state,
                            width = getOption("jupyter.plot.width",self$width),
                            height = getOption("jupyter.plot.height",self$height),
                            resolution = getOption("jupyter.plot.resolution",288),
                            zoom = getOption("jupyter.plot.zoom",1)) {
-          # log_out("++ new_display")
+          # log_out("== new_display")
           if(!length(self$current_state) || 
-            state$hsize > self$current_state$hsize
+            state$hsize > self$current_state$hsize 
           ) {
               display_id <- UUIDgenerate()
+              # log_out(display_id)
               gd <- GraphicsDisplay$new(
                 plot_id = plot_id,
                 width = width,
@@ -253,6 +254,7 @@ GraphicsClient <- R6Class("GraphicsClient",
                         transient = list(display_id = display_id))
               class(d) <- "display_data"
               self$interface$display_send(d)
+              self$current_display <- display_id
           }
         self$current_state <- state
     },
@@ -291,6 +293,7 @@ GraphicsClient <- R6Class("GraphicsClient",
       if(state$id == plot_id) {
         desc$upid <- state$upid
       }
+      self$current_state <- state
       structure(d,class=cl)
     },
     render_metadata = function(r, plot_id) {
@@ -306,20 +309,59 @@ GraphicsClient <- R6Class("GraphicsClient",
       }
       m
     },
+    new_display_forced = FALSE,
     update_displays = function() {
-      state <- self$get_current_state()
-      for(desc in self$display_obs) {
-        if(!desc$displayed ||
-           (state$id == desc$plot_id && state$upid != desc$upid)) {
-          d <- self$render_display(desc)
+      # log_out("== update_displays")
+      for(display_ob in self$display_obs) {
+        if(!display_ob$displayed) {
+          d <- self$render_display(display_ob)
           self$interface$display_send(d)
-          desc$displayed <- TRUE
+          # log_str(d)
+          # log_out(sprintf("Displaying existing '%s'", display_ob$display_id))
+          display_ob$displayed <- TRUE
+        } 
+      }
+      if(length(self$current_display)) {
+        state <- self$get_current_state()
+        display_ob <- self$display_obs[[self$current_display]]
+        needs_update <- FALSE
+        needs_new_display <- FALSE
+        if(state$active && 
+          state$id == display_ob$plot_id && 
+          state$upid > display_ob$upid) {
+          # Currently active device has changed
+          if(self$new_display_forced) {
+            self$new_display_forced <- FALSE
+            needs_new_display <- TRUE
+          } else {
+            needs_update <- TRUE
+          }
         }
-      } 
-    },
-    needs_update = function(desc) {
-      state <- self$get_current_state()
-      state$id != desc$plot_id || state$upid != desc$upid
+        if(needs_update) {
+            d <- self$render_display(display_ob)
+            self$interface$display_send(d)
+            self$display_obs[[self$current_display]] <- display_ob
+            # log_print(self$display_obs)
+            # log_out(sprintf("Updating '%s'", self$current_display))
+        }
+        if(needs_new_display) {
+          display_id <- UUIDgenerate()
+          display_ob <- GraphicsDisplay$new(
+            plot_id = state$id,
+            width = getOption("jupyter.plot.width",self$width),
+            height = getOption("jupyter.plot.height",self$height),
+            resolution = getOption("jupyter.plot.resolution",288),
+            zoom = getOption("jupyter.plot.zoom",1),
+            manager = self,
+            display_id = display_id)
+          d <- self$render_display(display_ob, update = FALSE)
+          self$interface$display_send(d)
+          display_ob$displayed <- TRUE
+          self$display_obs[[display_id]] <- display_ob
+          self$current_display <- display_id
+          # log_out(sprintf("New display by force: '%s' ", self$current_display))
+        }
+      }
     }
   ))
 

@@ -135,9 +135,13 @@ RSessionRunner <- R6Class("RSessionRunner",
       self$process_graphics()
     },
 
+    force_new_graphics_display = FALSE,
+
     process_graphics = function() {
       # log_out("========== process_graphics")
-        self$graphics$update_displays()
+      self$graphics$new_display_forced <- self$force_new_graphics_display
+      self$graphics$update_displays()
+      self$force_new_graphics_display <- FALSE
       # log_out("process_graphics -- done")
     },
 
