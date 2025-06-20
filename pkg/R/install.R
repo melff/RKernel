@@ -1,8 +1,8 @@
 #' install the R Kernel
 #'
 #' @export
-install <- function(){
-    installspec()
+install <- function(...){
+    installspec(...)
 }
 
 

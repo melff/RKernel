@@ -5,7 +5,7 @@
 \alias{installspec}
 \title{install the R Kernel}
 \usage{
-install()
+install(...)
 
 installspec(
   user = TRUE,
