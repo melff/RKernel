@@ -42,11 +42,22 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: |
+            any::rcmdcheck
+            any::pbdZMQ
+            any::jsonlite
+            any::uuid
+            any::svglite
+            any::htmltools
+            any::htmlwidgets
+            any::base64enc
+            any::unigd
+            any::rappdirs
           needs: check
-          dependencies: 'c("pbdZMQ", "jsonlite", "uuid", "svglite", "htmltools", "htmlwidgets", "base64enc", "unigd", "rappdirs")'
 
       - uses: r-lib/actions/check-r-package@v2
+        env: 
+          _R_CHECK_FORCE_SUGGESTS_: false
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
