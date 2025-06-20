@@ -59,6 +59,7 @@ jobs:
         env: 
           _R_CHECK_FORCE_SUGGESTS_: false
         with:
+          args: 'c("--no-manual")'
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
           working-directory: 'pkg'
