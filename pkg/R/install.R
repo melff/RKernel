@@ -44,7 +44,7 @@ installspec <- function(user = TRUE,
        "kernelspec",
        "install",
        "--replace",
-       "--name", name,
+       "--name", kernel_name,
        if(user) "--user" else NULL,
        if(length(prefix)) paste0("--prefix=",prefix),
        file.path(tmp_dir,"kernelspec")
