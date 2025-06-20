@@ -1,5 +1,6 @@
 #' install the R Kernel
 #'
+#' @param ... Arguments passed on to \code{installspec}
 #' @export
 install <- function(...){
     installspec(...)

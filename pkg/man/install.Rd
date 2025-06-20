@@ -16,6 +16,8 @@ installspec(
 )
 }
 \arguments{
+\item{...}{Arguments passed on to \code{installspec}}
+
 \item{user}{Logical, whether to install the kernel in the user's home directory}
 
 \item{prefix}{NULL or a character string with a path prefix}
