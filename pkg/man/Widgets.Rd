@@ -70,7 +70,6 @@ current widget class is supported.}
 \itemize{
 \item \href{#method-Widget-new}{\code{WidgetClass$new()}}
 \item \href{#method-Widget-open}{\code{WidgetClass$open()}}
-\item \href{#method-Widget-finalize}{\code{WidgetClass$finalize()}}
 \item \href{#method-Widget-close}{\code{WidgetClass$close()}}
 \item \href{#method-Widget-get_state}{\code{WidgetClass$get_state()}}
 \item \href{#method-Widget-set_state}{\code{WidgetClass$set_state()}}
@@ -126,16 +125,6 @@ Initialize an object
 Open a connection to the frontend
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{WidgetClass$open()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Widget-finalize"></a>}}
-\if{latex}{\out{\hypertarget{method-Widget-finalize}{}}}
-\subsection{Method \code{finalize()}}{
-Finalize the object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{WidgetClass$finalize()}\if{html}{\out{</div>}}
 }
 
 }

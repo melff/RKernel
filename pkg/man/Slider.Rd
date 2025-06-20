@@ -80,7 +80,6 @@ Classes and constructor functions for sliders (integer and floating-point ones)
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href='../../RKernel/html/Widget.html#method-Widget-check_version'><code>RKernel::Widget$check_version()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href='../../RKernel/html/Widget.html#method-Widget-close'><code>RKernel::Widget$close()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href='../../RKernel/html/Widget.html#method-Widget-display_data'><code>RKernel::Widget$display_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="finalize"><a href='../../RKernel/html/Widget.html#method-Widget-finalize'><code>RKernel::Widget$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href='../../RKernel/html/Widget.html#method-Widget-get_state'><code>RKernel::Widget$get_state()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href='../../RKernel/html/Widget.html#method-Widget-handle_buffers'><code>RKernel::Widget$handle_buffers()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href='../../RKernel/html/Widget.html#method-Widget-handle_comm_msg'><code>RKernel::Widget$handle_comm_msg()</code></a></span></li>
@@ -161,7 +160,6 @@ The objects of this class are cloneable with this method.
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href='../../RKernel/html/Widget.html#method-Widget-check_version'><code>RKernel::Widget$check_version()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href='../../RKernel/html/Widget.html#method-Widget-close'><code>RKernel::Widget$close()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href='../../RKernel/html/Widget.html#method-Widget-display_data'><code>RKernel::Widget$display_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="finalize"><a href='../../RKernel/html/Widget.html#method-Widget-finalize'><code>RKernel::Widget$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href='../../RKernel/html/Widget.html#method-Widget-get_state'><code>RKernel::Widget$get_state()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href='../../RKernel/html/Widget.html#method-Widget-handle_buffers'><code>RKernel::Widget$handle_buffers()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href='../../RKernel/html/Widget.html#method-Widget-handle_comm_msg'><code>RKernel::Widget$handle_comm_msg()</code></a></span></li>
@@ -249,7 +247,6 @@ The objects of this class are cloneable with this method.
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href='../../RKernel/html/Widget.html#method-Widget-check_version'><code>RKernel::Widget$check_version()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href='../../RKernel/html/Widget.html#method-Widget-close'><code>RKernel::Widget$close()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href='../../RKernel/html/Widget.html#method-Widget-display_data'><code>RKernel::Widget$display_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="finalize"><a href='../../RKernel/html/Widget.html#method-Widget-finalize'><code>RKernel::Widget$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href='../../RKernel/html/Widget.html#method-Widget-get_state'><code>RKernel::Widget$get_state()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href='../../RKernel/html/Widget.html#method-Widget-handle_buffers'><code>RKernel::Widget$handle_buffers()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href='../../RKernel/html/Widget.html#method-Widget-handle_comm_msg'><code>RKernel::Widget$handle_comm_msg()</code></a></span></li>
@@ -337,7 +334,6 @@ The objects of this class are cloneable with this method.
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href='../../RKernel/html/Widget.html#method-Widget-check_version'><code>RKernel::Widget$check_version()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href='../../RKernel/html/Widget.html#method-Widget-close'><code>RKernel::Widget$close()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href='../../RKernel/html/Widget.html#method-Widget-display_data'><code>RKernel::Widget$display_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="finalize"><a href='../../RKernel/html/Widget.html#method-Widget-finalize'><code>RKernel::Widget$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href='../../RKernel/html/Widget.html#method-Widget-get_state'><code>RKernel::Widget$get_state()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href='../../RKernel/html/Widget.html#method-Widget-handle_buffers'><code>RKernel::Widget$handle_buffers()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href='../../RKernel/html/Widget.html#method-Widget-handle_comm_msg'><code>RKernel::Widget$handle_comm_msg()</code></a></span></li>
@@ -425,7 +421,6 @@ The objects of this class are cloneable with this method.
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href='../../RKernel/html/Widget.html#method-Widget-check_version'><code>RKernel::Widget$check_version()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href='../../RKernel/html/Widget.html#method-Widget-close'><code>RKernel::Widget$close()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href='../../RKernel/html/Widget.html#method-Widget-display_data'><code>RKernel::Widget$display_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="finalize"><a href='../../RKernel/html/Widget.html#method-Widget-finalize'><code>RKernel::Widget$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href='../../RKernel/html/Widget.html#method-Widget-get_state'><code>RKernel::Widget$get_state()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href='../../RKernel/html/Widget.html#method-Widget-handle_buffers'><code>RKernel::Widget$handle_buffers()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href='../../RKernel/html/Widget.html#method-Widget-handle_comm_msg'><code>RKernel::Widget$handle_comm_msg()</code></a></span></li>
@@ -515,7 +510,6 @@ The objects of this class are cloneable with this method.
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href='../../RKernel/html/Widget.html#method-Widget-check_version'><code>RKernel::Widget$check_version()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href='../../RKernel/html/Widget.html#method-Widget-close'><code>RKernel::Widget$close()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href='../../RKernel/html/Widget.html#method-Widget-display_data'><code>RKernel::Widget$display_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="finalize"><a href='../../RKernel/html/Widget.html#method-Widget-finalize'><code>RKernel::Widget$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href='../../RKernel/html/Widget.html#method-Widget-get_state'><code>RKernel::Widget$get_state()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href='../../RKernel/html/Widget.html#method-Widget-handle_buffers'><code>RKernel::Widget$handle_buffers()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href='../../RKernel/html/Widget.html#method-Widget-handle_comm_msg'><code>RKernel::Widget$handle_comm_msg()</code></a></span></li>
