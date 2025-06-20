@@ -129,5 +129,5 @@ reference:
   - http_log
   - httpd_port
   - httpd_url
-  - set_help_port
+  - set_http_port
   - show_http_log
