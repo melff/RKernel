@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span> <span class="fu">http_get</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="httpd_url.html">httpd_url</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/data/iris?rows=1-5&amp;format=json"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in http_server$current$get_url():</span> attempt to apply non-function</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "[{\"Sepal.Length\":5.1,\"Sepal.Width\":3.5,\"Petal.Length\":1.4,\"Petal.Width\":0.2,\"Species\":\"setosa\"},{\"Sepal.Length\":4.9,\"Sepal.Width\":3,\"Petal.Length\":1.4,\"Petal.Width\":0.2,\"Species\":\"setosa\"},{\"Sepal.Length\":4.7,\"Sepal.Width\":3.2,\"Petal.Length\":1.3,\"Petal.Width\":0.2,\"Species\":\"setosa\"},{\"Sepal.Length\":4.6,\"Sepal.Width\":3.1,\"Petal.Length\":1.5,\"Petal.Width\":0.2,\"Species\":\"setosa\"},{\"Sepal.Length\":5,\"Sepal.Width\":3.6,\"Petal.Length\":1.4,\"Petal.Width\":0.2,\"Species\":\"setosa\"}]"</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
