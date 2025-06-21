@@ -1,3 +1,5 @@
+#' @importFrom utils getFromNamespace
+
 HTTPServer <- R6Class("HTTPServer",
     public = list(
         initialize = function(port = getOption("help.ports")[0]){
@@ -106,6 +108,11 @@ http_server <- new.env()
 #' Get the port the HTTP server listens to.
 #' @export
 httpd_url <- get_help_url <- function(){
+    if(!length(http_server$current)) {
+      port <- random_open_port()
+      http_server$current <- HTTPServer$new(port)
+      http_server$current$start()
+    }
     url <- http_server$current$get_url()
     return(url)
 }
@@ -113,6 +120,11 @@ httpd_url <- get_help_url <- function(){
 #' Get the URL of the HTTP server.
 #' @export
 httpd_port <- get_http_port <- function(){
+    if(!length(http_server$current)) {
+      port <- random_open_port()
+      http_server$current <- HTTPServer$new(port)
+      http_server$current$start()
+    }
     url <- http_server$current$get_port()
     return(url)
 }
@@ -180,7 +192,7 @@ http_echo <- function(path, query, ...){
 #'    "print".
 #' @param ... Any other arguments, ignored.
 #' @examples 
-#' \donttest{
+#' \dontrun{
 #'  browseURL(paste0(httpd_url(),"/eval?expr=Sys.time()&format=json"))
 #' } 
 #' @importFrom utils capture.output
@@ -197,7 +209,7 @@ http_eval <- function(path, query, ...){
         raw = res,
         cat = capture.output(cat(res)),
         json = toJSON(res),
-        print = , capture.output(print_orig(res))
+        print = , capture.output(orig_func$print(res))
       )
       content_type <- if("content-type" %in% names(query)) {
         query["content-type"]
@@ -238,7 +250,7 @@ get_range <- function(x){
 #'    rows and columns.
 #' @param ... Any other arguments, ignored.
 #' @examples 
-#' \donttest{
+#' \dontrun{
 #'   browseURL(paste0(httpd_url(),"/data/iris?rows=1-5&format=json"))
 #' }
 #' @importFrom utils capture.output
@@ -285,7 +297,7 @@ http_data <- function(path, query, ...){
         raw = res,
         cat = capture.output(cat(res)),
         json = toJSON(res),
-        print = , capture.output(print_orig(res))
+        print = , capture.output(orig_func$print(res))
     )
     list(
       payload = paste0(payload,collapse="\n"),

@@ -322,10 +322,7 @@ add_prompts <- function(txt) {
   txt
 }
 
-debugger_orig <- getFromNamespace("debugger","utils")
-recover_orig <- getFromNamespace("recover","utils")
-
-
+#' @importFrom utils menu
 debugger_ <- function(dump = last.dump) {
     #log_out("======= debugger_ ===========")
     debugger_look <- function(.index) { #adapted from utils::debugger
@@ -400,7 +397,11 @@ recover_ <- function() {
     # log_out(" - recover finished ---")
 }
 
+#' @importFrom utils getFromNamespace
 install_debugging <- function() {
+
+    orig_func$debugger <- getFromNamespace("debugger","utils")
+    orig_func$recover <- getFromNamespace("recover","utils")
     replace_in_package("utils", "debugger", debugger_)
     replace_in_package("utils", "recover", recover_)
     add_sync_options(c(

@@ -1,14 +1,10 @@
-
-print_orig <- getFromNamespace("print","base")
-
 RKernel_print <- function(x,...) {
     if(any(class(x) %in% getOption("rkernel_displayed_classes")))
         display(x)
     else
-        print_orig(x,...) # Original 'print' from package "base"
+        orig_func$print(x,...) # Original 'print' from package "base"
 }
 
-message_ <- getFromNamespace("message","base")
 message_stdout <- function (..., domain = NULL, appendLF = TRUE) 
 {
     cond <- if (...length() == 1L && inherits(..1, "condition")) {
@@ -32,7 +28,10 @@ message_stdout <- function (..., domain = NULL, appendLF = TRUE)
 }
 
 #' @include View.R
+#' @importFrom utils getFromNamespace
 install_output_hooks <- function() {
+    orig_func$print <- getFromNamespace("print","base")
+    orig_func$message <- getFromNamespace("message","base")
     replace_in_package("base","print",RKernel_print)
     replace_in_package("utils","View",View)    
     replace_in_package("base","message",message_stdout)

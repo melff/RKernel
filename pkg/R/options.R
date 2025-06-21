@@ -25,17 +25,18 @@ import_options <- function(opts){
     do.call("options",opts[n])
 }
 
-options_orig <- getFromNamespace("options", "base")
 
 options_with_send <- function(...) {
   args <- list(...)
-  res <- options_orig(...)
+  res <- orig_func$options(...)
   if(length(n <- names(args))) {
     send_options(n)
   }
   invisible(res)
 }
 
+#' @importFrom utils getFromNamespace
 inject_send_options <- function() {
+  orig_func$options <- getFromNamespace("options", "base")
   replace_in_package("base","options", options_with_send)
 }

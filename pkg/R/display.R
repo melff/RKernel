@@ -459,6 +459,8 @@ display_data.importer <- function(x,...,
                             metadata=emptyNamedList,
                             id=UUIDgenerate(),
                             update=FALSE){
+    description <- get0("description", mode="function")
+    if(!length(description)) return(NULL)
     x <- description(x)
     x <- as.data.frame(x)
     NextMethod("display_data")

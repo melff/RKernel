@@ -82,7 +82,7 @@ MenuWidgetClass <- R6Class("MenuWidget",
             # log_out("Menu: entering loop")
             while(self$continue_loop) {
                 # log_out("#")
-                inp <- readline_orig("> ")
+                inp <- orig_func$readline("> ")
                 expr <- str2expression(inp)
                 eval(expr)
                 # log_print(expr)
@@ -120,8 +120,6 @@ request_menu_widget <- function(choices,
       buttons = buttons,
       multiple = multiple)
 }
-
-menu_orig <- getFromNamespace("menu","utils")
 
 menu_ <- function(choices,graphics=FALSE,title=NULL) {
     if(get_config("use_widgets")) {
@@ -162,9 +160,6 @@ menu__ <- function(choices,title=NULL,...) {
     }
 }
 
-
-select_list_orig <- getFromNamespace("select.list","utils")
-
 select_list <- function(choices, preselect = NULL, multiple = FALSE, title = NULL, 
                          graphics = getOption("menu.graphics")) {
     if(get_config('use_widgets')) {
@@ -175,7 +170,7 @@ select_list <- function(choices, preselect = NULL, multiple = FALSE, title = NUL
                   )
       value <- choices[ind]
     } else {
-      value <- select_list_orig(choices,
+      value <- orig_func$select_list(choices,
                               preselect = preselect,
                               multiple = multiple,
                               title = title,
@@ -185,6 +180,8 @@ select_list <- function(choices, preselect = NULL, multiple = FALSE, title = NUL
 }
 
 install_menu <- function(){
+    orig_func$menu <- getFromNamespace("menu","utils")
+    orig_func$select_list <- getFromNamespace("select.list","utils")
     replace_in_package("utils", "menu", menu_)
     replace_in_package("utils", "select.list", select_list)
 }

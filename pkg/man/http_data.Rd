@@ -22,7 +22,7 @@ rows and columns.}
 These request can be used to get the value of an R object, usually a data frame.
 }
 \examples{
-\donttest{
+\dontrun{
   browseURL(paste0(httpd_url(),"/data/iris?rows=1-5&format=json"))
 }
 }

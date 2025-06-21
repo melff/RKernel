@@ -1,3 +1,5 @@
+orig_func <- new.env()
+
 #' @importFrom uuid UUIDgenerate
 
 uuid <- function() {
@@ -47,7 +49,7 @@ log_out <- function(message,...,use.print=FALSE,use.str=FALSE,serialize=FALSE){
   dcl <- deparse0(match.call())
   tryCatch({
     if(use.print)
-      message <- paste0("\n",paste0(capture.output(print_orig(message)),collapse="\n"))
+      message <- paste0("\n",paste0(capture.output(orig_func$print(message)),collapse="\n"))
     else if(serialize){
         message <- to_json(message,pretty=TRUE,force=TRUE)
     }
@@ -348,15 +350,15 @@ escape4srcdoc <- function(x) {
   gsub("\"","&quot;", x)
 }
 
-q_orig <- getFromNamespace("q","base")
-
 q_defunct <- function(save = "default", status = 0, runLast = TRUE) {
     warning("\n'q()' and 'quit()' are deactivated for safety reasons.",
             "\nPlease use the Jupyter frontend to shut down the kernel.",
             call.=FALSE,immediate.=TRUE)
 }
 
+#' @importFrom utils getFromNamespace
 install_safe_q <- function(){
+    orig_func$q <- getFromNamespace("q","base")
     replace_in_package("base","q",q_defunct)
     replace_in_package("base","quit",q_defunct)
 }
@@ -370,15 +372,14 @@ SCAN_BEGIN <- paste0(SO,"SCAN_BEGIN",SI,BEL)
 SCAN_END <- paste0(SO,"SCAN_END",SI,BEL)
 
 
-readline_orig <- getFromNamespace("readline","base")
-
 readline <- function(prompt = "") {
   prompt <- paste0(READLINE_PROMPT,prompt,BEL)
-  readline_orig(prompt = prompt)
+  orig_func$readline(prompt = prompt)
 }
 
 install_readline <- function(){
-    replace_in_package("base", "readline", readline)
+  orig_func$readline <- getFromNamespace("readline","base")
+  replace_in_package("base", "readline", readline)
 }
 
 read_asset <- function(path) {

@@ -187,6 +187,7 @@ help.start <- function(update = FALSE,
     structure(d,class=cl)
 }
 
+#' @importFrom utils getFromNamespace
 help_start <- help.start
 help_start_orig <- getFromNamespace("help.start","utils")
 
@@ -349,7 +350,7 @@ example_html <- function(topic,package = NULL,...) {
                 msg_frag <- remove_prefix(chunk, MSG_BEGIN)
             }
         } else if(endsWith(chunk, MSG_END)) {
-          msg <- paste0(self$msg_frag, remove_suffix(chunk, MSG_END))
+          msg <- paste0(msg_frag, remove_suffix(chunk, MSG_END))
           msg_incomplete <- FALSE
           msg_frag <- ""
           msg <- msg_unwrap(msg)

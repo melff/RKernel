@@ -87,7 +87,9 @@ start_graphics <- function(){
           "jupyter.update.graphics"))
     ugd()
     graphics$device <- dev.cur()
-    ur <- subset(ugd_renderers(),type=="plot")
+    #ur <- subset(ugd_renderers(),type=="plot")
+    ur <- ugd_renderers()
+    ur <- ur[ur$type=="plot",]
     tikz <- which(ur$id == "tikz")
     ur$mime[tikz] <- "text/latex"
     graphics$mime_types <- structure(ur$mime,

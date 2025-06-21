@@ -22,7 +22,7 @@ parameter should be one of "deparse", "str", "raw", "cat", "json", or
 These request can be used to have R evaluate an expression
 }
 \examples{
-\donttest{
+\dontrun{
  browseURL(paste0(httpd_url(),"/eval?expr=Sys.time()&format=json"))
 } 
 }

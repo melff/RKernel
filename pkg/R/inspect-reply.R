@@ -51,7 +51,7 @@ inspect_reply <- function(code,cursor_pos,detail_level=0){
             if(length(FUN) > 0){
                 result_text <- paste0(word,": ")
                 result_text <- c(result_text,
-                                 capture.output(print_orig(FUN)))
+                                 capture.output(orig_func$print(FUN)))
                 result_text <- paste(result_text,collapse="\n")
                 found <- TRUE
             }

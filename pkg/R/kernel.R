@@ -212,6 +212,7 @@ Kernel <- R6Class("Kernel",
     #' Send rich format data to the frontend
     #' @param msg A list with the appropriate structure. [TODO]
     display_send = function(msg){
+      if(!length(msg)) return(invisible())
       if(inherits(msg, "display_data") || inherits(msg, "update_display_data")) {
         d <- msg
         msg <- list(type = class(d),
