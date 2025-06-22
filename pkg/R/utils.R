@@ -468,18 +468,17 @@ install_browseURL <- function(){
     }
 }
 
-scan_ <- getFromNamespace("scan","base")
-
 scan <- function(file = "", ...) {
     if(is.character(file) && file=="") {
       cat(SCAN_BEGIN)
       on.exit(cat(SCAN_END))
-      r <- scan_(file=file, ...)
+      r <- orig_func$scan(file=file, ...)
       r
     }
-    else scan_(file=file, ...)
+    else orig_func$scan(file=file, ...)
 }
 
 install_scan <- function(){
+    orig_func$scan <- getFromNamespace("scan","base")
     replace_in_package("base", "scan", scan)
 }
