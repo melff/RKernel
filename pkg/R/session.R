@@ -170,6 +170,7 @@ RKernelSession <- R6Class("RKernelSession",
     setup = function() {
       self$http_port <- random_open_port()
       self$send_input(sprintf("RKernel:::setup_session(%d)",self$http_port))
+      self$send_input("RKernel:::startup()")
       self$receive_all_output(timeout = 1000)
   },
   #' @field http_port The port number of HTML help.
