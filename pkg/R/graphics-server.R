@@ -10,8 +10,17 @@ http_graphics <- function(path, query, ...) {
 }
 
 http_graphics_state <- function() {
-  info <- unclass(ugd_id(limit=0, state=TRUE))
-  info$plots <- lapply(info$plots, unclass)
+  if(names(dev.cur()) == "unigd") {
+    info <- try(ugd_id(limit=0, state=TRUE),silent=TRUE)
+    if(inherits(info,"try-error")){
+      info <- list(state=list(active=FALSE))
+    } else {
+      info <- unclass(info)
+      info$plots <- lapply(info$plots, unclass)
+    }
+  } else {
+    info <- list(state=list(active=FALSE))
+  }
   payload <- to_json(info,
                      pretty=TRUE)
   list(payload=payload,
