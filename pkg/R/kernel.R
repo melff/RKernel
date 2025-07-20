@@ -55,6 +55,8 @@ Kernel <- R6Class("Kernel",
       private$sandbox <- new.env()
       assign("kernel",self,envir=private$sandbox)
       config$use_widgets <- FALSE
+      orig_func$print <- getFromNamespace("print","base")
+      orig_func$message <- getFromNamespace("message","base")
     },
     #' @description Start the R session and other components 
     start = function(){
