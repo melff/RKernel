@@ -129,6 +129,9 @@ GraphicsClient <- R6Class("GraphicsClient",
         } else {
           data$content <- rawToChar_(data$content)
         }
+      } 
+      if(is.character(data$content)) {
+        Encoding(data$content) <- "UTF-8"
       }
       data$width <- width
       data$height <- height
@@ -150,7 +153,6 @@ GraphicsClient <- R6Class("GraphicsClient",
                                 height = height,
                                 resolution = resolution,
                                 zoom = zoom)
-        con <- url(gurl)
         resp <- tryCatch(curl_fetch_memory(gurl),
                          error = function(e) invokeRestart("continue"),
                          interrupt = function(e) invokeRestart("continue"))
@@ -398,3 +400,18 @@ GraphicsDisplay <- R6Class("GraphicsDisplay",
     }
   )
 )
+
+#' @importFrom unigd ugd_renderers
+urdrs <- ugd_renderers()
+
+format2type <- function(fmt) {
+  urdrs[urdrs$id==fmt,][["mime"]]
+}
+
+is_binary_fmt <- function(fmt) {
+  !urdrs[urdrs$id==fmt,][["text"]]
+}
+
+format2ext <- function(fmt) {
+  urdrs[urdrs$id==fmt,][["ext"]]
+}
