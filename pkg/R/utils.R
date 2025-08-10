@@ -410,6 +410,7 @@ send_error_condition <- function(e) {
     )
   )
   msg_send(msg, file=stderr())
+  invokeRestart("abort")
 }
 install_globalCallingHandlers <- function() {
   globalCallingHandlers(

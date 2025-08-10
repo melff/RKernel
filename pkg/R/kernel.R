@@ -6,7 +6,7 @@
 #' @importFrom digest hmac
 #' @importFrom uuid UUIDgenerate
 #' @importFrom jsonlite prettify toJSON
-
+#' @importFrom crayon green red yellow
 
 PROTOCOL_VERSION <- '5.3'
 WIRE_DELIM <- charToRaw("<IDS|MSG>")
@@ -1097,6 +1097,8 @@ Kernel <- R6Class("Kernel",
 
     sandbox = NULL,
 
+    hline = paste(rep("-",80),collapse=""),
+
     err_msg = NULL,
     handle_condition_msg = function(msg) {
       # log_out("handle_condition_message")
@@ -1107,12 +1109,16 @@ Kernel <- R6Class("Kernel",
         self$errored <- TRUE
         self$stop_on_error <- options$rkernel_stop_on_error
         # log_out(condition, use.str=TRUE)
+        error_message <- red(paste("Error:",msg_content$message))
         if(options$rkernel_show_traceback) {
             tb <- msg_content$traceback
             tb <- c("Traceback:",tb)
+            tb <- c(private$hline,tb,private$hline)
+            tb <- sapply(tb, yellow)
+            tb <- c(error_message, tb)
         }
         else {
-            tb <- list()
+            tb <- list(error_message)
         }
         content <- list(ename="error",
                         evalue=msg_content$message,
