@@ -35,9 +35,11 @@ from_query <- function(query, name, default) {
   } else default
 }
 
+#'@importFrom rsvg rsvg_pdf rsvg_png
+
 http_graphics_plot <- function(query) {
-  log_out("http_graphics_plot")
-  log_print(query)
+  # log_out("http_graphics_plot")
+  # log_print(query)
   dpi <- 72
   plot_id <- as.integer(from_query(query, "id", 0))
   format <- from_query(query, "renderer", "svgp")
@@ -46,9 +48,10 @@ http_graphics_plot <- function(query) {
   height <- as.numeric(from_query(query, "height", 
                       getOption("jupyter.plot.height",7)))
   zoom <- as.numeric(from_query(query, "zoom", 1))
-  resolution <- as.integer(from_query(query, "resolution", dpi))
-  
-  log_print(format)
+  resolution <- as.integer(from_query(query, "resolution", 
+                      getOption("jupyter.plot.res",dpi)))
+
+  # log_print(format)
   if(format %in% c("png", "tiff", "png-base64")) {
     zoom <- resolution/dpi * zoom
     width  <- width * resolution
@@ -59,13 +62,33 @@ http_graphics_plot <- function(query) {
     height <- height * dpi
   }
   data <- ugd_render(
-    page = plot_id,
-    width = width,
-    height = height,
-    zoom = zoom,
-    as = format,
-    which = graphics$device
+      page = plot_id,
+      width = width,
+      height = height,
+      zoom = zoom,
+      as = "svgp",
+      which = graphics$device
   )
+
+  if(format == "pdf") {
+    data <- charToRaw(data)
+    data <- rsvg_pdf(data, width=width, height=height)
+  } else if(format == "png") {
+    log_out(sprintf("Zoom = %s", zoom))
+    log_out(sprintf("Resolution = %s", resolution))
+    data <- charToRaw(data)
+    data <- rsvg_png(data, width=width, height=height)
+  }
+  else {
+    data <- ugd_render(
+      page = plot_id,
+      width = width,
+      height = height,
+      zoom = zoom,
+      as = format,
+      which = graphics$device
+    )
+  }
   # if(is.character(data)) {
   #   payload <- data
   # }
