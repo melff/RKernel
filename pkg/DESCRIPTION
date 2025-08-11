@@ -30,7 +30,8 @@ Imports:
     processx,
     crayon,
     curl,
-    rappdirs
+    rappdirs,
+    rsvg
 Depends:
     R (>= 4.4)
 Suggests:

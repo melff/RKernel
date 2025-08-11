@@ -53,6 +53,8 @@ jobs:
             any::base64enc
             any::unigd
             any::rappdirs
+            any::roxygen2
+            any::rsvg
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
