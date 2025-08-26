@@ -47,9 +47,10 @@ http_graphics_plot <- function(query) {
                       getOption("jupyter.plot.width",7)))
   height <- as.numeric(from_query(query, "height", 
                       getOption("jupyter.plot.height",7)))
-  zoom <- as.numeric(from_query(query, "zoom", 1))
+  zoom <- as.numeric(from_query(query, "zoom", 
+                      getOption("jupyter.plot.zoom",1)))
   resolution <- as.integer(from_query(query, "resolution", 
-                      getOption("jupyter.plot.res",dpi)))
+                      getOption("jupyter.plot.resolution",dpi)))
 
   # log_print(format)
   if(format %in% c("png", "tiff", "png-base64")) {
@@ -74,8 +75,8 @@ http_graphics_plot <- function(query) {
     data <- charToRaw(data)
     data <- rsvg_pdf(data, width=width, height=height)
   } else if(format == "png") {
-    log_out(sprintf("Zoom = %s", zoom))
-    log_out(sprintf("Resolution = %s", resolution))
+    # log_out(sprintf("Zoom = %s", zoom))
+    # log_out(sprintf("Resolution = %s", resolution))
     data <- charToRaw(data)
     data <- rsvg_png(data, width=width, height=height)
   }
@@ -114,8 +115,9 @@ start_graphics <- function(){
     add_sync_options(c(
           "jupyter.plot.width",
           "jupyter.plot.height",
-          "jupyter.plot.res",
+          "jupyter.plot.resolution",
           "jupyter.plot.formats",
+          "jupyter.plot.zoom",
           "jupyter.update.graphics"))
     ugd()
     graphics$device <- dev.cur()

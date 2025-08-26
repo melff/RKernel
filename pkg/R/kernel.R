@@ -1179,7 +1179,7 @@ Kernel <- R6Class("Kernel",
         for(block in code_blocks) {
           self$errored <- FALSE 
           # log_out("- run code block ----")
-          # log_out(block, use.str=TRUE)
+          # log_out(block)
           self$repl$run_code(block,io_timeout=10)
           # log_out("- done running code block ----")
           # log_out("- checking for changed graphics ----")

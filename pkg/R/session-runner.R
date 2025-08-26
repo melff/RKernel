@@ -178,8 +178,9 @@ RSessionRunner <- R6Class("RSessionRunner",
       add_sync_options(c(
           "jupyter.plot.width",
           "jupyter.plot.height",
-          "jupyter.plot.res",
+          "jupyter.plot.resolution",
           "jupyter.plot.formats",
+          "jupyter.plot.zoom",
           "jupyter.update.graphics"))
       self$session$start_graphics()
       self$graphics = GraphicsClient$new(self)
