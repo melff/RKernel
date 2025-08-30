@@ -211,7 +211,7 @@ RKernelSession <- R6Class("RKernelSession",
                       error = function(e) invokeRestart("continue"),
                       interrupt = function(e) invokeRestart("continue"))
       list(
-          content = rawToChar(resp$content),
+          content = resp$content,
           type = resp$type
         )
   })

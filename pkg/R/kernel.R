@@ -661,7 +661,7 @@ Kernel <- R6Class("Kernel",
         type = "comm_info_request",
         content = msg$content
       ))
-      # log_out(reply, use.print = TRUE)
+      # log_print(reply)
       if(reply$type != "comm_info_reply"){
         log_error(sprintf("Expected a 'comm_info_reply', got a '%s' message.", reply$type))
       }
@@ -1063,11 +1063,20 @@ Kernel <- R6Class("Kernel",
       msg <- URLencode(to_json(msg))
       resp <- self$session$http_get(slug="msg",
                                     query=msg)
-      if(resp$type == "application/json") {
-        json_unwrap(resp$content)
+      if(resp$type == "application/x-r-data") {
+        unserialize(resp$content)
       }
-      else {
-          resp$content
+      else if(resp$type == "application/json") {
+        content <- rawToChar(resp$content)
+        json_unwrap(content)
+      }
+      else if(resp$type == "text/x-r-source") {
+        content <- rawToChar(resp$content)
+        log_out(content)
+        eval(str2lang(content))
+      }
+      else if(startsWith(resp$type,"text/")){
+          rawToChar(resp$content)
       }
     },
     r_send_request_noreply = function(msg){
