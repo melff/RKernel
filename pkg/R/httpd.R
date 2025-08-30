@@ -331,8 +331,12 @@ http_msg <- function(path, query, ...) {
   msg <- json_unwrap(query)
   resp <- handle_request(msg)
   if(length(resp)) {
-    payload <- to_json(resp)
-    content_type <- "application/json"
+    #payload <- to_json(resp)
+    #content_type <- "application/json"
+    # payload <- deparse0(resp)
+    # content_type <- "text/x-r-source"
+    payload <- serialize(resp,connection=NULL)
+    content_type <- "application/x-r-data"
   } else {
     payload <- "OK"
     content_type <- "text/plain"
