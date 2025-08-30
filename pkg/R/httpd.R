@@ -327,6 +327,7 @@ redirect2docroot <- function() {
 #' @param path The url, excluding the hostname and port, but including
 #'    the slug "data" and the name of an R object.
 #' @param query The query string translated into a character vector.
+#' @param ... Any other arguments, ignored.
 http_msg <- function(path, query, ...) {
   msg <- json_unwrap(query)
   resp <- handle_request(msg)

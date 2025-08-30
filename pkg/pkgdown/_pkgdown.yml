@@ -125,6 +125,7 @@ reference:
   - http_echo
   - http_eval
   - http_get
+  - http_msg
   - http_is_proxied
   - http_log
   - httpd_port

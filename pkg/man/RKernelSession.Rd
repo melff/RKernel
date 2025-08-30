@@ -16,6 +16,8 @@ An object of this class handles the communication with
 \describe{
 \item{\code{http_port}}{The port number of HTML help.}
 
+\item{\code{hostname}}{The hostname.}
+
 \item{\code{yield}}{An optional function to service kernel requests}
 
 \item{\code{kernel}}{The reference to the controlling kernel object}
@@ -30,6 +32,7 @@ An object of this class handles the communication with
 \item \href{#method-RKernelSession-start_graphics}{\code{RKernelSession$start_graphics()}}
 \item \href{#method-RKernelSession-dev_new}{\code{RKernelSession$dev_new()}}
 \item \href{#method-RKernelSession-graphics_details}{\code{RKernelSession$graphics_details()}}
+\item \href{#method-RKernelSession-http_get}{\code{RKernelSession$http_get()}}
 \item \href{#method-RKernelSession-clone}{\code{RKernelSession$clone()}}
 }
 }
@@ -166,6 +169,15 @@ Return the
    graphics details.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{RKernelSession$graphics_details()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RKernelSession-http_get"></a>}}
+\if{latex}{\out{\hypertarget{method-RKernelSession-http_get}{}}}
+\subsection{Method \code{http_get()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RKernelSession$http_get(slug = "", query = "")}\if{html}{\out{</div>}}
 }
 
 }

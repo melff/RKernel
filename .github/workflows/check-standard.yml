@@ -5,7 +5,7 @@ on:
     branches: [main, master]
   pull_request:
 
-name: check-stanard.yml
+name: check-standard.yml
 
 permissions: read-all
 
