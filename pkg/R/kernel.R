@@ -70,7 +70,7 @@ Kernel <- R6Class("Kernel",
       # self$DAPServer <- DAPServer$new(
       #   r_session = self$session,
       #   send_debug_event = self$send_debug_event,
-      #   r_send_request = private$r_send_request,
+      #   r_send_msg = private$r_send_msg,
       #   r_send_cmd = private$r_send_cmd,
       #   r_send_input = self$session$send_input
       # )
@@ -614,7 +614,7 @@ Kernel <- R6Class("Kernel",
     inspect_reply = function(msg){
       # return(NULL)
       # log_out("inspect_reply")
-      reply <- private$r_send_request(list(
+      reply <- private$r_send_msg(list(
         type = "inspect_request",
         content = msg$content
       ))
@@ -657,7 +657,7 @@ Kernel <- R6Class("Kernel",
         config$use_widgets <- TRUE
         self$repl$run_cmd("RKernel:::set_config(use_widgets=TRUE)")
       }
-      reply <- private$r_send_request(list(
+      reply <- private$r_send_msg(list(
         type = "comm_info_request",
         content = msg$content
       ))
@@ -680,7 +680,7 @@ Kernel <- R6Class("Kernel",
         config$use_widgets <- TRUE
         self$repl$run_cmd("RKernel:::set_config(use_widgets=TRUE)")
       }
-      private$r_send_request_noreply(list(
+      private$r_send_msg_noreply(list(
         type = "comm_open",
         content = msg$content
       ))
@@ -697,7 +697,7 @@ Kernel <- R6Class("Kernel",
         cm$handle_msg(id, data)
       }
       else {
-        private$r_send_request_noreply(list(
+        private$r_send_msg_noreply(list(
           type = "comm_msg",
           content = msg$content
         ))
@@ -706,7 +706,7 @@ Kernel <- R6Class("Kernel",
 
     handle_comm_close = function(msg){
       # return(NULL)
-      private$r_send_request_noreply(list(
+      private$r_send_msg_noreply(list(
         type = "comm_close",
         content = msg$content
       ))
@@ -1059,7 +1059,7 @@ Kernel <- R6Class("Kernel",
         return("")
       }
     },
-    r_send_request = function(msg){
+    r_send_msg = function(msg){
       msg <- URLencode(to_json(msg))
       resp <- self$session$http_get(slug="msg",
                                     query=msg)
@@ -1079,8 +1079,8 @@ Kernel <- R6Class("Kernel",
           rawToChar(resp$content)
       }
     },
-    r_send_request_noreply = function(msg){
-      private$r_send_request(msg)
+    r_send_msg_noreply = function(msg){
+      private$r_send_msg(msg)
       return(invisible())
     },
     r_send_cmd = function(cmd) {

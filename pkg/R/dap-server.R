@@ -1,18 +1,18 @@
 DAPServer <- R6Class("DAPServer",
     public = list(
         r_session = NULL,
-        r_send_request = NULL,
+        r_send_msg = NULL,
         send_debug_event = NULL,
         r_send_cmd = NULL,
         r_send_input = NULL,
         initialize = function(
                         r_session, 
-                        r_send_request, 
+                        r_send_msg, 
                         send_debug_event, 
                         r_send_cmd,
                         r_send_input) {
             self$r_session <- r_session
-            self$r_send_request <- r_send_request
+            self$r_send_msg <- r_send_msg
             self$send_debug_event <- send_debug_event
             self$r_send_cmd <- r_send_cmd
             self$r_send_input <- r_send_input
