@@ -11,7 +11,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +59,10 @@
 <dd><p>The port number of HTML help.</p></dd>
 
 
+<dt><code>hostname</code></dt>
+<dd><p>The hostname.</p></dd>
+
+
 <dt><code>yield</code></dt>
 <dd><p>An optional function to service kernel requests</p></dd>
 
@@ -80,6 +84,7 @@
 <li><p><a href="#method-RKernelSession-start_graphics"><code>RKernelSession$start_graphics()</code></a></p></li>
 <li><p><a href="#method-RKernelSession-dev_new"><code>RKernelSession$dev_new()</code></a></p></li>
 <li><p><a href="#method-RKernelSession-graphics_details"><code>RKernelSession$graphics_details()</code></a></p></li>
+<li><p><a href="#method-RKernelSession-http_get"><code>RKernelSession$http_get()</code></a></p></li>
 <li><p><a href="#method-RKernelSession-clone"><code>RKernelSession$clone()</code></a></p></li>
 </ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="processx" data-topic="process" data-id="as_ps_handle"><a href="http://processx.r-lib.org/reference/process.html#method-as_ps_handle"><code>processx::process$as_ps_handle()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="processx" data-topic="process" data-id="format"><a href="http://processx.r-lib.org/reference/process.html#method-format"><code>processx::process$format()</code></a></span></li>
@@ -204,10 +209,19 @@ to wait for comm message when a widget is active.</p></dd>
 </div>
 
 
+</div><p></p><hr><a id="method-RKernelSession-http_get"></a><div class="section">
+<h3 id="method-http-get-">Method <code><a href="http_get.html">http_get()</a></code><a class="anchor" aria-label="anchor" href="#method-http-get-"></a></h3>
+
+<div class="section">
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RKernelSession</span><span class="op">$</span><span class="fu">http_get</span><span class="op">(</span>slug <span class="op">=</span> <span class="st">""</span>, query <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-RKernelSession-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RKernelSession</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
