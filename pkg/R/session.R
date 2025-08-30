@@ -153,6 +153,7 @@ RSessionBase <- R6Class("RSessionBase",
 #' @description An object of this class handles the communication with
 #'   an R process. There is usually one main session, but there may
 #'   also sessions for detached code cells.
+#' @importFrom curl curl_fetch_memory
 #' @export
 RKernelSession <- R6Class("RKernelSession",
   inherit = RSessionBase,
@@ -175,6 +176,8 @@ RKernelSession <- R6Class("RKernelSession",
   },
   #' @field http_port The port number of HTML help.
   http_port = NULL,
+  #' @field hostname The hostname.
+  hostname = "localhost",
   #' @description Initialize graphics, start device and
   #'    return details
   start_graphics = function() {
@@ -197,8 +200,21 @@ RKernelSession <- R6Class("RKernelSession",
   #' @field yield An optional function to service kernel requests
   yield = NULL, 
   #' @field kernel The reference to the controlling kernel object
-  kernel = NULL
-  )
+  kernel = NULL, 
+  http_get = function(slug="",query="") {
+      url <- paste0("http://",
+                     self$hostname,":",
+                     self$http_port,"/",
+                     slug)
+      url <- paste0(url,"?",query)
+      resp <- tryCatch(curl_fetch_memory(url),
+                      error = function(e) invokeRestart("continue"),
+                      interrupt = function(e) invokeRestart("continue"))
+      list(
+          content = rawToChar(resp$content),
+          type = resp$type
+        )
+  })
 )
 
 # This is convenience form to split a single character

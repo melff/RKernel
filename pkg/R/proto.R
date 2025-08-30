@@ -7,9 +7,7 @@ ETX <- "\x03"
 request_handlers <- new.env()
 
 handle_request <- function(msg){
-  # log_out("handle_request")
   msg_type <- msg$type
-  # log_out("msg_type")
   envir <- parent.frame()
   handler <- request_handlers[[msg_type]]
   if (is.function(handler)) {
@@ -23,15 +21,7 @@ handle_request <- function(msg){
   } else {
     response <- request_default_handler(msg,envir)
   }
-  if (length(response) && is.list(response)) {
-    tryCatch(
-      msg_send(response),
-      error = function(e) {
-        log_error(conditionMessage(e))
-        return(NULL)
-      }
-    )
-  }
+  response
 }
 
 make_dput_request <- function(msg) {

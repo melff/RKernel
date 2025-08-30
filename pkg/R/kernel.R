@@ -5,6 +5,7 @@
 #' @importFrom pbdZMQ ZMQ.MC random_open_port
 #' @importFrom digest hmac
 #' @importFrom uuid UUIDgenerate
+#' @importFrom utils URLencode
 #' @importFrom jsonlite prettify toJSON
 #' @importFrom crayon green red yellow
 
@@ -1059,24 +1060,18 @@ Kernel <- R6Class("Kernel",
       }
     },
     r_send_request = function(msg){
-      # log_out("r_send_request")
-      msg_dput <- wrap_dput(msg)
-      cmd <- paste0("RKernel:::handle_request(", msg_dput, ")")
-      resp <- self$repl$run_cmd(cmd)
-      # log_out("Response:")
-      # log_out(resp$stdout)
-      resp <- remove_prefix(resp$stdout, DLE) |> remove_suffix(DLE)
-      # log_out(resp)
-      resp <- remove_prefix(resp, MSG_BEGIN) |> remove_suffix(MSG_END)
-      # log_out(resp)
-      msg_unwrap(resp)
+      msg <- URLencode(to_json(msg))
+      resp <- self$session$http_get(slug="msg",
+                                    query=msg)
+      if(resp$type == "application/json") {
+        json_unwrap(resp$content)
+      }
+      else {
+          resp$content
+      }
     },
     r_send_request_noreply = function(msg){
-      # log_out("r_send_request_noreply")
-      msg_dput <- wrap_dput(msg)
-      cmd <- paste0("RKernel:::handle_request(", msg_dput, ")")
-      self$repl$run_code(cmd, echo = FALSE, until_prompt = TRUE,
-                         debug = FALSE)
+      private$r_send_request(msg)
       return(invisible())
     },
     r_send_cmd = function(cmd) {

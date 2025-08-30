@@ -44,6 +44,7 @@ HTTPServer <- R6Class("HTTPServer",
             self$add_http_handler("eval",http_eval)
             self$add_http_handler("data",http_data)
             self$add_http_handler("graphics",http_graphics)
+            self$add_http_handler("msg",http_msg)
         },
         add_http_handler = function(name, handler){
             private$handlers[[name]] <- handler
@@ -319,6 +320,29 @@ redirect2docroot <- function() {
       headers=NULL,
       "status code" = 200L
       )
+}
+
+#' Handle a generic message request sent via getting from an
+#' url with the slug 'msg'.
+#' @param path The url, excluding the hostname and port, but including
+#'    the slug "data" and the name of an R object.
+#' @param query The query string translated into a character vector.
+http_msg <- function(path, query, ...) {
+  msg <- json_unwrap(query)
+  resp <- handle_request(msg)
+  if(length(resp)) {
+    payload <- to_json(resp)
+    content_type <- "application/json"
+  } else {
+    payload <- "OK"
+    content_type <- "text/plain"
+  }
+  list(
+      payload = payload,
+      "content-type" = content_type,
+      headers=NULL,
+      "status code" = 200L
+  )
 }
 
 #' Send a GET request to an URL and read the response.
