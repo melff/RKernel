@@ -132,3 +132,5 @@ reference:
   - httpd_url
   - set_http_port
   - show_http_log
+  - url_prefix
+  - fix_localhost

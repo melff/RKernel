@@ -200,6 +200,7 @@ url2iframe <- function(url,
                       class = "rkernel-iframe",
                       style = "border-style:none",
                       ...){
+    url <- fix_localhost(url)
 
     resize_style <-"<style>
     .resizer { display:flex; margin:0; padding:0; resize:both; overflow:hidden }
@@ -440,6 +441,8 @@ update_list <- function(l1, l2) {
 }
 
 rkernel_urlbrowser <- function(url) {
+    log_out("rkernel_urlbrowser()")
+    log_out(paste0("url = ",url))
     if(jupyter_gui()) {
       if(startsWith(url,"/")) {
         url <- paste0("file://",url)

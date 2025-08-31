@@ -90,7 +90,7 @@ display_data.htmlwidget <- function(x,...,
                             metadata=emptyNamedList,
                             id=UUIDgenerate(),
                             update=FALSE){
-
+    log("display_data.htmlwidget")
     path <- getOption("htmlwidgets_path","htmlwidgets")
     embed <- getOption("htmlwidgets_embed",TRUE)
     embed <- embed && !inherits(x,"plotly")

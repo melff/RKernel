@@ -2,10 +2,10 @@
 % Please edit documentation in R/httpd.R
 \name{httpd_port}
 \alias{httpd_port}
-\title{Get the URL of the HTTP server.}
+\title{Get the port of the HTTP server.}
 \usage{
 httpd_port()
 }
 \description{
-Get the URL of the HTTP server.
+Get the port of the HTTP server.
 }

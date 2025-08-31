@@ -13,6 +13,9 @@ HTTPServer <- R6Class("HTTPServer",
         get_port = function(){
             return(private$http_port)
         },
+        get_prefix = function() {
+            return(private$url_prefix)
+        },
         start = function(){
             options(help.ports = private$http_port)
             suppressMessages(port <- tools::startDynamicHelp(NA))
@@ -28,16 +31,18 @@ HTTPServer <- R6Class("HTTPServer",
             jupyterhub_prefix <- Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")
             if(nzchar(jupyterhub_prefix)) private$use_proxy <- TRUE
             if(private$use_proxy){
-                http_url <- sprintf("/proxy/%d",port)
+                url_prefix <- "/proxy/"
                 if(nzchar(jupyterhub_prefix)){
-                    http_url <- paste0(jupyterhub_prefix,http_url)
-                    http_url <- gsub("//","/",http_url,fixed=TRUE)
+                    url_prefix <- paste0(jupyterhub_prefix,url_prefix)
+                    url_prefix <- gsub("//","/",url_prefix,fixed=TRUE)
                 }
             }
             else {
-                http_url <- sprintf("http://localhost:%d",port)
+                url_prefix <- "http://localhost:"
             }
+            http_url <- paste0(url_prefix,port)
             private$http_url <- http_url
+            private$url_prefix <- url_prefix
             private$httpd_orig <- getFromNamespace("httpd","tools")
             replace_in_package("tools","httpd",private$httpd)
             self$add_http_handler("echo",http_echo)
@@ -60,6 +65,7 @@ HTTPServer <- R6Class("HTTPServer",
         http_url = NULL,
         http_port = 0,
         use_proxy = FALSE,
+        url_prefix = "http://localhost:",
         httpd_orig = NULL,
         handlers = NULL,
         httpd = function(path,query,...){
@@ -118,7 +124,7 @@ httpd_url <- get_help_url <- function(){
     return(url)
 }
 
-#' Get the URL of the HTTP server.
+#' Get the port of the HTTP server.
 #' @export
 httpd_port <- get_http_port <- function(){
     if(!length(http_server$current)) {
@@ -128,6 +134,43 @@ httpd_port <- get_http_port <- function(){
     }
     url <- http_server$current$get_port()
     return(url)
+}
+
+#' Get the prefix for internal URLs
+#' @export
+url_prefix <- function() {
+  url_prefix <- "http://localhost:"
+  jupyterhub_prefix <- Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")
+  if(nzchar(jupyterhub_prefix)) {
+      url_prefix <- "/proxy/"
+      url_prefix <- paste0(jupyterhub_prefix,url_prefix)
+      url_prefix <- gsub("//","/",url_prefix,fixed=TRUE)
+  }
+  url_prefix
+}
+
+#' Adapt an localhost URL so that it works from behind Jupyterhub
+#' @param url A character string
+#' @export
+fix_localhost <- function(url) {
+  log_out("fix_localhost")
+  if(http_is_proxied()) {
+      prefix <- url_prefix()
+      # prefix <- "somewhere/proxy/"
+      pattern <- character(0)
+      if(startsWith(url,"http://localhost:")) {
+        pattern <- "http://localhost:([0-9]+)"
+      }
+      if(startsWith(url,"http://127.0.0.1:")) {
+        pattern <- "http://127.0.0.1:([0-9]+)"
+      }
+      if(length(pattern)) {
+        replacement <- paste0(prefix,"\\1/")
+        url <- sub(pattern,replacement,url)
+        url <- gsub("//","/",url)
+      }
+  } 
+  url
 }
 
 #' Add a handler for HTTP requests with slug given by `slug`.
@@ -156,7 +199,9 @@ has_http_handler <- function(slug) {
 #' `http://localhost:<PORT>`. 
 #' @export
 http_is_proxied <- function() {
-    http_server$current$proxied()
+    # http_server$current$proxied()
+    jupyterhub_prefix <- Sys.getenv("JUPYTERHUB_SERVICE_PREFIX")
+    nzchar(jupyterhub_prefix)
 }
 
 #' Handle requests with slug "echo".
