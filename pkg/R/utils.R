@@ -423,9 +423,9 @@ install_globalCallingHandlers <- function() {
 
 preproc_code <- function(code) {
   # log_out("preproc_code")
-  parsed <- str2expression(code)
-  lapply(parsed, deparse)
-  # unlist(lapply(res,pasteCR))
+  parsed <- parse(text=code,keep.source=TRUE)
+  srcref <- attr(parsed,"srcref")
+  lapply(srcref,as.character,useSource=TRUE)
 }
 
 pasteCR <- function(x) {

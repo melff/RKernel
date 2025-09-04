@@ -68,6 +68,8 @@ RSessionBase <- R6Class("RSessionBase",
       self$drop_last_input <- drop_echo
       if(drop_echo) {
         self$last_input <- text
+      } else {
+        self$last_input <- ""
       }
       while (TRUE) {
         text <- self$write_input(text)
@@ -376,7 +378,11 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         echo = self$echo,
         debug = FALSE
       ) {
-      if(debug) log_out("run_code()")
+      if(debug) {
+        log_out("==== run_code() ====")
+        log_str(code)
+        log_out(code)
+      }
       if(!is.character(code) || 
          length(code) < 1) return()
       if(length(code) > 1) {
@@ -385,6 +391,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       if(nzchar(code)) {
         code <- split_lines1(code) 
       }
+      if(debug) log_out(sprintf("Code has %d lines",length(code)))
       for(line in code) {
         if(debug) log_out(sprintf("Sending input '%s'",line))
         self$session$send_input(line)
@@ -473,6 +480,10 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         stopifnot(is.function(stderr_callback))
         session <- self$session
         resp <- session$receive_output(timeout = io_timeout)
+        if(debug) {
+            log_out("======== process_output ==========")
+            log_out(resp$stdout)
+        }
         self$found_browse_prompt <- character(0)
         self$found_prompt <- FALSE
         if (!is.null(resp$stderr) 
@@ -481,10 +492,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               stderr_callback(resp$stderr)
         }
         if (!is.null(resp$stdout)) {
-          if(debug) {
-            log_out("======== process_output ==========")
-            log_out(resp$stdout)
-          }
           if(drop_echo) {
             if(debug) log_out("dropping echo")
             resp$stdout <- drop_echo(resp$stdout)
@@ -527,9 +534,9 @@ RSessionAdapter <- R6Class("RSessionAdapter",
               session$send_input("Q")
             }
           }
-          if(debug) {
-            log_out("= DONE = process_output ==========")
-          }
+        }
+        if(debug) {
+          log_out("= DONE = process_output ==========")
         }
     },
     #' @description Run a one-line command without checking and return the 
