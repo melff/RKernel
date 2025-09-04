@@ -63,5 +63,5 @@ This kernel differs from the already existing [*IRKernel*](http://irkernel.githu
     
 Some demonstration notebooks can be found [here](https://tmphub.elff.eu/user-redirect/).
     
-A widget demonstration can be found [here](https://tmphub.elff.eu/user-redirect/voila/render/RKernel-demo-interact-linear-regression.ipynb).
+Widgets demonstrations can be found [here](https://voila.elff.eu/voila/render/RKernel-demo-interact-linear-regression.ipynb) and [here](https://voila.elff.eu/voila/render/RKernel-SVGWidget-demo-distributions.ipynb).
     
