@@ -61,7 +61,7 @@ dt_data_fetcher <- function(path,query,postBody,headers){
     from <- start + 1
     to <- min(nrow(obj),start + len)
     ii <- seq(from=from,to=to)
-    data <- obj[ii,,drop=FALSE]
+    data <- fmt_tab_section(obj,ii,seq.int(ncol(obj)))
     rown <- attr(data,"row.names")
     if(is.integer(rown)) rown <- ii
     data <- cbind("row.names"=rown,as.matrix(format(data)))
