@@ -128,11 +128,9 @@ RSessionRunner <- R6Class("RSessionRunner",
     },
     handle_stdout = function(text) {
       private$stdout_filter$process(text)
-      self$process_graphics()
     },
     handle_stderr = function(text) {
       private$stderr_filter$process(text)
-      self$process_graphics()
     },
 
     force_new_graphics_display = FALSE,
