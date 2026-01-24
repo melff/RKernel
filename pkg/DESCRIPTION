@@ -71,6 +71,7 @@ Collate:
     'widget-button.R'
     'debugging.R'
     'dictionary.R'
+    'display-codeplan.R'
     'display.R'
     'env-browser.R'
     'events.R'

@@ -1,0 +1,114 @@
+table.codeplan-table {
+    border-collapse: separate !important;
+    border-spacing: 0;
+}
+
+table.codeplan-table thead {
+    position: sticky;
+    top: 0;
+}
+
+table.codeplan-table {
+    width: 100%;
+}
+
+.codeplan-table th {
+    text-align: left !important;
+    color: black;
+    background-color:  #f7f7f7;
+    border: 1px solid #cfcfcf; 
+    padding: 0.5ex 0.5ex;
+    vertical-align: top;
+}
+.codeplan-table td {
+    text-align: left !important;
+    color: black;
+    background-color: white;
+    border: 1px solid #cfcfcf; 
+    padding: 0.5ex 0.5ex;
+    vertical-align: top;
+}
+
+.codeplan-table th.border-top,
+.codeplan-table td.border-top {
+    border-top: 1px solid #cfcfcf;    
+}
+
+.codeplan-table th.border-left,
+.codeplan-table td.border-left {
+    border-left: 1px solid #cfcfcf;    
+}
+
+.codeplan-table th.border-right,
+.codeplan-table td.border-right {
+    border-right: 1px solid #cfcfcf;    
+}
+
+.codeplan-table th.no-border-bottom,
+.codeplan-table td.no-border-bottom {
+    border-bottom: none;    
+}
+
+.codeplan-table col.codeplan-desc {
+    width: auto;
+}
+
+.codeplan-table col.codeplan-varname {
+    width: 15ex;
+}
+
+.codeplan-table col.codeplan-measurement {
+    width: 15ex;
+}
+
+.codeplan-table col.codeplan-mode {
+    width: 9ex;
+}
+
+.codeplan-table col.codeplan-vfilter {
+    width: 17.5ex;
+}
+
+.codeplan-table col.codeplan-labels {
+    width: 30ex;
+}
+
+.jp-RenderedHTMLCommon table.codeplan-details,
+table.codeplan-details {
+    margin-left: -0.5ex;
+    margin-right: -0.5ex;
+    margin-bottom: -0.5ex;
+    width: 100%;
+}
+
+.codeplan-table td details {
+    margin-right: -1ex;
+}
+
+
+.codeplan-table .codeplan-details td {
+    border: none;
+}
+
+.codeplan-details td.vallab-value {
+    width: 4ex;
+    text-align: right !important;
+}
+
+.codeplan-details td.vallab-value {
+    width: 4ex;
+    text-align: right !important;
+}
+
+.codeplan-details col.annot-name {
+    width: 10ex;
+}
+
+.codeplan-details td.vfilter-value {
+    text-align: right !important;
+}
+
+.codeplan-wrapper {
+    overflow: auto;
+    max-height: 336px;
+}

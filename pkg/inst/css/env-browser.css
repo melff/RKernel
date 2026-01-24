@@ -135,6 +135,11 @@ tbody.subtable {
     /* height: 300px */
 }
 
+.env-browser-wrapper details > summary::marker {
+    display: none;
+    content:"";
+}
+
 .env-browser-wrapper details[open] > summary {
     margin-bottom: 0;
 }
