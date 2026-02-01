@@ -239,8 +239,8 @@ drop_prompt <- function(txt, prompt="> ") {
 }
 
 
-XON <- '\x11'
-XOFF <- '\x13'
+XON <- "\x11"
+XOFF <- "\x13"
 XOFFXON <- paste0(XOFF,XON)
 
 #' A Rich R Session Interface
@@ -497,7 +497,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         self$found_prompt <- FALSE
         if (!is.null(resp$stderr) 
               && nzchar(resp$stderr)
-              && grepl('\\S',resp$stderr)) {
+              && grepl("\\S",resp$stderr)) {
               stderr_callback(resp$stderr)
         }
         if (!is.null(resp$stdout)) {

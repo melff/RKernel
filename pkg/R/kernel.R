@@ -42,7 +42,7 @@ Kernel <- R6Class("Kernel",
       private$sockets$shell   <-  zmq.socket(private$zmqctx, private$.pbd_env$ZMQ.ST$ROUTER)
       for(s in private$sockets[c("control","stdin","shell")])
         zmq.setsockopt(s, private$.pbd_env$ZMQ.SO$ROUTER_HANDOVER, 1L)
-      url <- paste0(conn_info$transport, '://', conn_info$ip)
+      url <- paste0(conn_info$transport, "://", conn_info$ip)
       url_sep <- switch(conn_info$transport, tcp=":", ipc="-")
       for(s in c("hb","iopub","control","stdin","shell")){
         port_name <- paste0(s,"_port")
@@ -1374,11 +1374,11 @@ Kernel <- R6Class("Kernel",
       } else {
         name <- names(args)[1]
       }
-      if(name == 'all') {
+      if(name == "all") {
         return(
           private$stop_all_detached()
         )
-      } else if(name == 'latest' && (!'latest' %in% names(private$detached_cells))) {
+      } else if(name == "latest" && (!"latest" %in% names(private$detached_cells))) {
         i <- length(private$detached_cells)
         if(i == 0) return(NULL)
         runner <- private$detached_cells[[i]]
