@@ -379,32 +379,44 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         code <- split_lines1(code) 
       }
       if(debug) log_out(sprintf("Code has %d lines",length(code)))
+      # Make sure that we are at a code input prompt
+      while(until_prompt && !self$found_prompt) {
+          if(self$poll_output(io_timeout = 1000)) {
+              self$process_output(
+                       stdout_callback = stdout_callback,
+                       stderr_callback = stderr_callback,
+                       browser_callback = browser_callback,
+                       input_callback = input_callback,
+                       prompt_callback = prompt_callback,
+                       drop_echo = FALSE,
+                       debug = debug)
+          }
+      }
       for(line in code) {
         if(debug) log_out(sprintf("Sending input '%s'",line))
         self$session$send_input(line)
-        self$process_output(
-                              io_timeout = 1,
-                              stdout_callback = stdout_callback,
-                              stderr_callback = stderr_callback,
-                              browser_callback = browser_callback,
-                              input_callback = input_callback,
-                              prompt_callback = prompt_callback,
-                              drop_echo = !echo,
-                              debug = debug)
-        #output <- self$collect()
-        #stderr_callback(output$stderr)
-        #stdout_callback(output$stdout)
+        if(self$poll_output(io_timeout = 1000)) {
+            self$process_output(
+                     stdout_callback = stdout_callback,
+                     stderr_callback = stderr_callback,
+                     browser_callback = browser_callback,
+                     input_callback = input_callback,
+                     prompt_callback = prompt_callback,
+                     drop_echo = !echo,
+                     debug = debug)
+        }
       }
       while(until_prompt && !self$found_prompt){
-          self$process_output(
-                              io_timeout = io_timeout,
-                              stdout_callback = stdout_callback,
-                              stderr_callback = stderr_callback,
-                              browser_callback = browser_callback,
-                              input_callback = input_callback,
-                              prompt_callback = prompt_callback,
-                              drop_echo = FALSE,
-                              debug = debug)
+          if(self$poll_output(io_timeout = io_timeout)) {
+              self$process_output(
+                       stdout_callback = stdout_callback,
+                       stderr_callback = stderr_callback,
+                       browser_callback = browser_callback,
+                       input_callback = input_callback,
+                       prompt_callback = prompt_callback,
+                       drop_echo = FALSE,
+                       debug = debug)
+          }
       }
     },
     #' @description Send an interrupt signal (SIGINT) to the R process. This
@@ -437,9 +449,20 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         # log_out("trying again ...")
       }
     },
+    current_output = list(),
+    poll_output = function(io_timeout = 1) {
+        ready <- FALSE
+        self$current_output <- list()
+        resp <- self$session$receive_output(timeout = io_timeout)
+        if(length(resp$stdout) || length(resp$stderr)) {
+            self$current_output <- resp
+            ready <- TRUE
+        }
+        ready
+    },
     #' @field found_prompt A logical value, whether a prompt has been found
     #'    in the output of the R process
-    found_prompt = FALSE,
+    found_prompt = TRUE,
     #' @field found_browse_prompt The latest instance of the browser prompt
     #'    pattern found in the R process output
     found_browse_prompt = character(0),
@@ -454,7 +477,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
     #'    until a command prompt is encountered.
     #' @param drop_echo A logical value, whether input echo be dropped
    process_output = function(
-        io_timeout = 1,
         stdout_callback = self$stdout_callback,
         stderr_callback = self$stderr_callback,
         browser_callback = self$browser_callback,
@@ -465,12 +487,12 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       ) {
         stopifnot(is.function(stdout_callback))
         stopifnot(is.function(stderr_callback))
-        session <- self$session
-        resp <- session$receive_output(timeout = io_timeout)
+        resp <- self$current_output
         if(debug) {
             log_out("======== process_output ==========")
             log_out(resp$stdout)
         }
+        
         self$found_browse_prompt <- character(0)
         self$found_prompt <- FALSE
         if (!is.null(resp$stderr) 
