@@ -257,6 +257,8 @@ RSessionAdapter <- R6Class("RSessionAdapter",
     session = NULL,
     #' @field prompt The R console prompt or NULL
     prompt = NULL,
+    #' @field coprompt The R console continuation prompt or NULL
+    coprompt = NULL,
     #' @field browse_prompt The prompt created by a call to `browser()`
     browse_prompt = "Browse\\[([0-9]+)\\]> $",
     #' @field io_timeout An integer number a timeout in microseconds
@@ -327,10 +329,12 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       prompt_callback = NULL,
       input_callback = NULL,
       prompt = "> ",
+      coprompt = "+ ",
       echo = FALSE
     ) {
       self$session <- session
       self$prompt <- prompt
+      self$coprompt <- coprompt
       self$stdout_callback <- stdout_callback
       self$stderr_callback <- stderr_callback
       self$browser_callback <- browser_callback
