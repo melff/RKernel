@@ -132,8 +132,8 @@ Kernel <- R6Class("Kernel",
       drop = NULL
       ){
         private$run_services()
-        if(self$session$is_alive()) {
-          self$repl$process_output()
+        if(self$session$is_alive() && self$repl$poll_output()) {
+            self$repl$process_output()
         }
         # log_out(sprintf("poll_timeout = %d",poll_timeout))
         req <- private$poll_request(c("hb","control","shell"),timeout=poll_timeout)
@@ -1348,12 +1348,14 @@ Kernel <- R6Class("Kernel",
           if(this$iter == 1) de <- TRUE
           else de <- FALSE
           repl$found_prompt <- FALSE
-          repl$process_output(drop_echo=de)
-          if(repl$found_prompt) {
+          if(repl$poll_output()) {
+            repl$process_output(drop_echo=de)
+            if(repl$found_prompt) {
             # log_out("Found prompt")
-            this$iter <- 0
-          } else {
-            this$iter <- this$iter + 1
+              this$iter <- 0
+            } else {
+              this$iter <- this$iter + 1
+            }
           }
           continue <- TRUE
         }
