@@ -51,12 +51,6 @@ RSessionBase <- R6Class("RSessionBase",
     sleeping = function() {
       self$get_status() == "sleeping"
     },
-    #' @field drop_last_input A logical value, whether to drop the echo of
-    #'    the last input
-    drop_last_input = FALSE,
-    #' @field last_input A character string, the last input sent to the
-    #'    R session. Needed to filter out the echo of the input.
-    last_input = "",
     #' @description Send input text to the R process
     #' @param text A character string
     #' @param drop_echo A logical value, whether to drop the echo from
@@ -65,12 +59,6 @@ RSessionBase <- R6Class("RSessionBase",
       if(!length(text) || !is.character(text)) return(invisible())
       if(length(text) > 1) text <- paste(text,collapse="\n")
       if(!endsWith(text, "\n")) text <- paste0(text, "\n")
-      self$drop_last_input <- drop_echo
-      if(drop_echo) {
-        self$last_input <- text
-      } else {
-        self$last_input <- ""
-      }
       while (TRUE) {
         text <- self$write_input(text)
         if (!length(text)) {
@@ -83,11 +71,6 @@ RSessionBase <- R6Class("RSessionBase",
     #' @param n The number of characters to read
     read_output = function(n = -1) {
       res <- super$read_output(n = n)
-      if(self$drop_last_input) {
-          res <- remove_prefix(res,self$last_input)
-          self$drop_last_input <- FALSE
-          self$last_input <- ""
-      }
       res
     },
     #' @description Poll R process for output and read it
