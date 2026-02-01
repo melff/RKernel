@@ -13,7 +13,7 @@ and for a REPL created by a call to browser().'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,6 +60,10 @@ and for a REPL created by a call to browser().</p>
 
 <dt><code>prompt</code></dt>
 <dd><p>The R console prompt or NULL</p></dd>
+
+
+<dt><code>coprompt</code></dt>
+<dd><p>The R console continuation prompt or NULL</p></dd>
 
 
 <dt><code>browse_prompt</code></dt>
@@ -135,6 +139,7 @@ session</p></dd>
 <li><p><a href="#method-RSessionAdapter-new"><code>RSessionAdapter$new()</code></a></p></li>
 <li><p><a href="#method-RSessionAdapter-run_code"><code>RSessionAdapter$run_code()</code></a></p></li>
 <li><p><a href="#method-RSessionAdapter-interrupt"><code>RSessionAdapter$interrupt()</code></a></p></li>
+<li><p><a href="#method-RSessionAdapter-poll_output"><code>RSessionAdapter$poll_output()</code></a></p></li>
 <li><p><a href="#method-RSessionAdapter-process_output"><code>RSessionAdapter$process_output()</code></a></p></li>
 <li><p><a href="#method-RSessionAdapter-run_cmd"><code>RSessionAdapter$run_cmd()</code></a></p></li>
 <li><p><a href="#method-RSessionAdapter-getOption"><code>RSessionAdapter$getOption()</code></a></p></li>
@@ -223,6 +228,7 @@ cleared after being returned.</p></dd>
 <span>  prompt_callback <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  input_callback <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prompt <span class="op">=</span> <span class="st">"&gt; "</span>,</span>
+<span>  coprompt <span class="op">=</span> <span class="st">"+ "</span>,</span>
 <span>  echo <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -333,12 +339,20 @@ until a command prompt is encountered.</p></dd>
 </div>
 
 
+</div><p></p><hr><a id="method-RSessionAdapter-poll_output"></a><div class="section">
+<h3 id="method-poll-output-">Method <code>poll_output()</code><a class="anchor" aria-label="anchor" href="#method-poll-output-"></a></h3>
+
+<div class="section">
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">poll_output</span><span class="op">(</span>io_timeout <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-RSessionAdapter-process_output"></a><div class="section">
 <h3 id="method-process-output-">Method <code>process_output()</code><a class="anchor" aria-label="anchor" href="#method-process-output-"></a></h3>
 <p>Process output created by commands sent to the R process</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">process_output</span><span class="op">(</span></span>
-<span>  io_timeout <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  stdout_callback <span class="op">=</span> <span class="va">self</span><span class="op">$</span><span class="va">stdout_callback</span>,</span>
 <span>  stderr_callback <span class="op">=</span> <span class="va">self</span><span class="op">$</span><span class="va">stderr_callback</span>,</span>
 <span>  browser_callback <span class="op">=</span> <span class="va">self</span><span class="op">$</span><span class="va">browser_callback</span>,</span>
@@ -351,11 +365,7 @@ until a command prompt is encountered.</p></dd>
 
 <div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>io_timeout</code></dt>
-<dd><p>An integer value, the timeout of waiting for output</p></dd>
-
-
-<dt><code>stdout_callback</code></dt>
+<p></p><div class="arguments"><dl><dt><code>stdout_callback</code></dt>
 <dd><p>A callback function for "stdout" output</p></dd>
 
 
@@ -379,6 +389,10 @@ until a command prompt is encountered.</p></dd>
 <dd><p>A logical value, whether input echo be dropped</p></dd>
 
 
+<dt><code>io_timeout</code></dt>
+<dd><p>An integer value, the timeout of waiting for output</p></dd>
+
+
 <dt><code>until_prompt</code></dt>
 <dd><p>A logical value, whether process and wait output
 until a command prompt is encountered.</p></dd>
@@ -391,7 +405,7 @@ until a command prompt is encountered.</p></dd>
 <h3 id="method-run-cmd-">Method <code>run_cmd()</code><a class="anchor" aria-label="anchor" href="#method-run-cmd-"></a></h3>
 <p>Run a one-line command without checking and return the
     output</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">run_cmd</span><span class="op">(</span><span class="va">cmd</span>, debug <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -407,7 +421,7 @@ until a command prompt is encountered.</p></dd>
 </div><p></p><hr><a id="method-RSessionAdapter-getOption"></a><div class="section">
 <h3 id="method-getoption-">Method <code><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption()</a></code><a class="anchor" aria-label="anchor" href="#method-getoption-"></a></h3>
 <p>Get an option value from the R session</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">getOption</span><span class="op">(</span><span class="va">n</span>, default <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -428,7 +442,7 @@ until a command prompt is encountered.</p></dd>
 <h3 id="method-eval-">Method <code><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval()</a></code><a class="anchor" aria-label="anchor" href="#method-eval-"></a></h3>
 <p>Evaluate an expression in the R session and return the
    result.</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">eval</span><span class="op">(</span><span class="va">expr</span>, safe <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -449,7 +463,7 @@ until a command prompt is encountered.</p></dd>
 <h3 id="method-eval-code-">Method <code>eval_code()</code><a class="anchor" aria-label="anchor" href="#method-eval-code-"></a></h3>
 <p>Evaluate some code in the R session and return the
    result.</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">eval_code</span><span class="op">(</span><span class="va">code</span>, safe <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -469,7 +483,7 @@ until a command prompt is encountered.</p></dd>
 </div><p></p><hr><a id="method-RSessionAdapter-ls"></a><div class="section">
 <h3 id="method-ls-">Method <code><a href="https://rdrr.io/r/base/ls.html" class="external-link">ls()</a></code><a class="anchor" aria-label="anchor" href="#method-ls-"></a></h3>
 <p>Run `ls()` in the R session and return the result.</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">ls</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -478,7 +492,7 @@ until a command prompt is encountered.</p></dd>
 <h3 id="method-get-">Method <code><a href="https://rdrr.io/r/base/get.html" class="external-link">get()</a></code><a class="anchor" aria-label="anchor" href="#method-get-"></a></h3>
 <p>Get the value of a variable (named object) from the
    R session and return it.</p><div class="section">
-<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">get</span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -494,7 +508,7 @@ until a command prompt is encountered.</p></dd>
 </div><p></p><hr><a id="method-RSessionAdapter-assign"></a><div class="section">
 <h3 id="method-assign-">Method <code><a href="https://rdrr.io/r/base/assign.html" class="external-link">assign()</a></code><a class="anchor" aria-label="anchor" href="#method-assign-"></a></h3>
 <p>Assign a value to a variable in the R session</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">assign</span><span class="op">(</span><span class="va">n</span>, <span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -514,7 +528,7 @@ until a command prompt is encountered.</p></dd>
 </div><p></p><hr><a id="method-RSessionAdapter-setOption"></a><div class="section">
 <h3 id="method-setoption-">Method <code>setOption()</code><a class="anchor" aria-label="anchor" href="#method-setoption-"></a></h3>
 <p>Set an option in the R session</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">setOption</span><span class="op">(</span><span class="va">n</span>, <span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -535,7 +549,7 @@ until a command prompt is encountered.</p></dd>
 <h3 id="method-importoption-">Method <code>importOption()</code><a class="anchor" aria-label="anchor" href="#method-importoption-"></a></h3>
 <p>Import an option value from the R session to the
    kernel</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">importOption</span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -552,7 +566,7 @@ until a command prompt is encountered.</p></dd>
 <h3 id="method-handle-bel-">Method <code>handle_BEL()</code><a class="anchor" aria-label="anchor" href="#method-handle-bel-"></a></h3>
 <p>Handle special output from the R session that starts
    with BEL</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">handle_BEL</span><span class="op">(</span></span>
 <span>  <span class="va">txt</span>,</span>
 <span>  <span class="va">input_callback</span>,</span>
@@ -588,7 +602,7 @@ R session via "stderr" channel</p></dd>
 <h3 id="method-handle-readline-">Method <code>handle_readline()</code><a class="anchor" aria-label="anchor" href="#method-handle-readline-"></a></h3>
 <p>Handle special an input request obtained from the
    R session via output indicated with a special output string</p><div class="section">
-<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">handle_readline</span><span class="op">(</span></span>
 <span>  <span class="va">txt</span>,</span>
 <span>  <span class="va">input_callback</span>,</span>
@@ -624,7 +638,7 @@ R session via "stderr" channel</p></dd>
 <h3 id="method-handle-scan-">Method <code>handle_scan()</code><a class="anchor" aria-label="anchor" href="#method-handle-scan-"></a></h3>
 <p>Handle input request created by the function `scan` the
    in the R session</p><div class="section">
-<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">handle_scan</span><span class="op">(</span></span>
 <span>  <span class="va">txt</span>,</span>
 <span>  <span class="va">input_callback</span>,</span>
@@ -659,7 +673,7 @@ R session via "stderr" channel</p></dd>
 </div><p></p><hr><a id="method-RSessionAdapter-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
+<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RSessionAdapter</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 

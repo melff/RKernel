@@ -15,6 +15,10 @@ to browser().
 
   The R console prompt or NULL
 
+- `coprompt`:
+
+  The R console continuation prompt or NULL
+
 - `browse_prompt`:
 
   The prompt created by a call to \`browser()\`
@@ -84,6 +88,8 @@ to browser().
 - [`RSessionAdapter$run_code()`](#method-RSessionAdapter-run_code)
 
 - [`RSessionAdapter$interrupt()`](#method-RSessionAdapter-interrupt)
+
+- [`RSessionAdapter$poll_output()`](#method-RSessionAdapter-poll_output)
 
 - [`RSessionAdapter$process_output()`](#method-RSessionAdapter-process_output)
 
@@ -189,6 +195,7 @@ Initialize an object
       prompt_callback = NULL,
       input_callback = NULL,
       prompt = "> ",
+      coprompt = "+ ",
       echo = FALSE
     )
 
@@ -299,6 +306,14 @@ what the R process is doing without killing it.
 
 ------------------------------------------------------------------------
 
+### Method `poll_output()`
+
+#### Usage
+
+    RSessionAdapter$poll_output(io_timeout = 1)
+
+------------------------------------------------------------------------
+
 ### Method `process_output()`
 
 Process output created by commands sent to the R process
@@ -306,7 +321,6 @@ Process output created by commands sent to the R process
 #### Usage
 
     RSessionAdapter$process_output(
-      io_timeout = 1,
       stdout_callback = self$stdout_callback,
       stderr_callback = self$stderr_callback,
       browser_callback = self$browser_callback,
@@ -317,10 +331,6 @@ Process output created by commands sent to the R process
     )
 
 #### Arguments
-
-- `io_timeout`:
-
-  An integer value, the timeout of waiting for output
 
 - `stdout_callback`:
 
@@ -345,6 +355,10 @@ Process output created by commands sent to the R process
 - `drop_echo`:
 
   A logical value, whether input echo be dropped
+
+- `io_timeout`:
+
+  An integer value, the timeout of waiting for output
 
 - `until_prompt`:
 

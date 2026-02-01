@@ -27,15 +27,6 @@ inherit from this class.
 
   A logical value, whether the R session is waiting for input.
 
-- `drop_last_input`:
-
-  A logical value, whether to drop the echo of the last input
-
-- `last_input`:
-
-  A character string, the last input sent to the R session. Needed to
-  filter out the echo of the input.
-
 ## Methods
 
 ### Public methods
