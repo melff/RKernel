@@ -10,7 +10,6 @@ RCHKIMG := kalibera-rchk-master-def.simg
 #export R_LIBS_USER = $(PWD)/lib/R/library
 
 .PHONY: default
-
 default: install-quick installspec 
 	date
 
