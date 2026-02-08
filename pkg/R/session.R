@@ -217,12 +217,13 @@ split_lines1 <- function(x) {
 # @param txt A character string, the output from which the echo
 #     is to be dropped
 # @param n The number of lines to drop
-drop_echo <- function(txt, n = 1) {
+# @param coprompt The continuation prompt
+drop_echo <- function(txt, n = 1, coprompt = "+ ") {
   if(length(txt) && nzchar(txt)){
       out_lines <- split_lines1(txt)
       ii <- 1:n
       out_lines <- out_lines[-ii]
-      drop <- startsWith(out_lines, "+")
+      drop <- endsWith(out_lines, coprompt)
       out_lines <- out_lines[!drop]
       txt <- paste(out_lines, collapse = "\n")
   }
