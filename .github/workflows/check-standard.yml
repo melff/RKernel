@@ -51,7 +51,6 @@ jobs:
             any::htmltools
             any::htmlwidgets
             any::base64enc
-            any::unigd
             any::rappdirs
             any::roxygen2
             any::rsvg
