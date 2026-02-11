@@ -39,7 +39,6 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
-          extra-repositories: https://nx10.r-universe.dev
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -57,6 +56,10 @@ jobs:
             any::roxygen2
             any::rsvg
           needs: check
+
+      - name: Install unigd
+        run: install.packages('unigd', repos = c('https://nx10.r-universe.dev', 'https://cloud.r-project.org'))
+        shell: Rscript {0}
           
       - uses: r-lib/actions/check-r-package@v2
         env: 
