@@ -1,7 +1,7 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom curl curl_fetch_memory
 #' @importFrom jsonlite base64_enc
-#' @import unigd
+#' @import R6
 
 GraphicsClient <- R6Class("GraphicsClient",
   public = list(
