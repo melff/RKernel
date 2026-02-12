@@ -56,10 +56,6 @@ jobs:
             any::roxygen2
             any::rsvg
           needs: check
-
-      - name: Install unigd
-        run: install.packages('unigd', repos = c('https://nx10.r-universe.dev', 'https://cloud.r-project.org'))
-        shell: Rscript {0}
           
       - uses: r-lib/actions/check-r-package@v2
         env: 
