@@ -21,6 +21,7 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
   public = list(
       device = NULL,
       get_svg = NULL,
+      recordings = list(),
       initialize = function(width = 7,
                             height = 7) {
           self$get_svg <- svgstring(standalone=FALSE,
@@ -46,8 +47,14 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
                         format = "svg",
                         resolution = 288,
                         ...) {
-          dev.set(self$device)
-          plt <- recordPlot()
+          s0 <- self$get_svg()
+          n <- length(s0)
+          if(page == 0 || page == n) {
+              self$record()
+              plt <- self$recordings[[n]]
+          } else {
+              plt <- self$recordings[[page]]
+          }
           scale_correction <- 5/7 # svgstring pictures tend to be too large
           zoom <- zoom * scale_correction
           s <- svgstring(width      = width  * zoom,
@@ -58,8 +65,6 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
           data <- s()
           dev.off()
 
-          log_out(sprintf("Resolution = %f",resolution))
-          
           if(format == "pdf") {
               pdf_res <- 72
               data <- charToRaw(data)
@@ -98,6 +103,15 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
               active = self$is_active(),
               id = n,
               upid = digest(unclass(s[n])))
+      },
+      record = function() {
+          s <- self$get_svg()
+          n <- length(s)
+          cur_dev <- dev.cur()
+          dev.set(self$device)
+          plt <- recordPlot()
+          self$recordings[[n]] <- plt
+          dev.set(cur_dev)
       }
   )
 )

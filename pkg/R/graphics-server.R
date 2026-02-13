@@ -66,8 +66,8 @@ http_graphics_plot <- function(query) {
 start_graphics <- function(){
     setHook('plot.new', send_new_plot)
     setHook('grid.newpage', send_new_plot)
-    # setHook('before.plot.new', send_before_new_plot)
-    # setHook('before.grid.newpage', send_before_new_plot)
+    setHook('before.plot.new', send_before_new_plot)
+    setHook('before.grid.newpage', send_before_new_plot)
     options(device=svgstring)
     add_sync_options(c(
           "jupyter.plot.width",
@@ -98,6 +98,7 @@ send_new_plot <- function() {
 send_before_new_plot <- function() {
     if(graphics$renderer$is_active()){
         state <- graphics$renderer$state()
+        graphics$renderer$record()
         msg <- list(type="event",
                     content = list(event = "before_new_plot", 
                                    plot_id = state$id))
