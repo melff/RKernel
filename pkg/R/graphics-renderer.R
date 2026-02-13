@@ -44,31 +44,48 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
                         height = 7,
                         zoom = 1,
                         format = "svg",
+                        resolution = 288,
                         ...) {
           dev.set(self$device)
           plt <- recordPlot()
-          s <- svgstring(width=width,height=height,standalone=FALSE)
+          scale_correction <- 5/7 # svgstring pictures tend to be too large
+          zoom <- zoom * scale_correction
+          s <- svgstring(width      = width  * zoom,
+                         height     = height * zoom,
+                         standalone = FALSE,
+                         scaling    = zoom)
           replayPlot(plt)
           data <- s()
           dev.off()
+
+          log_out(sprintf("Resolution = %f",resolution))
           
           if(format == "pdf") {
+              pdf_res <- 72
               data <- charToRaw(data)
               data <- rsvg_pdf(data,
-                               width=width,
-                               height=height)
+                               width  = width  * zoom * pdf_res,
+                               height = height * zoom * pdf_res)
           } else if(format == "png") {
               data <- charToRaw(data)
-              data <- rsvg_png(data, width=width, height=height)
+              data <- rsvg_png(data,
+                               width  = width  * zoom * resolution,
+                               height = height * zoom * resolution)
           } else if(format == "webp") {
               data <- charToRaw(data)
-              data <- rsvg_webp(data, width=width, height=height)
+              data <- rsvg_webp(data,
+                                width  = width  * zoom * resolution,
+                                height = height * zoom * resolution)
           } else if(format == "postscript") {
               data <- charToRaw(data)
-              data <- rsvg_ps(data, width=width, height=height)
+              data <- rsvg_ps(data,
+                              width  = width  * zoom,
+                              height = height * zoom)
           } else if(format == "eps") {
               data <- charToRaw(data)
-              data <- rsvg_eps(data, width=width, height=height)
+              data <- rsvg_eps(data,
+                               width  = width  * zoom,
+                               height = height * zoom)
           } else if(!(format %in% c("svg","svgp"))) {
               data <- NULL
           }

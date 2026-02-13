@@ -95,7 +95,7 @@ GraphicsClient <- R6Class("GraphicsClient",
                       plot_id = integer(0),
                       width = getOption("jupyter.plot.width",self$width),
                       height = getOption("jupyter.plot.height",self$height),
-                      resolution = getOption("jupyter.plot.resolution",self$dpi),
+                      resolution = getOption("jupyter.plot.resolution",288),
                       zoom = getOption("jupyter.plot.zoom",1)) {
       if(self$internal) {
         data <- self$render_internal(
@@ -137,7 +137,7 @@ GraphicsClient <- R6Class("GraphicsClient",
                           plot_id = integer(0),
                           width = getOption("jupyter.plot.width",self$width),
                           height = getOption("jupyter.plot.height",self$height),
-                          resolution = getOption("jupyter.plot.resolution",self$dpi),
+                          resolution = getOption("jupyter.plot.resolution",288),
                           zoom = getOption("jupyter.plot.zoom",1)) {
         gurl <- self$get_render_url(format = format,
                                 plot_id = plot_id,
@@ -157,7 +157,7 @@ GraphicsClient <- R6Class("GraphicsClient",
                           plot_id = integer(0),
                           width = getOption("jupyter.plot.width",self$width),
                           height = getOption("jupyter.plot.height",self$height),
-                          resolution = getOption("jupyter.plot.resolution",self$dpi),
+                          resolution = getOption("jupyter.plot.resolution",288),
                           zoom = getOption("jupyter.plot.zoom",1)) {
       paste0(
         "http://",
@@ -169,29 +169,23 @@ GraphicsClient <- R6Class("GraphicsClient",
         "renderer=", format,"&",
         "width=", width,"&",
         "height=", height,"&",
+        "resolution=", resolution,"&",
         "zoom=",zoom)
     },
     render_internal = function(format = "svg", 
                           plot_id = integer(0),
                           width = getOption("jupyter.plot.width",self$width),
                           height = getOption("jupyter.plot.height",self$height),
-                          resolution = getOption("jupyter.plot.resolution",self$dpi),
+                          resolution = getOption("jupyter.plot.resolution",288),
                           zoom = getOption("jupyter.plot.zoom",1)) {
-      if(format %in% c("png", "tiff", "png-base64")) {
-        zoom <- resolution/self$dpi * zoom
-        width  <- width * resolution
-        height <- height * resolution
-      }
-      else {
-        width  <- width * self$dpi
-        height <- height * self$dpi
-      }
+
       content <- self$renderer$render(
         page = 0,
         width = width,
         height = height,
         zoom = zoom,
-        format = format
+        format = format,
+        resolution = resolution
       )
       ii <- match(format,self$formats)
       type <- self$mime_types[ii]

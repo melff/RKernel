@@ -34,7 +34,6 @@ from_query <- function(query, name, default) {
 http_graphics_plot <- function(query) {
   # log_out("http_graphics_plot")
   # log_print(query)
-    dpi <- 72
     plot_id <- as.integer(from_query(query, "id", 0))
     format <- from_query(query, "renderer", "svg")
     width <- as.numeric(from_query(query, "width", 
@@ -44,14 +43,15 @@ http_graphics_plot <- function(query) {
     zoom <- as.numeric(from_query(query, "zoom", 
                                   getOption("jupyter.plot.zoom",1)))
     resolution <- as.integer(from_query(query, "resolution", 
-                                        getOption("jupyter.plot.resolution",dpi)))
+                                        getOption("jupyter.plot.resolution",288)))
   
     data <- graphics$renderer$render(
-      page = plot_id,
-      width = width,
-      height = height,
-      zoom = zoom,
-      format = format
+      page       = plot_id,
+      width      = width,
+      height     = height,
+      zoom       = zoom,
+      format     = format,
+      resolution = resolution
     )
 
     type <- graphics$mime_types[format]
