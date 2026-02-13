@@ -59,7 +59,6 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
           zoom <- zoom * scale_correction
           s <- svgstring(width      = width  * zoom,
                          height     = height * zoom,
-                         standalone = FALSE,
                          scaling    = zoom)
           replayPlot(plt)
           data <- s()
