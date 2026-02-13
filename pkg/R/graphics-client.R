@@ -125,11 +125,14 @@ GraphicsClient <- R6Class("GraphicsClient",
       if(is.character(data$content)) {
         Encoding(data$content) <- "UTF-8"
       }
-      data$width <- width
-      data$height <- height
-      data$format <- format
-      data$zoom <- zoom
-      data$resolution <- resolution
+      data$meta_data <- list(
+          format = format,
+          plot_id = plot_id,
+          width = width,
+          height = height,
+          resolution = resolution,
+          zoom = zoom
+      )
       data
     },
 
@@ -201,7 +204,7 @@ GraphicsClient <- R6Class("GraphicsClient",
                            height = getOption("jupyter.plot.height",self$height),
                            resolution = getOption("jupyter.plot.resolution",288),
                            zoom = getOption("jupyter.plot.zoom",1)) {
-          log_out("== new_display")
+          # log_out("== new_display")
           if(!length(self$current_state) || 
             state$id > self$current_state$id 
           ) {
@@ -217,7 +220,7 @@ GraphicsClient <- R6Class("GraphicsClient",
                 display_id = display_id
               )
               self$display_obs[[display_id]] <- gd
-              gurl <- self$get_render_url(format = "svgp",
+              gurl <- self$get_render_url(format = "svg",
                                     plot_id = plot_id,
                                     width = width,
                                     height = height,
@@ -240,7 +243,7 @@ GraphicsClient <- R6Class("GraphicsClient",
                             update = TRUE,
                             formats = getOption("jupyter.plot.formats",c("png","svg","pdf"))
                             ) {
-      log_out("== render_display")
+      # log_out("== render_display")
       formats <- intersect(formats, self$formats)
       plot_id <- desc$plot_id
       display_id <- desc$display_id
@@ -275,19 +278,10 @@ GraphicsClient <- R6Class("GraphicsClient",
       structure(d,class=cl)
     },
     render_metadata = function(r, plot_id) {
-      m <- list(plot_id = plot_id)
-      if(r$format %in% c("png")) {
-        f <- self$dpi
-        m$width <- r$width * f
-        m$height <- r$height * f
-      } else if(r$format %in% c("svg")) {
-        f <- self$dpi
-        m$width <- r$width * f
-        m$height <- r$height * f
-      }
-      log_out("render_metadata")
-      log_print(m)
-      m
+        m <- r$meta_data
+        m$width <- m$width * m$zoom * 72
+        m$height <- m$height * m$zoom * 72
+        m
     },
     new_display_forced = FALSE,
     update_displays = function() {
