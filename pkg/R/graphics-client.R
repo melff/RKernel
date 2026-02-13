@@ -302,7 +302,7 @@ GraphicsClient <- R6Class("GraphicsClient",
         needs_new_display <- FALSE
         if(state$active && 
           state$id == display_ob$plot_id && 
-          state$upid > display_ob$upid) {
+          state$upid != display_ob$upid) {
           # Currently active device has changed
           if(self$new_display_forced) {
             self$new_display_forced <- FALSE
