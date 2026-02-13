@@ -111,6 +111,19 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
           plt <- recordPlot()
           self$recordings[[n]] <- plt
           dev.set(cur_dev)
+      },
+      par = NULL,
+      save_par = function() {
+          cur_dev <- dev.cur()
+          dev.set(self$device)
+          self$par <- par()
+          dev.set(cur_dev)
+      },
+      restore_par = function() {
+          cur_dev <- dev.cur()
+          dev.set(self$device)
+          par(self$par)
+          dev.set(cur_dev)
       }
   )
 )
