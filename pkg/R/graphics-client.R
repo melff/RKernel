@@ -11,34 +11,29 @@ GraphicsClient <- R6Class("GraphicsClient",
     device = NULL,
     session = NULL,
     interface = NULL,
+    renderer = NULL,
     initialize = function(interface = NULL, internal = FALSE) {
       self$internal <- internal
       if(internal) {
-        self$device <- dev.cur()
+        self$renderer <- GraphicsRenderer$new()
       } else {
         # log_out("graphics$initialize()")
-        self$interface <- interface
-        session <- interface$session
-        self$session <- session
-        # details <- session$graphics_details()
-        # log_print(details)
-        self$host <- "localhost"
-        self$port <- session$http_port
+          self$interface <- interface
+          session <- interface$session
+          self$session <- session
+          self$host <- "localhost"
+          self$port <- session$http_port
+          self$formats <- names(graphics$mime_types)
+          self$mime_types <- graphics$mime_types
+          self$binary_formats <- graphics$binary_formats[self$formats]
       }
-      ur <- subset(ugd_renderers(),type=="plot")
-      tikz <- which(ur$id == "tikz")
-      ur$mime[tikz] <- "text/latex"
-      self$formats <- ur$id
-      self$mime_types <- ur$mime
-      self$binary_formats <- !ur$text
     },
     restart = function() {
       if(self$internal) {
-        ugd()
-        self$device <- dev.cur()
+        self$renderer <- GraphicsRenderer$new()
       } else {
         # log_out("graphics$restart()")
-        self$session$send_receive("ugd()")
+        self$session$send_receive("restart_graphics()")
       }
     },
     id = 0,
@@ -66,11 +61,10 @@ GraphicsClient <- R6Class("GraphicsClient",
       }
     },
     get_current_state_internal = function() {
-      state <- ugd_state(self$device)
+      state <- self$renderer$state()
       list(
         active = state$active,
-        hsize = state$hsize,
-        id = state$hsize,
+        id = state$id,
         upid = state$upid
       )
     },
@@ -84,12 +78,10 @@ GraphicsClient <- R6Class("GraphicsClient",
       con <- url(gurl)
       resp <- readLines(con, warn = FALSE)
       close(con)
-      resp <- fromJSON(resp)
-      state <- resp$state
+      state <- fromJSON(resp)
       list(
         active = state$active,
-        hsize = state$hsize,
-        id = state$hsize,
+        id = state$id,
         upid = state$upid
       )
     },
@@ -99,7 +91,7 @@ GraphicsClient <- R6Class("GraphicsClient",
     width = 7,
     height = 7,
     dpi = 72,
-    render = function(format = "svgp", 
+    render = function(format = "svg", 
                       plot_id = integer(0),
                       width = getOption("jupyter.plot.width",self$width),
                       height = getOption("jupyter.plot.height",self$height),
@@ -121,7 +113,7 @@ GraphicsClient <- R6Class("GraphicsClient",
                                 height = height,
                                 resolution = resolution,
                                 zoom = zoom)
-      } 
+      }
       ii <- match(format, self$formats)
       if(is.raw(data$content)) {
         if(self$binary_formats[ii]) {
@@ -141,7 +133,7 @@ GraphicsClient <- R6Class("GraphicsClient",
       data
     },
 
-    render_http = function(format = "svgp", 
+    render_http = function(format = "svg", 
                           plot_id = integer(0),
                           width = getOption("jupyter.plot.width",self$width),
                           height = getOption("jupyter.plot.height",self$height),
@@ -161,7 +153,7 @@ GraphicsClient <- R6Class("GraphicsClient",
           type = resp$type
         )
     },
-    get_render_url = function(format = "svgp", 
+    get_render_url = function(format = "svg", 
                           plot_id = integer(0),
                           width = getOption("jupyter.plot.width",self$width),
                           height = getOption("jupyter.plot.height",self$height),
@@ -179,7 +171,7 @@ GraphicsClient <- R6Class("GraphicsClient",
         "height=", height,"&",
         "zoom=",zoom)
     },
-    render_internal = function(format = "svgp", 
+    render_internal = function(format = "svg", 
                           plot_id = integer(0),
                           width = getOption("jupyter.plot.width",self$width),
                           height = getOption("jupyter.plot.height",self$height),
@@ -194,13 +186,12 @@ GraphicsClient <- R6Class("GraphicsClient",
         width  <- width * self$dpi
         height <- height * self$dpi
       }
-      content <- ugd_render(
+      content <- self$renderer$render(
         page = 0,
         width = width,
         height = height,
         zoom = zoom,
-        as = format,
-        which = self$device
+        format = format
       )
       ii <- match(format,self$formats)
       type <- self$mime_types[ii]
@@ -216,9 +207,9 @@ GraphicsClient <- R6Class("GraphicsClient",
                            height = getOption("jupyter.plot.height",self$height),
                            resolution = getOption("jupyter.plot.resolution",288),
                            zoom = getOption("jupyter.plot.zoom",1)) {
-          # log_out("== new_display")
+          log_out("== new_display")
           if(!length(self$current_state) || 
-            state$hsize > self$current_state$hsize 
+            state$id > self$current_state$id 
           ) {
               display_id <- UUIDgenerate()
               # log_out(display_id)
@@ -253,8 +244,9 @@ GraphicsClient <- R6Class("GraphicsClient",
     display_res = 144,
     render_display = function(desc,
                             update = TRUE,
-                            formats = getOption("jupyter.plot.formats",c("png","svgp","pdf"))
+                            formats = getOption("jupyter.plot.formats",c("png","svg","pdf"))
                             ) {
+      log_out("== render_display")
       formats <- intersect(formats, self$formats)
       plot_id <- desc$plot_id
       display_id <- desc$display_id
@@ -290,15 +282,17 @@ GraphicsClient <- R6Class("GraphicsClient",
     },
     render_metadata = function(r, plot_id) {
       m <- list(plot_id = plot_id)
-      if(r$format %in% c("png", "tiff", "png-base64")) {
+      if(r$format %in% c("png")) {
         f <- self$dpi
         m$width <- r$width * f
         m$height <- r$height * f
-      } else if(r$format %in% c("svg","svgp", "svgz", "svgzp")) {
+      } else if(r$format %in% c("svg")) {
         f <- self$dpi
         m$width <- r$width * f
         m$height <- r$height * f
       }
+      log_out("render_metadata")
+      log_print(m)
       m
     },
     new_display_forced = FALSE,
@@ -401,17 +395,3 @@ GraphicsDisplay <- R6Class("GraphicsDisplay",
   )
 )
 
-#' @importFrom unigd ugd_renderers
-urdrs <- ugd_renderers()
-
-format2type <- function(fmt) {
-  urdrs[urdrs$id==fmt,][["mime"]]
-}
-
-is_binary_fmt <- function(fmt) {
-  !urdrs[urdrs$id==fmt,][["text"]]
-}
-
-format2ext <- function(fmt) {
-  urdrs[urdrs$id==fmt,][["ext"]]
-}
