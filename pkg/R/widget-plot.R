@@ -11,8 +11,6 @@ SVGWidgetClass <- R6Class_(
     "SVGWidget",
     inherit = HTMLClass,
     public = list(
-        #' @field context A Context instance or NULL
-        context = NULL,
         #' @description 
         #' Initialize the object
         #' @param ... Arguments passed to the superclass initializer

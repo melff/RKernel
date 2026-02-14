@@ -36,6 +36,12 @@ GraphicsClient <- R6Class("GraphicsClient",
         self$session$send_receive("restart_graphics()")
       }
     },
+    suspend = function() {
+        self$renderer$suspend()
+    },
+    activate = function() {
+        self$renderer$activate()
+    },
     id = 0,
     upid = 0,
     poll = function() {

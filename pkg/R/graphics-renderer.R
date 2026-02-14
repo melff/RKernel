@@ -22,6 +22,7 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
       device = NULL,
       get_svg = NULL,
       recordings = list(),
+      prev_device = NULL,
       initialize = function(width = 7,
                             height = 7) {
           self$get_svg <- svgstring(standalone=FALSE,
@@ -29,9 +30,18 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
                                     height=height)
           dev.control("enable")
           self$device <- dev.cur()
+          graphics$renderers[[as.character(self$device)]] <- self
       },
       activate = function() {
+          if(dev.cur() == self$device) return()
+          self$prev_device <- dev.cur()
           dev.set(self$device)
+      },
+      suspend = function() {
+          if(length(self$prev_device)) {
+              dev.set(self$prev_device)
+              self$prev_device <- NULL
+          }
       },
       is_active = function() {
           dev_cur <- dev.cur()

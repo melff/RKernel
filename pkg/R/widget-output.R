@@ -27,14 +27,18 @@ OutputWidgetClass <- R6Class_("OutputWidget",
         outputs = structure(List(),sync=TRUE),
         #' @description Initializing function
         #' @param append_output Logical, whether existing output should be appended to or overwritten.
-        #' @param envir An environment, where expressions are evaluated.
-        #' @param use_display Logical, whether the display mechanism is used internally for 
-        #'    output streams.
+        #' @param graphics Logical, whether graphics should be captured and processed within the widget 
         #' @param ... Any other arguments, passed to the superclass initializer.
-        initialize = function(append_output = TRUE,
+        initialize = function(append_output = TRUE, graphics = FALSE,
                               ...){
             super$initialize(...)
             private$append_output <- append_output
+            self$context <- Context$new(
+                    stdout_callback = self$stdout,
+                    stderr_callback = self$stderr,
+                    msg_handlers = list(default=self$handle_msg),
+                    graphics = graphics
+                    )
         },
         #' @description A variant of \code{\link{display}} for output within a display widget.
         #' @param ... Arguments passed to the function \code{\link{display_data}}.
@@ -70,10 +74,10 @@ OutputWidgetClass <- R6Class_("OutputWidget",
             else {
                 msg_send(msg) # Pass message on to frontend
             }
-        }
+        },
+        context = NULL
     ),
     private = list(
-
         append_output = FALSE,
         current_output = NULL,
         stream = function(text,stream_name) {
@@ -195,28 +199,19 @@ OutputWidget <- function(append_output=FALSE,...)
 #' @param ... Other arguments, ignored.
 #' @export
 with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear=TRUE,...){
-    # log_out("with.OutputWidget")
+    log_out("with.OutputWidget")
     widget <- data
-    ctx <- Context$new(
-        stdout_callback = widget$stdout,
-        stderr_callback = widget$stderr,
-        msg_handlers = list(default=widget$handle_msg)
-    )
     expr <- substitute(expr)
-    ctx$start_graphics()
     envir$display <- widget$display
     if(expr[[1]] == as.symbol("{")) {
         expr <- expr[-1]
         for(e in as.list(expr)) {
-            r <- ctx$eval(e,envir=envir,enclos=enclos)
+            r <- widget$context$eval(e,envir=envir,enclos=enclos)
             widget$send_state("outputs")
-            ctx$process_graphics()
         }
     } else {
-        r <- ctx$eval(expr,envir=envir,enclos=enclos)
+        r <- widget$eval(expr,envir=envir,enclos=enclos)
         widget$send_state("outputs")
-        ctx$process_graphics()
     }
-    ctx$stop_graphics()
     invisible(r)
 }

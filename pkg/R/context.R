@@ -5,9 +5,11 @@ public=list(
   stdout_filter = NULL,
   stderr_filter = NULL,
   msg_handlers = NULL,
+  graphics = NULL,
   initialize = function(stdout_callback, 
                         stderr_callback,
-                        msg_handlers = NULL) {
+                        msg_handlers = NULL,
+                        graphics = FALSE) {
     self$stdout_callback <- stdout_callback
     self$stderr_callback <- stderr_callback
     self$msg_handlers <- msg_handlers
@@ -18,7 +20,11 @@ public=list(
     self$stderr_filter <- MessageFilter$new(
       text_handler = stderr_callback,
       msg_handler = self$handle_msg
-    )
+      )
+    if (graphics) {
+        self$graphics <- GraphicsClient$new(internal=TRUE)
+        self$graphics$suspend()
+    }
   },
   handle_msg = function(msg) {
     # log_out("Context$handle_msg")
@@ -50,6 +56,10 @@ public=list(
       close(serr_con)
       close(sout_con)
     })
+    if(length(self$graphics)) {
+        self$graphics$activate()
+        on.exit(self$graphics$suspend())
+    }
     r <- try(withVisible(eval(expr,
                     envir=envir,enclos=enclos)),
              silent=TRUE)
@@ -73,37 +83,27 @@ public=list(
     self$stderr_filter$process(serr)
     self$stdout_filter$process(sout)
   },
-  graphics = NULL,
-  dev_num = 0,
-  start_graphics = function() {
-    ugd()
-    self$dev_num <- dev.cur()
-    self$graphics <- GraphicsClient$new(internal=TRUE)
-  },
-  stop_graphics = function() {
-    self$graphics <- NULL
-    ugd_close(self$dev_num)
-  },
   g_display_id = NULL,
   process_graphics = function() {
-    # log_out("Context$process_graphics")
-    poll_res <- self$graphics$poll()
-    d <- list()
-    if(poll_res[1]) {
-      if(poll_res[2]) {
-        d <- self$graphics$display_data()
-        g_display_id <- display_id(d)
-      } else if(poll_res[3]) {
-        d <- self$graphics$display_data(
-          display_id = self$g_display_id,
-          update = TRUE
-        )
+      # log_out("Context$process_graphics")
+      if(!length(self$graphics)) return()
+      poll_res <- self$graphics$poll()
+      d <- list()
+      if(poll_res[1]) {
+          if(poll_res[2]) {
+              d <- self$graphics$display_data()
+              g_display_id <- display_id(d)
+          } else if(poll_res[3]) {
+              d <- self$graphics$display_data(
+                                     display_id = self$g_display_id,
+                                     update = TRUE
+                                 )
+          }
       }
-    }
-    if(length(d)) {
-      msg <- list(type=class(d),
-                  content=unclass(d))
-      self$handle_msg(msg)
-    }
+      if(length(d)) {
+          msg <- list(type=class(d),
+                      content=unclass(d))
+          self$handle_msg(msg)
+      }
   }
 ))
