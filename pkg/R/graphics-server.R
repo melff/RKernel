@@ -80,12 +80,27 @@ start_graphics <- function(){
                                               width=getOption("jupyter.plot.width",7),
                                               height=getOption("jupyter.plot.height",7)
                                           )
+    graphics$help_renderer <- GraphicsRenderer$new(
+                                              width=getOption("jupyter.plot.width",7),
+                                              height=getOption("jupyter.plot.height",7)
+                                              )
+    graphics$help_renderer$suspend()
+    graphics$renderer$activate()
+}
+
+get_current_renderer <- function() {
+    dev_cur <- as.character(dev.cur())
+    graphics$renderers[[dev_cur]]
 }
 
 #' @importFrom graphics par
 send_new_plot <- function() {
-    if(graphics$renderer$is_active()){
-        state <- graphics$renderer$state()
+    # log_out("send_new_plot")
+    current_renderer <- get_current_renderer()
+    if(!length(current_renderer)) return()
+    # log_print(current_renderer)
+    if(current_renderer$is_active()){
+        state <- current_renderer$state()
         msg <- list(type="event",
                     content = list(event = "new_plot",
                                    plot_id = state$id,
@@ -96,9 +111,11 @@ send_new_plot <- function() {
 }
 
 send_before_new_plot <- function() {
-    if(graphics$renderer$is_active()){
-        state <- graphics$renderer$state()
-        graphics$renderer$record()
+    current_renderer <- get_current_renderer()
+    if(!length(current_renderer)) return()
+    if(current_renderer$is_active()){
+        state <- current_renderer$state()
+        current_renderer$record()
         msg <- list(type="event",
                     content = list(event = "before_new_plot", 
                                    plot_id = state$id))

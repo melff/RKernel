@@ -295,11 +295,12 @@ my_example2html <- function(topic, package, Rhome = "", env = NULL){
 #' @importFrom utils capture.output example
 example_html <- function(topic,package = NULL,...) {
     # log_out("====== example_html ======")
-    ugd()
-    d <- dev.cur()
-    on.exit(ugd_close(d))
+    graphics$help_renderer$activate()
+    op <- par()
     e <- capture.output(example(topic,package,local=TRUE,
                                 character.only=TRUE))
+    par(op)
+    graphics$help_renderer$suspend()
     
     e <- paste(e,collapse="\n")
     e <- split_string1(e,DLE)
@@ -325,10 +326,10 @@ example_html <- function(topic,package = NULL,...) {
         # log_print(content)
         if(content$event == "new_plot") {
             plot_id <- content$plot_id
-            r <- ugd_render(page = plot_id,
-                       width = 7 * 72, 
-                       height = 7 * 72, 
-                       as = "svgp")
+            r <- graphics$help_renderer$render(page = plot_id,
+                       width = 7, 
+                       height = 7, 
+                       format = "svg")
             r <- charToRaw(r)
             r <- dataURI(data=r,mime="image/svg+xml",
                          encoding=NULL)

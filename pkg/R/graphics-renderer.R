@@ -15,7 +15,7 @@ graphics$binary_formats <- c(
     svg=FALSE,
     png=TRUE
 )
-
+graphics$renderers <- list()
 
 GraphicsRenderer <- R6Class("GraphicsRenderer",
   public = list(
