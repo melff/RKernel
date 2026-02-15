@@ -75,7 +75,7 @@ vfilter_details <- function(x) {
             vftab <- c(vftab, vfilter$values)
         }
         if(length(vfilter$range)){
-            vftab <- c(vftab, sprintf("%s–%s",
+            vftab <- c(vftab, sprintf("%s\u2013%s",
                                       vfilter$range[1],
                                       vfilter$range[2]
                                       ))
