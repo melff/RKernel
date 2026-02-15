@@ -152,7 +152,7 @@ Set up the R session, by installing hooks etc.
 
 ------------------------------------------------------------------------
 
-### Method `start_graphics()`
+### Method [`start_graphics()`](https://melff.github.io/RKernel/reference/start_graphics.md)
 
 Initialize graphics, start device and return details
 

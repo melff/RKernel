@@ -139,7 +139,7 @@ Initializing function
 
 #### Usage
 
-    OutputWidgetClass$new(append_output = TRUE, ...)
+    OutputWidgetClass$new(append_output = TRUE, graphics = FALSE, ...)
 
 #### Arguments
 
@@ -147,18 +147,14 @@ Initializing function
 
   Logical, whether existing output should be appended to or overwritten.
 
+- `graphics`:
+
+  Logical, whether graphics should be captured and processed within the
+  widget
+
 - `...`:
 
   Any other arguments, passed to the superclass initializer.
-
-- `envir`:
-
-  An environment, where expressions are evaluated.
-
-- `use_display`:
-
-  Logical, whether the display mechanism is used internally for output
-  streams.
 
 ------------------------------------------------------------------------
 

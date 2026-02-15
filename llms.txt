@@ -417,4 +417,6 @@ and
   : Get the prefix for internal URLs
 - [`fix_localhost()`](https://melff.github.io/RKernel/reference/fix_localhost.md)
   : Adapt an localhost URL so that it works from behind Jupyterhub
+- [`start_graphics()`](https://melff.github.io/RKernel/reference/start_graphics.md)
+  : importFrom svglite svgstring
 

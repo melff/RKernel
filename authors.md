@@ -11,12 +11,12 @@ Source:
 [`DESCRIPTION`](https://github.com/melff/RKernel/blob/main/DESCRIPTION)
 
 Elff M (2026). *RKernel: Yet Another R Kernel for Jupyter*. R package
-version 1.1.6, <https://melff.github.io/RKernel/>.
+version 1.2, <https://melff.github.io/RKernel/>.
 
     @Manual{,
       title = {RKernel: Yet Another R Kernel for Jupyter},
       author = {Martin Elff},
       year = {2026},
-      note = {R package version 1.1.6},
+      note = {R package version 1.2},
       url = {https://melff.github.io/RKernel/},
     }

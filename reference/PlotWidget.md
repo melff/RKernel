@@ -51,12 +51,6 @@ PlotWidget(...)
 [`RKernel::HTML`](https://melff.github.io/RKernel/reference/StringWidget.md)
 -\> `SVGWidget`
 
-## Public fields
-
-- `context`:
-
-  A Context instance or NULL
-
 ## Methods
 
 ### Public methods
