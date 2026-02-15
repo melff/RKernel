@@ -381,6 +381,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
       }
       if(debug) log_out(sprintf("Code has %d lines",length(code)))
       # Make sure that we are at a code input prompt
+      if(debug) log_out("Waiting for prompt ...")
       while(until_prompt && !self$found_prompt) {
           if(self$poll_output(io_timeout = 1000)) {
               self$process_output(
@@ -393,6 +394,7 @@ RSessionAdapter <- R6Class("RSessionAdapter",
                        debug = debug)
           }
       }
+      self$found_prompt <- FALSE
       for(line in code) {
         if(debug) log_out(sprintf("Sending input '%s'",line))
         self$session$send_input(line)
@@ -495,7 +497,6 @@ RSessionAdapter <- R6Class("RSessionAdapter",
         }
         
         self$found_browse_prompt <- character(0)
-        self$found_prompt <- FALSE
         if (!is.null(resp$stderr) 
               && nzchar(resp$stderr)
               && grepl("\\S",resp$stderr)) {
