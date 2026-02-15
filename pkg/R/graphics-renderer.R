@@ -111,7 +111,9 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
           list(
               active = self$is_active(),
               id = n,
-              upid = digest(unclass(s[n])))
+              upid = digest(unclass(s[n])),
+              device = self$device,
+              curr_device = dev.cur())
       },
       record = function() {
           s <- self$get_svg()
