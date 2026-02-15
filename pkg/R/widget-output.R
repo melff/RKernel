@@ -199,7 +199,7 @@ OutputWidget <- function(append_output=FALSE,...)
 #' @param ... Other arguments, ignored.
 #' @export
 with.OutputWidget <- function(data,expr,envir=list(),enclos=parent.frame(),clear=TRUE,...){
-    log_out("with.OutputWidget")
+    # log_out("with.OutputWidget")
     widget <- data
     expr <- substitute(expr)
     envir$display <- widget$display

@@ -153,7 +153,7 @@ url_prefix <- function() {
 #' @param url A character string
 #' @export
 fix_localhost <- function(url) {
-  log_out("fix_localhost")
+  # log_out("fix_localhost")
   if(http_is_proxied()) {
       prefix <- url_prefix()
       # prefix <- "somewhere/proxy/"
