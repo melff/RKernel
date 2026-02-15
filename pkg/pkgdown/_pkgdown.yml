@@ -134,3 +134,4 @@ reference:
   - show_http_log
   - url_prefix
   - fix_localhost
+  - start_graphics

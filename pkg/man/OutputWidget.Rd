@@ -103,7 +103,7 @@ Classes and constructors to wrap output created by code
 \subsection{Method \code{new()}}{
 Initializing function
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OutputWidgetClass$new(append_output = TRUE, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{OutputWidgetClass$new(append_output = TRUE, graphics = FALSE, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -111,12 +111,9 @@ Initializing function
 \describe{
 \item{\code{append_output}}{Logical, whether existing output should be appended to or overwritten.}
 
+\item{\code{graphics}}{Logical, whether graphics should be captured and processed within the widget}
+
 \item{\code{...}}{Any other arguments, passed to the superclass initializer.}
-
-\item{\code{envir}}{An environment, where expressions are evaluated.}
-
-\item{\code{use_display}}{Logical, whether the display mechanism is used internally for 
-output streams.}
 }
 \if{html}{\out{</div>}}
 }

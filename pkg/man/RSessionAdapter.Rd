@@ -16,6 +16,8 @@ and for a REPL created by a call to browser().
 
 \item{\code{prompt}}{The R console prompt or NULL}
 
+\item{\code{coprompt}}{The R console continuation prompt or NULL}
+
 \item{\code{browse_prompt}}{The prompt created by a call to `browser()`}
 
 \item{\code{io_timeout}}{An integer number a timeout in microseconds}
@@ -60,6 +62,7 @@ session}
 \item \href{#method-RSessionAdapter-new}{\code{RSessionAdapter$new()}}
 \item \href{#method-RSessionAdapter-run_code}{\code{RSessionAdapter$run_code()}}
 \item \href{#method-RSessionAdapter-interrupt}{\code{RSessionAdapter$interrupt()}}
+\item \href{#method-RSessionAdapter-poll_output}{\code{RSessionAdapter$poll_output()}}
 \item \href{#method-RSessionAdapter-process_output}{\code{RSessionAdapter$process_output()}}
 \item \href{#method-RSessionAdapter-run_cmd}{\code{RSessionAdapter$run_cmd()}}
 \item \href{#method-RSessionAdapter-getOption}{\code{RSessionAdapter$getOption()}}
@@ -151,6 +154,7 @@ Initialize an object
   prompt_callback = NULL,
   input_callback = NULL,
   prompt = "> ",
+  coprompt = "+ ",
   echo = FALSE
 )}\if{html}{\out{</div>}}
 }
@@ -234,13 +238,21 @@ Send an interrupt signal (SIGINT) to the R process. This
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RSessionAdapter-poll_output"></a>}}
+\if{latex}{\out{\hypertarget{method-RSessionAdapter-poll_output}{}}}
+\subsection{Method \code{poll_output()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RSessionAdapter$poll_output(io_timeout = 1)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RSessionAdapter-process_output"></a>}}
 \if{latex}{\out{\hypertarget{method-RSessionAdapter-process_output}{}}}
 \subsection{Method \code{process_output()}}{
 Process output created by commands sent to the R process
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{RSessionAdapter$process_output(
-  io_timeout = 1,
   stdout_callback = self$stdout_callback,
   stderr_callback = self$stderr_callback,
   browser_callback = self$browser_callback,
@@ -254,8 +266,6 @@ Process output created by commands sent to the R process
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{io_timeout}}{An integer value, the timeout of waiting for output}
-
 \item{\code{stdout_callback}}{A callback function for "stdout" output}
 
 \item{\code{stderr_callback}}{A callback function for "stderr" output}
@@ -267,6 +277,8 @@ Process output created by commands sent to the R process
 \item{\code{prompt_callback}}{A callback function for command prompts encountered}
 
 \item{\code{drop_echo}}{A logical value, whether input echo be dropped}
+
+\item{\code{io_timeout}}{An integer value, the timeout of waiting for output}
 
 \item{\code{until_prompt}}{A logical value, whether process and wait output
 until a command prompt is encountered.}

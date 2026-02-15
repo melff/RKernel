@@ -21,12 +21,6 @@ the terminal and info box.}
 
 \item{\code{waiting}}{A logical value, whether the R session is waiting 
 for input.}
-
-\item{\code{drop_last_input}}{A logical value, whether to drop the echo of
-the last input}
-
-\item{\code{last_input}}{A character string, the last input sent to the
-R session. Needed to filter out the echo of the input.}
 }
 \if{html}{\out{</div>}}
 }

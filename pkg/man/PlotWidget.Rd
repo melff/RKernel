@@ -31,13 +31,6 @@ Class and constructors show graphics created by code
 \section{Super classes}{
 \code{\link[RKernel:HasTraits]{RKernel::HasTraits}} -> \code{\link[RKernel:Widget]{RKernel::Widget}} -> \code{\link[RKernel:DOMWidget]{RKernel::DOMWidget}} -> \code{\link[RKernel:DescriptionWidget]{RKernel::DescriptionWidget}} -> \code{RKernel::ValueWidget} -> \code{\link[RKernel:StringWidget]{RKernel::StringWidget}} -> \code{\link[RKernel:HTML]{RKernel::HTML}} -> \code{SVGWidget}
 }
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{context}}{A Context instance or NULL}
-}
-\if{html}{\out{</div>}}
-}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
