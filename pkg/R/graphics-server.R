@@ -13,7 +13,7 @@ http_graphics_state <- function() {
     if(graphics$renderer$is_active()) {
         info <- graphics$renderer$state()
     } else {
-        info <- list(state=list(active=FALSE))
+        info <- list(active=FALSE)
     }
     payload <- to_json(info,
                        pretty=TRUE)
