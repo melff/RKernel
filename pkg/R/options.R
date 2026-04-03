@@ -27,12 +27,15 @@ import_options <- function(opts){
 
 
 options_with_send <- function(...) {
-  args <- list(...)
-  res <- orig_func$options(...)
-  if(length(n <- names(args))) {
-    send_options(n)
-  }
-  invisible(res)
+    args <- list(...)
+    return_visibly <- TRUE
+    res <- orig_func$options(...)
+    if(length(n <- names(args))) {
+        send_options(n)
+        if(all(nzchar(n))) return_visibly <- FALSE
+    }
+    if(return_visibly) res
+    else invisible(res)
 }
 
 #' @importFrom utils getFromNamespace
