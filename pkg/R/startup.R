@@ -41,4 +41,5 @@ setup_session <- function(http_port) {
   install_globalCallingHandlers()
   install_debugging()
   # log_out("setup_session DONE")
+  install_device_size_hook()
 }

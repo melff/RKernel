@@ -57,6 +57,9 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
                         format = "svg",
                         resolution = 288,
                         ...) {
+          set_dev_size(width = width * zoom,
+                       height = height * zoom)
+          
           s0 <- self$get_svg()
           n <- length(s0)
           if(page == 0 || page == n) {
@@ -73,7 +76,6 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
           replayPlot(plt)
           data <- s()
           dev.off()
-
           if(format == "pdf") {
               pdf_res <- 72
               data <- charToRaw(data)
@@ -139,3 +141,52 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
       }
   )
 )
+
+install_device_size_hook <- function() {
+    orig_func$dev.size <- getFromNamespace("dev.size","grDevices")
+    replace_in_package("grDevices","dev.size",dev_size)
+}
+
+graphics$device_sizes <- list()
+
+set_dev_size <- function(
+                         width  = getOption("jupyter.plot.width",7),
+                         height = getOption("jupyter.plot.width",7),
+                         units  = "in") {
+    dev_cur <- as.character(dev.cur())
+    graphics$device_sizes[[dev_cur]] <- structure(c(width, height),
+                                                  units=units)
+}
+
+#' @importFrom graphics par
+dev_size <- function(units = c("in", "cm", "px")) {
+    dev_cur <- as.character(dev.cur())
+    units <- match.arg(units)
+    if(dev_cur %in% names(graphics$device_sizes)) {
+        saved_size <- graphics$device_sizes[[dev_cur]]
+        width <- saved_size[1]
+        height <- saved_size[2]
+        saved_units <- attr(saved_size,"units")
+        if(saved_units == units) {
+            return(c(width,height))
+        } else {
+            scale <- 1
+            cra <- par("cra")
+            cin <- par("cin")
+            ccm <- cin * 2.54
+            if(scaled_units == "in") {
+                scale <- cra/cin
+            } else if (scaled_units == "cm") {
+                scale <- cra/ccm
+            }
+            if(units == "in") {
+                scale <- scale * cin/cra
+            } else if(units == "cm") {
+                scale <- scale * ccm/cra
+            }
+            return(c(widht,height) * scale)
+        }
+    } else {
+        return(orig_func$dev.size(units=units))
+    }
+}
