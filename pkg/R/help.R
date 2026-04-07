@@ -295,12 +295,13 @@ my_example2html <- function(topic, package, Rhome = "", env = NULL){
 #' @importFrom utils capture.output example
 example_html <- function(topic,package = NULL,...) {
     # log_out("====== example_html ======")
-    graphics$help_renderer$activate()
+    help_dev <- new_jupyter_dev(width=7,height=7)
+    help_renderer <- graphics$device_renderers[[as.character(help_dev)]]
     op <- par(no.readonly = TRUE)
     e <- capture.output(example(topic,package,local=TRUE,
                                 character.only=TRUE))
     par(op)
-    graphics$help_renderer$suspend()
+    on.exit(dev.off(help_dev))
     
     e <- paste(e,collapse="\n")
     e <- split_string1(e,DLE)
@@ -321,21 +322,26 @@ example_html <- function(topic,package = NULL,...) {
             paste0("<pre>",res,"\n</pre>")
         }
     }
-    last_id <- -1
+    last_page <- -1
+    last_uuid <- ""
     handle_event <- function(content) {
         # log_out("handle_event")
         # log_print(content)
         if(content$event == "new_plot") {
-            plot_id <- content$plot_id
-            if(plot_id > last_id) {
-                r <- graphics$help_renderer$render(page = plot_id,
-                                                   width = 7, 
-                                                   height = 7, 
-                                                   format = "svg")
+            state <- content$state
+            page <- state$page
+            uuid <- state$uuid
+            help_renderer <- get_renderer(uuid)
+            if(page > last_page || uuid != last_uuid) {
+                r <- help_renderer$render(page = page,
+                                          width = 7, 
+                                          height = 7, 
+                                          format = "svg")
                 r <- charToRaw(r)
                 r <- dataURI(data=r,mime="image/svg+xml",
                              encoding=NULL)
-                last_id <<- plot_id
+                last_page <<- page
+                last_uuid <<- uuid
                 sprintf("<img src=\"%s\">",r)
             } else {
                 ""
@@ -402,17 +408,17 @@ example_html <- function(topic,package = NULL,...) {
 
 #' @importFrom utils capture.output demo
 demo_html <- function(topic,package = NULL,...) {
-    graphics$help_renderer$activate()
+    help_dev <- new_jupyter_dev(width=7,height=7)
+    help_renderer <- graphics$device_renderers[[as.character(help_dev)]]
     op <- par(no.readonly = TRUE)
     e <- capture.output(demo(topic=topic,package,ask=FALSE,character.only=TRUE))
     par(op)
-    graphics$help_renderer$suspend()
+    on.exit(dev.off(help_dev))
 
     e <- paste(e,collapse="\n")
     e <- strsplit(e,DLE,fixed=TRUE)[[1]]
 
     r <- character()
-
     msg_frag <- character(0)
     msg_incomplete <- FALSE
 
@@ -428,21 +434,26 @@ demo_html <- function(topic,package = NULL,...) {
             paste0("<pre>",res,"\n</pre>")
         }
     }
-    last_id <- -1
+    last_page <- -1
+    last_uuid <- ""
     handle_event <- function(content) {
         # log_out("handle_event")
         # log_print(content)
         if(content$event == "new_plot") {
-            plot_id <- content$plot_id
-            if(plot_id > last_id) {
-                r <- graphics$help_renderer$render(page = plot_id,
-                                                   width = 7, 
-                                                   height = 7, 
-                                                   format = "svg")
+            state <- content$state
+            page <- state$page
+            uuid <- state$uuid
+            help_renderer <- get_renderer(uuid)
+            if(page > last_page || uuid != last_uuid) {
+                r <- help_renderer$render(page = page,
+                                          width = 7, 
+                                          height = 7, 
+                                          format = "svg")
                 r <- charToRaw(r)
                 r <- dataURI(data=r,mime="image/svg+xml",
                              encoding=NULL)
-                last_id <<- plot_id
+                last_page <<- page
+                last_uuid <<- uuid
                 sprintf("<img src=\"%s\">",r)
             } else {
                 ""

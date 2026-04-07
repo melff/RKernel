@@ -137,8 +137,7 @@ RSessionRunner <- R6Class("RSessionRunner",
 
     process_graphics = function() {
       # log_out("========== process_graphics")
-      self$graphics$new_display_forced <- self$force_new_graphics_display
-      self$graphics$update_displays()
+      self$graphics$update_displays(self$force_new_graphics_display)
       self$force_new_graphics_display <- FALSE
       # log_out("process_graphics -- done")
     },
@@ -181,16 +180,17 @@ RSessionRunner <- R6Class("RSessionRunner",
           "jupyter.plot.zoom",
           "jupyter.update.graphics"))
       self$session$start_graphics()
-      self$graphics = GraphicsClient$new(self)
+      host <- self$session$hostname
+      port <- self$session$http_port
+      self$graphics <- GraphicsDisplayManager$new(host, port, self$kernel)
     },
     stdout_filter = NULL,
     stderr_filter = NULL,
     shell_parent = NULL,
 
     handle_new_plot = function(content) {
-      plot_id <- content$plot_id
       state <- content$state
-      self$graphics$new_display(plot_id, state)
+      self$graphics$handle_plot_new(state)
     }
   )
 )

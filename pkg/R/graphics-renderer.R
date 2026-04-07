@@ -16,6 +16,7 @@ graphics$binary_formats <- c(
     png=TRUE
 )
 graphics$renderers <- list()
+graphics$device_renderers <- list()
 
 GraphicsRenderer <- R6Class("GraphicsRenderer",
   public = list(
@@ -23,14 +24,19 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
       get_svg = NULL,
       recordings = list(),
       prev_device = NULL,
-      initialize = function(width = 7,
-                            height = 7) {
+      uuid = NULL,
+      initialize = function(width = getOption("jupyter.plot.width",7),
+                            height = getOption("jupyter.plot.height",7)) {
           self$get_svg <- svgstring(standalone=FALSE,
                                     width=width,
                                     height=height)
           dev.control("enable")
-          self$device <- dev.cur()
-          graphics$renderers[[as.character(self$device)]] <- self
+          dev <- dev.cur()
+          uuid <- UUIDgenerate()
+          self$device <- dev
+          self$uuid <- uuid
+          graphics$device_renderers[[as.character(dev)]] <- self
+          graphics$renderers[[uuid]] <- self
       },
       activate = function() {
           if(dev.cur() == self$device) return()
@@ -57,12 +63,14 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
                         format = "svg",
                         resolution = 288,
                         ...) {
-          set_dev_size(width = width * zoom,
-                       height = height * zoom)
+          if(self$is_active()) {
+              set_dev_size(width = width * zoom,
+                           height = height * zoom)
           
+          }
           s0 <- self$get_svg()
           n <- length(s0)
-          if(page == 0 || page == n) {
+          if(self$is_active() && page %in% c(0,n)) {
               self$record()
               plt <- self$recordings[[n]]
           } else {
@@ -112,10 +120,11 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
           n <- length(s)
           list(
               active = self$is_active(),
-              id = n,
+              page = n,
               upid = digest(unclass(s[n])),
               device = self$device,
-              curr_device = dev.cur())
+              curr_device = dev.cur(),
+              uuid = self$uuid)
       },
       record = function() {
           s <- self$get_svg()
@@ -189,4 +198,28 @@ dev_size <- function(units = c("in", "cm", "px")) {
     } else {
         return(orig_func$dev.size(units=units))
     }
+}
+
+new_jupyter_dev <- function(width=getOption("jupyter.plot.width",7),
+                            height=getOption("jupyter.plot.height",7),
+                            ...) {
+    # log_out("new_jupyter_dev")
+    # log_print(c(width=width,height=height))
+    renderer <- GraphicsRenderer$new(width=width, height=height)
+    dev <- renderer$device
+    uuid <- renderer$uuid
+    # log_print(dev)
+    # log_print(dev.cur())
+    # log_print(dev.list())
+    # log_out(uuid)
+    dev
+}
+
+get_current_renderer <- function() {
+    dev_cur <- as.character(dev.cur())
+    graphics$device_renderers[[dev_cur]]
+}
+
+get_renderer <- function(uuid) {
+    graphics$renderers[[uuid]]
 }

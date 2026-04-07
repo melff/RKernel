@@ -22,8 +22,9 @@ public=list(
       msg_handler = self$handle_msg
       )
     if (graphics) {
-        self$graphics <- GraphicsClient$new(internal=TRUE)
-        self$graphics$suspend()
+        renderer <- GraphicsRenderer()
+        renderer$suspend()
+        self$graphics <- renderer
     }
   },
   handle_msg = function(msg) {
