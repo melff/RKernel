@@ -119,7 +119,7 @@ GraphicsDisplay <- R6Class("GraphicsDisplay",
      binary_formats = logical(0),
      poll = function() {
          state <- self$get_state()
-         updated <- state$upid > self$render_info$upid
+         updated <- state$upid != self$render_info$upid
          self$render_info <- state
          state$updated <- updated
          state
