@@ -67,9 +67,28 @@ GraphicsDisplayManager <- R6Class("GraphicsDisplayManager",
               }
           }
       },
-      handle_plot_new = function(render_info) {
-          display_ob <- self$new_display(render_info)
-          display_ob$send()
+      handle_event = function(msg_content) {
+          log_out("graphicsDisplayManager$handle_event()")
+          event <- msg_content$event
+          state <- msg_content$state
+          log_out(sprintf("event = %s",event))
+          if(event == "before_plot_new") {
+              private$par_page <- state$par_page
+          }
+          else if(event == "plot_new") {
+              if(private$par_page) {
+                  display_ob <- self$new_display(state)
+                  display_ob$send()
+              }
+              # else {
+              #     display_id <- private$current_display
+              #     log_print(display_id)
+              #     display_ob <- private$display_obs[[display_id]]
+              #     log_print(display_ob)
+              #     display_ob$render(update = TRUE)
+              #     display_ob$send()
+              # }
+          }
       }
   ),
   private = list(
@@ -77,6 +96,7 @@ GraphicsDisplayManager <- R6Class("GraphicsDisplayManager",
       port = -1,
       display_obs = list(),
       current_display = character(0),
+      par_page = FALSE,
       kernel = NULL
   )
 )

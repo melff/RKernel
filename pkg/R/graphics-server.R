@@ -107,10 +107,10 @@ http_graphics_render <- function(query) {
 #' importFrom svglite svgstring
 
 start_graphics <- function(){
-    setHook('plot.new', send_new_plot)
-    setHook('grid.newpage', send_new_plot)
-    setHook('before.plot.new', send_before_new_plot)
-    setHook('before.grid.newpage', send_before_new_plot)
+    setHook('plot.new', send_plot_new)
+    setHook('grid.newpage', send_plot_new)
+    setHook('before.plot.new', send_before_plot_new)
+    setHook('before.grid.newpage', send_before_plot_new)
     options(device=new_jupyter_dev)
     add_sync_options(c(
           "jupyter.plot.width",
@@ -122,31 +122,35 @@ start_graphics <- function(){
 }
 
 #' @importFrom graphics par
-send_new_plot <- function() {
-    # log_out("send_new_plot")
+send_plot_new <- function() {
+    # log_out("send_plot_new")
     # log_print(dev.list())
     current_renderer <- get_current_renderer()
     # log_print(current_renderer)
     if(!length(current_renderer)) return()
-    if(current_renderer$is_active() && par("page")){
+    # log_out(sprintf("is_active: %s",current_renderer$is_active()))
+    # log_out(sprintf("par('page'): %s",par("page")))
+    if(current_renderer$is_active()){
         state <- current_renderer$state()
+        # log_print(state)
         msg <- list(type="event",
-                    content = list(event = "new_plot",
+                    content = list(event = "plot_new",
                                    state = state
                                ))
         msg_send(msg)
     }
 }
 
-send_before_new_plot <- function() {
-    # log_out("send_before_new_plot")
+send_before_plot_new <- function() {
+    # log_out("before_plot_new")
     current_renderer <- get_current_renderer()
     if(!length(current_renderer)) return()
     if(current_renderer$is_active()){
         state <- current_renderer$state()
+        # log_print(state)
         current_renderer$record()
         msg <- list(type="event",
-                    content = list(event = "before_new_plot", 
+                    content = list(event = "before_plot_new", 
                                    state = state))
         msg_send(msg)
     }

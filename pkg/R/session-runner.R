@@ -162,13 +162,12 @@ RSessionRunner <- R6Class("RSessionRunner",
     },
 
     handle_event_msg = function(msg) {
-      # log_out("handle_event_msg")
-      # log_str(msg)
-      event <- msg$content$event
-      switch(event,
-             new_plot = private$handle_new_plot(content = msg$content)
-             )
-      # log_out("handle_event_msg -- done")
+        # log_out("handle_event_msg")
+        # log_str(msg)
+        event <- msg$content$event
+        if(event %in% c("plot_new", "before_plot_new")) {
+            self$graphics$handle_event(msg$content)
+        }
     },
 
     start_graphics = function(...) {
@@ -186,11 +185,6 @@ RSessionRunner <- R6Class("RSessionRunner",
     },
     stdout_filter = NULL,
     stderr_filter = NULL,
-    shell_parent = NULL,
-
-    handle_new_plot = function(content) {
-      state <- content$state
-      self$graphics$handle_plot_new(state)
-    }
+    shell_parent = NULL
   )
 )

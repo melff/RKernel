@@ -124,7 +124,8 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
               upid = digest(unclass(s[n])),
               device = self$device,
               curr_device = dev.cur(),
-              uuid = self$uuid)
+              uuid = self$uuid,
+              par_page = par("page"))
       },
       record = function() {
           s <- self$get_svg()
