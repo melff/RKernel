@@ -12,8 +12,8 @@ GraphicsDisplayManager <- R6Class("GraphicsDisplayManager",
           private$kernel <- kernel
       },
       new_display = function(render_info) {
-          log_out("graphicsDisplayManager$new_display()")
-          log_print(render_info)
+          # log_out("graphicsDisplayManager$new_display()")
+          # log_print(render_info)
           display_ob <- GraphicsDisplay$new(host = private$host,
                                             port = private$port,
                                             kernel = private$kernel,
@@ -24,8 +24,7 @@ GraphicsDisplayManager <- R6Class("GraphicsDisplayManager",
           display_ob
       },
       update_displays = function(force_new_display = FALSE) {
-          log_out(sprintf("graphicsDisplayManager$update_displays(force_new_display = %s)",
-                          force_new_display))
+          # log_out(sprintf("graphicsDisplayManager$update_displays(force_new_display = %s)", force_new_display))
           # log_str(private$display_obs)
           for(display_ob in private$display_obs) {
               display_id <- display_ob$display_id
@@ -37,7 +36,7 @@ GraphicsDisplayManager <- R6Class("GraphicsDisplayManager",
           }
           if(length(private$current_display)) {
               display_ob <- private$display_obs[[private$current_display]]
-              log_out("display_ob$poll()")
+              # log_out("display_ob$poll()")
               # log_print(display_ob)
               state <- display_ob$poll()
               # log_print(state)
@@ -53,8 +52,8 @@ GraphicsDisplayManager <- R6Class("GraphicsDisplayManager",
                       needs_update <- TRUE
                   }
               }
-              log_out(sprintf("needs_update = %s",needs_update))
-              log_out(sprintf("needs_new_display = %s",needs_new_display))
+              # log_out(sprintf("needs_update = %s",needs_update))
+              # log_out(sprintf("needs_new_display = %s",needs_new_display))
               if(needs_update) {
                   display_ob$render(update = TRUE)
                   display_ob$send()
@@ -69,10 +68,10 @@ GraphicsDisplayManager <- R6Class("GraphicsDisplayManager",
           }
       },
       handle_event = function(msg_content) {
-          log_out("graphicsDisplayManager$handle_event()")
+          # log_out("graphicsDisplayManager$handle_event()")
           event <- msg_content$event
           state <- msg_content$state
-          log_out(sprintf("event = %s",event))
+          # log_pout(sprintf("event = %s",event))
           if(event == "before_plot_new") {
               private$par_page <- state$par_page
           }

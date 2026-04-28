@@ -327,7 +327,7 @@ example_html <- function(topic,package = NULL,...) {
     handle_event <- function(content) {
         # log_out("handle_event")
         # log_print(content)
-        if(content$event == "new_plot") {
+        if(content$event == "plot_new") {
             state <- content$state
             page <- state$page
             uuid <- state$uuid
@@ -439,7 +439,7 @@ demo_html <- function(topic,package = NULL,...) {
     handle_event <- function(content) {
         # log_out("handle_event")
         # log_print(content)
-        if(content$event == "new_plot") {
+        if(content$event == "plot_new") {
             state <- content$state
             page <- state$page
             uuid <- state$uuid
