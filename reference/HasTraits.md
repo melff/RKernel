@@ -28,7 +28,7 @@ function.
 
 ### Public methods
 
-- [`HasTraits$new()`](#method-HasTraits-new)
+- [`HasTraits$new()`](#method-HasTraits-initialize)
 
 - [`HasTraits$notify()`](#method-HasTraits-notify)
 
@@ -40,7 +40,7 @@ function.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `HasTraits$new()`
 
 Initialize an object
 
@@ -56,7 +56,7 @@ Initialize an object
 
 ------------------------------------------------------------------------
 
-### Method `notify()`
+### `HasTraits$notify()`
 
 Notify observers about a trait being set to a value.
 
@@ -76,7 +76,7 @@ Notify observers about a trait being set to a value.
 
 ------------------------------------------------------------------------
 
-### Method `observe()`
+### `HasTraits$observe()`
 
 Install or remove an observer function.
 
@@ -102,7 +102,7 @@ Install or remove an observer function.
 
 ------------------------------------------------------------------------
 
-### Method `validate()`
+### `HasTraits$validate()`
 
 Install or remove the validator function of a trait.
 
@@ -127,7 +127,7 @@ Install or remove the validator function of a trait.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `HasTraits$clone()`
 
 The objects of this class are cloneable with this method.
 

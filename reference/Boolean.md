@@ -16,8 +16,8 @@ Boolean(...)
 
 ## Super class
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\> `Boolean`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+`Boolean`
 
 ## Public fields
 
@@ -43,26 +43,26 @@ Boolean(...)
 
 ### Public methods
 
-- [`BooleanClass$validator()`](#method-Boolean-validator)
+- [`Boolean$validator()`](#method-Boolean-validator)
 
-- [`BooleanClass$new()`](#method-Boolean-new)
+- [`Boolean$new()`](#method-Boolean-initialize)
 
-- [`BooleanClass$clone()`](#method-Boolean-clone)
+- [`Boolean$clone()`](#method-Boolean-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `Boolean$validator()`
 
 A validator method
 
 #### Usage
 
-    BooleanClass$validator(value)
+    Boolean$validator(value)
 
 #### Arguments
 
@@ -72,13 +72,13 @@ A validator method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Boolean$new()`
 
 The initializing method
 
 #### Usage
 
-    BooleanClass$new(
+    Boolean$new(
       initial,
       coerce = TRUE,
       optional = length(initial) == 0,
@@ -105,13 +105,13 @@ The initializing method
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Boolean$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    BooleanClass$clone(deep = FALSE)
+    Boolean$clone(deep = FALSE)
 
 #### Arguments
 

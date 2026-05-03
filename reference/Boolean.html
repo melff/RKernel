@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,7 @@
 </dl></div>
     <div class="section level2">
     <h2 id="super-class">Super class<a class="anchor" aria-label="anchor" href="#super-class"></a></h2>
-    <p><code><a href="Traitlets.html">RKernel::Trait</a></code> -&gt; <code>Boolean</code></p>
+    <p><code><a href="Traitlets.html">Trait</a></code> -&gt; <code>Boolean</code></p>
     </div>
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
@@ -65,16 +65,16 @@
 <dd><p>A logical vector, usually of length 1</p></dd>
 
 
-<dt><code>optional</code></dt>
+    <dt><code>optional</code></dt>
 <dd><p>Logical, whether an initializing logical value must be provided</p></dd>
 
 
-<dt><code>coerce</code></dt>
+    <dt><code>coerce</code></dt>
 <dd><p>Logical, whether 'as.logical()' is implicitely used when a value is
 assigned to the trait</p></dd>
 
 
-<dt><code>length</code></dt>
+    <dt><code>length</code></dt>
 <dd><p>Integer, the length of the logical vector that poses as the value of the traitlet.</p></dd>
 
 
@@ -85,20 +85,17 @@ assigned to the trait</p></dd>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-Boolean-validator"><code>BooleanClass$validator()</code></a></p></li>
-<li><p><a href="#method-Boolean-new"><code>BooleanClass$new()</code></a></p></li>
-<li><p><a href="#method-Boolean-clone"><code>BooleanClass$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="Trait" data-id="get"><a href="Trait.html#method-get"><code>RKernel::Trait$get()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Trait" data-id="set"><a href="Trait.html#method-set"><code>RKernel::Trait$set()</code></a></span></li>
+<p></p><ul><li><p><a href="#method-Boolean-validator"><code>Boolean$validator()</code></a></p></li>
+<li><p><a href="#method-Boolean-initialize"><code>Boolean$new()</code></a></p></li>
+<li><p><a href="#method-Boolean-clone"><code>Boolean$clone()</code></a></p></li>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="Trait" data-id="get"><a href="Trait.html#method-get"><code>Trait$get()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Trait" data-id="set"><a href="Trait.html#method-set"><code>Trait$set()</code></a></span></li>
 </ul></details></p><hr><a id="method-Boolean-validator"></a><div class="section">
-<h3 id="method-validator-">Method <code>validator()</code><a class="anchor" aria-label="anchor" href="#method-validator-"></a></h3>
+<h3 id="boolean-validator-"><code>Boolean$validator()</code><a class="anchor" aria-label="anchor" href="#boolean-validator-"></a></h3>
 <p>A validator method</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BooleanClass</span><span class="op">$</span><span class="fu">validator</span><span class="op">(</span><span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Boolean</span><span class="op">$</span><span class="fu">validator</span><span class="op">(</span><span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>value</code></dt>
 <dd><p>A value to be checked for validity</p></dd>
@@ -107,47 +104,44 @@ assigned to the trait</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Boolean-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-Boolean-initialize"></a><div class="section">
+<h3 id="boolean-new-"><code>Boolean$new()</code><a class="anchor" aria-label="anchor" href="#boolean-new-"></a></h3>
 <p>The initializing method</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Boolean.html">BooleanClass</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Boolean.html">Boolean</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  <span class="va">initial</span>,</span>
 <span>  coerce <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  optional <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">initial</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span>,</span>
 <span>  length <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>initial</code></dt>
 <dd><p>A value with which the traitlet is initialized</p></dd>
 
-
-<dt><code>coerce</code></dt>
+      <dt><code>coerce</code></dt>
 <dd><p>Logical, used to initialize the 'coerce' field</p></dd>
 
-
-<dt><code>optional</code></dt>
+      <dt><code>optional</code></dt>
 <dd><p>Logical, used to initialize the 'optional' field</p></dd>
 
-
-<dt><code>length</code></dt>
+      <dt><code>length</code></dt>
 <dd><p>Integer, used to initialize the 'length' field</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Boolean-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BooleanClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-Boolean-clone"></a><div class="section">
+<h3 id="boolean-clone-"><code>Boolean$clone()</code><a class="anchor" aria-label="anchor" href="#boolean-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Boolean</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -157,6 +151,7 @@ assigned to the trait</p></dd>
 </div>
 
 </div>
+
 
     </div>
 

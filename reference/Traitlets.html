@@ -19,7 +19,7 @@ The function TraitInstance  returns information needed by a
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,11 +91,11 @@ The function TraitInstance  returns information needed by a
 <dd><p>The value of the trait</p></dd>
 
 
-<dt><code>observers</code></dt>
+    <dt><code>observers</code></dt>
 <dd><p>A list of functions to be called as notification callbacks</p></dd>
 
 
-<dt><code>validators</code></dt>
+    <dt><code>validators</code></dt>
 <dd><p>A list of functions to check the validity of a</p></dd>
 
 
@@ -106,53 +106,49 @@ The function TraitInstance  returns information needed by a
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-Trait-set"><code>TraitClass$set()</code></a></p></li>
-<li><p><a href="#method-Trait-get"><code>TraitClass$get()</code></a></p></li>
-<li><p><a href="#method-Trait-new"><code>TraitClass$new()</code></a></p></li>
-<li><p><a href="#method-Trait-clone"><code>TraitClass$clone()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-Trait-set"><code>Trait$set()</code></a></p></li>
+<li><p><a href="#method-Trait-get"><code>Trait$get()</code></a></p></li>
+<li><p><a href="#method-Trait-initialize"><code>Trait$new()</code></a></p></li>
+<li><p><a href="#method-Trait-clone"><code>Trait$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-Trait-set"></a><div class="section">
-<h3 id="method-set-">Method <code>set()</code><a class="anchor" aria-label="anchor" href="#method-set-"></a></h3>
+<h3 id="trait-set-"><code>Trait$set()</code><a class="anchor" aria-label="anchor" href="#trait-set-"></a></h3>
 <p>Set the value of the trait</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TraitClass</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">value</span>, notify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Trait</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="va">value</span>, notify <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>value</code></dt>
 <dd><p>The value to be set</p></dd>
 
-
-<dt><code>notify</code></dt>
+      <dt><code>notify</code></dt>
 <dd><p>Logical; whether to call notification callbacks</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Trait-get"></a><div class="section">
-<h3 id="method-get-">Method <code><a href="https://rdrr.io/r/base/get.html" class="external-link">get()</a></code><a class="anchor" aria-label="anchor" href="#method-get-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-Trait-get"></a><div class="section">
+<h3 id="trait-get-"><code>Trait$get()</code><a class="anchor" aria-label="anchor" href="#trait-get-"></a></h3>
 <p>Get the trait value</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TraitClass</span><span class="op">$</span><span class="fu">get</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Trait</span><span class="op">$</span><span class="fu">get</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-Trait-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+<p></p><hr><a id="method-Trait-initialize"></a><div class="section">
+<h3 id="trait-new-"><code>Trait$new()</code><a class="anchor" aria-label="anchor" href="#trait-new-"></a></h3>
 <p>Initialize the trait, i.e. set an initial value</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Traitlets.html">TraitClass</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">initial</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Traitlets.html">Trait</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">initial</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>initial</code></dt>
 <dd><p>The initial value</p></dd>
 
-
-<dt><code>coerce</code></dt>
+      <dt><code>coerce</code></dt>
 <dd><p>Logical; whether to coerce the initial value
 to the approriate mode.</p></dd>
 
@@ -160,14 +156,14 @@ to the approriate mode.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Trait-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TraitClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-Trait-clone"></a><div class="section">
+<h3 id="trait-clone-"><code>Trait$clone()</code><a class="anchor" aria-label="anchor" href="#trait-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Trait</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -177,6 +173,7 @@ to the approriate mode.</p></dd>
 </div>
 
 </div>
+
 
     </div>
 

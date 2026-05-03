@@ -17,34 +17,33 @@ Dict(...)
 
 ## Super classes
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\> [`RKernel::List`](https://melff.github.io/RKernel/reference/List.md)
--\> `Dict`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+[`List`](https://melff.github.io/RKernel/reference/List.md) -\> `Dict`
 
 ## Methods
 
 ### Public methods
 
-- [`DictClass$validator()`](#method-Dict-validator)
+- [`Dict$validator()`](#method-Dict-validator)
 
-- [`DictClass$clone()`](#method-Dict-clone)
+- [`Dict$clone()`](#method-Dict-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$initialize()`](https://melff.github.io/RKernel/reference/Trait.html#method-initialize)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$initialize()`](https://melff.github.io/RKernel/reference/Trait.html#method-initialize)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `Dict$validator()`
 
 A function that checks the validity of an assigned value, i.e. whether
 the assigned value is a list with unique names
 
 #### Usage
 
-    DictClass$validator(value)
+    Dict$validator(value)
 
 #### Arguments
 
@@ -54,13 +53,13 @@ the assigned value is a list with unique names
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Dict$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    DictClass$clone(deep = FALSE)
+    Dict$clone(deep = FALSE)
 
 #### Arguments
 

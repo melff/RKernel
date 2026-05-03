@@ -9,7 +9,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,59 +120,59 @@
 <dd><p>A container widget or NULL</p></dd>
 
 
-<dt><code>page</code></dt>
+    <dt><code>page</code></dt>
 <dd><p>Number of the current page</p></dd>
 
 
-<dt><code>m</code></dt>
+    <dt><code>m</code></dt>
 <dd><p>Width of the object divided by 'size'</p></dd>
 
 
-<dt><code>r</code></dt>
+    <dt><code>r</code></dt>
 <dd><p>Remainder of the widht of the object divided by 'size'</p></dd>
 
 
-<dt><code>size</code></dt>
+    <dt><code>size</code></dt>
 <dd><p>Number of columns in each group for horizontal paging</p></dd>
 
 
-<dt><code>iframe</code></dt>
+    <dt><code>iframe</code></dt>
 <dd><p>An &lt;iframe&gt; container or NULL</p></dd>
 
 
-<dt><code>b_left</code></dt>
+    <dt><code>b_left</code></dt>
 <dd><p>Button to scroll left</p></dd>
 
 
-<dt><code>b_right</code></dt>
+    <dt><code>b_right</code></dt>
 <dd><p>Button to scroll right</p></dd>
 
 
-<dt><code>b_first</code></dt>
+    <dt><code>b_first</code></dt>
 <dd><p>Button to scroll to the first group of columns</p></dd>
 
 
-<dt><code>b_last</code></dt>
+    <dt><code>b_last</code></dt>
 <dd><p>Button to scroll to the last group of columns</p></dd>
 
 
-<dt><code>dt</code></dt>
+    <dt><code>dt</code></dt>
 <dd><p>HTML code for the visible table</p></dd>
 
 
-<dt><code>obj</code></dt>
+    <dt><code>obj</code></dt>
 <dd><p>The tabular object being dispayed</p></dd>
 
 
-<dt><code>label</code></dt>
+    <dt><code>label</code></dt>
 <dd><p>A string label that shows the columns being displayed</p></dd>
 
 
-<dt><code>style</code></dt>
+    <dt><code>style</code></dt>
 <dd><p>A string with CSS styling</p></dd>
 
 
-<dt><code>navigator</code></dt>
+    <dt><code>navigator</code></dt>
 <dd><p>A container widget that contains the navigator buttons</p></dd>
 
 
@@ -183,95 +183,96 @@
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-dataTable-new"><code>dataTableClass$new()</code></a></p></li>
-<li><p><a href="#method-dataTable-show_columns"><code>dataTableClass$show_columns()</code></a></p></li>
-<li><p><a href="#method-dataTable-page_left"><code>dataTableClass$page_left()</code></a></p></li>
-<li><p><a href="#method-dataTable-page_right"><code>dataTableClass$page_right()</code></a></p></li>
-<li><p><a href="#method-dataTable-page_first"><code>dataTableClass$page_first()</code></a></p></li>
-<li><p><a href="#method-dataTable-page_last"><code>dataTableClass$page_last()</code></a></p></li>
-<li><p><a href="#method-dataTable-draw"><code>dataTableClass$draw()</code></a></p></li>
-<li><p><a href="#method-dataTable-clone"><code>dataTableClass$clone()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-dataTable-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+<p></p><ul><li><p><a href="#method-dataTable-initialize"><code>dataTable$new()</code></a></p></li>
+<li><p><a href="#method-dataTable-show_columns"><code>dataTable$show_columns()</code></a></p></li>
+<li><p><a href="#method-dataTable-page_left"><code>dataTable$page_left()</code></a></p></li>
+<li><p><a href="#method-dataTable-page_right"><code>dataTable$page_right()</code></a></p></li>
+<li><p><a href="#method-dataTable-page_first"><code>dataTable$page_first()</code></a></p></li>
+<li><p><a href="#method-dataTable-page_last"><code>dataTable$page_last()</code></a></p></li>
+<li><p><a href="#method-dataTable-draw"><code>dataTable$draw()</code></a></p></li>
+<li><p><a href="#method-dataTable-clone"><code>dataTable$clone()</code></a></p></li>
+</ul></div><p></p><hr><a id="method-dataTable-initialize"></a><div class="section">
+<h3 id="datatable-new-"><code>dataTable$new()</code><a class="anchor" aria-label="anchor" href="#datatable-new-"></a></h3>
 <p>Initialize the DataTable</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/dataTable.html">dataTableClass</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">obj</span>, size <span class="op">=</span> <span class="fl">50</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/dataTable.html">dataTable</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">obj</span>, size <span class="op">=</span> <span class="fl">50</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>obj</code></dt>
 <dd><p>The object to be displayed</p></dd>
 
-
-<dt><code>size</code></dt>
+      <dt><code>size</code></dt>
 <dd><p>An integer, the number of columns pre-formatted on each page.</p></dd>
 
-
-<dt><code>...</code></dt>
+      <dt><code>...</code></dt>
 <dd><p>Other arguments, ignored</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-dataTable-show_columns"></a><div class="section">
-<h3 id="method-show-columns-">Method <code>show_columns()</code><a class="anchor" aria-label="anchor" href="#method-show-columns-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-dataTable-show_columns"></a><div class="section">
+<h3 id="datatable-show-columns-"><code>dataTable$show_columns()</code><a class="anchor" aria-label="anchor" href="#datatable-show-columns-"></a></h3>
 <p>Show which columns are displayed</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTableClass</span><span class="op">$</span><span class="fu">show_columns</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTable</span><span class="op">$</span><span class="fu">show_columns</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-dataTable-page_left"></a><div class="section">
-<h3 id="method-page-left-">Method <code>page_left()</code><a class="anchor" aria-label="anchor" href="#method-page-left-"></a></h3>
+<p></p><hr><a id="method-dataTable-page_left"></a><div class="section">
+<h3 id="datatable-page-left-"><code>dataTable$page_left()</code><a class="anchor" aria-label="anchor" href="#datatable-page-left-"></a></h3>
 <p>Go one page to the left</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTableClass</span><span class="op">$</span><span class="fu">page_left</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTable</span><span class="op">$</span><span class="fu">page_left</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-dataTable-page_right"></a><div class="section">
-<h3 id="method-page-right-">Method <code>page_right()</code><a class="anchor" aria-label="anchor" href="#method-page-right-"></a></h3>
+<p></p><hr><a id="method-dataTable-page_right"></a><div class="section">
+<h3 id="datatable-page-right-"><code>dataTable$page_right()</code><a class="anchor" aria-label="anchor" href="#datatable-page-right-"></a></h3>
 <p>Go one page to the right</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTableClass</span><span class="op">$</span><span class="fu">page_right</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTable</span><span class="op">$</span><span class="fu">page_right</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-dataTable-page_first"></a><div class="section">
-<h3 id="method-page-first-">Method <code>page_first()</code><a class="anchor" aria-label="anchor" href="#method-page-first-"></a></h3>
+<p></p><hr><a id="method-dataTable-page_first"></a><div class="section">
+<h3 id="datatable-page-first-"><code>dataTable$page_first()</code><a class="anchor" aria-label="anchor" href="#datatable-page-first-"></a></h3>
 <p>Go to the first page (to the left)</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTableClass</span><span class="op">$</span><span class="fu">page_first</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTable</span><span class="op">$</span><span class="fu">page_first</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-dataTable-page_last"></a><div class="section">
-<h3 id="method-page-last-">Method <code>page_last()</code><a class="anchor" aria-label="anchor" href="#method-page-last-"></a></h3>
+<p></p><hr><a id="method-dataTable-page_last"></a><div class="section">
+<h3 id="datatable-page-last-"><code>dataTable$page_last()</code><a class="anchor" aria-label="anchor" href="#datatable-page-last-"></a></h3>
 <p>Go to the last page (to the right)</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTableClass</span><span class="op">$</span><span class="fu">page_last</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTable</span><span class="op">$</span><span class="fu">page_last</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-dataTable-draw"></a><div class="section">
-<h3 id="method-draw-">Method <code>draw()</code><a class="anchor" aria-label="anchor" href="#method-draw-"></a></h3>
+<p></p><hr><a id="method-dataTable-draw"></a><div class="section">
+<h3 id="datatable-draw-"><code>dataTable$draw()</code><a class="anchor" aria-label="anchor" href="#datatable-draw-"></a></h3>
 <p>Draw the iframe with the data table contents</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTableClass</span><span class="op">$</span><span class="fu">draw</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTable</span><span class="op">$</span><span class="fu">draw</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-dataTable-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p></p><hr><a id="method-dataTable-clone"></a><div class="section">
+<h3 id="datatable-clone-"><code>dataTable$clone()</code><a class="anchor" aria-label="anchor" href="#datatable-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTableClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">dataTable</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -281,6 +282,7 @@
 </div>
 
 </div>
+
 
     </div>
 

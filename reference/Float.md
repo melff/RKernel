@@ -27,8 +27,8 @@ as.numeric(x, ...)
 
 ## Super class
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\> `Float`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+`Float`
 
 ## Public fields
 
@@ -53,26 +53,26 @@ as.numeric(x, ...)
 
 ### Public methods
 
-- [`FloatClass$validator()`](#method-Float-validator)
+- [`Float$validator()`](#method-Float-validator)
 
-- [`FloatClass$new()`](#method-Float-new)
+- [`Float$new()`](#method-Float-initialize)
 
-- [`FloatClass$clone()`](#method-Float-clone)
+- [`Float$clone()`](#method-Float-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `Float$validator()`
 
 Check the value assigned to the traitlet.
 
 #### Usage
 
-    FloatClass$validator(value)
+    Float$validator(value)
 
 #### Arguments
 
@@ -82,13 +82,13 @@ Check the value assigned to the traitlet.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Float$new()`
 
 Initialize the traitlet.
 
 #### Usage
 
-    FloatClass$new(
+    Float$new(
       initial = numeric(0),
       coerce = TRUE,
       optional = length(initial) == 0,
@@ -116,13 +116,13 @@ Initialize the traitlet.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Float$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    FloatClass$clone(deep = FALSE)
+    Float$clone(deep = FALSE)
 
 #### Arguments
 

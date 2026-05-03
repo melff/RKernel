@@ -34,45 +34,45 @@ messages](https://jupyter-client.readthedocs.io/en/latest/messaging.html#custom-
 
 ### Public methods
 
-- [`CommManagerClass$add_handlers()`](#method-CommManager-add_handlers)
+- [`CommManager$add_handlers()`](#method-CommManager-add_handlers)
 
-- [`CommManagerClass$remove_handlers()`](#method-CommManager-remove_handlers)
+- [`CommManager$remove_handlers()`](#method-CommManager-remove_handlers)
 
-- [`CommManagerClass$has_handlers()`](#method-CommManager-has_handlers)
+- [`CommManager$has_handlers()`](#method-CommManager-has_handlers)
 
-- [`CommManagerClass$get_handlers()`](#method-CommManager-get_handlers)
+- [`CommManager$get_handlers()`](#method-CommManager-get_handlers)
 
-- [`CommManagerClass$get_comms()`](#method-CommManager-get_comms)
+- [`CommManager$get_comms()`](#method-CommManager-get_comms)
 
-- [`CommManagerClass$new_comm()`](#method-CommManager-new_comm)
+- [`CommManager$new_comm()`](#method-CommManager-new_comm)
 
-- [`CommManagerClass$handle_open()`](#method-CommManager-handle_open)
+- [`CommManager$handle_open()`](#method-CommManager-handle_open)
 
-- [`CommManagerClass$handle_close()`](#method-CommManager-handle_close)
+- [`CommManager$handle_close()`](#method-CommManager-handle_close)
 
-- [`CommManagerClass$handle_msg()`](#method-CommManager-handle_msg)
+- [`CommManager$handle_msg()`](#method-CommManager-handle_msg)
 
-- [`CommManagerClass$has()`](#method-CommManager-has)
+- [`CommManager$has()`](#method-CommManager-has)
 
-- [`CommManagerClass$send()`](#method-CommManager-send)
+- [`CommManager$send()`](#method-CommManager-send)
 
-- [`CommManagerClass$send_open()`](#method-CommManager-send_open)
+- [`CommManager$send_open()`](#method-CommManager-send_open)
 
-- [`CommManagerClass$send_close()`](#method-CommManager-send_close)
+- [`CommManager$send_close()`](#method-CommManager-send_close)
 
-- [`CommManagerClass$list_targets()`](#method-CommManager-list_targets)
+- [`CommManager$list_targets()`](#method-CommManager-list_targets)
 
-- [`CommManagerClass$clone()`](#method-CommManager-clone)
+- [`CommManager$clone()`](#method-CommManager-clone)
 
 ------------------------------------------------------------------------
 
-### Method `add_handlers()`
+### `CommManager$add_handlers()`
 
 Add a handler for a comm target
 
 #### Usage
 
-    CommManagerClass$add_handlers(target_name, handlers)
+    CommManager$add_handlers(target_name, handlers)
 
 #### Arguments
 
@@ -86,13 +86,13 @@ Add a handler for a comm target
 
 ------------------------------------------------------------------------
 
-### Method `remove_handlers()`
+### `CommManager$remove_handlers()`
 
 Remove the handlers of a comm target
 
 #### Usage
 
-    CommManagerClass$remove_handlers(target_name)
+    CommManager$remove_handlers(target_name)
 
 #### Arguments
 
@@ -102,13 +102,13 @@ Remove the handlers of a comm target
 
 ------------------------------------------------------------------------
 
-### Method `has_handlers()`
+### `CommManager$has_handlers()`
 
 Check if handlers for a target exist
 
 #### Usage
 
-    CommManagerClass$has_handlers(target_name)
+    CommManager$has_handlers(target_name)
 
 #### Arguments
 
@@ -118,13 +118,13 @@ Check if handlers for a target exist
 
 ------------------------------------------------------------------------
 
-### Method `get_handlers()`
+### `CommManager$get_handlers()`
 
 Get the handlers for a target
 
 #### Usage
 
-    CommManagerClass$get_handlers(target_name)
+    CommManager$get_handlers(target_name)
 
 #### Arguments
 
@@ -134,13 +134,13 @@ Get the handlers for a target
 
 ------------------------------------------------------------------------
 
-### Method `get_comms()`
+### `CommManager$get_comms()`
 
 Get all comms or all comms related to a target
 
 #### Usage
 
-    CommManagerClass$get_comms(target_name = NULL)
+    CommManager$get_comms(target_name = NULL)
 
 #### Arguments
 
@@ -150,13 +150,13 @@ Get all comms or all comms related to a target
 
 ------------------------------------------------------------------------
 
-### Method `new_comm()`
+### `CommManager$new_comm()`
 
 Create a new comm related to a target
 
 #### Usage
 
-    CommManagerClass$new_comm(target_name)
+    CommManager$new_comm(target_name)
 
 #### Arguments
 
@@ -166,13 +166,13 @@ Create a new comm related to a target
 
 ------------------------------------------------------------------------
 
-### Method `handle_open()`
+### `CommManager$handle_open()`
 
 Handle a 'comm open' request from the frontend
 
 #### Usage
 
-    CommManagerClass$handle_open(target_name, id, data)
+    CommManager$handle_open(target_name, id, data)
 
 #### Arguments
 
@@ -190,13 +190,13 @@ Handle a 'comm open' request from the frontend
 
 ------------------------------------------------------------------------
 
-### Method `handle_close()`
+### `CommManager$handle_close()`
 
 Handle a 'comm close' request from the frontend
 
 #### Usage
 
-    CommManagerClass$handle_close(id, data)
+    CommManager$handle_close(id, data)
 
 #### Arguments
 
@@ -210,13 +210,13 @@ Handle a 'comm close' request from the frontend
 
 ------------------------------------------------------------------------
 
-### Method `handle_msg()`
+### `CommManager$handle_msg()`
 
 Handle a comm message from the frontend
 
 #### Usage
 
-    CommManagerClass$handle_msg(id, data)
+    CommManager$handle_msg(id, data)
 
 #### Arguments
 
@@ -230,13 +230,13 @@ Handle a comm message from the frontend
 
 ------------------------------------------------------------------------
 
-### Method `has()`
+### `CommManager$has()`
 
 Check whether the comm manager has info about comm with an id
 
 #### Usage
 
-    CommManagerClass$has(id)
+    CommManager$has(id)
 
 #### Arguments
 
@@ -246,13 +246,13 @@ Check whether the comm manager has info about comm with an id
 
 ------------------------------------------------------------------------
 
-### Method `send()`
+### `CommManager$send()`
 
 Send data to the frontend
 
 #### Usage
 
-    CommManagerClass$send(id, data, metadata = emptyNamedList, buffers = NULL)
+    CommManager$send(id, data, metadata = emptyNamedList, buffers = NULL)
 
 #### Arguments
 
@@ -274,13 +274,13 @@ Send data to the frontend
 
 ------------------------------------------------------------------------
 
-### Method `send_open()`
+### `CommManager$send_open()`
 
 Send an 'open' request to the frontend
 
 #### Usage
 
-    CommManagerClass$send_open(
+    CommManager$send_open(
       id,
       target_name,
       data,
@@ -312,13 +312,13 @@ Send an 'open' request to the frontend
 
 ------------------------------------------------------------------------
 
-### Method `send_close()`
+### `CommManager$send_close()`
 
 Send an 'close' request to the frontend
 
 #### Usage
 
-    CommManagerClass$send_close(
+    CommManager$send_close(
       id,
       data = emptyNamedList,
       metadata = emptyNamedList,
@@ -345,23 +345,23 @@ Send an 'close' request to the frontend
 
 ------------------------------------------------------------------------
 
-### Method `list_targets()`
+### `CommManager$list_targets()`
 
 Return a list of targets
 
 #### Usage
 
-    CommManagerClass$list_targets()
+    CommManager$list_targets()
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `CommManager$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    CommManagerClass$clone(deep = FALSE)
+    CommManager$clone(deep = FALSE)
 
 #### Arguments
 

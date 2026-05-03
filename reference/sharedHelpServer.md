@@ -21,7 +21,7 @@ several RKernel processes
 
 ### Public methods
 
-- [`sharedHelpServer$new()`](#method-sharedHelpServer-new)
+- [`sharedHelpServer$new()`](#method-sharedHelpServer-initialize)
 
 - [`sharedHelpServer$httpd()`](#method-sharedHelpServer-httpd)
 
@@ -35,7 +35,7 @@ several RKernel processes
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `sharedHelpServer$new()`
 
 Intialize the object
 
@@ -60,7 +60,7 @@ Intialize the object
 
 ------------------------------------------------------------------------
 
-### Method `httpd()`
+### `sharedHelpServer$httpd()`
 
 The function that serves paths and queries
 
@@ -84,7 +84,7 @@ The function that serves paths and queries
 
 ------------------------------------------------------------------------
 
-### Method `run()`
+### `sharedHelpServer$run()`
 
 The server loop
 
@@ -94,7 +94,7 @@ The server loop
 
 ------------------------------------------------------------------------
 
-### Method `publish_port()`
+### `sharedHelpServer$publish_port()`
 
 Put a port number into a temporary file, for other processes to find
 
@@ -110,7 +110,7 @@ Put a port number into a temporary file, for other processes to find
 
 ------------------------------------------------------------------------
 
-### Method [`log()`](https://rdrr.io/r/base/Log.html)
+### `sharedHelpServer$log()`
 
 Put log text into a temporary file, for other processes to read
 
@@ -126,7 +126,7 @@ Put log text into a temporary file, for other processes to read
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `sharedHelpServer$clone()`
 
 The objects of this class are cloneable with this method.
 

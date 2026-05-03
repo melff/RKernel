@@ -28,14 +28,12 @@ AudioWidget(...)
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
 -\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
--\>
-[`RKernel::DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
--\> `RKernel::ValueWidget` -\> `MediaWidget`
+[`DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
+-\> `ValueWidget` -\> `MediaWidget`
 
 ## Public fields
 
@@ -52,52 +50,52 @@ AudioWidget(...)
 
 ### Public methods
 
-- [`MediaWidgetClass$from_url()`](#method-MediaWidget-from_url)
+- [`MediaWidget$from_url()`](#method-MediaWidget-from_url)
 
-- [`MediaWidgetClass$from_file()`](#method-MediaWidget-from_file)
+- [`MediaWidget$from_file()`](#method-MediaWidget-from_file)
 
-- [`MediaWidgetClass$on_change()`](#method-MediaWidget-on_change)
+- [`MediaWidget$on_change()`](#method-MediaWidget-on_change)
 
-- [`MediaWidgetClass$new()`](#method-MediaWidget-new)
+- [`MediaWidget$new()`](#method-MediaWidget-initialize)
 
-- [`MediaWidgetClass$clone()`](#method-MediaWidget-clone)
+- [`MediaWidget$clone()`](#method-MediaWidget-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
 
 ------------------------------------------------------------------------
 
-### Method `from_url()`
+### `MediaWidget$from_url()`
 
 Create media widget from url
 
 #### Usage
 
-    MediaWidgetClass$from_url(url, width = NULL, height = NULL)
+    MediaWidget$from_url(url, width = NULL, height = NULL)
 
 #### Arguments
 
@@ -115,13 +113,13 @@ Create media widget from url
 
 ------------------------------------------------------------------------
 
-### Method `from_file()`
+### `MediaWidget$from_file()`
 
 Create media widget from file
 
 #### Usage
 
-    MediaWidgetClass$from_file(filename)
+    MediaWidget$from_file(filename)
 
 #### Arguments
 
@@ -131,13 +129,13 @@ Create media widget from file
 
 ------------------------------------------------------------------------
 
-### Method `on_change()`
+### `MediaWidget$on_change()`
 
 Add or remove a handler to be called if value is changed.
 
 #### Usage
 
-    MediaWidgetClass$on_change(handler, remove = FALSE)
+    MediaWidget$on_change(handler, remove = FALSE)
 
 #### Arguments
 
@@ -151,13 +149,13 @@ Add or remove a handler to be called if value is changed.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `MediaWidget$new()`
 
 Initialize an object
 
 #### Usage
 
-    MediaWidgetClass$new(from_file = NULL, from_url = NULL, ...)
+    MediaWidget$new(from_file = NULL, from_url = NULL, ...)
 
 #### Arguments
 
@@ -176,13 +174,13 @@ Initialize an object
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `MediaWidget$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    MediaWidgetClass$clone(deep = FALSE)
+    MediaWidget$clone(deep = FALSE)
 
 #### Arguments
 
@@ -192,14 +190,12 @@ The objects of this class are cloneable with this method.
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
 -\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
--\>
-[`RKernel::DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
--\> `RKernel::ValueWidget` -\> `RKernel::MediaWidget` -\> `ImageWidget`
+[`DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
+-\> `ValueWidget` -\> `MediaWidget` -\> `ImageWidget`
 
 ## Public fields
 
@@ -227,49 +223,49 @@ The objects of this class are cloneable with this method.
 
 ### Public methods
 
-- [`ImageWidgetClass$from_file()`](#method-ImageWidget-from_file)
+- [`ImageWidget$from_file()`](#method-ImageWidget-from_file)
 
-- [`ImageWidgetClass$clone()`](#method-ImageWidget-clone)
+- [`ImageWidget$clone()`](#method-ImageWidget-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
-- [`RKernel::MediaWidget$from_url()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-from_url)
-- [`RKernel::MediaWidget$initialize()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-initialize)
-- [`RKernel::MediaWidget$on_change()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-on_change)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- [`MediaWidget$from_url()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-from_url)
+- [`MediaWidget$initialize()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-initialize)
+- [`MediaWidget$on_change()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-on_change)
 
 ------------------------------------------------------------------------
 
-### Method `from_file()`
+### `ImageWidget$from_file()`
 
 Create image widget from file
 
 #### Usage
 
-    ImageWidgetClass$from_file(filename, width = NULL, height = NULL)
+    ImageWidget$from_file(filename, width = NULL, height = NULL)
 
 #### Arguments
 
@@ -287,13 +283,13 @@ Create image widget from file
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `ImageWidget$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    ImageWidgetClass$clone(deep = FALSE)
+    ImageWidget$clone(deep = FALSE)
 
 #### Arguments
 
@@ -303,14 +299,12 @@ The objects of this class are cloneable with this method.
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
 -\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
--\>
-[`RKernel::DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
--\> `RKernel::ValueWidget` -\> `RKernel::MediaWidget` -\> `VideoWidget`
+[`DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
+-\> `ValueWidget` -\> `MediaWidget` -\> `VideoWidget`
 
 ## Public fields
 
@@ -350,49 +344,49 @@ The objects of this class are cloneable with this method.
 
 ### Public methods
 
-- [`VideoWidgetClass$from_file()`](#method-VideoWidget-from_file)
+- [`VideoWidget$from_file()`](#method-VideoWidget-from_file)
 
-- [`VideoWidgetClass$clone()`](#method-VideoWidget-clone)
+- [`VideoWidget$clone()`](#method-VideoWidget-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
-- [`RKernel::MediaWidget$from_url()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-from_url)
-- [`RKernel::MediaWidget$initialize()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-initialize)
-- [`RKernel::MediaWidget$on_change()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-on_change)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- [`MediaWidget$from_url()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-from_url)
+- [`MediaWidget$initialize()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-initialize)
+- [`MediaWidget$on_change()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-on_change)
 
 ------------------------------------------------------------------------
 
-### Method `from_file()`
+### `VideoWidget$from_file()`
 
 Create image widget from file
 
 #### Usage
 
-    VideoWidgetClass$from_file(filename, width = NULL, height = NULL)
+    VideoWidget$from_file(filename, width = NULL, height = NULL)
 
 #### Arguments
 
@@ -410,13 +404,13 @@ Create image widget from file
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `VideoWidget$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    VideoWidgetClass$clone(deep = FALSE)
+    VideoWidget$clone(deep = FALSE)
 
 #### Arguments
 
@@ -426,14 +420,12 @@ The objects of this class are cloneable with this method.
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
 -\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
--\>
-[`RKernel::DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
--\> `RKernel::ValueWidget` -\> `RKernel::MediaWidget` -\> `AudioWidget`
+[`DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
+-\> `ValueWidget` -\> `MediaWidget` -\> `AudioWidget`
 
 ## Public fields
 
@@ -465,48 +457,48 @@ The objects of this class are cloneable with this method.
 
 ### Public methods
 
-- [`AudioWidgetClass$clone()`](#method-AudioWidget-clone)
+- [`AudioWidget$clone()`](#method-AudioWidget-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
-- [`RKernel::MediaWidget$from_file()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-from_file)
-- [`RKernel::MediaWidget$from_url()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-from_url)
-- [`RKernel::MediaWidget$initialize()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-initialize)
-- [`RKernel::MediaWidget$on_change()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-on_change)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- [`MediaWidget$from_file()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-from_file)
+- [`MediaWidget$from_url()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-from_url)
+- [`MediaWidget$initialize()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-initialize)
+- [`MediaWidget$on_change()`](https://melff.github.io/RKernel/reference/MediaWidget.html#method-on_change)
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `AudioWidget$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    AudioWidgetClass$clone(deep = FALSE)
+    AudioWidget$clone(deep = FALSE)
 
 #### Arguments
 

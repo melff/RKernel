@@ -52,23 +52,23 @@ TraitInstance(Class, ...)
 
 ### Public methods
 
-- [`TraitClass$set()`](#method-Trait-set)
+- [`Trait$set()`](#method-Trait-set)
 
-- [`TraitClass$get()`](#method-Trait-get)
+- [`Trait$get()`](#method-Trait-get)
 
-- [`TraitClass$new()`](#method-Trait-new)
+- [`Trait$new()`](#method-Trait-initialize)
 
-- [`TraitClass$clone()`](#method-Trait-clone)
+- [`Trait$clone()`](#method-Trait-clone)
 
 ------------------------------------------------------------------------
 
-### Method `set()`
+### `Trait$set()`
 
 Set the value of the trait
 
 #### Usage
 
-    TraitClass$set(value, notify = FALSE)
+    Trait$set(value, notify = FALSE)
 
 #### Arguments
 
@@ -82,23 +82,23 @@ Set the value of the trait
 
 ------------------------------------------------------------------------
 
-### Method [`get()`](https://rdrr.io/r/base/get.html)
+### `Trait$get()`
 
 Get the trait value
 
 #### Usage
 
-    TraitClass$get()
+    Trait$get()
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Trait$new()`
 
 Initialize the trait, i.e. set an initial value
 
 #### Usage
 
-    TraitClass$new(initial)
+    Trait$new(initial)
 
 #### Arguments
 
@@ -112,13 +112,13 @@ Initialize the trait, i.e. set an initial value
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Trait$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    TraitClass$clone(deep = FALSE)
+    Trait$clone(deep = FALSE)
 
 #### Arguments
 

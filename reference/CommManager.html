@@ -9,7 +9,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,50 +81,46 @@
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-CommManager-add_handlers"><code>CommManagerClass$add_handlers()</code></a></p></li>
-<li><p><a href="#method-CommManager-remove_handlers"><code>CommManagerClass$remove_handlers()</code></a></p></li>
-<li><p><a href="#method-CommManager-has_handlers"><code>CommManagerClass$has_handlers()</code></a></p></li>
-<li><p><a href="#method-CommManager-get_handlers"><code>CommManagerClass$get_handlers()</code></a></p></li>
-<li><p><a href="#method-CommManager-get_comms"><code>CommManagerClass$get_comms()</code></a></p></li>
-<li><p><a href="#method-CommManager-new_comm"><code>CommManagerClass$new_comm()</code></a></p></li>
-<li><p><a href="#method-CommManager-handle_open"><code>CommManagerClass$handle_open()</code></a></p></li>
-<li><p><a href="#method-CommManager-handle_close"><code>CommManagerClass$handle_close()</code></a></p></li>
-<li><p><a href="#method-CommManager-handle_msg"><code>CommManagerClass$handle_msg()</code></a></p></li>
-<li><p><a href="#method-CommManager-has"><code>CommManagerClass$has()</code></a></p></li>
-<li><p><a href="#method-CommManager-send"><code>CommManagerClass$send()</code></a></p></li>
-<li><p><a href="#method-CommManager-send_open"><code>CommManagerClass$send_open()</code></a></p></li>
-<li><p><a href="#method-CommManager-send_close"><code>CommManagerClass$send_close()</code></a></p></li>
-<li><p><a href="#method-CommManager-list_targets"><code>CommManagerClass$list_targets()</code></a></p></li>
-<li><p><a href="#method-CommManager-clone"><code>CommManagerClass$clone()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-CommManager-add_handlers"><code>CommManager$add_handlers()</code></a></p></li>
+<li><p><a href="#method-CommManager-remove_handlers"><code>CommManager$remove_handlers()</code></a></p></li>
+<li><p><a href="#method-CommManager-has_handlers"><code>CommManager$has_handlers()</code></a></p></li>
+<li><p><a href="#method-CommManager-get_handlers"><code>CommManager$get_handlers()</code></a></p></li>
+<li><p><a href="#method-CommManager-get_comms"><code>CommManager$get_comms()</code></a></p></li>
+<li><p><a href="#method-CommManager-new_comm"><code>CommManager$new_comm()</code></a></p></li>
+<li><p><a href="#method-CommManager-handle_open"><code>CommManager$handle_open()</code></a></p></li>
+<li><p><a href="#method-CommManager-handle_close"><code>CommManager$handle_close()</code></a></p></li>
+<li><p><a href="#method-CommManager-handle_msg"><code>CommManager$handle_msg()</code></a></p></li>
+<li><p><a href="#method-CommManager-has"><code>CommManager$has()</code></a></p></li>
+<li><p><a href="#method-CommManager-send"><code>CommManager$send()</code></a></p></li>
+<li><p><a href="#method-CommManager-send_open"><code>CommManager$send_open()</code></a></p></li>
+<li><p><a href="#method-CommManager-send_close"><code>CommManager$send_close()</code></a></p></li>
+<li><p><a href="#method-CommManager-list_targets"><code>CommManager$list_targets()</code></a></p></li>
+<li><p><a href="#method-CommManager-clone"><code>CommManager$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-CommManager-add_handlers"></a><div class="section">
-<h3 id="method-add-handlers-">Method <code>add_handlers()</code><a class="anchor" aria-label="anchor" href="#method-add-handlers-"></a></h3>
+<h3 id="commmanager-add-handlers-"><code>CommManager$add_handlers()</code><a class="anchor" aria-label="anchor" href="#commmanager-add-handlers-"></a></h3>
 <p>Add a handler for a comm target</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">add_handlers</span><span class="op">(</span><span class="va">target_name</span>, <span class="va">handlers</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">add_handlers</span><span class="op">(</span><span class="va">target_name</span>, <span class="va">handlers</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>target_name</code></dt>
 <dd><p>A string, the name of the target.</p></dd>
 
-
-<dt><code>handlers</code></dt>
+      <dt><code>handlers</code></dt>
 <dd><p>A named list of handlers</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-remove_handlers"></a><div class="section">
-<h3 id="method-remove-handlers-">Method <code>remove_handlers()</code><a class="anchor" aria-label="anchor" href="#method-remove-handlers-"></a></h3>
-<p>Remove the handlers of a comm target</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">remove_handlers</span><span class="op">(</span><span class="va">target_name</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-CommManager-remove_handlers"></a><div class="section">
+<h3 id="commmanager-remove-handlers-"><code>CommManager$remove_handlers()</code><a class="anchor" aria-label="anchor" href="#commmanager-remove-handlers-"></a></h3>
+<p>Remove the handlers of a comm target</p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">remove_handlers</span><span class="op">(</span><span class="va">target_name</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>target_name</code></dt>
 <dd><p>A string, the name of the target</p></dd>
@@ -133,14 +129,14 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-has_handlers"></a><div class="section">
-<h3 id="method-has-handlers-">Method <code>has_handlers()</code><a class="anchor" aria-label="anchor" href="#method-has-handlers-"></a></h3>
-<p>Check if handlers for a target exist</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">has_handlers</span><span class="op">(</span><span class="va">target_name</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-CommManager-has_handlers"></a><div class="section">
+<h3 id="commmanager-has-handlers-"><code>CommManager$has_handlers()</code><a class="anchor" aria-label="anchor" href="#commmanager-has-handlers-"></a></h3>
+<p>Check if handlers for a target exist</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">has_handlers</span><span class="op">(</span><span class="va">target_name</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>target_name</code></dt>
 <dd><p>A string, the name of the target</p></dd>
@@ -149,14 +145,14 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-get_handlers"></a><div class="section">
-<h3 id="method-get-handlers-">Method <code>get_handlers()</code><a class="anchor" aria-label="anchor" href="#method-get-handlers-"></a></h3>
-<p>Get the handlers for a target</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">get_handlers</span><span class="op">(</span><span class="va">target_name</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-CommManager-get_handlers"></a><div class="section">
+<h3 id="commmanager-get-handlers-"><code>CommManager$get_handlers()</code><a class="anchor" aria-label="anchor" href="#commmanager-get-handlers-"></a></h3>
+<p>Get the handlers for a target</p><div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">get_handlers</span><span class="op">(</span><span class="va">target_name</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>target_name</code></dt>
 <dd><p>A string, the name of the target</p></dd>
@@ -165,14 +161,14 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-get_comms"></a><div class="section">
-<h3 id="method-get-comms-">Method <code>get_comms()</code><a class="anchor" aria-label="anchor" href="#method-get-comms-"></a></h3>
-<p>Get all comms or all comms related to a target</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">get_comms</span><span class="op">(</span>target_name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-CommManager-get_comms"></a><div class="section">
+<h3 id="commmanager-get-comms-"><code>CommManager$get_comms()</code><a class="anchor" aria-label="anchor" href="#commmanager-get-comms-"></a></h3>
+<p>Get all comms or all comms related to a target</p><div class="section">
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">get_comms</span><span class="op">(</span>target_name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>target_name</code></dt>
 <dd><p>A string, the name of the target or NULL. If NULL,</p></dd>
@@ -181,14 +177,14 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-new_comm"></a><div class="section">
-<h3 id="method-new-comm-">Method <code>new_comm()</code><a class="anchor" aria-label="anchor" href="#method-new-comm-"></a></h3>
-<p>Create a new comm related to a target</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">new_comm</span><span class="op">(</span><span class="va">target_name</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-CommManager-new_comm"></a><div class="section">
+<h3 id="commmanager-new-comm-"><code>CommManager$new_comm()</code><a class="anchor" aria-label="anchor" href="#commmanager-new-comm-"></a></h3>
+<p>Create a new comm related to a target</p><div class="section">
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">new_comm</span><span class="op">(</span><span class="va">target_name</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>target_name</code></dt>
 <dd><p>A string, the name of the target</p></dd>
@@ -197,79 +193,75 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-handle_open"></a><div class="section">
-<h3 id="method-handle-open-">Method <code>handle_open()</code><a class="anchor" aria-label="anchor" href="#method-handle-open-"></a></h3>
-<p>Handle a 'comm open' request from the frontend</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">handle_open</span><span class="op">(</span><span class="va">target_name</span>, <span class="va">id</span>, <span class="va">data</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-CommManager-handle_open"></a><div class="section">
+<h3 id="commmanager-handle-open-"><code>CommManager$handle_open()</code><a class="anchor" aria-label="anchor" href="#commmanager-handle-open-"></a></h3>
+<p>Handle a 'comm open' request from the frontend</p><div class="section">
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">handle_open</span><span class="op">(</span><span class="va">target_name</span>, <span class="va">id</span>, <span class="va">data</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>target_name</code></dt>
 <dd><p>A string, the name of the target</p></dd>
 
-
-<dt><code>id</code></dt>
+      <dt><code>id</code></dt>
 <dd><p>A string, the comm id</p></dd>
 
-
-<dt><code>data</code></dt>
+      <dt><code>data</code></dt>
 <dd><p>Data sent by the frontend</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-handle_close"></a><div class="section">
-<h3 id="method-handle-close-">Method <code>handle_close()</code><a class="anchor" aria-label="anchor" href="#method-handle-close-"></a></h3>
-<p>Handle a 'comm close' request from the frontend</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">handle_close</span><span class="op">(</span><span class="va">id</span>, <span class="va">data</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-CommManager-handle_close"></a><div class="section">
+<h3 id="commmanager-handle-close-"><code>CommManager$handle_close()</code><a class="anchor" aria-label="anchor" href="#commmanager-handle-close-"></a></h3>
+<p>Handle a 'comm close' request from the frontend</p><div class="section">
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">handle_close</span><span class="op">(</span><span class="va">id</span>, <span class="va">data</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>id</code></dt>
 <dd><p>A string, the comm id</p></dd>
 
-
-<dt><code>data</code></dt>
+      <dt><code>data</code></dt>
 <dd><p>Data sent by the frontend</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-handle_msg"></a><div class="section">
-<h3 id="method-handle-msg-">Method <code>handle_msg()</code><a class="anchor" aria-label="anchor" href="#method-handle-msg-"></a></h3>
-<p>Handle a comm message from the frontend</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">handle_msg</span><span class="op">(</span><span class="va">id</span>, <span class="va">data</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-CommManager-handle_msg"></a><div class="section">
+<h3 id="commmanager-handle-msg-"><code>CommManager$handle_msg()</code><a class="anchor" aria-label="anchor" href="#commmanager-handle-msg-"></a></h3>
+<p>Handle a comm message from the frontend</p><div class="section">
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">handle_msg</span><span class="op">(</span><span class="va">id</span>, <span class="va">data</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>id</code></dt>
 <dd><p>A string, the comm id</p></dd>
 
-
-<dt><code>data</code></dt>
+      <dt><code>data</code></dt>
 <dd><p>Data sent by the frontend</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-has"></a><div class="section">
-<h3 id="method-has-">Method <code>has()</code><a class="anchor" aria-label="anchor" href="#method-has-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-CommManager-has"></a><div class="section">
+<h3 id="commmanager-has-"><code>CommManager$has()</code><a class="anchor" aria-label="anchor" href="#commmanager-has-"></a></h3>
 <p>Check whether the comm manager has info
 about comm with an id</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">has</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">has</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>id</code></dt>
 <dd><p>A string, possibly a comm id</p></dd>
@@ -278,121 +270,112 @@ about comm with an id</p><div class="section">
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-send"></a><div class="section">
-<h3 id="method-send-">Method <code>send()</code><a class="anchor" aria-label="anchor" href="#method-send-"></a></h3>
-<p>Send data to the frontend</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">send</span><span class="op">(</span><span class="va">id</span>, <span class="va">data</span>, metadata <span class="op">=</span> <span class="va">emptyNamedList</span>, buffers <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-CommManager-send"></a><div class="section">
+<h3 id="commmanager-send-"><code>CommManager$send()</code><a class="anchor" aria-label="anchor" href="#commmanager-send-"></a></h3>
+<p>Send data to the frontend</p><div class="section">
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">send</span><span class="op">(</span><span class="va">id</span>, <span class="va">data</span>, metadata <span class="op">=</span> <span class="va">emptyNamedList</span>, buffers <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>id</code></dt>
 <dd><p>A string, the comm id</p></dd>
 
-
-<dt><code>data</code></dt>
+      <dt><code>data</code></dt>
 <dd><p>A named list</p></dd>
 
-
-<dt><code>metadata</code></dt>
+      <dt><code>metadata</code></dt>
 <dd><p>A named list</p></dd>
 
-
-<dt><code>buffers</code></dt>
+      <dt><code>buffers</code></dt>
 <dd><p>A list of raw vectors or NULL</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-send_open"></a><div class="section">
-<h3 id="method-send-open-">Method <code>send_open()</code><a class="anchor" aria-label="anchor" href="#method-send-open-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-CommManager-send_open"></a><div class="section">
+<h3 id="commmanager-send-open-"><code>CommManager$send_open()</code><a class="anchor" aria-label="anchor" href="#commmanager-send-open-"></a></h3>
 <p>Send an 'open' request to the frontend</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">send_open</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">send_open</span><span class="op">(</span></span>
 <span>  <span class="va">id</span>,</span>
 <span>  <span class="va">target_name</span>,</span>
 <span>  <span class="va">data</span>,</span>
 <span>  metadata <span class="op">=</span> <span class="va">emptyNamedList</span>,</span>
 <span>  buffers <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>id</code></dt>
 <dd><p>A string, the comm id</p></dd>
 
-
-<dt><code>target_name</code></dt>
+      <dt><code>target_name</code></dt>
 <dd><p>A string, the name of the target</p></dd>
 
-
-<dt><code>data</code></dt>
+      <dt><code>data</code></dt>
 <dd><p>A named list</p></dd>
 
-
-<dt><code>metadata</code></dt>
+      <dt><code>metadata</code></dt>
 <dd><p>A named list</p></dd>
 
-
-<dt><code>buffers</code></dt>
+      <dt><code>buffers</code></dt>
 <dd><p>A list of raw vectors or NULL</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-send_close"></a><div class="section">
-<h3 id="method-send-close-">Method <code>send_close()</code><a class="anchor" aria-label="anchor" href="#method-send-close-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-CommManager-send_close"></a><div class="section">
+<h3 id="commmanager-send-close-"><code>CommManager$send_close()</code><a class="anchor" aria-label="anchor" href="#commmanager-send-close-"></a></h3>
 <p>Send an 'close' request to the frontend</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">send_close</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">send_close</span><span class="op">(</span></span>
 <span>  <span class="va">id</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">emptyNamedList</span>,</span>
 <span>  metadata <span class="op">=</span> <span class="va">emptyNamedList</span>,</span>
 <span>  buffers <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>id</code></dt>
 <dd><p>A string, the comm id</p></dd>
 
-
-<dt><code>data</code></dt>
+      <dt><code>data</code></dt>
 <dd><p>A named list</p></dd>
 
-
-<dt><code>metadata</code></dt>
+      <dt><code>metadata</code></dt>
 <dd><p>A named list</p></dd>
 
-
-<dt><code>buffers</code></dt>
+      <dt><code>buffers</code></dt>
 <dd><p>A list of raw vectors or NULL</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CommManager-list_targets"></a><div class="section">
-<h3 id="method-list-targets-">Method <code>list_targets()</code><a class="anchor" aria-label="anchor" href="#method-list-targets-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-CommManager-list_targets"></a><div class="section">
+<h3 id="commmanager-list-targets-"><code>CommManager$list_targets()</code><a class="anchor" aria-label="anchor" href="#commmanager-list-targets-"></a></h3>
 <p>Return a list of targets</p><div class="section">
 <h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">list_targets</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">list_targets</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-CommManager-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p></p><hr><a id="method-CommManager-clone"></a><div class="section">
+<h3 id="commmanager-clone-"><code>CommManager$clone()</code><a class="anchor" aria-label="anchor" href="#commmanager-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManagerClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CommManager</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-14">Arguments<a class="anchor" aria-label="anchor" href="#arguments-14"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -402,6 +385,7 @@ about comm with an id</p><div class="section">
 </div>
 
 </div>
+
 
     </div>
 

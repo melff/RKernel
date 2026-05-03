@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@
 </dl></div>
     <div class="section level2">
     <h2 id="super-class">Super class<a class="anchor" aria-label="anchor" href="#super-class"></a></h2>
-    <p><code><a href="Traitlets.html">RKernel::Trait</a></code> -&gt; <code>Integer</code></p>
+    <p><code><a href="Traitlets.html">Trait</a></code> -&gt; <code>Integer</code></p>
     </div>
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
@@ -78,16 +78,16 @@
 <dd><p>An integer vector.</p></dd>
 
 
-<dt><code>optional</code></dt>
+    <dt><code>optional</code></dt>
 <dd><p>Logical value, whether a length-zero value is allowed.</p></dd>
 
 
-<dt><code>coerce</code></dt>
+    <dt><code>coerce</code></dt>
 <dd><p>Logical value, whether assignments to the value field should
 be coerced to the appropriate type.</p></dd>
 
 
-<dt><code>length</code></dt>
+    <dt><code>length</code></dt>
 <dd><p>Integer number, the length the value should have.</p></dd>
 
 
@@ -98,20 +98,17 @@ be coerced to the appropriate type.</p></dd>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-Integer-validator"><code>IntegerClass$validator()</code></a></p></li>
-<li><p><a href="#method-Integer-new"><code>IntegerClass$new()</code></a></p></li>
-<li><p><a href="#method-Integer-clone"><code>IntegerClass$clone()</code></a></p></li>
-</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="Trait" data-id="get"><a href="Trait.html#method-get"><code>RKernel::Trait$get()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Trait" data-id="set"><a href="Trait.html#method-set"><code>RKernel::Trait$set()</code></a></span></li>
+<p></p><ul><li><p><a href="#method-Integer-validator"><code>Integer$validator()</code></a></p></li>
+<li><p><a href="#method-Integer-initialize"><code>Integer$new()</code></a></p></li>
+<li><p><a href="#method-Integer-clone"><code>Integer$clone()</code></a></p></li>
+</ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="Trait" data-id="get"><a href="Trait.html#method-get"><code>Trait$get()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Trait" data-id="set"><a href="Trait.html#method-set"><code>Trait$set()</code></a></span></li>
 </ul></details></p><hr><a id="method-Integer-validator"></a><div class="section">
-<h3 id="method-validator-">Method <code>validator()</code><a class="anchor" aria-label="anchor" href="#method-validator-"></a></h3>
+<h3 id="integer-validator-"><code>Integer$validator()</code><a class="anchor" aria-label="anchor" href="#integer-validator-"></a></h3>
 <p>Check the value assigned to the traitlet.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IntegerClass</span><span class="op">$</span><span class="fu">validator</span><span class="op">(</span><span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Integer</span><span class="op">$</span><span class="fu">validator</span><span class="op">(</span><span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>value</code></dt>
 <dd><p>The value assigned to the traitlet.</p></dd>
@@ -120,48 +117,45 @@ be coerced to the appropriate type.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Integer-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-Integer-initialize"></a><div class="section">
+<h3 id="integer-new-"><code>Integer$new()</code><a class="anchor" aria-label="anchor" href="#integer-new-"></a></h3>
 <p>Initialize the traitlet.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Integer.html">IntegerClass</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Integer.html">Integer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  initial <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
 <span>  coerce <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  optional <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">initial</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span>,</span>
 <span>  length <span class="op">=</span> <span class="fl">1L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>initial</code></dt>
 <dd><p>An integer vector, the initial value for the traitlet.</p></dd>
 
-
-<dt><code>coerce</code></dt>
+      <dt><code>coerce</code></dt>
 <dd><p>coerce Logical value, whether assignments to the value field should
 be coerced to the appropriate type.</p></dd>
 
-
-<dt><code>optional</code></dt>
+      <dt><code>optional</code></dt>
 <dd><p>Logical value, whether a length-zero value is allowed.</p></dd>
 
-
-<dt><code>length</code></dt>
+      <dt><code>length</code></dt>
 <dd><p>Integer number, the length the value should have.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Integer-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">IntegerClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-Integer-clone"></a><div class="section">
+<h3 id="integer-clone-"><code>Integer$clone()</code><a class="anchor" aria-label="anchor" href="#integer-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Integer</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -171,6 +165,7 @@ be coerced to the appropriate type.</p></dd>
 </div>
 
 </div>
+
 
     </div>
 

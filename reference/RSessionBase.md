@@ -31,7 +31,7 @@ inherit from this class.
 
 ### Public methods
 
-- [`RSessionBase$new()`](#method-RSessionBase-new)
+- [`RSessionBase$new()`](#method-RSessionBase-initialize)
 
 - [`RSessionBase$sleeping()`](#method-RSessionBase-sleeping)
 
@@ -53,6 +53,7 @@ Inherited methods
 - [`processx::process$format()`](http://processx.r-lib.org/reference/process.html#method-format)
 - [`processx::process$get_cmdline()`](http://processx.r-lib.org/reference/process.html#method-get_cmdline)
 - [`processx::process$get_cpu_times()`](http://processx.r-lib.org/reference/process.html#method-get_cpu_times)
+- [`processx::process$get_end_time()`](http://processx.r-lib.org/reference/process.html#method-get_end_time)
 - [`processx::process$get_error_connection()`](http://processx.r-lib.org/reference/process.html#method-get_error_connection)
 - [`processx::process$get_error_file()`](http://processx.r-lib.org/reference/process.html#method-get_error_file)
 - [`processx::process$get_exe()`](http://processx.r-lib.org/reference/process.html#method-get_exe)
@@ -87,7 +88,9 @@ Inherited methods
 - [`processx::process$read_all_output()`](http://processx.r-lib.org/reference/process.html#method-read_all_output)
 - [`processx::process$read_all_output_lines()`](http://processx.r-lib.org/reference/process.html#method-read_all_output_lines)
 - [`processx::process$read_error()`](http://processx.r-lib.org/reference/process.html#method-read_error)
+- [`processx::process$read_error_bytes()`](http://processx.r-lib.org/reference/process.html#method-read_error_bytes)
 - [`processx::process$read_error_lines()`](http://processx.r-lib.org/reference/process.html#method-read_error_lines)
+- [`processx::process$read_output_bytes()`](http://processx.r-lib.org/reference/process.html#method-read_output_bytes)
 - [`processx::process$read_output_lines()`](http://processx.r-lib.org/reference/process.html#method-read_output_lines)
 - [`processx::process$resume()`](http://processx.r-lib.org/reference/process.html#method-resume)
 - [`processx::process$signal()`](http://processx.r-lib.org/reference/process.html#method-signal)
@@ -111,7 +114,7 @@ Inherited methods
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RSessionBase$new()`
 
 Initialize the object and start the session
 
@@ -141,7 +144,7 @@ Initialize the object and start the session
 
 ------------------------------------------------------------------------
 
-### Method `sleeping()`
+### `RSessionBase$sleeping()`
 
 Returns a logical value, indicating whether the R process is sleeping.
 
@@ -151,7 +154,7 @@ Returns a logical value, indicating whether the R process is sleeping.
 
 ------------------------------------------------------------------------
 
-### Method `send_input()`
+### `RSessionBase$send_input()`
 
 Send input text to the R process
 
@@ -171,7 +174,7 @@ Send input text to the R process
 
 ------------------------------------------------------------------------
 
-### Method `read_output()`
+### `RSessionBase$read_output()`
 
 Read output from the R session and drop input echo if so requested
 
@@ -187,7 +190,7 @@ Read output from the R session and drop input echo if so requested
 
 ------------------------------------------------------------------------
 
-### Method `receive_output()`
+### `RSessionBase$receive_output()`
 
 Poll R process for output and read it
 
@@ -203,7 +206,7 @@ Poll R process for output and read it
 
 ------------------------------------------------------------------------
 
-### Method `receive_all_output()`
+### `RSessionBase$receive_all_output()`
 
 Receive all output that is available
 
@@ -219,7 +222,7 @@ Receive all output that is available
 
 ------------------------------------------------------------------------
 
-### Method `send_receive()`
+### `RSessionBase$send_receive()`
 
 Send text to R process and receive all output from the process
 
@@ -239,7 +242,7 @@ Send text to R process and receive all output from the process
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RSessionBase$clone()`
 
 The objects of this class are cloneable with this method.
 

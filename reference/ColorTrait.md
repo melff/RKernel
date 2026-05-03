@@ -2,8 +2,6 @@
 
 A Color String Trait
 
-A Color String Trait
-
 ## Usage
 
 ``` r
@@ -18,10 +16,9 @@ Color(...)
 
 ## Super classes
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\>
-[`RKernel::Unicode`](https://melff.github.io/RKernel/reference/Unicode.md)
--\> `Color`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+[`Unicode`](https://melff.github.io/RKernel/reference/Unicode.md) -\>
+`Color`
 
 ## Public fields
 
@@ -33,25 +30,25 @@ Color(...)
 
 ### Public methods
 
-- [`ColorTraitClass$validator()`](#method-Color-validator)
+- [`Color$validator()`](#method-Color-validator)
 
-- [`ColorTraitClass$clone()`](#method-Color-clone)
+- [`Color$clone()`](#method-Color-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
-- [`RKernel::Unicode$initialize()`](https://melff.github.io/RKernel/reference/Unicode.html#method-initialize)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Unicode$initialize()`](https://melff.github.io/RKernel/reference/Unicode.html#method-initialize)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `Color$validator()`
 
 Check the value assigned to the traitlet.
 
 #### Usage
 
-    ColorTraitClass$validator(value)
+    Color$validator(value)
 
 #### Arguments
 
@@ -61,13 +58,13 @@ Check the value assigned to the traitlet.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Color$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    ColorTraitClass$clone(deep = FALSE)
+    Color$clone(deep = FALSE)
 
 #### Arguments
 

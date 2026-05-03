@@ -24,14 +24,12 @@ NaiveDatetimePicker(...)
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
 -\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
--\>
-[`RKernel::DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
--\> `RKernel::ValueWidget` -\> `DatetimePicker`
+[`DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
+-\> `ValueWidget` -\> `DatetimePicker`
 
 ## Public fields
 
@@ -65,55 +63,55 @@ NaiveDatetimePicker(...)
 
 ### Public methods
 
-- [`DatetimePickerClass$validate_tz()`](#method-DatetimePicker-validate_tz)
+- [`DatetimePicker$validate_tz()`](#method-DatetimePicker-validate_tz)
 
-- [`DatetimePickerClass$validate_value()`](#method-DatetimePicker-validate_value)
+- [`DatetimePicker$validate_value()`](#method-DatetimePicker-validate_value)
 
-- [`DatetimePickerClass$validate_min()`](#method-DatetimePicker-validate_min)
+- [`DatetimePicker$validate_min()`](#method-DatetimePicker-validate_min)
 
-- [`DatetimePickerClass$validate_max()`](#method-DatetimePicker-validate_max)
+- [`DatetimePicker$validate_max()`](#method-DatetimePicker-validate_max)
 
-- [`DatetimePickerClass$new()`](#method-DatetimePicker-new)
+- [`DatetimePicker$new()`](#method-DatetimePicker-initialize)
 
-- [`DatetimePickerClass$clone()`](#method-DatetimePicker-clone)
+- [`DatetimePicker$clone()`](#method-DatetimePicker-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
-- [`RKernel::ValueWidget$on_change()`](https://melff.github.io/RKernel/reference/ValueWidget.html#method-on_change)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- `ValueWidget$on_change()`
 
 ------------------------------------------------------------------------
 
-### Method `validate_tz()`
+### `DatetimePicker$validate_tz()`
 
 Check whether time zone is valid.
 
 #### Usage
 
-    DatetimePickerClass$validate_tz(value)
+    DatetimePicker$validate_tz(value)
 
 #### Arguments
 
@@ -123,13 +121,13 @@ Check whether time zone is valid.
 
 ------------------------------------------------------------------------
 
-### Method `validate_value()`
+### `DatetimePicker$validate_value()`
 
 Check wether "value" is within range.
 
 #### Usage
 
-    DatetimePickerClass$validate_value(value)
+    DatetimePicker$validate_value(value)
 
 #### Arguments
 
@@ -139,13 +137,13 @@ Check wether "value" is within range.
 
 ------------------------------------------------------------------------
 
-### Method `validate_min()`
+### `DatetimePicker$validate_min()`
 
 Validate the "min" field after assignment.
 
 #### Usage
 
-    DatetimePickerClass$validate_min(min)
+    DatetimePicker$validate_min(min)
 
 #### Arguments
 
@@ -155,13 +153,13 @@ Validate the "min" field after assignment.
 
 ------------------------------------------------------------------------
 
-### Method `validate_max()`
+### `DatetimePicker$validate_max()`
 
 Validate the "max" field after assignment.
 
 #### Usage
 
-    DatetimePickerClass$validate_max(max)
+    DatetimePicker$validate_max(max)
 
 #### Arguments
 
@@ -171,11 +169,11 @@ Validate the "max" field after assignment.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `DatetimePicker$new()`
 
 #### Usage
 
-    DatetimePickerClass$new(...)
+    DatetimePicker$new(...)
 
 #### Arguments
 
@@ -185,13 +183,13 @@ Validate the "max" field after assignment.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `DatetimePicker$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    DatetimePickerClass$clone(deep = FALSE)
+    DatetimePicker$clone(deep = FALSE)
 
 #### Arguments
 
@@ -201,15 +199,12 @@ The objects of this class are cloneable with this method.
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
 -\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
--\>
-[`RKernel::DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
--\> `RKernel::ValueWidget` -\> `RKernel::DatetimePicker` -\>
-`NaiveDatetimePicker`
+[`DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
+-\> `ValueWidget` -\> `DatetimePicker` -\> `NaiveDatetimePicker`
 
 ## Public fields
 
@@ -235,53 +230,53 @@ The objects of this class are cloneable with this method.
 
 ### Public methods
 
-- [`NaiveDatetimePickerClass$validate_tz()`](#method-NaiveDatetimePicker-validate_tz)
+- [`NaiveDatetimePicker$validate_tz()`](#method-NaiveDatetimePicker-validate_tz)
 
-- [`NaiveDatetimePickerClass$validate_value()`](#method-NaiveDatetimePicker-validate_value)
+- [`NaiveDatetimePicker$validate_value()`](#method-NaiveDatetimePicker-validate_value)
 
-- [`NaiveDatetimePickerClass$new()`](#method-NaiveDatetimePicker-new)
+- [`NaiveDatetimePicker$new()`](#method-NaiveDatetimePicker-initialize)
 
-- [`NaiveDatetimePickerClass$clone()`](#method-NaiveDatetimePicker-clone)
+- [`NaiveDatetimePicker$clone()`](#method-NaiveDatetimePicker-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
-- [`RKernel::ValueWidget$on_change()`](https://melff.github.io/RKernel/reference/ValueWidget.html#method-on_change)
-- [`RKernel::DatetimePicker$validate_max()`](https://melff.github.io/RKernel/reference/DatetimePicker.html#method-validate_max)
-- [`RKernel::DatetimePicker$validate_min()`](https://melff.github.io/RKernel/reference/DatetimePicker.html#method-validate_min)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- `ValueWidget$on_change()`
+- [`DatetimePicker$validate_max()`](https://melff.github.io/RKernel/reference/DatetimePicker.html#method-validate_max)
+- [`DatetimePicker$validate_min()`](https://melff.github.io/RKernel/reference/DatetimePicker.html#method-validate_min)
 
 ------------------------------------------------------------------------
 
-### Method `validate_tz()`
+### `NaiveDatetimePicker$validate_tz()`
 
 Check whether time zone is valid.
 
 #### Usage
 
-    NaiveDatetimePickerClass$validate_tz(value)
+    NaiveDatetimePicker$validate_tz(value)
 
 #### Arguments
 
@@ -291,13 +286,13 @@ Check whether time zone is valid.
 
 ------------------------------------------------------------------------
 
-### Method `validate_value()`
+### `NaiveDatetimePicker$validate_value()`
 
 Check wether "value" is within range.
 
 #### Usage
 
-    NaiveDatetimePickerClass$validate_value(value)
+    NaiveDatetimePicker$validate_value(value)
 
 #### Arguments
 
@@ -307,11 +302,11 @@ Check wether "value" is within range.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `NaiveDatetimePicker$new()`
 
 #### Usage
 
-    NaiveDatetimePickerClass$new(...)
+    NaiveDatetimePicker$new(...)
 
 #### Arguments
 
@@ -321,13 +316,13 @@ Check wether "value" is within range.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `NaiveDatetimePicker$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    NaiveDatetimePickerClass$clone(deep = FALSE)
+    NaiveDatetimePicker$clone(deep = FALSE)
 
 #### Arguments
 

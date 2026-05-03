@@ -2,14 +2,11 @@
 
 An Enumerated Strings Trait
 
-An Enumerated Strings Trait
-
 ## Super classes
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\>
-[`RKernel::Unicode`](https://melff.github.io/RKernel/reference/Unicode.md)
--\> `StrEnum`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+[`Unicode`](https://melff.github.io/RKernel/reference/Unicode.md) -\>
+`StrEnum`
 
 ## Public fields
 
@@ -25,27 +22,27 @@ An Enumerated Strings Trait
 
 ### Public methods
 
-- [`StrEnumClass$validator()`](#method-StrEnum-validator)
+- [`StrEnum$validator()`](#method-StrEnum-validator)
 
-- [`StrEnumClass$new()`](#method-StrEnum-new)
+- [`StrEnum$new()`](#method-StrEnum-initialize)
 
-- [`StrEnumClass$clone()`](#method-StrEnum-clone)
+- [`StrEnum$clone()`](#method-StrEnum-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `StrEnum$validator()`
 
 Check whether the assigned vector is one of the allowed enumerated
 strings.
 
 #### Usage
 
-    StrEnumClass$validator(value)
+    StrEnum$validator(value)
 
 #### Arguments
 
@@ -55,13 +52,13 @@ strings.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `StrEnum$new()`
 
 Initialize the trait.
 
 #### Usage
 
-    StrEnumClass$new(enum, default = character(0), optional = FALSE)
+    StrEnum$new(enum, default = character(0), optional = FALSE)
 
 #### Arguments
 
@@ -79,13 +76,13 @@ Initialize the trait.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `StrEnum$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    StrEnumClass$clone(deep = FALSE)
+    StrEnum$clone(deep = FALSE)
 
 #### Arguments
 

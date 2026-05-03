@@ -47,11 +47,9 @@ in a grid box widget are arraned in a grid.
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
--\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
 -\> `Box`
 
 ## Public fields
@@ -92,48 +90,48 @@ in a grid box widget are arraned in a grid.
 
 ### Public methods
 
-- [`BoxClass$new()`](#method-Box-new)
+- [`Box$new()`](#method-Box-initialize)
 
-- [`BoxClass$notify_children_displayed()`](#method-Box-notify_children_displayed)
+- [`Box$notify_children_displayed()`](#method-Box-notify_children_displayed)
 
-- [`BoxClass$clone()`](#method-Box-clone)
+- [`Box$clone()`](#method-Box-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Box$new()`
 
 An initializer function
 
 #### Usage
 
-    BoxClass$new(children = list(), ...)
+    Box$new(children = list(), ...)
 
 #### Arguments
 
@@ -147,23 +145,23 @@ An initializer function
 
 ------------------------------------------------------------------------
 
-### Method `notify_children_displayed()`
+### `Box$notify_children_displayed()`
 
 Notifies children that they are displayed
 
 #### Usage
 
-    BoxClass$notify_children_displayed()
+    Box$notify_children_displayed()
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Box$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    BoxClass$clone(deep = FALSE)
+    Box$clone(deep = FALSE)
 
 #### Arguments
 
@@ -173,12 +171,10 @@ The objects of this class are cloneable with this method.
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
--\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
--\> `RKernel::Box` -\> `HBox`
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
+-\> `Box` -\> `HBox`
 
 ## Public fields
 
@@ -194,46 +190,46 @@ The objects of this class are cloneable with this method.
 
 ### Public methods
 
-- [`HBoxClass$clone()`](#method-HBox-clone)
+- [`HBox$clone()`](#method-HBox-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
-- [`RKernel::Box$initialize()`](https://melff.github.io/RKernel/reference/Box.html#method-initialize)
-- [`RKernel::Box$notify_children_displayed()`](https://melff.github.io/RKernel/reference/Box.html#method-notify_children_displayed)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- [`Box$initialize()`](https://melff.github.io/RKernel/reference/Box.html#method-initialize)
+- [`Box$notify_children_displayed()`](https://melff.github.io/RKernel/reference/Box.html#method-notify_children_displayed)
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `HBox$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    HBoxClass$clone(deep = FALSE)
+    HBox$clone(deep = FALSE)
 
 #### Arguments
 
@@ -243,12 +239,10 @@ The objects of this class are cloneable with this method.
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
--\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
--\> `RKernel::Box` -\> `VBox`
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
+-\> `Box` -\> `VBox`
 
 ## Public fields
 
@@ -264,46 +258,46 @@ The objects of this class are cloneable with this method.
 
 ### Public methods
 
-- [`VBoxClass$clone()`](#method-VBox-clone)
+- [`VBox$clone()`](#method-VBox-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
-- [`RKernel::Box$initialize()`](https://melff.github.io/RKernel/reference/Box.html#method-initialize)
-- [`RKernel::Box$notify_children_displayed()`](https://melff.github.io/RKernel/reference/Box.html#method-notify_children_displayed)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- [`Box$initialize()`](https://melff.github.io/RKernel/reference/Box.html#method-initialize)
+- [`Box$notify_children_displayed()`](https://melff.github.io/RKernel/reference/Box.html#method-notify_children_displayed)
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `VBox$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    VBoxClass$clone(deep = FALSE)
+    VBox$clone(deep = FALSE)
 
 #### Arguments
 
@@ -313,12 +307,10 @@ The objects of this class are cloneable with this method.
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
--\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
--\> `RKernel::Box` -\> `GridBox`
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
+-\> `Box` -\> `GridBox`
 
 ## Public fields
 
@@ -334,46 +326,46 @@ The objects of this class are cloneable with this method.
 
 ### Public methods
 
-- [`GridBoxClass$clone()`](#method-GridBox-clone)
+- [`GridBox$clone()`](#method-GridBox-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
-- [`RKernel::Box$initialize()`](https://melff.github.io/RKernel/reference/Box.html#method-initialize)
-- [`RKernel::Box$notify_children_displayed()`](https://melff.github.io/RKernel/reference/Box.html#method-notify_children_displayed)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- [`Box$initialize()`](https://melff.github.io/RKernel/reference/Box.html#method-initialize)
+- [`Box$notify_children_displayed()`](https://melff.github.io/RKernel/reference/Box.html#method-notify_children_displayed)
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `GridBox$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    GridBoxClass$clone(deep = FALSE)
+    GridBox$clone(deep = FALSE)
 
 #### Arguments
 

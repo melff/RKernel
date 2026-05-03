@@ -11,7 +11,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,15 +55,15 @@
 <dd><p>The generating call</p></dd>
 
 
-<dt><code>traits</code></dt>
+    <dt><code>traits</code></dt>
 <dd><p>A list of traits</p></dd>
 
 
-<dt><code>suspended</code></dt>
+    <dt><code>suspended</code></dt>
 <dd><p>Logical value; whether notifying observers is suspended.</p></dd>
 
 
-<dt><code>observers</code></dt>
+    <dt><code>observers</code></dt>
 <dd><p>A list of observers, i.e. callback functions called by
 the <code>notify</code> method.</p></dd>
 
@@ -75,20 +75,17 @@ the <code>notify</code> method.</p></dd>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-HasTraits-new"><code>HasTraits$new()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-HasTraits-initialize"><code>HasTraits$new()</code></a></p></li>
 <li><p><a href="#method-HasTraits-notify"><code>HasTraits$notify()</code></a></p></li>
 <li><p><a href="#method-HasTraits-observe"><code>HasTraits$observe()</code></a></p></li>
 <li><p><a href="#method-HasTraits-validate"><code>HasTraits$validate()</code></a></p></li>
 <li><p><a href="#method-HasTraits-clone"><code>HasTraits$clone()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-HasTraits-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</ul></div><p></p><hr><a id="method-HasTraits-initialize"></a><div class="section">
+<h3 id="hastraits-new-"><code>HasTraits$new()</code><a class="anchor" aria-label="anchor" href="#hastraits-new-"></a></h3>
 <p>Initialize an object</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/HasTraits.html">HasTraits</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>Initializsing values</p></dd>
@@ -97,45 +94,42 @@ the <code>notify</code> method.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-HasTraits-notify"></a><div class="section">
-<h3 id="method-notify-">Method <code>notify()</code><a class="anchor" aria-label="anchor" href="#method-notify-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-HasTraits-notify"></a><div class="section">
+<h3 id="hastraits-notify-"><code>HasTraits$notify()</code><a class="anchor" aria-label="anchor" href="#hastraits-notify-"></a></h3>
 <p>Notify observers about a trait being set to a value.</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">HasTraits</span><span class="op">$</span><span class="fu">notify</span><span class="op">(</span><span class="va">tn</span>, <span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>tn</code></dt>
 <dd><p>A string, the name of the trait.</p></dd>
 
-
-<dt><code>value</code></dt>
+      <dt><code>value</code></dt>
 <dd><p>The value to which the trait is set.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-HasTraits-observe"></a><div class="section">
-<h3 id="method-observe-">Method <code>observe()</code><a class="anchor" aria-label="anchor" href="#method-observe-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-HasTraits-observe"></a><div class="section">
+<h3 id="hastraits-observe-"><code>HasTraits$observe()</code><a class="anchor" aria-label="anchor" href="#hastraits-observe-"></a></h3>
 <p>Install or remove an observer function.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">HasTraits</span><span class="op">$</span><span class="fu">observe</span><span class="op">(</span><span class="va">tn</span>, <span class="va">observer</span>, remove <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>tn</code></dt>
 <dd><p>A string, the name of a trait.</p></dd>
 
-
-<dt><code>observer</code></dt>
+      <dt><code>observer</code></dt>
 <dd><p>A callback function, which should take three arguments,
 (1) the trait name, (2) the object that has the trait, (3)</p></dd>
 
-
-<dt><code>remove</code></dt>
+      <dt><code>remove</code></dt>
 <dd><p>A logical value, indicates whether the observer is to be removed
 or added</p></dd>
 
@@ -143,24 +137,22 @@ or added</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-HasTraits-validate"></a><div class="section">
-<h3 id="method-validate-">Method <code>validate()</code><a class="anchor" aria-label="anchor" href="#method-validate-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-HasTraits-validate"></a><div class="section">
+<h3 id="hastraits-validate-"><code>HasTraits$validate()</code><a class="anchor" aria-label="anchor" href="#hastraits-validate-"></a></h3>
 <p>Install or remove the validator function of a trait.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">HasTraits</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="va">tn</span>, <span class="va">validator</span>, remove <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>tn</code></dt>
 <dd><p>A string, the name of a trait.</p></dd>
 
-
-<dt><code>validator</code></dt>
+      <dt><code>validator</code></dt>
 <dd><p>A callback function</p></dd>
 
-
-<dt><code>remove</code></dt>
+      <dt><code>remove</code></dt>
 <dd><p>A logical value, indicates whether the validator is to be removed
 or added</p></dd>
 
@@ -168,14 +160,14 @@ or added</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-HasTraits-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-HasTraits-clone"></a><div class="section">
+<h3 id="hastraits-clone-"><code>HasTraits$clone()</code><a class="anchor" aria-label="anchor" href="#hastraits-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">HasTraits</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -185,6 +177,7 @@ or added</p></dd>
 </div>
 
 </div>
+
 
     </div>
 

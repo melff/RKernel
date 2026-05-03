@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,7 @@
 </ul></div>
     <div class="section level2">
     <h2 id="super-classes">Super classes<a class="anchor" aria-label="anchor" href="#super-classes"></a></h2>
-    <p><code><a href="HasTraits.html">RKernel::HasTraits</a></code> -&gt; <code><a href="Widgets.html">RKernel::Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">RKernel::DOMWidget</a></code> -&gt; <code><a href="DescriptionWidget.html">RKernel::DescriptionWidget</a></code> -&gt; <code>RKernel::ValueWidget</code> -&gt; <code>TimePicker</code></p>
+    <p><code><a href="HasTraits.html">HasTraits</a></code> -&gt; <code><a href="Widgets.html">Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">DOMWidget</a></code> -&gt; <code><a href="DescriptionWidget.html">DescriptionWidget</a></code> -&gt; <code>ValueWidget</code> -&gt; <code>TimePicker</code></p>
     </div>
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
@@ -70,23 +70,23 @@
 <dd><p>Name of the Javascript model in the frontend</p></dd>
 
 
-<dt><code>_view_name</code></dt>
+    <dt><code>_view_name</code></dt>
 <dd><p>Name of the Javascript view in the frontend</p></dd>
 
 
-<dt><code>value</code></dt>
+    <dt><code>value</code></dt>
 <dd><p>The date and time. If non-zero length, must have valid timezone info.</p></dd>
 
 
-<dt><code>disabled</code></dt>
+    <dt><code>disabled</code></dt>
 <dd><p>Boolean, whether the user can make changes</p></dd>
 
 
-<dt><code>min</code></dt>
+    <dt><code>min</code></dt>
 <dd><p>Minimum selectable date and time. If non-zero length, must have valid timezone info.</p></dd>
 
 
-<dt><code>max</code></dt>
+    <dt><code>max</code></dt>
 <dd><p>Maximum selectable date and time. If non-zero length, must have valid timezone info.</p></dd>
 
 
@@ -97,45 +97,42 @@
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-TimePicker-validate_value"><code>TimePickerClass$validate_value()</code></a></p></li>
-<li><p><a href="#method-TimePicker-validate_min"><code>TimePickerClass$validate_min()</code></a></p></li>
-<li><p><a href="#method-TimePicker-validate_max"><code>TimePickerClass$validate_max()</code></a></p></li>
-<li><p><a href="#method-TimePicker-new"><code>TimePickerClass$new()</code></a></p></li>
-<li><p><a href="#method-TimePicker-clone"><code>TimePickerClass$clone()</code></a></p></li>
-</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>RKernel::HasTraits$notify()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>RKernel::HasTraits$observe()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="validate"><a href="HasTraits.html#method-validate"><code>RKernel::HasTraits$validate()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="_send"><a href="Widget.html#method-_send"><code>RKernel::Widget$_send()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href="Widget.html#method-check_version"><code>RKernel::Widget$check_version()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href="Widget.html#method-close"><code>RKernel::Widget$close()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href="Widget.html#method-display_data"><code>RKernel::Widget$display_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href="Widget.html#method-get_state"><code>RKernel::Widget$get_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href="Widget.html#method-handle_buffers"><code>RKernel::Widget$handle_buffers()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href="Widget.html#method-handle_comm_msg"><code>RKernel::Widget$handle_comm_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_opened"><a href="Widget.html#method-handle_comm_opened"><code>RKernel::Widget$handle_comm_opened()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_custom_msg"><a href="Widget.html#method-handle_custom_msg"><code>RKernel::Widget$handle_custom_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_displayed"><a href="Widget.html#method-handle_displayed"><code>RKernel::Widget$handle_displayed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_event"><a href="Widget.html#method-handle_event"><code>RKernel::Widget$handle_event()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_displayed"><a href="Widget.html#method-on_displayed"><code>RKernel::Widget$on_displayed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_event"><a href="Widget.html#method-on_event"><code>RKernel::Widget$on_event()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_msg"><a href="Widget.html#method-on_msg"><code>RKernel::Widget$on_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="open"><a href="Widget.html#method-open"><code>RKernel::Widget$open()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send"><a href="Widget.html#method-send"><code>RKernel::Widget$send()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send_state"><a href="Widget.html#method-send_state"><code>RKernel::Widget$send_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="set_state"><a href="Widget.html#method-set_state"><code>RKernel::Widget$set_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="add_class"><a href="DOMWidget.html#method-add_class"><code>RKernel::DOMWidget$add_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="has_class"><a href="DOMWidget.html#method-has_class"><code>RKernel::DOMWidget$has_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>RKernel::DOMWidget$remove_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="ValueWidget" data-id="on_change"><a href="ValueWidget.html#method-on_change"><code>RKernel::ValueWidget$on_change()</code></a></span></li>
+<p></p><ul><li><p><a href="#method-TimePicker-validate_value"><code>TimePicker$validate_value()</code></a></p></li>
+<li><p><a href="#method-TimePicker-validate_min"><code>TimePicker$validate_min()</code></a></p></li>
+<li><p><a href="#method-TimePicker-validate_max"><code>TimePicker$validate_max()</code></a></p></li>
+<li><p><a href="#method-TimePicker-initialize"><code>TimePicker$new()</code></a></p></li>
+<li><p><a href="#method-TimePicker-clone"><code>TimePicker$clone()</code></a></p></li>
+</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>HasTraits$notify()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>HasTraits$observe()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="validate"><a href="HasTraits.html#method-validate"><code>HasTraits$validate()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="_send"><a href="Widget.html#method-_send"><code>Widget$_send()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href="Widget.html#method-check_version"><code>Widget$check_version()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href="Widget.html#method-close"><code>Widget$close()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href="Widget.html#method-display_data"><code>Widget$display_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href="Widget.html#method-get_state"><code>Widget$get_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href="Widget.html#method-handle_buffers"><code>Widget$handle_buffers()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href="Widget.html#method-handle_comm_msg"><code>Widget$handle_comm_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_opened"><a href="Widget.html#method-handle_comm_opened"><code>Widget$handle_comm_opened()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_custom_msg"><a href="Widget.html#method-handle_custom_msg"><code>Widget$handle_custom_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_displayed"><a href="Widget.html#method-handle_displayed"><code>Widget$handle_displayed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_event"><a href="Widget.html#method-handle_event"><code>Widget$handle_event()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_displayed"><a href="Widget.html#method-on_displayed"><code>Widget$on_displayed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_event"><a href="Widget.html#method-on_event"><code>Widget$on_event()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_msg"><a href="Widget.html#method-on_msg"><code>Widget$on_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="open"><a href="Widget.html#method-open"><code>Widget$open()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send"><a href="Widget.html#method-send"><code>Widget$send()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send_state"><a href="Widget.html#method-send_state"><code>Widget$send_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="set_state"><a href="Widget.html#method-set_state"><code>Widget$set_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="add_class"><a href="DOMWidget.html#method-add_class"><code>DOMWidget$add_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="has_class"><a href="DOMWidget.html#method-has_class"><code>DOMWidget$has_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>DOMWidget$remove_class()</code></a></span></li>
+  <li><code>ValueWidget$on_change()</code></li>
 </ul></details></p><hr><a id="method-TimePicker-validate_value"></a><div class="section">
-<h3 id="method-validate-value-">Method <code>validate_value()</code><a class="anchor" aria-label="anchor" href="#method-validate-value-"></a></h3>
+<h3 id="timepicker-validate-value-"><code>TimePicker$validate_value()</code><a class="anchor" aria-label="anchor" href="#timepicker-validate-value-"></a></h3>
 <p>Check wether "value" is within range.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TimePickerClass</span><span class="op">$</span><span class="fu">validate_value</span><span class="op">(</span><span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TimePicker</span><span class="op">$</span><span class="fu">validate_value</span><span class="op">(</span><span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>value</code></dt>
 <dd><p>A date and time to be checked for validity</p></dd>
@@ -144,14 +141,14 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-TimePicker-validate_min"></a><div class="section">
-<h3 id="method-validate-min-">Method <code>validate_min()</code><a class="anchor" aria-label="anchor" href="#method-validate-min-"></a></h3>
-<p>Validate the "min" field after assignment.</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TimePickerClass</span><span class="op">$</span><span class="fu">validate_min</span><span class="op">(</span><span class="va">min</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-TimePicker-validate_min"></a><div class="section">
+<h3 id="timepicker-validate-min-"><code>TimePicker$validate_min()</code><a class="anchor" aria-label="anchor" href="#timepicker-validate-min-"></a></h3>
+<p>Validate the "min" field after assignment.</p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TimePicker</span><span class="op">$</span><span class="fu">validate_min</span><span class="op">(</span><span class="va">min</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>min</code></dt>
 <dd><p>A minimum date and time to be checked for validity</p></dd>
@@ -160,14 +157,14 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-TimePicker-validate_max"></a><div class="section">
-<h3 id="method-validate-max-">Method <code>validate_max()</code><a class="anchor" aria-label="anchor" href="#method-validate-max-"></a></h3>
-<p>Validate the "max" field after assignment.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TimePickerClass</span><span class="op">$</span><span class="fu">validate_max</span><span class="op">(</span><span class="va">max</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-TimePicker-validate_max"></a><div class="section">
+<h3 id="timepicker-validate-max-"><code>TimePicker$validate_max()</code><a class="anchor" aria-label="anchor" href="#timepicker-validate-max-"></a></h3>
+<p>Validate the "max" field after assignment.</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TimePicker</span><span class="op">$</span><span class="fu">validate_max</span><span class="op">(</span><span class="va">max</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>max</code></dt>
 <dd><p>A maximum date and time to be checked for validity</p></dd>
@@ -176,15 +173,14 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-TimePicker-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
-
-<div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/TimePicker.html">TimePickerClass</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-TimePicker-initialize"></a><div class="section">
+<h3 id="timepicker-new-"><code>TimePicker$new()</code><a class="anchor" aria-label="anchor" href="#timepicker-new-"></a></h3>
+<p></p><div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/TimePicker.html">TimePicker</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>Arguments passed to the superclass initializer</p></dd>
@@ -193,14 +189,14 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-TimePicker-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TimePickerClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-TimePicker-clone"></a><div class="section">
+<h3 id="timepicker-clone-"><code>TimePicker$clone()</code><a class="anchor" aria-label="anchor" href="#timepicker-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TimePicker</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -210,6 +206,7 @@
 </div>
 
 </div>
+
 
     </div>
 

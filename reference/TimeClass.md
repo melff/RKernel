@@ -4,8 +4,8 @@ A class and constructor of time traitlets.
 
 ## Super class
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\> `TimeClass`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+`TimeClass`
 
 ## Public fields
 
@@ -24,18 +24,18 @@ A class and constructor of time traitlets.
 
 - [`TimeClass$validator()`](#method-TimeClass-validator)
 
-- [`TimeClass$new()`](#method-TimeClass-new)
+- [`TimeClass$new()`](#method-TimeClass-initialize)
 
 - [`TimeClass$clone()`](#method-TimeClass-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `TimeClass$validator()`
 
 Check the value assigned to the traitlet.
 
@@ -51,7 +51,7 @@ Check the value assigned to the traitlet.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `TimeClass$new()`
 
 Initialize the traitlet.
 
@@ -71,7 +71,7 @@ Initialize the traitlet.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `TimeClass$clone()`
 
 The objects of this class are cloneable with this method.
 

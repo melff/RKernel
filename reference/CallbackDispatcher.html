@@ -11,7 +11,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,27 +71,23 @@
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-CallbackDispatcher-register"><code>CallbackDispatcherClass$register()</code></a></p></li>
-<li><p><a href="#method-CallbackDispatcher-clear"><code>CallbackDispatcherClass$clear()</code></a></p></li>
-<li><p><a href="#method-CallbackDispatcher-suspend_handlers"><code>CallbackDispatcherClass$suspend_handlers()</code></a></p></li>
-<li><p><a href="#method-CallbackDispatcher-activate_handlers"><code>CallbackDispatcherClass$activate_handlers()</code></a></p></li>
-<li><p><a href="#method-CallbackDispatcher-run"><code>CallbackDispatcherClass$run()</code></a></p></li>
-<li><p><a href="#method-CallbackDispatcher-clone"><code>CallbackDispatcherClass$clone()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-CallbackDispatcher-register"><code>CallbackDispatcher$register()</code></a></p></li>
+<li><p><a href="#method-CallbackDispatcher-clear"><code>CallbackDispatcher$clear()</code></a></p></li>
+<li><p><a href="#method-CallbackDispatcher-suspend_handlers"><code>CallbackDispatcher$suspend_handlers()</code></a></p></li>
+<li><p><a href="#method-CallbackDispatcher-activate_handlers"><code>CallbackDispatcher$activate_handlers()</code></a></p></li>
+<li><p><a href="#method-CallbackDispatcher-run"><code>CallbackDispatcher$run()</code></a></p></li>
+<li><p><a href="#method-CallbackDispatcher-clone"><code>CallbackDispatcher$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-CallbackDispatcher-register"></a><div class="section">
-<h3 id="method-register-">Method <code>register()</code><a class="anchor" aria-label="anchor" href="#method-register-"></a></h3>
+<h3 id="callbackdispatcher-register-"><code>CallbackDispatcher$register()</code><a class="anchor" aria-label="anchor" href="#callbackdispatcher-register-"></a></h3>
 <p>Register a function as a callback</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcherClass</span><span class="op">$</span><span class="fu">register</span><span class="op">(</span><span class="va">handler</span>, <span class="va">remove</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcher</span><span class="op">$</span><span class="fu">register</span><span class="op">(</span><span class="va">handler</span>, <span class="va">remove</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>handler</code></dt>
 <dd><p>A function</p></dd>
 
-
-<dt><code>remove</code></dt>
+      <dt><code>remove</code></dt>
 <dd><p>A logical value; whether the function
 is added or removed from the list of callbacks</p></dd>
 
@@ -99,38 +95,41 @@ is added or removed from the list of callbacks</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CallbackDispatcher-clear"></a><div class="section">
-<h3 id="method-clear-">Method <code>clear()</code><a class="anchor" aria-label="anchor" href="#method-clear-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-CallbackDispatcher-clear"></a><div class="section">
+<h3 id="callbackdispatcher-clear-"><code>CallbackDispatcher$clear()</code><a class="anchor" aria-label="anchor" href="#callbackdispatcher-clear-"></a></h3>
 <p>Remove all callback functions</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcherClass</span><span class="op">$</span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcher</span><span class="op">$</span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-CallbackDispatcher-suspend_handlers"></a><div class="section">
-<h3 id="method-suspend-handlers-">Method <code>suspend_handlers()</code><a class="anchor" aria-label="anchor" href="#method-suspend-handlers-"></a></h3>
+<p></p><hr><a id="method-CallbackDispatcher-suspend_handlers"></a><div class="section">
+<h3 id="callbackdispatcher-suspend-handlers-"><code>CallbackDispatcher$suspend_handlers()</code><a class="anchor" aria-label="anchor" href="#callbackdispatcher-suspend-handlers-"></a></h3>
 <p>Suspend registered callback functions</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcherClass</span><span class="op">$</span><span class="fu">suspend_handlers</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcher</span><span class="op">$</span><span class="fu">suspend_handlers</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-CallbackDispatcher-activate_handlers"></a><div class="section">
-<h3 id="method-activate-handlers-">Method <code>activate_handlers()</code><a class="anchor" aria-label="anchor" href="#method-activate-handlers-"></a></h3>
+<p></p><hr><a id="method-CallbackDispatcher-activate_handlers"></a><div class="section">
+<h3 id="callbackdispatcher-activate-handlers-"><code>CallbackDispatcher$activate_handlers()</code><a class="anchor" aria-label="anchor" href="#callbackdispatcher-activate-handlers-"></a></h3>
 <p>(Re-)activate registered callback functions</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcherClass</span><span class="op">$</span><span class="fu">activate_handlers</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcher</span><span class="op">$</span><span class="fu">activate_handlers</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+</div>
 
-</div><p></p><hr><a id="method-CallbackDispatcher-run"></a><div class="section">
-<h3 id="method-run-">Method <code>run()</code><a class="anchor" aria-label="anchor" href="#method-run-"></a></h3>
+<p></p><hr><a id="method-CallbackDispatcher-run"></a><div class="section">
+<h3 id="callbackdispatcher-run-"><code>CallbackDispatcher$run()</code><a class="anchor" aria-label="anchor" href="#callbackdispatcher-run-"></a></h3>
 <p>Run all registered callback functions</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcherClass</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcher</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
 <dd><p>Aruments passed on to the handler functions</p></dd>
@@ -139,14 +138,14 @@ is added or removed from the list of callbacks</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-CallbackDispatcher-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcherClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-CallbackDispatcher-clone"></a><div class="section">
+<h3 id="callbackdispatcher-clone-"><code>CallbackDispatcher$clone()</code><a class="anchor" aria-label="anchor" href="#callbackdispatcher-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CallbackDispatcher</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -156,6 +155,7 @@ is added or removed from the list of callbacks</p></dd>
 </div>
 
 </div>
+
 
     </div>
 

@@ -2,8 +2,6 @@
 
 A Unicode String Vector Trait
 
-A Unicode String Vector Trait
-
 ## Usage
 
 ``` r
@@ -28,8 +26,8 @@ as.character(x, ...)
 
 ## Super class
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\> `Unicode`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+`Unicode`
 
 ## Public fields
 
@@ -53,26 +51,26 @@ as.character(x, ...)
 
 ### Public methods
 
-- [`UnicodeClass$validator()`](#method-Unicode-validator)
+- [`Unicode$validator()`](#method-Unicode-validator)
 
-- [`UnicodeClass$new()`](#method-Unicode-new)
+- [`Unicode$new()`](#method-Unicode-initialize)
 
-- [`UnicodeClass$clone()`](#method-Unicode-clone)
+- [`Unicode$clone()`](#method-Unicode-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `Unicode$validator()`
 
 A validator function
 
 #### Usage
 
-    UnicodeClass$validator(value)
+    Unicode$validator(value)
 
 #### Arguments
 
@@ -82,13 +80,13 @@ A validator function
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Unicode$new()`
 
 Initialize an object
 
 #### Usage
 
-    UnicodeClass$new(
+    Unicode$new(
       initial = character(0),
       coerce = TRUE,
       optional = length(initial) == 0,
@@ -115,13 +113,13 @@ Initialize an object
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Unicode$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    UnicodeClass$clone(deep = FALSE)
+    Unicode$clone(deep = FALSE)
 
 #### Arguments
 

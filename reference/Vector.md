@@ -16,8 +16,8 @@ Vector(...)
 
 ## Super class
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\> `Vector`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+`Vector`
 
 ## Public fields
 
@@ -33,27 +33,27 @@ Vector(...)
 
 ### Public methods
 
-- [`VectorClass$validator()`](#method-Vector-validator)
+- [`Vector$validator()`](#method-Vector-validator)
 
-- [`VectorClass$new()`](#method-Vector-new)
+- [`Vector$new()`](#method-Vector-initialize)
 
-- [`VectorClass$clone()`](#method-Vector-clone)
+- [`Vector$clone()`](#method-Vector-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `Vector$validator()`
 
 A function that checks the validity of an assigned value, i.e. whether
 the assigned value is a list with all elements of the same class
 
 #### Usage
 
-    VectorClass$validator(value)
+    Vector$validator(value)
 
 #### Arguments
 
@@ -63,11 +63,11 @@ the assigned value is a list with all elements of the same class
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Vector$new()`
 
 #### Usage
 
-    VectorClass$new(class = NULL, ...)
+    Vector$new(class = NULL, ...)
 
 #### Arguments
 
@@ -81,13 +81,13 @@ the assigned value is a list with all elements of the same class
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Vector$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    VectorClass$clone(deep = FALSE)
+    Vector$clone(deep = FALSE)
 
 #### Arguments
 

@@ -137,31 +137,31 @@ display_data(
 
 ### Public methods
 
-- [`dataTableClass$new()`](#method-dataTable-new)
+- [`dataTable$new()`](#method-dataTable-initialize)
 
-- [`dataTableClass$show_columns()`](#method-dataTable-show_columns)
+- [`dataTable$show_columns()`](#method-dataTable-show_columns)
 
-- [`dataTableClass$page_left()`](#method-dataTable-page_left)
+- [`dataTable$page_left()`](#method-dataTable-page_left)
 
-- [`dataTableClass$page_right()`](#method-dataTable-page_right)
+- [`dataTable$page_right()`](#method-dataTable-page_right)
 
-- [`dataTableClass$page_first()`](#method-dataTable-page_first)
+- [`dataTable$page_first()`](#method-dataTable-page_first)
 
-- [`dataTableClass$page_last()`](#method-dataTable-page_last)
+- [`dataTable$page_last()`](#method-dataTable-page_last)
 
-- [`dataTableClass$draw()`](#method-dataTable-draw)
+- [`dataTable$draw()`](#method-dataTable-draw)
 
-- [`dataTableClass$clone()`](#method-dataTable-clone)
+- [`dataTable$clone()`](#method-dataTable-clone)
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `dataTable$new()`
 
 Initialize the DataTable
 
 #### Usage
 
-    dataTableClass$new(obj, size = 50, ...)
+    dataTable$new(obj, size = 50, ...)
 
 #### Arguments
 
@@ -179,73 +179,73 @@ Initialize the DataTable
 
 ------------------------------------------------------------------------
 
-### Method `show_columns()`
+### `dataTable$show_columns()`
 
 Show which columns are displayed
 
 #### Usage
 
-    dataTableClass$show_columns()
+    dataTable$show_columns()
 
 ------------------------------------------------------------------------
 
-### Method `page_left()`
+### `dataTable$page_left()`
 
 Go one page to the left
 
 #### Usage
 
-    dataTableClass$page_left()
+    dataTable$page_left()
 
 ------------------------------------------------------------------------
 
-### Method `page_right()`
+### `dataTable$page_right()`
 
 Go one page to the right
 
 #### Usage
 
-    dataTableClass$page_right()
+    dataTable$page_right()
 
 ------------------------------------------------------------------------
 
-### Method `page_first()`
+### `dataTable$page_first()`
 
 Go to the first page (to the left)
 
 #### Usage
 
-    dataTableClass$page_first()
+    dataTable$page_first()
 
 ------------------------------------------------------------------------
 
-### Method `page_last()`
+### `dataTable$page_last()`
 
 Go to the last page (to the right)
 
 #### Usage
 
-    dataTableClass$page_last()
+    dataTable$page_last()
 
 ------------------------------------------------------------------------
 
-### Method `draw()`
+### `dataTable$draw()`
 
 Draw the iframe with the data table contents
 
 #### Usage
 
-    dataTableClass$draw()
+    dataTable$draw()
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `dataTable$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    dataTableClass$clone(deep = FALSE)
+    dataTable$clone(deep = FALSE)
 
 #### Arguments
 

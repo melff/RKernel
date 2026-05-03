@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@
 </ul></div>
     <div class="section level2">
     <h2 id="super-classes">Super classes<a class="anchor" aria-label="anchor" href="#super-classes"></a></h2>
-    <p><code><a href="HasTraits.html">RKernel::HasTraits</a></code> -&gt; <code><a href="Widgets.html">RKernel::Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">RKernel::DOMWidget</a></code> -&gt; <code><a href="DescriptionWidget.html">RKernel::DescriptionWidget</a></code> -&gt; <code>RKernel::ValueWidget</code> -&gt; <code>MediaWidget</code></p>
+    <p><code><a href="HasTraits.html">HasTraits</a></code> -&gt; <code><a href="Widgets.html">Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">DOMWidget</a></code> -&gt; <code><a href="DescriptionWidget.html">DescriptionWidget</a></code> -&gt; <code>ValueWidget</code> -&gt; <code>MediaWidget</code></p>
     </div>
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
@@ -76,7 +76,7 @@
 <dd><p>A string, giving the graphics fromat.</p></dd>
 
 
-<dt><code>value</code></dt>
+    <dt><code>value</code></dt>
 <dd><p>A <a href="Bytes.html">Bytes</a> traitlet.</p></dd>
 
 
@@ -87,68 +87,63 @@
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-MediaWidget-from_url"><code>MediaWidgetClass$from_url()</code></a></p></li>
-<li><p><a href="#method-MediaWidget-from_file"><code>MediaWidgetClass$from_file()</code></a></p></li>
-<li><p><a href="#method-MediaWidget-on_change"><code>MediaWidgetClass$on_change()</code></a></p></li>
-<li><p><a href="#method-MediaWidget-new"><code>MediaWidgetClass$new()</code></a></p></li>
-<li><p><a href="#method-MediaWidget-clone"><code>MediaWidgetClass$clone()</code></a></p></li>
-</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>RKernel::HasTraits$notify()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>RKernel::HasTraits$observe()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="validate"><a href="HasTraits.html#method-validate"><code>RKernel::HasTraits$validate()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="_send"><a href="Widget.html#method-_send"><code>RKernel::Widget$_send()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href="Widget.html#method-check_version"><code>RKernel::Widget$check_version()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href="Widget.html#method-close"><code>RKernel::Widget$close()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href="Widget.html#method-display_data"><code>RKernel::Widget$display_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href="Widget.html#method-get_state"><code>RKernel::Widget$get_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href="Widget.html#method-handle_buffers"><code>RKernel::Widget$handle_buffers()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href="Widget.html#method-handle_comm_msg"><code>RKernel::Widget$handle_comm_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_opened"><a href="Widget.html#method-handle_comm_opened"><code>RKernel::Widget$handle_comm_opened()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_custom_msg"><a href="Widget.html#method-handle_custom_msg"><code>RKernel::Widget$handle_custom_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_displayed"><a href="Widget.html#method-handle_displayed"><code>RKernel::Widget$handle_displayed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_event"><a href="Widget.html#method-handle_event"><code>RKernel::Widget$handle_event()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_displayed"><a href="Widget.html#method-on_displayed"><code>RKernel::Widget$on_displayed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_event"><a href="Widget.html#method-on_event"><code>RKernel::Widget$on_event()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_msg"><a href="Widget.html#method-on_msg"><code>RKernel::Widget$on_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="open"><a href="Widget.html#method-open"><code>RKernel::Widget$open()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send"><a href="Widget.html#method-send"><code>RKernel::Widget$send()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send_state"><a href="Widget.html#method-send_state"><code>RKernel::Widget$send_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="set_state"><a href="Widget.html#method-set_state"><code>RKernel::Widget$set_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="add_class"><a href="DOMWidget.html#method-add_class"><code>RKernel::DOMWidget$add_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="has_class"><a href="DOMWidget.html#method-has_class"><code>RKernel::DOMWidget$has_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>RKernel::DOMWidget$remove_class()</code></a></span></li>
+<p></p><ul><li><p><a href="#method-MediaWidget-from_url"><code>MediaWidget$from_url()</code></a></p></li>
+<li><p><a href="#method-MediaWidget-from_file"><code>MediaWidget$from_file()</code></a></p></li>
+<li><p><a href="#method-MediaWidget-on_change"><code>MediaWidget$on_change()</code></a></p></li>
+<li><p><a href="#method-MediaWidget-initialize"><code>MediaWidget$new()</code></a></p></li>
+<li><p><a href="#method-MediaWidget-clone"><code>MediaWidget$clone()</code></a></p></li>
+</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>HasTraits$notify()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>HasTraits$observe()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="validate"><a href="HasTraits.html#method-validate"><code>HasTraits$validate()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="_send"><a href="Widget.html#method-_send"><code>Widget$_send()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href="Widget.html#method-check_version"><code>Widget$check_version()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href="Widget.html#method-close"><code>Widget$close()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href="Widget.html#method-display_data"><code>Widget$display_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href="Widget.html#method-get_state"><code>Widget$get_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href="Widget.html#method-handle_buffers"><code>Widget$handle_buffers()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href="Widget.html#method-handle_comm_msg"><code>Widget$handle_comm_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_opened"><a href="Widget.html#method-handle_comm_opened"><code>Widget$handle_comm_opened()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_custom_msg"><a href="Widget.html#method-handle_custom_msg"><code>Widget$handle_custom_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_displayed"><a href="Widget.html#method-handle_displayed"><code>Widget$handle_displayed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_event"><a href="Widget.html#method-handle_event"><code>Widget$handle_event()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_displayed"><a href="Widget.html#method-on_displayed"><code>Widget$on_displayed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_event"><a href="Widget.html#method-on_event"><code>Widget$on_event()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_msg"><a href="Widget.html#method-on_msg"><code>Widget$on_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="open"><a href="Widget.html#method-open"><code>Widget$open()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send"><a href="Widget.html#method-send"><code>Widget$send()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send_state"><a href="Widget.html#method-send_state"><code>Widget$send_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="set_state"><a href="Widget.html#method-set_state"><code>Widget$set_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="add_class"><a href="DOMWidget.html#method-add_class"><code>DOMWidget$add_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="has_class"><a href="DOMWidget.html#method-has_class"><code>DOMWidget$has_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>DOMWidget$remove_class()</code></a></span></li>
 </ul></details></p><hr><a id="method-MediaWidget-from_url"></a><div class="section">
-<h3 id="method-from-url-">Method <code>from_url()</code><a class="anchor" aria-label="anchor" href="#method-from-url-"></a></h3>
+<h3 id="mediawidget-from-url-"><code>MediaWidget$from_url()</code><a class="anchor" aria-label="anchor" href="#mediawidget-from-url-"></a></h3>
 <p>Create media widget from url</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MediaWidgetClass</span><span class="op">$</span><span class="fu">from_url</span><span class="op">(</span><span class="va">url</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MediaWidget</span><span class="op">$</span><span class="fu">from_url</span><span class="op">(</span><span class="va">url</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>url</code></dt>
 <dd><p>A character string</p></dd>
 
-
-<dt><code>width</code></dt>
+      <dt><code>width</code></dt>
 <dd><p>A character string with CSS width specification</p></dd>
 
-
-<dt><code>height</code></dt>
+      <dt><code>height</code></dt>
 <dd><p>A character string with CSS height specification</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-MediaWidget-from_file"></a><div class="section">
-<h3 id="method-from-file-">Method <code>from_file()</code><a class="anchor" aria-label="anchor" href="#method-from-file-"></a></h3>
-<p>Create media widget from file</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MediaWidgetClass</span><span class="op">$</span><span class="fu">from_file</span><span class="op">(</span><span class="va">filename</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-MediaWidget-from_file"></a><div class="section">
+<h3 id="mediawidget-from-file-"><code>MediaWidget$from_file()</code><a class="anchor" aria-label="anchor" href="#mediawidget-from-file-"></a></h3>
+<p>Create media widget from file</p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MediaWidget</span><span class="op">$</span><span class="fu">from_file</span><span class="op">(</span><span class="va">filename</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>filename</code></dt>
 <dd><p>A character string</p></dd>
@@ -157,59 +152,56 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-MediaWidget-on_change"></a><div class="section">
-<h3 id="method-on-change-">Method <code>on_change()</code><a class="anchor" aria-label="anchor" href="#method-on-change-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-MediaWidget-on_change"></a><div class="section">
+<h3 id="mediawidget-on-change-"><code>MediaWidget$on_change()</code><a class="anchor" aria-label="anchor" href="#mediawidget-on-change-"></a></h3>
 <p>Add or remove a handler to be called if value
    is changed.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MediaWidgetClass</span><span class="op">$</span><span class="fu">on_change</span><span class="op">(</span><span class="va">handler</span>, remove <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MediaWidget</span><span class="op">$</span><span class="fu">on_change</span><span class="op">(</span><span class="va">handler</span>, remove <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>handler</code></dt>
 <dd><p>A function that is called when the button is clicked.</p></dd>
 
-
-<dt><code>remove</code></dt>
+      <dt><code>remove</code></dt>
 <dd><p>Logical value, whether the handler is to be removed.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-MediaWidget-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
-<p>Initialize an object</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/MediaWidget.html">MediaWidgetClass</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>from_file <span class="op">=</span> <span class="cn">NULL</span>, from_url <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-MediaWidget-initialize"></a><div class="section">
+<h3 id="mediawidget-new-"><code>MediaWidget$new()</code><a class="anchor" aria-label="anchor" href="#mediawidget-new-"></a></h3>
+<p>Initialize an object</p><div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/MediaWidget.html">MediaWidget</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>from_file <span class="op">=</span> <span class="cn">NULL</span>, from_url <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>from_file</code></dt>
 <dd><p>An optional character string, name of the file from which to initialize the widget.</p></dd>
 
-
-<dt><code>from_url</code></dt>
+      <dt><code>from_url</code></dt>
 <dd><p>An optional character string, URL from which to initialize the widget.</p></dd>
 
-
-<dt><code>...</code></dt>
+      <dt><code>...</code></dt>
 <dd><p>Other arguments, passed to the superclass initializer.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-MediaWidget-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MediaWidgetClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-MediaWidget-clone"></a><div class="section">
+<h3 id="mediawidget-clone-"><code>MediaWidget$clone()</code><a class="anchor" aria-label="anchor" href="#mediawidget-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MediaWidget</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -220,10 +212,11 @@
 
 </div>
 
+
     </div>
     <div class="section level2">
     <h2 id="super-classes-1">Super classes<a class="anchor" aria-label="anchor" href="#super-classes-1"></a></h2>
-    <p><code><a href="HasTraits.html">RKernel::HasTraits</a></code> -&gt; <code><a href="Widgets.html">RKernel::Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">RKernel::DOMWidget</a></code> -&gt; <code><a href="DescriptionWidget.html">RKernel::DescriptionWidget</a></code> -&gt; <code>RKernel::ValueWidget</code> -&gt; <code>RKernel::MediaWidget</code> -&gt; <code>ImageWidget</code></p>
+    <p><code><a href="HasTraits.html">HasTraits</a></code> -&gt; <code><a href="Widgets.html">Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">DOMWidget</a></code> -&gt; <code><a href="DescriptionWidget.html">DescriptionWidget</a></code> -&gt; <code>ValueWidget</code> -&gt; <code>MediaWidget</code> -&gt; <code>ImageWidget</code></p>
     </div>
     <div class="section level2">
     <h2 id="public-fields-1">Public fields<a class="anchor" aria-label="anchor" href="#public-fields-1"></a></h2>
@@ -231,19 +224,19 @@
 <dd><p>Name of the Javascript view in the frontend.</p></dd>
 
 
-<dt><code>_model_name</code></dt>
+    <dt><code>_model_name</code></dt>
 <dd><p>Name of the Javascript model in the frontend.</p></dd>
 
 
-<dt><code>format</code></dt>
+    <dt><code>format</code></dt>
 <dd><p>A string, giving the graphics fromat.</p></dd>
 
 
-<dt><code>width</code></dt>
+    <dt><code>width</code></dt>
 <dd><p>A string, describing the width in CSS language, e.g. "480px".</p></dd>
 
 
-<dt><code>height</code></dt>
+    <dt><code>height</code></dt>
 <dd><p>A string, describing the height in CSS language, e.g. "480px".</p></dd>
 
 
@@ -254,68 +247,63 @@
 
 <div class="section">
 <h3 id="public-methods-1">Public methods<a class="anchor" aria-label="anchor" href="#public-methods-1"></a></h3>
-
-<ul><li><p><a href="#method-ImageWidget-from_file"><code>ImageWidgetClass$from_file()</code></a></p></li>
-<li><p><a href="#method-ImageWidget-clone"><code>ImageWidgetClass$clone()</code></a></p></li>
-</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>RKernel::HasTraits$notify()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>RKernel::HasTraits$observe()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="validate"><a href="HasTraits.html#method-validate"><code>RKernel::HasTraits$validate()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="_send"><a href="Widget.html#method-_send"><code>RKernel::Widget$_send()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href="Widget.html#method-check_version"><code>RKernel::Widget$check_version()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href="Widget.html#method-close"><code>RKernel::Widget$close()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href="Widget.html#method-display_data"><code>RKernel::Widget$display_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href="Widget.html#method-get_state"><code>RKernel::Widget$get_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href="Widget.html#method-handle_buffers"><code>RKernel::Widget$handle_buffers()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href="Widget.html#method-handle_comm_msg"><code>RKernel::Widget$handle_comm_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_opened"><a href="Widget.html#method-handle_comm_opened"><code>RKernel::Widget$handle_comm_opened()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_custom_msg"><a href="Widget.html#method-handle_custom_msg"><code>RKernel::Widget$handle_custom_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_displayed"><a href="Widget.html#method-handle_displayed"><code>RKernel::Widget$handle_displayed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_event"><a href="Widget.html#method-handle_event"><code>RKernel::Widget$handle_event()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_displayed"><a href="Widget.html#method-on_displayed"><code>RKernel::Widget$on_displayed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_event"><a href="Widget.html#method-on_event"><code>RKernel::Widget$on_event()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_msg"><a href="Widget.html#method-on_msg"><code>RKernel::Widget$on_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="open"><a href="Widget.html#method-open"><code>RKernel::Widget$open()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send"><a href="Widget.html#method-send"><code>RKernel::Widget$send()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send_state"><a href="Widget.html#method-send_state"><code>RKernel::Widget$send_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="set_state"><a href="Widget.html#method-set_state"><code>RKernel::Widget$set_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="add_class"><a href="DOMWidget.html#method-add_class"><code>RKernel::DOMWidget$add_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="has_class"><a href="DOMWidget.html#method-has_class"><code>RKernel::DOMWidget$has_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>RKernel::DOMWidget$remove_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="from_url"><a href="MediaWidget.html#method-from_url"><code>RKernel::MediaWidget$from_url()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="initialize"><a href="MediaWidget.html#method-initialize"><code>RKernel::MediaWidget$initialize()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="on_change"><a href="MediaWidget.html#method-on_change"><code>RKernel::MediaWidget$on_change()</code></a></span></li>
+<p></p><ul><li><p><a href="#method-ImageWidget-from_file"><code>ImageWidget$from_file()</code></a></p></li>
+<li><p><a href="#method-ImageWidget-clone"><code>ImageWidget$clone()</code></a></p></li>
+</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>HasTraits$notify()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>HasTraits$observe()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="validate"><a href="HasTraits.html#method-validate"><code>HasTraits$validate()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="_send"><a href="Widget.html#method-_send"><code>Widget$_send()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href="Widget.html#method-check_version"><code>Widget$check_version()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href="Widget.html#method-close"><code>Widget$close()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href="Widget.html#method-display_data"><code>Widget$display_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href="Widget.html#method-get_state"><code>Widget$get_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href="Widget.html#method-handle_buffers"><code>Widget$handle_buffers()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href="Widget.html#method-handle_comm_msg"><code>Widget$handle_comm_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_opened"><a href="Widget.html#method-handle_comm_opened"><code>Widget$handle_comm_opened()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_custom_msg"><a href="Widget.html#method-handle_custom_msg"><code>Widget$handle_custom_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_displayed"><a href="Widget.html#method-handle_displayed"><code>Widget$handle_displayed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_event"><a href="Widget.html#method-handle_event"><code>Widget$handle_event()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_displayed"><a href="Widget.html#method-on_displayed"><code>Widget$on_displayed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_event"><a href="Widget.html#method-on_event"><code>Widget$on_event()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_msg"><a href="Widget.html#method-on_msg"><code>Widget$on_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="open"><a href="Widget.html#method-open"><code>Widget$open()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send"><a href="Widget.html#method-send"><code>Widget$send()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send_state"><a href="Widget.html#method-send_state"><code>Widget$send_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="set_state"><a href="Widget.html#method-set_state"><code>Widget$set_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="add_class"><a href="DOMWidget.html#method-add_class"><code>DOMWidget$add_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="has_class"><a href="DOMWidget.html#method-has_class"><code>DOMWidget$has_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>DOMWidget$remove_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="from_url"><a href="MediaWidget.html#method-from_url"><code>MediaWidget$from_url()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="initialize"><a href="MediaWidget.html#method-initialize"><code>MediaWidget$initialize()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="on_change"><a href="MediaWidget.html#method-on_change"><code>MediaWidget$on_change()</code></a></span></li>
 </ul></details></p><hr><a id="method-ImageWidget-from_file"></a><div class="section">
-<h3 id="method-from-file--1">Method <code>from_file()</code><a class="anchor" aria-label="anchor" href="#method-from-file--1"></a></h3>
+<h3 id="imagewidget-from-file-"><code>ImageWidget$from_file()</code><a class="anchor" aria-label="anchor" href="#imagewidget-from-file-"></a></h3>
 <p>Create image widget from file</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ImageWidgetClass</span><span class="op">$</span><span class="fu">from_file</span><span class="op">(</span><span class="va">filename</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ImageWidget</span><span class="op">$</span><span class="fu">from_file</span><span class="op">(</span><span class="va">filename</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>filename</code></dt>
 <dd><p>A character string</p></dd>
 
-
-<dt><code>width</code></dt>
+      <dt><code>width</code></dt>
 <dd><p>A character string with CSS width specification</p></dd>
 
-
-<dt><code>height</code></dt>
+      <dt><code>height</code></dt>
 <dd><p>A character string with CSS height specification</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-ImageWidget-clone"></a><div class="section">
-<h3 id="method-clone--1">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone--1"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ImageWidgetClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-ImageWidget-clone"></a><div class="section">
+<h3 id="imagewidget-clone-"><code>ImageWidget$clone()</code><a class="anchor" aria-label="anchor" href="#imagewidget-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ImageWidget</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -326,10 +314,11 @@
 
 </div>
 
+
     </div>
     <div class="section level2">
     <h2 id="super-classes-2">Super classes<a class="anchor" aria-label="anchor" href="#super-classes-2"></a></h2>
-    <p><code><a href="HasTraits.html">RKernel::HasTraits</a></code> -&gt; <code><a href="Widgets.html">RKernel::Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">RKernel::DOMWidget</a></code> -&gt; <code><a href="DescriptionWidget.html">RKernel::DescriptionWidget</a></code> -&gt; <code>RKernel::ValueWidget</code> -&gt; <code>RKernel::MediaWidget</code> -&gt; <code>VideoWidget</code></p>
+    <p><code><a href="HasTraits.html">HasTraits</a></code> -&gt; <code><a href="Widgets.html">Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">DOMWidget</a></code> -&gt; <code><a href="DescriptionWidget.html">DescriptionWidget</a></code> -&gt; <code>ValueWidget</code> -&gt; <code>MediaWidget</code> -&gt; <code>VideoWidget</code></p>
     </div>
     <div class="section level2">
     <h2 id="public-fields-2">Public fields<a class="anchor" aria-label="anchor" href="#public-fields-2"></a></h2>
@@ -337,31 +326,31 @@
 <dd><p>Name of the Javascript view in the frontend.</p></dd>
 
 
-<dt><code>_model_name</code></dt>
+    <dt><code>_model_name</code></dt>
 <dd><p>Name of the Javascript model in the frontend.</p></dd>
 
 
-<dt><code>format</code></dt>
+    <dt><code>format</code></dt>
 <dd><p>A string, giving the video fromat.</p></dd>
 
 
-<dt><code>width</code></dt>
+    <dt><code>width</code></dt>
 <dd><p>A string, describing the width in CSS language, e.g. "480px".</p></dd>
 
 
-<dt><code>height</code></dt>
+    <dt><code>height</code></dt>
 <dd><p>A string, describing the height in CSS language, e.g. "480px".</p></dd>
 
 
-<dt><code>autoplay</code></dt>
+    <dt><code>autoplay</code></dt>
 <dd><p>Boolean, when TRUE the video starts when it is displayed.</p></dd>
 
 
-<dt><code>loop</code></dt>
+    <dt><code>loop</code></dt>
 <dd><p>Boolean, when TRUE the video restarts after finishing.</p></dd>
 
 
-<dt><code>controls</code></dt>
+    <dt><code>controls</code></dt>
 <dd><p>Boolean, when TRUE then video controls are shown.</p></dd>
 
 
@@ -372,68 +361,63 @@
 
 <div class="section">
 <h3 id="public-methods-2">Public methods<a class="anchor" aria-label="anchor" href="#public-methods-2"></a></h3>
-
-<ul><li><p><a href="#method-VideoWidget-from_file"><code>VideoWidgetClass$from_file()</code></a></p></li>
-<li><p><a href="#method-VideoWidget-clone"><code>VideoWidgetClass$clone()</code></a></p></li>
-</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>RKernel::HasTraits$notify()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>RKernel::HasTraits$observe()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="validate"><a href="HasTraits.html#method-validate"><code>RKernel::HasTraits$validate()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="_send"><a href="Widget.html#method-_send"><code>RKernel::Widget$_send()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href="Widget.html#method-check_version"><code>RKernel::Widget$check_version()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href="Widget.html#method-close"><code>RKernel::Widget$close()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href="Widget.html#method-display_data"><code>RKernel::Widget$display_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href="Widget.html#method-get_state"><code>RKernel::Widget$get_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href="Widget.html#method-handle_buffers"><code>RKernel::Widget$handle_buffers()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href="Widget.html#method-handle_comm_msg"><code>RKernel::Widget$handle_comm_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_opened"><a href="Widget.html#method-handle_comm_opened"><code>RKernel::Widget$handle_comm_opened()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_custom_msg"><a href="Widget.html#method-handle_custom_msg"><code>RKernel::Widget$handle_custom_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_displayed"><a href="Widget.html#method-handle_displayed"><code>RKernel::Widget$handle_displayed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_event"><a href="Widget.html#method-handle_event"><code>RKernel::Widget$handle_event()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_displayed"><a href="Widget.html#method-on_displayed"><code>RKernel::Widget$on_displayed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_event"><a href="Widget.html#method-on_event"><code>RKernel::Widget$on_event()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_msg"><a href="Widget.html#method-on_msg"><code>RKernel::Widget$on_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="open"><a href="Widget.html#method-open"><code>RKernel::Widget$open()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send"><a href="Widget.html#method-send"><code>RKernel::Widget$send()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send_state"><a href="Widget.html#method-send_state"><code>RKernel::Widget$send_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="set_state"><a href="Widget.html#method-set_state"><code>RKernel::Widget$set_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="add_class"><a href="DOMWidget.html#method-add_class"><code>RKernel::DOMWidget$add_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="has_class"><a href="DOMWidget.html#method-has_class"><code>RKernel::DOMWidget$has_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>RKernel::DOMWidget$remove_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="from_url"><a href="MediaWidget.html#method-from_url"><code>RKernel::MediaWidget$from_url()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="initialize"><a href="MediaWidget.html#method-initialize"><code>RKernel::MediaWidget$initialize()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="on_change"><a href="MediaWidget.html#method-on_change"><code>RKernel::MediaWidget$on_change()</code></a></span></li>
+<p></p><ul><li><p><a href="#method-VideoWidget-from_file"><code>VideoWidget$from_file()</code></a></p></li>
+<li><p><a href="#method-VideoWidget-clone"><code>VideoWidget$clone()</code></a></p></li>
+</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>HasTraits$notify()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>HasTraits$observe()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="validate"><a href="HasTraits.html#method-validate"><code>HasTraits$validate()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="_send"><a href="Widget.html#method-_send"><code>Widget$_send()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href="Widget.html#method-check_version"><code>Widget$check_version()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href="Widget.html#method-close"><code>Widget$close()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href="Widget.html#method-display_data"><code>Widget$display_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href="Widget.html#method-get_state"><code>Widget$get_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href="Widget.html#method-handle_buffers"><code>Widget$handle_buffers()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href="Widget.html#method-handle_comm_msg"><code>Widget$handle_comm_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_opened"><a href="Widget.html#method-handle_comm_opened"><code>Widget$handle_comm_opened()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_custom_msg"><a href="Widget.html#method-handle_custom_msg"><code>Widget$handle_custom_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_displayed"><a href="Widget.html#method-handle_displayed"><code>Widget$handle_displayed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_event"><a href="Widget.html#method-handle_event"><code>Widget$handle_event()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_displayed"><a href="Widget.html#method-on_displayed"><code>Widget$on_displayed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_event"><a href="Widget.html#method-on_event"><code>Widget$on_event()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_msg"><a href="Widget.html#method-on_msg"><code>Widget$on_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="open"><a href="Widget.html#method-open"><code>Widget$open()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send"><a href="Widget.html#method-send"><code>Widget$send()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send_state"><a href="Widget.html#method-send_state"><code>Widget$send_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="set_state"><a href="Widget.html#method-set_state"><code>Widget$set_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="add_class"><a href="DOMWidget.html#method-add_class"><code>DOMWidget$add_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="has_class"><a href="DOMWidget.html#method-has_class"><code>DOMWidget$has_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>DOMWidget$remove_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="from_url"><a href="MediaWidget.html#method-from_url"><code>MediaWidget$from_url()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="initialize"><a href="MediaWidget.html#method-initialize"><code>MediaWidget$initialize()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="on_change"><a href="MediaWidget.html#method-on_change"><code>MediaWidget$on_change()</code></a></span></li>
 </ul></details></p><hr><a id="method-VideoWidget-from_file"></a><div class="section">
-<h3 id="method-from-file--2">Method <code>from_file()</code><a class="anchor" aria-label="anchor" href="#method-from-file--2"></a></h3>
+<h3 id="videowidget-from-file-"><code>VideoWidget$from_file()</code><a class="anchor" aria-label="anchor" href="#videowidget-from-file-"></a></h3>
 <p>Create image widget from file</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VideoWidgetClass</span><span class="op">$</span><span class="fu">from_file</span><span class="op">(</span><span class="va">filename</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VideoWidget</span><span class="op">$</span><span class="fu">from_file</span><span class="op">(</span><span class="va">filename</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>filename</code></dt>
 <dd><p>A character string</p></dd>
 
-
-<dt><code>width</code></dt>
+      <dt><code>width</code></dt>
 <dd><p>A character string with CSS width specification</p></dd>
 
-
-<dt><code>height</code></dt>
+      <dt><code>height</code></dt>
 <dd><p>A character string with CSS height specification</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-VideoWidget-clone"></a><div class="section">
-<h3 id="method-clone--2">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone--2"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VideoWidgetClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-VideoWidget-clone"></a><div class="section">
+<h3 id="videowidget-clone-"><code>VideoWidget$clone()</code><a class="anchor" aria-label="anchor" href="#videowidget-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">VideoWidget</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -444,10 +428,11 @@
 
 </div>
 
+
     </div>
     <div class="section level2">
     <h2 id="super-classes-3">Super classes<a class="anchor" aria-label="anchor" href="#super-classes-3"></a></h2>
-    <p><code><a href="HasTraits.html">RKernel::HasTraits</a></code> -&gt; <code><a href="Widgets.html">RKernel::Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">RKernel::DOMWidget</a></code> -&gt; <code><a href="DescriptionWidget.html">RKernel::DescriptionWidget</a></code> -&gt; <code>RKernel::ValueWidget</code> -&gt; <code>RKernel::MediaWidget</code> -&gt; <code>AudioWidget</code></p>
+    <p><code><a href="HasTraits.html">HasTraits</a></code> -&gt; <code><a href="Widgets.html">Widget</a></code> -&gt; <code><a href="DOMWidgetClass.html">DOMWidget</a></code> -&gt; <code><a href="DescriptionWidget.html">DescriptionWidget</a></code> -&gt; <code>ValueWidget</code> -&gt; <code>MediaWidget</code> -&gt; <code>AudioWidget</code></p>
     </div>
     <div class="section level2">
     <h2 id="public-fields-3">Public fields<a class="anchor" aria-label="anchor" href="#public-fields-3"></a></h2>
@@ -455,23 +440,23 @@
 <dd><p>Name of the Javascript view in the frontend.</p></dd>
 
 
-<dt><code>_model_name</code></dt>
+    <dt><code>_model_name</code></dt>
 <dd><p>Name of the Javascript model in the frontend.</p></dd>
 
 
-<dt><code>format</code></dt>
+    <dt><code>format</code></dt>
 <dd><p>A string, giving the audio fromat.</p></dd>
 
 
-<dt><code>autoplay</code></dt>
+    <dt><code>autoplay</code></dt>
 <dd><p>Boolean, when TRUE the video starts when it is displayed.</p></dd>
 
 
-<dt><code>loop</code></dt>
+    <dt><code>loop</code></dt>
 <dd><p>Boolean, when TRUE the video restarts after finishing.</p></dd>
 
 
-<dt><code>controls</code></dt>
+    <dt><code>controls</code></dt>
 <dd><p>Boolean, when TRUE then video controls are shown.</p></dd>
 
 
@@ -482,44 +467,41 @@
 
 <div class="section">
 <h3 id="public-methods-3">Public methods<a class="anchor" aria-label="anchor" href="#public-methods-3"></a></h3>
-
-<ul><li><p><a href="#method-AudioWidget-clone"><code>AudioWidgetClass$clone()</code></a></p></li>
-</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>RKernel::HasTraits$notify()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>RKernel::HasTraits$observe()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="validate"><a href="HasTraits.html#method-validate"><code>RKernel::HasTraits$validate()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="_send"><a href="Widget.html#method-_send"><code>RKernel::Widget$_send()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href="Widget.html#method-check_version"><code>RKernel::Widget$check_version()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href="Widget.html#method-close"><code>RKernel::Widget$close()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href="Widget.html#method-display_data"><code>RKernel::Widget$display_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href="Widget.html#method-get_state"><code>RKernel::Widget$get_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href="Widget.html#method-handle_buffers"><code>RKernel::Widget$handle_buffers()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href="Widget.html#method-handle_comm_msg"><code>RKernel::Widget$handle_comm_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_opened"><a href="Widget.html#method-handle_comm_opened"><code>RKernel::Widget$handle_comm_opened()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_custom_msg"><a href="Widget.html#method-handle_custom_msg"><code>RKernel::Widget$handle_custom_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_displayed"><a href="Widget.html#method-handle_displayed"><code>RKernel::Widget$handle_displayed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_event"><a href="Widget.html#method-handle_event"><code>RKernel::Widget$handle_event()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_displayed"><a href="Widget.html#method-on_displayed"><code>RKernel::Widget$on_displayed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_event"><a href="Widget.html#method-on_event"><code>RKernel::Widget$on_event()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_msg"><a href="Widget.html#method-on_msg"><code>RKernel::Widget$on_msg()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="open"><a href="Widget.html#method-open"><code>RKernel::Widget$open()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send"><a href="Widget.html#method-send"><code>RKernel::Widget$send()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send_state"><a href="Widget.html#method-send_state"><code>RKernel::Widget$send_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="set_state"><a href="Widget.html#method-set_state"><code>RKernel::Widget$set_state()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="add_class"><a href="DOMWidget.html#method-add_class"><code>RKernel::DOMWidget$add_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="has_class"><a href="DOMWidget.html#method-has_class"><code>RKernel::DOMWidget$has_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>RKernel::DOMWidget$remove_class()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="from_file"><a href="MediaWidget.html#method-from_file"><code>RKernel::MediaWidget$from_file()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="from_url"><a href="MediaWidget.html#method-from_url"><code>RKernel::MediaWidget$from_url()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="initialize"><a href="MediaWidget.html#method-initialize"><code>RKernel::MediaWidget$initialize()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="on_change"><a href="MediaWidget.html#method-on_change"><code>RKernel::MediaWidget$on_change()</code></a></span></li>
+<p></p><ul><li><p><a href="#method-AudioWidget-clone"><code>AudioWidget$clone()</code></a></p></li>
+</ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="notify"><a href="HasTraits.html#method-notify"><code>HasTraits$notify()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="observe"><a href="HasTraits.html#method-observe"><code>HasTraits$observe()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="HasTraits" data-id="validate"><a href="HasTraits.html#method-validate"><code>HasTraits$validate()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="_send"><a href="Widget.html#method-_send"><code>Widget$_send()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="check_version"><a href="Widget.html#method-check_version"><code>Widget$check_version()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="close"><a href="Widget.html#method-close"><code>Widget$close()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="display_data"><a href="Widget.html#method-display_data"><code>Widget$display_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="get_state"><a href="Widget.html#method-get_state"><code>Widget$get_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_buffers"><a href="Widget.html#method-handle_buffers"><code>Widget$handle_buffers()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_msg"><a href="Widget.html#method-handle_comm_msg"><code>Widget$handle_comm_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_comm_opened"><a href="Widget.html#method-handle_comm_opened"><code>Widget$handle_comm_opened()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_custom_msg"><a href="Widget.html#method-handle_custom_msg"><code>Widget$handle_custom_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_displayed"><a href="Widget.html#method-handle_displayed"><code>Widget$handle_displayed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="handle_event"><a href="Widget.html#method-handle_event"><code>Widget$handle_event()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_displayed"><a href="Widget.html#method-on_displayed"><code>Widget$on_displayed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_event"><a href="Widget.html#method-on_event"><code>Widget$on_event()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="on_msg"><a href="Widget.html#method-on_msg"><code>Widget$on_msg()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="open"><a href="Widget.html#method-open"><code>Widget$open()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send"><a href="Widget.html#method-send"><code>Widget$send()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="send_state"><a href="Widget.html#method-send_state"><code>Widget$send_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="Widget" data-id="set_state"><a href="Widget.html#method-set_state"><code>Widget$set_state()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="add_class"><a href="DOMWidget.html#method-add_class"><code>DOMWidget$add_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="has_class"><a href="DOMWidget.html#method-has_class"><code>DOMWidget$has_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="DOMWidget" data-id="remove_class"><a href="DOMWidget.html#method-remove_class"><code>DOMWidget$remove_class()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="from_file"><a href="MediaWidget.html#method-from_file"><code>MediaWidget$from_file()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="from_url"><a href="MediaWidget.html#method-from_url"><code>MediaWidget$from_url()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="initialize"><a href="MediaWidget.html#method-initialize"><code>MediaWidget$initialize()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="RKernel" data-topic="MediaWidget" data-id="on_change"><a href="MediaWidget.html#method-on_change"><code>MediaWidget$on_change()</code></a></span></li>
 </ul></details></p><hr><a id="method-AudioWidget-clone"></a><div class="section">
-<h3 id="method-clone--3">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone--3"></a></h3>
+<h3 id="audiowidget-clone-"><code>AudioWidget$clone()</code><a class="anchor" aria-label="anchor" href="#audiowidget-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">AudioWidgetClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">AudioWidget</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -529,6 +511,7 @@
 </div>
 
 </div>
+
 
     </div>
 

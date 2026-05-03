@@ -36,7 +36,7 @@ this class in existence.
 
 ### Public methods
 
-- [`Kernel$new()`](#method-Kernel-new)
+- [`Kernel$new()`](#method-Kernel-initialize)
 
 - [`Kernel$start()`](#method-Kernel-start)
 
@@ -94,7 +94,7 @@ this class in existence.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Kernel$new()`
 
 Initialize the kernel
 
@@ -110,7 +110,7 @@ Initialize the kernel
 
 ------------------------------------------------------------------------
 
-### Method [`start()`](https://rdrr.io/r/stats/start.html)
+### `Kernel$start()`
 
 Start the R session and other components
 
@@ -120,7 +120,7 @@ Start the R session and other components
 
 ------------------------------------------------------------------------
 
-### Method `run_code()`
+### `Kernel$run_code()`
 
 Run some code (for testing purposes)
 
@@ -141,7 +141,7 @@ Run some code (for testing purposes)
 
 ------------------------------------------------------------------------
 
-### Method `run()`
+### `Kernel$run()`
 
 Run the kernel.
 
@@ -151,7 +151,7 @@ Run the kernel.
 
 ------------------------------------------------------------------------
 
-### Method `poll_and_respond()`
+### `Kernel$poll_and_respond()`
 
 A single iteration of the kernel loop
 
@@ -174,7 +174,7 @@ A single iteration of the kernel loop
 
 ------------------------------------------------------------------------
 
-### Method `clear_output()`
+### `Kernel$clear_output()`
 
 Clear the current output cell in the frontend.
 
@@ -190,7 +190,7 @@ Clear the current output cell in the frontend.
 
 ------------------------------------------------------------------------
 
-### Method `stream()`
+### `Kernel$stream()`
 
 Stream text to the frontend.
 
@@ -210,7 +210,7 @@ Stream text to the frontend.
 
 ------------------------------------------------------------------------
 
-### Method [`stdout()`](https://rdrr.io/r/base/showConnections.html)
+### `Kernel$stdout()`
 
 Stream text to the frontend via 'stdout' stream.
 
@@ -226,7 +226,7 @@ Stream text to the frontend via 'stdout' stream.
 
 ------------------------------------------------------------------------
 
-### Method [`stderr()`](https://rdrr.io/r/base/showConnections.html)
+### `Kernel$stderr()`
 
 Stream text to the frontend via 'stderr' stream.
 
@@ -242,7 +242,7 @@ Stream text to the frontend via 'stderr' stream.
 
 ------------------------------------------------------------------------
 
-### Method [`readline()`](https://rdrr.io/r/base/readline.html)
+### `Kernel$readline()`
 
 Ask the frontend for a line of text input.
 
@@ -258,7 +258,7 @@ Ask the frontend for a line of text input.
 
 ------------------------------------------------------------------------
 
-### Method `execute_result()`
+### `Kernel$execute_result()`
 
 Send execution results to the frontend
 
@@ -278,7 +278,7 @@ Send execution results to the frontend
 
 ------------------------------------------------------------------------
 
-### Method `display_send()`
+### `Kernel$display_send()`
 
 Send rich format data to the frontend
 
@@ -294,7 +294,7 @@ Send rich format data to the frontend
 
 ------------------------------------------------------------------------
 
-### Method `send_error()`
+### `Kernel$send_error()`
 
 Send an error message and traceback to the frontend.
 
@@ -318,7 +318,7 @@ Send an error message and traceback to the frontend.
 
 ------------------------------------------------------------------------
 
-### Method `send_comm()`
+### `Kernel$send_comm()`
 
 Send a message via a comm.
 
@@ -334,7 +334,7 @@ Send a message via a comm.
 
 ------------------------------------------------------------------------
 
-### Method `get_parent()`
+### `Kernel$get_parent()`
 
 The parent of the message currently sent.
 
@@ -350,7 +350,7 @@ The parent of the message currently sent.
 
 ------------------------------------------------------------------------
 
-### Method `get_conn_info()`
+### `Kernel$get_conn_info()`
 
 Return the current connection info.
 
@@ -360,7 +360,7 @@ Return the current connection info.
 
 ------------------------------------------------------------------------
 
-### Method `is_child()`
+### `Kernel$is_child()`
 
 Check if the current process is a fork from the original kernel process
 
@@ -370,7 +370,7 @@ Check if the current process is a fork from the original kernel process
 
 ------------------------------------------------------------------------
 
-### Method `input_request()`
+### `Kernel$input_request()`
 
 Send an input request to the frontend
 
@@ -391,7 +391,7 @@ Send an input request to the frontend
 
 ------------------------------------------------------------------------
 
-### Method `read_stdin()`
+### `Kernel$read_stdin()`
 
 Read a line from the frontend
 
@@ -401,7 +401,7 @@ Read a line from the frontend
 
 ------------------------------------------------------------------------
 
-### Method `send_debug_event()`
+### `Kernel$send_debug_event()`
 
 Send a debug event to the frontend
 
@@ -417,7 +417,7 @@ Send a debug event to the frontend
 
 ------------------------------------------------------------------------
 
-### Method `save_shell_parent()`
+### `Kernel$save_shell_parent()`
 
 Save the parent message on the shell channel
 
@@ -427,7 +427,7 @@ Save the parent message on the shell channel
 
 ------------------------------------------------------------------------
 
-### Method `restore_shell_parent()`
+### `Kernel$restore_shell_parent()`
 
 Restore a saved parent message on the shell channel.
 
@@ -443,7 +443,7 @@ Restore a saved parent message on the shell channel.
 
 ------------------------------------------------------------------------
 
-### Method `shutdown()`
+### `Kernel$shutdown()`
 
 Shut down the kernel and all associated sub-process i.e. the R session
 and all detached-cell processes.
@@ -454,7 +454,7 @@ and all detached-cell processes.
 
 ------------------------------------------------------------------------
 
-### Method `restart()`
+### `Kernel$restart()`
 
 Restart the R session
 
@@ -464,7 +464,7 @@ Restart the R session
 
 ------------------------------------------------------------------------
 
-### Method `restore_execute_parent()`
+### `Kernel$restore_execute_parent()`
 
 Restore parent message of last execute_request.
 
@@ -474,7 +474,7 @@ Restore parent message of last execute_request.
 
 ------------------------------------------------------------------------
 
-### Method `handle_yield()`
+### `Kernel$handle_yield()`
 
 Handle R session's yielding to allow servicing frontend requests
 
@@ -490,7 +490,7 @@ Handle R session's yielding to allow servicing frontend requests
 
 ------------------------------------------------------------------------
 
-### Method `add_service()`
+### `Kernel$add_service()`
 
 Add a function as a service to be run each iteration of the kernel loop.
 
@@ -506,7 +506,7 @@ Add a function as a service to be run each iteration of the kernel loop.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Kernel$clone()`
 
 The objects of this class are cloneable with this method.
 

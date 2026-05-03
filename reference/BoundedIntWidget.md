@@ -38,14 +38,12 @@ The function `BoundedIntWidget` creates objects of the R6 Class
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
 -\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
--\>
-[`RKernel::DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
--\> `RKernel::ValueWidget` -\> `BoundedIntWidget`
+[`DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
+-\> `ValueWidget` -\> `BoundedIntWidget`
 
 ## Public fields
 
@@ -68,53 +66,53 @@ The function `BoundedIntWidget` creates objects of the R6 Class
 
 ### Public methods
 
-- [`BoundedIntWidgetClass$validate_value()`](#method-BoundedIntWidget-validate_value)
+- [`BoundedIntWidget$validate_value()`](#method-BoundedIntWidget-validate_value)
 
-- [`BoundedIntWidgetClass$validate_min()`](#method-BoundedIntWidget-validate_min)
+- [`BoundedIntWidget$validate_min()`](#method-BoundedIntWidget-validate_min)
 
-- [`BoundedIntWidgetClass$validate_max()`](#method-BoundedIntWidget-validate_max)
+- [`BoundedIntWidget$validate_max()`](#method-BoundedIntWidget-validate_max)
 
-- [`BoundedIntWidgetClass$new()`](#method-BoundedIntWidget-new)
+- [`BoundedIntWidget$new()`](#method-BoundedIntWidget-initialize)
 
-- [`BoundedIntWidgetClass$clone()`](#method-BoundedIntWidget-clone)
+- [`BoundedIntWidget$clone()`](#method-BoundedIntWidget-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
-- [`RKernel::ValueWidget$on_change()`](https://melff.github.io/RKernel/reference/ValueWidget.html#method-on_change)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- `ValueWidget$on_change()`
 
 ------------------------------------------------------------------------
 
-### Method `validate_value()`
+### `BoundedIntWidget$validate_value()`
 
 Validate the "value" after assignment.
 
 #### Usage
 
-    BoundedIntWidgetClass$validate_value(value)
+    BoundedIntWidget$validate_value(value)
 
 #### Arguments
 
@@ -124,13 +122,13 @@ Validate the "value" after assignment.
 
 ------------------------------------------------------------------------
 
-### Method `validate_min()`
+### `BoundedIntWidget$validate_min()`
 
 Validate the "min" field after assignment.
 
 #### Usage
 
-    BoundedIntWidgetClass$validate_min(min)
+    BoundedIntWidget$validate_min(min)
 
 #### Arguments
 
@@ -140,13 +138,13 @@ Validate the "min" field after assignment.
 
 ------------------------------------------------------------------------
 
-### Method `validate_max()`
+### `BoundedIntWidget$validate_max()`
 
 Validate the "max" field after assignment.
 
 #### Usage
 
-    BoundedIntWidgetClass$validate_max(max)
+    BoundedIntWidget$validate_max(max)
 
 #### Arguments
 
@@ -156,11 +154,11 @@ Validate the "max" field after assignment.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `BoundedIntWidget$new()`
 
 #### Usage
 
-    BoundedIntWidgetClass$new(...)
+    BoundedIntWidget$new(...)
 
 #### Arguments
 
@@ -170,13 +168,13 @@ Validate the "max" field after assignment.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `BoundedIntWidget$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    BoundedIntWidgetClass$clone(deep = FALSE)
+    BoundedIntWidget$clone(deep = FALSE)
 
 #### Arguments
 
@@ -186,14 +184,12 @@ The objects of this class are cloneable with this method.
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
 -\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
--\>
-[`RKernel::DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
--\> `RKernel::ValueWidget` -\> `BoundedIntRangeWidget`
+[`DescriptionWidget`](https://melff.github.io/RKernel/reference/DescriptionWidget.md)
+-\> `ValueWidget` -\> `BoundedIntRangeWidget`
 
 ## Public fields
 
@@ -216,53 +212,53 @@ The objects of this class are cloneable with this method.
 
 ### Public methods
 
-- [`BoundedIntRangeWidgetClass$validate_value()`](#method-BoundedIntRangeWidget-validate_value)
+- [`BoundedIntRangeWidget$validate_value()`](#method-BoundedIntRangeWidget-validate_value)
 
-- [`BoundedIntRangeWidgetClass$validate_min()`](#method-BoundedIntRangeWidget-validate_min)
+- [`BoundedIntRangeWidget$validate_min()`](#method-BoundedIntRangeWidget-validate_min)
 
-- [`BoundedIntRangeWidgetClass$validate_max()`](#method-BoundedIntRangeWidget-validate_max)
+- [`BoundedIntRangeWidget$validate_max()`](#method-BoundedIntRangeWidget-validate_max)
 
-- [`BoundedIntRangeWidgetClass$new()`](#method-BoundedIntRangeWidget-new)
+- [`BoundedIntRangeWidget$new()`](#method-BoundedIntRangeWidget-initialize)
 
-- [`BoundedIntRangeWidgetClass$clone()`](#method-BoundedIntRangeWidget-clone)
+- [`BoundedIntRangeWidget$clone()`](#method-BoundedIntRangeWidget-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
-- [`RKernel::ValueWidget$on_change()`](https://melff.github.io/RKernel/reference/ValueWidget.html#method-on_change)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- `ValueWidget$on_change()`
 
 ------------------------------------------------------------------------
 
-### Method `validate_value()`
+### `BoundedIntRangeWidget$validate_value()`
 
 Validate the "value" after assignment.
 
 #### Usage
 
-    BoundedIntRangeWidgetClass$validate_value(value)
+    BoundedIntRangeWidget$validate_value(value)
 
 #### Arguments
 
@@ -272,13 +268,13 @@ Validate the "value" after assignment.
 
 ------------------------------------------------------------------------
 
-### Method `validate_min()`
+### `BoundedIntRangeWidget$validate_min()`
 
 Validate the "min" field after assignment.
 
 #### Usage
 
-    BoundedIntRangeWidgetClass$validate_min(min)
+    BoundedIntRangeWidget$validate_min(min)
 
 #### Arguments
 
@@ -288,13 +284,13 @@ Validate the "min" field after assignment.
 
 ------------------------------------------------------------------------
 
-### Method `validate_max()`
+### `BoundedIntRangeWidget$validate_max()`
 
 Validate the "max" field after assignment.
 
 #### Usage
 
-    BoundedIntRangeWidgetClass$validate_max(max)
+    BoundedIntRangeWidget$validate_max(max)
 
 #### Arguments
 
@@ -304,11 +300,11 @@ Validate the "max" field after assignment.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `BoundedIntRangeWidget$new()`
 
 #### Usage
 
-    BoundedIntRangeWidgetClass$new(...)
+    BoundedIntRangeWidget$new(...)
 
 #### Arguments
 
@@ -318,13 +314,13 @@ Validate the "max" field after assignment.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `BoundedIntRangeWidget$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    BoundedIntRangeWidgetClass$clone(deep = FALSE)
+    BoundedIntRangeWidget$clone(deep = FALSE)
 
 #### Arguments
 

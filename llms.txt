@@ -11,6 +11,7 @@ A demonstration of interactive distribution plots
 To install run the following lines in *R*:
 
 ``` r
+
 install.packages('RKernel', repos = c('https://melff.r-universe.dev', 'https://cloud.r-project.org'))
 RKernel::installspec()
 ```

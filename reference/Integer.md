@@ -29,8 +29,8 @@ to_json(x, ...)
 
 ## Super class
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\> `Integer`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+`Integer`
 
 ## Public fields
 
@@ -55,26 +55,26 @@ to_json(x, ...)
 
 ### Public methods
 
-- [`IntegerClass$validator()`](#method-Integer-validator)
+- [`Integer$validator()`](#method-Integer-validator)
 
-- [`IntegerClass$new()`](#method-Integer-new)
+- [`Integer$new()`](#method-Integer-initialize)
 
-- [`IntegerClass$clone()`](#method-Integer-clone)
+- [`Integer$clone()`](#method-Integer-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `Integer$validator()`
 
 Check the value assigned to the traitlet.
 
 #### Usage
 
-    IntegerClass$validator(value)
+    Integer$validator(value)
 
 #### Arguments
 
@@ -84,13 +84,13 @@ Check the value assigned to the traitlet.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Integer$new()`
 
 Initialize the traitlet.
 
 #### Usage
 
-    IntegerClass$new(
+    Integer$new(
       initial = integer(0),
       coerce = TRUE,
       optional = length(initial) == 0,
@@ -118,13 +118,13 @@ Initialize the traitlet.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Integer$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    IntegerClass$clone(deep = FALSE)
+    Integer$clone(deep = FALSE)
 
 #### Arguments
 

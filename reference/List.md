@@ -16,8 +16,8 @@ List(...)
 
 ## Super class
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\> `List`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+`List`
 
 ## Public fields
 
@@ -29,26 +29,26 @@ List(...)
 
 ### Public methods
 
-- [`ListClass$validator()`](#method-List-validator)
+- [`List$validator()`](#method-List-validator)
 
-- [`ListClass$clone()`](#method-List-clone)
+- [`List$clone()`](#method-List-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$initialize()`](https://melff.github.io/RKernel/reference/Trait.html#method-initialize)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$initialize()`](https://melff.github.io/RKernel/reference/Trait.html#method-initialize)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `List$validator()`
 
 A function that checks the validity of an assigned value, i.e. whether
 the assigned value is a list
 
 #### Usage
 
-    ListClass$validator(value)
+    List$validator(value)
 
 #### Arguments
 
@@ -58,13 +58,13 @@ the assigned value is a list
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `List$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    ListClass$clone(deep = FALSE)
+    List$clone(deep = FALSE)
 
 #### Arguments
 

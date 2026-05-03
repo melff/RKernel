@@ -47,25 +47,25 @@ messages](https://jupyter-client.readthedocs.io/en/latest/messaging.html#custom-
 
 ### Public methods
 
-- [`CommClass$new()`](#method-Comm-new)
+- [`Comm$new()`](#method-Comm-initialize)
 
-- [`CommClass$open()`](#method-Comm-open)
+- [`Comm$open()`](#method-Comm-open)
 
-- [`CommClass$send()`](#method-Comm-send)
+- [`Comm$send()`](#method-Comm-send)
 
-- [`CommClass$close()`](#method-Comm-close)
+- [`Comm$close()`](#method-Comm-close)
 
-- [`CommClass$clone()`](#method-Comm-clone)
+- [`Comm$clone()`](#method-Comm-clone)
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Comm$new()`
 
 Initialize a 'Comm' object
 
 #### Usage
 
-    CommClass$new(target_name, id = uuid(), handlers = list())
+    Comm$new(target_name, id = uuid(), handlers = list())
 
 #### Arguments
 
@@ -87,13 +87,13 @@ Initialize a 'Comm' object
 
 ------------------------------------------------------------------------
 
-### Method [`open()`](https://rdrr.io/r/base/connections.html)
+### `Comm$open()`
 
 Open a comm
 
 #### Usage
 
-    CommClass$open(data, metadata = emptyNamedList, buffers = NULL)
+    Comm$open(data, metadata = emptyNamedList, buffers = NULL)
 
 #### Arguments
 
@@ -111,13 +111,13 @@ Open a comm
 
 ------------------------------------------------------------------------
 
-### Method `send()`
+### `Comm$send()`
 
 Send data through a comm
 
 #### Usage
 
-    CommClass$send(data, metadata = emptyNamedList, buffers = NULL)
+    Comm$send(data, metadata = emptyNamedList, buffers = NULL)
 
 #### Arguments
 
@@ -135,17 +135,13 @@ Send data through a comm
 
 ------------------------------------------------------------------------
 
-### Method [`close()`](https://rdrr.io/r/base/connections.html)
+### `Comm$close()`
 
 Close a comm
 
 #### Usage
 
-    CommClass$close(
-      data = emptyNamedList,
-      metadata = emptyNamedList,
-      buffers = NULL
-    )
+    Comm$close(data = emptyNamedList, metadata = emptyNamedList, buffers = NULL)
 
 #### Arguments
 
@@ -163,13 +159,13 @@ Close a comm
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Comm$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    CommClass$clone(deep = FALSE)
+    Comm$clone(deep = FALSE)
 
 #### Arguments
 

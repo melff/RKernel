@@ -24,33 +24,33 @@ EventManager(...)
 
 ### Public methods
 
-- [`EventManagerClass$new()`](#method-EventManager-new)
+- [`EventManager$new()`](#method-EventManager-initialize)
 
-- [`EventManagerClass$send()`](#method-EventManager-send)
+- [`EventManager$send()`](#method-EventManager-send)
 
-- [`EventManagerClass$on()`](#method-EventManager-on)
+- [`EventManager$on()`](#method-EventManager-on)
 
-- [`EventManagerClass$activate()`](#method-EventManager-activate)
+- [`EventManager$activate()`](#method-EventManager-activate)
 
-- [`EventManagerClass$suspend()`](#method-EventManager-suspend)
+- [`EventManager$suspend()`](#method-EventManager-suspend)
 
-- [`EventManagerClass$clear()`](#method-EventManager-clear)
+- [`EventManager$clear()`](#method-EventManager-clear)
 
-- [`EventManagerClass$resume()`](#method-EventManager-resume)
+- [`EventManager$resume()`](#method-EventManager-resume)
 
-- [`EventManagerClass$has()`](#method-EventManager-has)
+- [`EventManager$has()`](#method-EventManager-has)
 
-- [`EventManagerClass$clone()`](#method-EventManager-clone)
+- [`EventManager$clone()`](#method-EventManager-clone)
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `EventManager$new()`
 
 Initialize an event manager
 
 #### Usage
 
-    EventManagerClass$new(type)
+    EventManager$new(type)
 
 #### Arguments
 
@@ -60,13 +60,13 @@ Initialize an event manager
 
 ------------------------------------------------------------------------
 
-### Method `send()`
+### `EventManager$send()`
 
 Send an event
 
 #### Usage
 
-    EventManagerClass$send(event, ...)
+    EventManager$send(event, ...)
 
 #### Arguments
 
@@ -80,13 +80,13 @@ Send an event
 
 ------------------------------------------------------------------------
 
-### Method `on()`
+### `EventManager$on()`
 
 Install a handler for an event
 
 #### Usage
 
-    EventManagerClass$on(event, handler, remove = FALSE)
+    EventManager$on(event, handler, remove = FALSE)
 
 #### Arguments
 
@@ -104,13 +104,13 @@ Install a handler for an event
 
 ------------------------------------------------------------------------
 
-### Method `activate()`
+### `EventManager$activate()`
 
 Activate handlers
 
 #### Usage
 
-    EventManagerClass$activate(event = NULL, all = TRUE)
+    EventManager$activate(event = NULL, all = TRUE)
 
 #### Arguments
 
@@ -125,13 +125,13 @@ Activate handlers
 
 ------------------------------------------------------------------------
 
-### Method `suspend()`
+### `EventManager$suspend()`
 
 Suspend handlers
 
 #### Usage
 
-    EventManagerClass$suspend(event = NULL, all = TRUE)
+    EventManager$suspend(event = NULL, all = TRUE)
 
 #### Arguments
 
@@ -146,13 +146,13 @@ Suspend handlers
 
 ------------------------------------------------------------------------
 
-### Method `clear()`
+### `EventManager$clear()`
 
 Clear (i.e. remove) handlers for an event
 
 #### Usage
 
-    EventManagerClass$clear(event)
+    EventManager$clear(event)
 
 #### Arguments
 
@@ -162,23 +162,23 @@ Clear (i.e. remove) handlers for an event
 
 ------------------------------------------------------------------------
 
-### Method `resume()`
+### `EventManager$resume()`
 
 Resume (i.e. reactivate) an event handler
 
 #### Usage
 
-    EventManagerClass$resume()
+    EventManager$resume()
 
 ------------------------------------------------------------------------
 
-### Method `has()`
+### `EventManager$has()`
 
 Check whether the event manager has handlers for the given events
 
 #### Usage
 
-    EventManagerClass$has(events)
+    EventManager$has(events)
 
 #### Arguments
 
@@ -188,13 +188,13 @@ Check whether the event manager has handlers for the given events
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `EventManager$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    EventManagerClass$clone(deep = FALSE)
+    EventManager$clone(deep = FALSE)
 
 #### Arguments
 

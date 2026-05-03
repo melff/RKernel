@@ -10,7 +10,7 @@ detached code cells.
 -\>
 [`callr::r_session`](https://callr.r-lib.org/reference/r_session.html)
 -\>
-[`RKernel::RSessionBase`](https://melff.github.io/RKernel/reference/RSessionBase.md)
+[`RSessionBase`](https://melff.github.io/RKernel/reference/RSessionBase.md)
 -\> `RKernelSession`
 
 ## Public fields
@@ -55,6 +55,7 @@ Inherited methods
 - [`processx::process$format()`](http://processx.r-lib.org/reference/process.html#method-format)
 - [`processx::process$get_cmdline()`](http://processx.r-lib.org/reference/process.html#method-get_cmdline)
 - [`processx::process$get_cpu_times()`](http://processx.r-lib.org/reference/process.html#method-get_cpu_times)
+- [`processx::process$get_end_time()`](http://processx.r-lib.org/reference/process.html#method-get_end_time)
 - [`processx::process$get_error_connection()`](http://processx.r-lib.org/reference/process.html#method-get_error_connection)
 - [`processx::process$get_error_file()`](http://processx.r-lib.org/reference/process.html#method-get_error_file)
 - [`processx::process$get_exe()`](http://processx.r-lib.org/reference/process.html#method-get_exe)
@@ -89,7 +90,9 @@ Inherited methods
 - [`processx::process$read_all_output()`](http://processx.r-lib.org/reference/process.html#method-read_all_output)
 - [`processx::process$read_all_output_lines()`](http://processx.r-lib.org/reference/process.html#method-read_all_output_lines)
 - [`processx::process$read_error()`](http://processx.r-lib.org/reference/process.html#method-read_error)
+- [`processx::process$read_error_bytes()`](http://processx.r-lib.org/reference/process.html#method-read_error_bytes)
 - [`processx::process$read_error_lines()`](http://processx.r-lib.org/reference/process.html#method-read_error_lines)
+- [`processx::process$read_output_bytes()`](http://processx.r-lib.org/reference/process.html#method-read_output_bytes)
 - [`processx::process$read_output_lines()`](http://processx.r-lib.org/reference/process.html#method-read_output_lines)
 - [`processx::process$resume()`](http://processx.r-lib.org/reference/process.html#method-resume)
 - [`processx::process$signal()`](http://processx.r-lib.org/reference/process.html#method-signal)
@@ -110,17 +113,17 @@ Inherited methods
 - [`callr::r_session$run()`](https://callr.r-lib.org/reference/r_session.html#method-run)
 - [`callr::r_session$run_with_output()`](https://callr.r-lib.org/reference/r_session.html#method-run_with_output)
 - [`callr::r_session$traceback()`](https://callr.r-lib.org/reference/r_session.html#method-traceback)
-- [`RKernel::RSessionBase$initialize()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-initialize)
-- [`RKernel::RSessionBase$read_output()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-read_output)
-- [`RKernel::RSessionBase$receive_all_output()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-receive_all_output)
-- [`RKernel::RSessionBase$receive_output()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-receive_output)
-- [`RKernel::RSessionBase$send_input()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-send_input)
-- [`RKernel::RSessionBase$send_receive()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-send_receive)
-- [`RKernel::RSessionBase$sleeping()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-sleeping)
+- [`RSessionBase$initialize()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-initialize)
+- [`RSessionBase$read_output()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-read_output)
+- [`RSessionBase$receive_all_output()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-receive_all_output)
+- [`RSessionBase$receive_output()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-receive_output)
+- [`RSessionBase$send_input()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-send_input)
+- [`RSessionBase$send_receive()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-send_receive)
+- [`RSessionBase$sleeping()`](https://melff.github.io/RKernel/reference/RSessionBase.html#method-sleeping)
 
 ------------------------------------------------------------------------
 
-### Method `connect()`
+### `RKernelSession$connect()`
 
 Connect the session with the main Kernel object
 
@@ -142,7 +145,7 @@ Connect the session with the main Kernel object
 
 ------------------------------------------------------------------------
 
-### Method `setup()`
+### `RKernelSession$setup()`
 
 Set up the R session, by installing hooks etc.
 
@@ -152,7 +155,7 @@ Set up the R session, by installing hooks etc.
 
 ------------------------------------------------------------------------
 
-### Method [`start_graphics()`](https://melff.github.io/RKernel/reference/start_graphics.md)
+### `RKernelSession$start_graphics()`
 
 Initialize graphics, start device and return details
 
@@ -162,7 +165,7 @@ Initialize graphics, start device and return details
 
 ------------------------------------------------------------------------
 
-### Method `dev_new()`
+### `RKernelSession$dev_new()`
 
 Start a httpgd device and return the graphics details.
 
@@ -172,7 +175,7 @@ Start a httpgd device and return the graphics details.
 
 ------------------------------------------------------------------------
 
-### Method `graphics_details()`
+### `RKernelSession$graphics_details()`
 
 Return the graphics details.
 
@@ -182,7 +185,7 @@ Return the graphics details.
 
 ------------------------------------------------------------------------
 
-### Method [`http_get()`](https://melff.github.io/RKernel/reference/http_get.md)
+### `RKernelSession$http_get()`
 
 #### Usage
 
@@ -190,7 +193,7 @@ Return the graphics details.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RKernelSession$clone()`
 
 The objects of this class are cloneable with this method.
 

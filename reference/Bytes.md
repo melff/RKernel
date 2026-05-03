@@ -16,8 +16,8 @@ Bytes(...)
 
 ## Super class
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\> `Bytes`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+`Bytes`
 
 ## Public fields
 
@@ -38,26 +38,26 @@ Bytes(...)
 
 ### Public methods
 
-- [`BytesClass$validator()`](#method-Bytes-validator)
+- [`Bytes$validator()`](#method-Bytes-validator)
 
-- [`BytesClass$new()`](#method-Bytes-new)
+- [`Bytes$new()`](#method-Bytes-initialize)
 
-- [`BytesClass$clone()`](#method-Bytes-clone)
+- [`Bytes$clone()`](#method-Bytes-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `Bytes$validator()`
 
 A validator method
 
 #### Usage
 
-    BytesClass$validator(value)
+    Bytes$validator(value)
 
 #### Arguments
 
@@ -67,13 +67,13 @@ A validator method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Bytes$new()`
 
 The initializing method
 
 #### Usage
 
-    BytesClass$new(initial = raw(0), coerce = TRUE, optional = TRUE)
+    Bytes$new(initial = raw(0), coerce = TRUE, optional = TRUE)
 
 #### Arguments
 
@@ -91,13 +91,13 @@ The initializing method
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Bytes$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    BytesClass$clone(deep = FALSE)
+    Bytes$clone(deep = FALSE)
 
 #### Arguments
 

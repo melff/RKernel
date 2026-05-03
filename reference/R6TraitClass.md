@@ -2,12 +2,10 @@
 
 A Base Class for Traits that are R6 Objects
 
-A Base Class for Traits that are R6 Objects
-
 ## Super class
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\> `R6Trait`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+`R6Trait`
 
 ## Public fields
 
@@ -23,26 +21,26 @@ A Base Class for Traits that are R6 Objects
 
 ### Public methods
 
-- [`R6TraitClass$validator()`](#method-R6Trait-validator)
+- [`R6Trait$validator()`](#method-R6Trait-validator)
 
-- [`R6TraitClass$new()`](#method-R6Trait-new)
+- [`R6Trait$new()`](#method-R6Trait-initialize)
 
-- [`R6TraitClass$clone()`](#method-R6Trait-clone)
+- [`R6Trait$clone()`](#method-R6Trait-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `R6Trait$validator()`
 
 Checks wether `value` has the corret class
 
 #### Usage
 
-    R6TraitClass$validator(value)
+    R6Trait$validator(value)
 
 #### Arguments
 
@@ -52,13 +50,13 @@ Checks wether `value` has the corret class
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `R6Trait$new()`
 
 Initialize an object
 
 #### Usage
 
-    R6TraitClass$new(Class, ...)
+    R6Trait$new(Class, ...)
 
 #### Arguments
 
@@ -72,13 +70,13 @@ Initialize an object
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `R6Trait$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    R6TraitClass$clone(deep = FALSE)
+    R6Trait$clone(deep = FALSE)
 
 #### Arguments
 

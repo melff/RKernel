@@ -23,8 +23,8 @@ as.Date(x, ...)
 
 ## Super class
 
-[`RKernel::Trait`](https://melff.github.io/RKernel/reference/Traitlets.md)
--\> `DateClass`
+[`Trait`](https://melff.github.io/RKernel/reference/Traitlets.md) -\>
+`DateClass`
 
 ## Public fields
 
@@ -43,18 +43,18 @@ as.Date(x, ...)
 
 - [`DateClass$validator()`](#method-DateClass-validator)
 
-- [`DateClass$new()`](#method-DateClass-new)
+- [`DateClass$new()`](#method-DateClass-initialize)
 
 - [`DateClass$clone()`](#method-DateClass-clone)
 
 Inherited methods
 
-- [`RKernel::Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
-- [`RKernel::Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
+- [`Trait$get()`](https://melff.github.io/RKernel/reference/Trait.html#method-get)
+- [`Trait$set()`](https://melff.github.io/RKernel/reference/Trait.html#method-set)
 
 ------------------------------------------------------------------------
 
-### Method `validator()`
+### `DateClass$validator()`
 
 Check the value assigned to the traitlet.
 
@@ -70,7 +70,7 @@ Check the value assigned to the traitlet.
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `DateClass$new()`
 
 Initialize the traitlet.
 
@@ -108,7 +108,7 @@ Initialize the traitlet.
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `DateClass$clone()`
 
 The objects of this class are cloneable with this method.
 

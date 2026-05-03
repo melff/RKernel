@@ -25,27 +25,27 @@ CallbackDispatcher(...)
 
 ### Public methods
 
-- [`CallbackDispatcherClass$register()`](#method-CallbackDispatcher-register)
+- [`CallbackDispatcher$register()`](#method-CallbackDispatcher-register)
 
-- [`CallbackDispatcherClass$clear()`](#method-CallbackDispatcher-clear)
+- [`CallbackDispatcher$clear()`](#method-CallbackDispatcher-clear)
 
-- [`CallbackDispatcherClass$suspend_handlers()`](#method-CallbackDispatcher-suspend_handlers)
+- [`CallbackDispatcher$suspend_handlers()`](#method-CallbackDispatcher-suspend_handlers)
 
-- [`CallbackDispatcherClass$activate_handlers()`](#method-CallbackDispatcher-activate_handlers)
+- [`CallbackDispatcher$activate_handlers()`](#method-CallbackDispatcher-activate_handlers)
 
-- [`CallbackDispatcherClass$run()`](#method-CallbackDispatcher-run)
+- [`CallbackDispatcher$run()`](#method-CallbackDispatcher-run)
 
-- [`CallbackDispatcherClass$clone()`](#method-CallbackDispatcher-clone)
+- [`CallbackDispatcher$clone()`](#method-CallbackDispatcher-clone)
 
 ------------------------------------------------------------------------
 
-### Method `register()`
+### `CallbackDispatcher$register()`
 
 Register a function as a callback
 
 #### Usage
 
-    CallbackDispatcherClass$register(handler, remove)
+    CallbackDispatcher$register(handler, remove)
 
 #### Arguments
 
@@ -60,43 +60,43 @@ Register a function as a callback
 
 ------------------------------------------------------------------------
 
-### Method `clear()`
+### `CallbackDispatcher$clear()`
 
 Remove all callback functions
 
 #### Usage
 
-    CallbackDispatcherClass$clear()
+    CallbackDispatcher$clear()
 
 ------------------------------------------------------------------------
 
-### Method `suspend_handlers()`
+### `CallbackDispatcher$suspend_handlers()`
 
 Suspend registered callback functions
 
 #### Usage
 
-    CallbackDispatcherClass$suspend_handlers()
+    CallbackDispatcher$suspend_handlers()
 
 ------------------------------------------------------------------------
 
-### Method `activate_handlers()`
+### `CallbackDispatcher$activate_handlers()`
 
 (Re-)activate registered callback functions
 
 #### Usage
 
-    CallbackDispatcherClass$activate_handlers()
+    CallbackDispatcher$activate_handlers()
 
 ------------------------------------------------------------------------
 
-### Method `run()`
+### `CallbackDispatcher$run()`
 
 Run all registered callback functions
 
 #### Usage
 
-    CallbackDispatcherClass$run(...)
+    CallbackDispatcher$run(...)
 
 #### Arguments
 
@@ -106,13 +106,13 @@ Run all registered callback functions
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `CallbackDispatcher$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    CallbackDispatcherClass$clone(deep = FALSE)
+    CallbackDispatcher$clone(deep = FALSE)
 
 #### Arguments
 

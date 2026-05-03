@@ -45,11 +45,9 @@ with(data, expr, envir = list(), enclos = parent.frame(), clear = TRUE, ...)
 
 ## Super classes
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
--\>
-[`RKernel::Widget`](https://melff.github.io/RKernel/reference/Widgets.md)
--\>
-[`RKernel::DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+-\> [`Widget`](https://melff.github.io/RKernel/reference/Widgets.md) -\>
+[`DOMWidget`](https://melff.github.io/RKernel/reference/DOMWidgetClass.md)
 -\> `OutputWidget`
 
 ## Public fields
@@ -90,56 +88,56 @@ with(data, expr, envir = list(), enclos = parent.frame(), clear = TRUE, ...)
 
 ### Public methods
 
-- [`OutputWidgetClass$new()`](#method-OutputWidget-new)
+- [`OutputWidget$new()`](#method-OutputWidget-initialize)
 
-- [`OutputWidgetClass$display()`](#method-OutputWidget-display)
+- [`OutputWidget$display()`](#method-OutputWidget-display)
 
-- [`OutputWidgetClass$clear()`](#method-OutputWidget-clear)
+- [`OutputWidget$clear()`](#method-OutputWidget-clear)
 
-- [`OutputWidgetClass$stdout()`](#method-OutputWidget-stdout)
+- [`OutputWidget$stdout()`](#method-OutputWidget-stdout)
 
-- [`OutputWidgetClass$stderr()`](#method-OutputWidget-stderr)
+- [`OutputWidget$stderr()`](#method-OutputWidget-stderr)
 
-- [`OutputWidgetClass$handle_msg()`](#method-OutputWidget-handle_msg)
+- [`OutputWidget$handle_msg()`](#method-OutputWidget-handle_msg)
 
-- [`OutputWidgetClass$clone()`](#method-OutputWidget-clone)
+- [`OutputWidget$clone()`](#method-OutputWidget-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
-- [`RKernel::Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
-- [`RKernel::Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
-- [`RKernel::Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
-- [`RKernel::Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
-- [`RKernel::Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
-- [`RKernel::Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
-- [`RKernel::Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
-- [`RKernel::Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
-- [`RKernel::Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
-- [`RKernel::Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
-- [`RKernel::Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
-- [`RKernel::Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
-- [`RKernel::Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
-- [`RKernel::Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
-- [`RKernel::Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
-- [`RKernel::Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
-- [`RKernel::Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
-- [`RKernel::Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
-- [`RKernel::DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
-- [`RKernel::DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
-- [`RKernel::DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`Widget$_send()`](https://melff.github.io/RKernel/reference/Widget.html#method-_send)
+- [`Widget$check_version()`](https://melff.github.io/RKernel/reference/Widget.html#method-check_version)
+- [`Widget$close()`](https://melff.github.io/RKernel/reference/Widget.html#method-close)
+- [`Widget$display_data()`](https://melff.github.io/RKernel/reference/Widget.html#method-display_data)
+- [`Widget$get_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-get_state)
+- [`Widget$handle_buffers()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_buffers)
+- [`Widget$handle_comm_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_msg)
+- [`Widget$handle_comm_opened()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_comm_opened)
+- [`Widget$handle_custom_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_custom_msg)
+- [`Widget$handle_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_displayed)
+- [`Widget$handle_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-handle_event)
+- [`Widget$on_displayed()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_displayed)
+- [`Widget$on_event()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_event)
+- [`Widget$on_msg()`](https://melff.github.io/RKernel/reference/Widget.html#method-on_msg)
+- [`Widget$open()`](https://melff.github.io/RKernel/reference/Widget.html#method-open)
+- [`Widget$send()`](https://melff.github.io/RKernel/reference/Widget.html#method-send)
+- [`Widget$send_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-send_state)
+- [`Widget$set_state()`](https://melff.github.io/RKernel/reference/Widget.html#method-set_state)
+- [`DOMWidget$add_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-add_class)
+- [`DOMWidget$has_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-has_class)
+- [`DOMWidget$remove_class()`](https://melff.github.io/RKernel/reference/DOMWidget.html#method-remove_class)
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `OutputWidget$new()`
 
 Initializing function
 
 #### Usage
 
-    OutputWidgetClass$new(append_output = TRUE, graphics = FALSE, ...)
+    OutputWidget$new(append_output = TRUE, graphics = FALSE, ...)
 
 #### Arguments
 
@@ -158,7 +156,7 @@ Initializing function
 
 ------------------------------------------------------------------------
 
-### Method [`display()`](https://melff.github.io/RKernel/reference/display.md)
+### `OutputWidget$display()`
 
 A variant of
 [`display`](https://melff.github.io/RKernel/reference/display.md) for
@@ -166,7 +164,7 @@ output within a display widget.
 
 #### Usage
 
-    OutputWidgetClass$display(...)
+    OutputWidget$display(...)
 
 #### Arguments
 
@@ -177,13 +175,13 @@ output within a display widget.
 
 ------------------------------------------------------------------------
 
-### Method `clear()`
+### `OutputWidget$clear()`
 
 Clear the output
 
 #### Usage
 
-    OutputWidgetClass$clear(wait = FALSE)
+    OutputWidget$clear(wait = FALSE)
 
 #### Arguments
 
@@ -193,13 +191,13 @@ Clear the output
 
 ------------------------------------------------------------------------
 
-### Method [`stdout()`](https://rdrr.io/r/base/showConnections.html)
+### `OutputWidget$stdout()`
 
 Handle output via stdout stream
 
 #### Usage
 
-    OutputWidgetClass$stdout(text)
+    OutputWidget$stdout(text)
 
 #### Arguments
 
@@ -209,13 +207,13 @@ Handle output via stdout stream
 
 ------------------------------------------------------------------------
 
-### Method [`stderr()`](https://rdrr.io/r/base/showConnections.html)
+### `OutputWidget$stderr()`
 
 Handle output via stderr stream
 
 #### Usage
 
-    OutputWidgetClass$stderr(text)
+    OutputWidget$stderr(text)
 
 #### Arguments
 
@@ -225,13 +223,13 @@ Handle output via stderr stream
 
 ------------------------------------------------------------------------
 
-### Method `handle_msg()`
+### `OutputWidget$handle_msg()`
 
 Handle a (JSON) message sent to the output
 
 #### Usage
 
-    OutputWidgetClass$handle_msg(msg)
+    OutputWidget$handle_msg(msg)
 
 #### Arguments
 
@@ -241,13 +239,13 @@ Handle a (JSON) message sent to the output
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `OutputWidget$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    OutputWidgetClass$clone(deep = FALSE)
+    OutputWidget$clone(deep = FALSE)
 
 #### Arguments
 

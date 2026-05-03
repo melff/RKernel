@@ -9,7 +9,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RKernel</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,24 +68,21 @@
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-EventManager-new"><code>EventManagerClass$new()</code></a></p></li>
-<li><p><a href="#method-EventManager-send"><code>EventManagerClass$send()</code></a></p></li>
-<li><p><a href="#method-EventManager-on"><code>EventManagerClass$on()</code></a></p></li>
-<li><p><a href="#method-EventManager-activate"><code>EventManagerClass$activate()</code></a></p></li>
-<li><p><a href="#method-EventManager-suspend"><code>EventManagerClass$suspend()</code></a></p></li>
-<li><p><a href="#method-EventManager-clear"><code>EventManagerClass$clear()</code></a></p></li>
-<li><p><a href="#method-EventManager-resume"><code>EventManagerClass$resume()</code></a></p></li>
-<li><p><a href="#method-EventManager-has"><code>EventManagerClass$has()</code></a></p></li>
-<li><p><a href="#method-EventManager-clone"><code>EventManagerClass$clone()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-EventManager-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+<p></p><ul><li><p><a href="#method-EventManager-initialize"><code>EventManager$new()</code></a></p></li>
+<li><p><a href="#method-EventManager-send"><code>EventManager$send()</code></a></p></li>
+<li><p><a href="#method-EventManager-on"><code>EventManager$on()</code></a></p></li>
+<li><p><a href="#method-EventManager-activate"><code>EventManager$activate()</code></a></p></li>
+<li><p><a href="#method-EventManager-suspend"><code>EventManager$suspend()</code></a></p></li>
+<li><p><a href="#method-EventManager-clear"><code>EventManager$clear()</code></a></p></li>
+<li><p><a href="#method-EventManager-resume"><code>EventManager$resume()</code></a></p></li>
+<li><p><a href="#method-EventManager-has"><code>EventManager$has()</code></a></p></li>
+<li><p><a href="#method-EventManager-clone"><code>EventManager$clone()</code></a></p></li>
+</ul></div><p></p><hr><a id="method-EventManager-initialize"></a><div class="section">
+<h3 id="eventmanager-new-"><code>EventManager$new()</code><a class="anchor" aria-label="anchor" href="#eventmanager-new-"></a></h3>
 <p>Initialize an event manager</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/EventManager.html">EventManagerClass</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">type</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/EventManager.html">EventManager</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">type</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>type</code></dt>
 <dd><p>A string, the type of event (e.g. "print")</p></dd>
@@ -94,64 +91,60 @@
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-EventManager-send"></a><div class="section">
-<h3 id="method-send-">Method <code>send()</code><a class="anchor" aria-label="anchor" href="#method-send-"></a></h3>
-<p>Send an event</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManagerClass</span><span class="op">$</span><span class="fu">send</span><span class="op">(</span><span class="va">event</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-EventManager-send"></a><div class="section">
+<h3 id="eventmanager-send-"><code>EventManager$send()</code><a class="anchor" aria-label="anchor" href="#eventmanager-send-"></a></h3>
+<p>Send an event</p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManager</span><span class="op">$</span><span class="fu">send</span><span class="op">(</span><span class="va">event</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>event</code></dt>
 <dd><p>A string, the name of an event</p></dd>
 
-
-<dt><code>...</code></dt>
+      <dt><code>...</code></dt>
 <dd><p>Other arguments, sent to the event handler(s)</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-EventManager-on"></a><div class="section">
-<h3 id="method-on-">Method <code>on()</code><a class="anchor" aria-label="anchor" href="#method-on-"></a></h3>
-<p>Install a handler for an event</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManagerClass</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="va">event</span>, <span class="va">handler</span>, remove <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-EventManager-on"></a><div class="section">
+<h3 id="eventmanager-on-"><code>EventManager$on()</code><a class="anchor" aria-label="anchor" href="#eventmanager-on-"></a></h3>
+<p>Install a handler for an event</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManager</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="va">event</span>, <span class="va">handler</span>, remove <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>event</code></dt>
 <dd><p>A string, the name of an event</p></dd>
 
-
-<dt><code>handler</code></dt>
+      <dt><code>handler</code></dt>
 <dd><p>A function</p></dd>
 
-
-<dt><code>remove</code></dt>
+      <dt><code>remove</code></dt>
 <dd><p>A logical value, whether the handler is to be removed</p></dd>
 
 
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-EventManager-activate"></a><div class="section">
-<h3 id="method-activate-">Method <code>activate()</code><a class="anchor" aria-label="anchor" href="#method-activate-"></a></h3>
-<p>Activate handlers</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManagerClass</span><span class="op">$</span><span class="fu">activate</span><span class="op">(</span>event <span class="op">=</span> <span class="cn">NULL</span>, all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-EventManager-activate"></a><div class="section">
+<h3 id="eventmanager-activate-"><code>EventManager$activate()</code><a class="anchor" aria-label="anchor" href="#eventmanager-activate-"></a></h3>
+<p>Activate handlers</p><div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManager</span><span class="op">$</span><span class="fu">activate</span><span class="op">(</span>event <span class="op">=</span> <span class="cn">NULL</span>, all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>event</code></dt>
 <dd><p>A string, the name of an event, ignored if 'all' is TRUE.</p></dd>
 
-
-<dt><code>all</code></dt>
+      <dt><code>all</code></dt>
 <dd><p>A logical value, if TRUE, all handlers that belong to
 the event type of the event manager are activated.</p></dd>
 
@@ -159,20 +152,19 @@ the event type of the event manager are activated.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-EventManager-suspend"></a><div class="section">
-<h3 id="method-suspend-">Method <code>suspend()</code><a class="anchor" aria-label="anchor" href="#method-suspend-"></a></h3>
-<p>Suspend handlers</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManagerClass</span><span class="op">$</span><span class="fu">suspend</span><span class="op">(</span>event <span class="op">=</span> <span class="cn">NULL</span>, all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-EventManager-suspend"></a><div class="section">
+<h3 id="eventmanager-suspend-"><code>EventManager$suspend()</code><a class="anchor" aria-label="anchor" href="#eventmanager-suspend-"></a></h3>
+<p>Suspend handlers</p><div class="section">
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManager</span><span class="op">$</span><span class="fu">suspend</span><span class="op">(</span>event <span class="op">=</span> <span class="cn">NULL</span>, all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>event</code></dt>
 <dd><p>A string, the name of an event, ignored if 'all' is TRUE.</p></dd>
 
-
-<dt><code>all</code></dt>
+      <dt><code>all</code></dt>
 <dd><p>A logical value, if TRUE, all handlers that belong to
 the event type of the event manager are suspended.</p></dd>
 
@@ -180,14 +172,14 @@ the event type of the event manager are suspended.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-EventManager-clear"></a><div class="section">
-<h3 id="method-clear-">Method <code>clear()</code><a class="anchor" aria-label="anchor" href="#method-clear-"></a></h3>
-<p>Clear (i.e. remove) handlers for an event</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManagerClass</span><span class="op">$</span><span class="fu">clear</span><span class="op">(</span><span class="va">event</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-EventManager-clear"></a><div class="section">
+<h3 id="eventmanager-clear-"><code>EventManager$clear()</code><a class="anchor" aria-label="anchor" href="#eventmanager-clear-"></a></h3>
+<p>Clear (i.e. remove) handlers for an event</p><div class="section">
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManager</span><span class="op">$</span><span class="fu">clear</span><span class="op">(</span><span class="va">event</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>event</code></dt>
 <dd><p>A string, the name of an event</p></dd>
@@ -196,23 +188,24 @@ the event type of the event manager are suspended.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-EventManager-resume"></a><div class="section">
-<h3 id="method-resume-">Method <code>resume()</code><a class="anchor" aria-label="anchor" href="#method-resume-"></a></h3>
-<p>Resume (i.e. reactivate) an event handler</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManagerClass</span><span class="op">$</span><span class="fu">resume</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<p></p><hr><a id="method-EventManager-resume"></a><div class="section">
+<h3 id="eventmanager-resume-"><code>EventManager$resume()</code><a class="anchor" aria-label="anchor" href="#eventmanager-resume-"></a></h3>
+<p>Resume (i.e. reactivate) an event handler</p><div class="section">
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManager</span><span class="op">$</span><span class="fu">resume</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
 
-</div><p></p><hr><a id="method-EventManager-has"></a><div class="section">
-<h3 id="method-has-">Method <code>has()</code><a class="anchor" aria-label="anchor" href="#method-has-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-EventManager-has"></a><div class="section">
+<h3 id="eventmanager-has-"><code>EventManager$has()</code><a class="anchor" aria-label="anchor" href="#eventmanager-has-"></a></h3>
 <p>Check whether the event manager has handlers for the
   given events</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManagerClass</span><span class="op">$</span><span class="fu">has</span><span class="op">(</span><span class="va">events</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManager</span><span class="op">$</span><span class="fu">has</span><span class="op">(</span><span class="va">events</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>events</code></dt>
 <dd><p>A character vector with names of events</p></dd>
@@ -221,14 +214,14 @@ the event type of the event manager are suspended.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-EventManager-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManagerClass</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-EventManager-clone"></a><div class="section">
+<h3 id="eventmanager-clone-"><code>EventManager$clone()</code><a class="anchor" aria-label="anchor" href="#eventmanager-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EventManager</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -238,6 +231,7 @@ the event type of the event manager are suspended.</p></dd>
 </div>
 
 </div>
+
 
     </div>
 

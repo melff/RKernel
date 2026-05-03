@@ -83,7 +83,7 @@ to browser().
 
 - [`RSessionAdapter$collect()`](#method-RSessionAdapter-collect)
 
-- [`RSessionAdapter$new()`](#method-RSessionAdapter-new)
+- [`RSessionAdapter$new()`](#method-RSessionAdapter-initialize)
 
 - [`RSessionAdapter$run_code()`](#method-RSessionAdapter-run_code)
 
@@ -121,7 +121,7 @@ to browser().
 
 ------------------------------------------------------------------------
 
-### Method `aggreg_stdout()`
+### `RSessionAdapter$aggreg_stdout()`
 
 A potential "stdout_callback" function that aggregates output sent from
 the R process via "stdout" channel to the eponymous "stdout" field
@@ -142,7 +142,7 @@ the R process via "stdout" channel to the eponymous "stdout" field
 
 ------------------------------------------------------------------------
 
-### Method `aggreg_stderr()`
+### `RSessionAdapter$aggreg_stderr()`
 
 A potential "stderr_callback" function that aggregates output sent from
 the R process via "stderr" channel to the eponymous "stderr" field
@@ -163,7 +163,7 @@ the R process via "stderr" channel to the eponymous "stderr" field
 
 ------------------------------------------------------------------------
 
-### Method `collect()`
+### `RSessionAdapter$collect()`
 
 Collect the accumulated output from fields "stdout" and "stderr" into a
 list with two elements named "stdout" and "stderr".
@@ -181,7 +181,7 @@ list with two elements named "stdout" and "stderr".
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RSessionAdapter$new()`
 
 Initialize an object
 
@@ -229,13 +229,17 @@ Initialize an object
 
   A character string, the expected command prompt
 
+- `coprompt`:
+
+  The R console continuation prompt or NULL
+
 - `echo`:
 
   A logical value, whether to echo input
 
 ------------------------------------------------------------------------
 
-### Method `run_code()`
+### `RSessionAdapter$run_code()`
 
 Run code and pass output to callback functions
 
@@ -295,7 +299,7 @@ Run code and pass output to callback functions
 
 ------------------------------------------------------------------------
 
-### Method `interrupt()`
+### `RSessionAdapter$interrupt()`
 
 Send an interrupt signal (SIGINT) to the R process. This should stop
 what the R process is doing without killing it.
@@ -306,7 +310,7 @@ what the R process is doing without killing it.
 
 ------------------------------------------------------------------------
 
-### Method `poll_output()`
+### `RSessionAdapter$poll_output()`
 
 #### Usage
 
@@ -314,7 +318,7 @@ what the R process is doing without killing it.
 
 ------------------------------------------------------------------------
 
-### Method `process_output()`
+### `RSessionAdapter$process_output()`
 
 Process output created by commands sent to the R process
 
@@ -367,7 +371,7 @@ Process output created by commands sent to the R process
 
 ------------------------------------------------------------------------
 
-### Method `run_cmd()`
+### `RSessionAdapter$run_cmd()`
 
 Run a one-line command without checking and return the output
 
@@ -383,7 +387,7 @@ Run a one-line command without checking and return the output
 
 ------------------------------------------------------------------------
 
-### Method [`getOption()`](https://rdrr.io/r/base/options.html)
+### `RSessionAdapter$getOption()`
 
 Get an option value from the R session
 
@@ -403,7 +407,7 @@ Get an option value from the R session
 
 ------------------------------------------------------------------------
 
-### Method [`eval()`](https://rdrr.io/r/base/eval.html)
+### `RSessionAdapter$eval()`
 
 Evaluate an expression in the R session and return the result.
 
@@ -423,7 +427,7 @@ Evaluate an expression in the R session and return the result.
 
 ------------------------------------------------------------------------
 
-### Method `eval_code()`
+### `RSessionAdapter$eval_code()`
 
 Evaluate some code in the R session and return the result.
 
@@ -443,7 +447,7 @@ Evaluate some code in the R session and return the result.
 
 ------------------------------------------------------------------------
 
-### Method [`ls()`](https://rdrr.io/r/base/ls.html)
+### `RSessionAdapter$ls()`
 
 Run \`ls()\` in the R session and return the result.
 
@@ -453,7 +457,7 @@ Run \`ls()\` in the R session and return the result.
 
 ------------------------------------------------------------------------
 
-### Method [`get()`](https://rdrr.io/r/base/get.html)
+### `RSessionAdapter$get()`
 
 Get the value of a variable (named object) from the R session and return
 it.
@@ -470,7 +474,7 @@ it.
 
 ------------------------------------------------------------------------
 
-### Method [`assign()`](https://rdrr.io/r/base/assign.html)
+### `RSessionAdapter$assign()`
 
 Assign a value to a variable in the R session
 
@@ -490,7 +494,7 @@ Assign a value to a variable in the R session
 
 ------------------------------------------------------------------------
 
-### Method `setOption()`
+### `RSessionAdapter$setOption()`
 
 Set an option in the R session
 
@@ -510,7 +514,7 @@ Set an option in the R session
 
 ------------------------------------------------------------------------
 
-### Method `importOption()`
+### `RSessionAdapter$importOption()`
 
 Import an option value from the R session to the kernel
 
@@ -526,7 +530,7 @@ Import an option value from the R session to the kernel
 
 ------------------------------------------------------------------------
 
-### Method `handle_BEL()`
+### `RSessionAdapter$handle_BEL()`
 
 Handle special output from the R session that starts with BEL
 
@@ -561,7 +565,7 @@ Handle special output from the R session that starts with BEL
 
 ------------------------------------------------------------------------
 
-### Method `handle_readline()`
+### `RSessionAdapter$handle_readline()`
 
 Handle special an input request obtained from the R session via output
 indicated with a special output string
@@ -597,7 +601,7 @@ indicated with a special output string
 
 ------------------------------------------------------------------------
 
-### Method `handle_scan()`
+### `RSessionAdapter$handle_scan()`
 
 Handle input request created by the function \`scan\` the in the R
 session
@@ -633,7 +637,7 @@ session
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RSessionAdapter$clone()`
 
 The objects of this class are cloneable with this method.
 

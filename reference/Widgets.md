@@ -20,7 +20,7 @@ Widget(...)
 
 ## Super class
 
-[`RKernel::HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
+[`HasTraits`](https://melff.github.io/RKernel/reference/HasTraits.md)
 -\> `Widget`
 
 ## Public fields
@@ -96,61 +96,61 @@ Widget(...)
 
 ### Public methods
 
-- [`WidgetClass$new()`](#method-Widget-new)
+- [`Widget$new()`](#method-Widget-initialize)
 
-- [`WidgetClass$open()`](#method-Widget-open)
+- [`Widget$open()`](#method-Widget-open)
 
-- [`WidgetClass$close()`](#method-Widget-close)
+- [`Widget$close()`](#method-Widget-close)
 
-- [`WidgetClass$get_state()`](#method-Widget-get_state)
+- [`Widget$get_state()`](#method-Widget-get_state)
 
-- [`WidgetClass$set_state()`](#method-Widget-set_state)
+- [`Widget$set_state()`](#method-Widget-set_state)
 
-- [`WidgetClass$send_state()`](#method-Widget-send_state)
+- [`Widget$send_state()`](#method-Widget-send_state)
 
-- [`WidgetClass$send()`](#method-Widget-send)
+- [`Widget$send()`](#method-Widget-send)
 
-- [`WidgetClass$display_data()`](#method-Widget-display_data)
+- [`Widget$display_data()`](#method-Widget-display_data)
 
-- [`WidgetClass$handle_comm_opened()`](#method-Widget-handle_comm_opened)
+- [`Widget$handle_comm_opened()`](#method-Widget-handle_comm_opened)
 
-- [`WidgetClass$handle_comm_msg()`](#method-Widget-handle_comm_msg)
+- [`Widget$handle_comm_msg()`](#method-Widget-handle_comm_msg)
 
-- [`WidgetClass$handle_buffers()`](#method-Widget-handle_buffers)
+- [`Widget$handle_buffers()`](#method-Widget-handle_buffers)
 
-- [`WidgetClass$handle_custom_msg()`](#method-Widget-handle_custom_msg)
+- [`Widget$handle_custom_msg()`](#method-Widget-handle_custom_msg)
 
-- [`WidgetClass$on_msg()`](#method-Widget-on_msg)
+- [`Widget$on_msg()`](#method-Widget-on_msg)
 
-- [`WidgetClass$on_event()`](#method-Widget-on_event)
+- [`Widget$on_event()`](#method-Widget-on_event)
 
-- [`WidgetClass$handle_event()`](#method-Widget-handle_event)
+- [`Widget$handle_event()`](#method-Widget-handle_event)
 
-- [`WidgetClass$on_displayed()`](#method-Widget-on_displayed)
+- [`Widget$on_displayed()`](#method-Widget-on_displayed)
 
-- [`WidgetClass$handle_displayed()`](#method-Widget-handle_displayed)
+- [`Widget$handle_displayed()`](#method-Widget-handle_displayed)
 
-- [`WidgetClass$_send()`](#method-Widget-_send)
+- [`Widget$_send()`](#method-Widget-_send)
 
-- [`WidgetClass$check_version()`](#method-Widget-check_version)
+- [`Widget$check_version()`](#method-Widget-check_version)
 
-- [`WidgetClass$clone()`](#method-Widget-clone)
+- [`Widget$clone()`](#method-Widget-clone)
 
 Inherited methods
 
-- [`RKernel::HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
-- [`RKernel::HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
-- [`RKernel::HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
+- [`HasTraits$notify()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-notify)
+- [`HasTraits$observe()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-observe)
+- [`HasTraits$validate()`](https://melff.github.io/RKernel/reference/HasTraits.html#method-validate)
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Widget$new()`
 
 Initialize an object
 
 #### Usage
 
-    WidgetClass$new(..., open = TRUE)
+    Widget$new(..., open = TRUE)
 
 #### Arguments
 
@@ -164,33 +164,33 @@ Initialize an object
 
 ------------------------------------------------------------------------
 
-### Method [`open()`](https://rdrr.io/r/base/connections.html)
+### `Widget$open()`
 
 Open a connection to the frontend
 
 #### Usage
 
-    WidgetClass$open()
+    Widget$open()
 
 ------------------------------------------------------------------------
 
-### Method [`close()`](https://rdrr.io/r/base/connections.html)
+### `Widget$close()`
 
 Close the connection to the frontend
 
 #### Usage
 
-    WidgetClass$close()
+    Widget$close()
 
 ------------------------------------------------------------------------
 
-### Method `get_state()`
+### `Widget$get_state()`
 
 Prepare synchronized traits for sending them to the frontend
 
 #### Usage
 
-    WidgetClass$get_state(keys = NULL)
+    Widget$get_state(keys = NULL)
 
 #### Arguments
 
@@ -200,14 +200,14 @@ Prepare synchronized traits for sending them to the frontend
 
 ------------------------------------------------------------------------
 
-### Method `set_state()`
+### `Widget$set_state()`
 
 Update the synchronized states, usually with information from the
 frontend
 
 #### Usage
 
-    WidgetClass$set_state(state)
+    Widget$set_state(state)
 
 #### Arguments
 
@@ -217,13 +217,13 @@ frontend
 
 ------------------------------------------------------------------------
 
-### Method `send_state()`
+### `Widget$send_state()`
 
 Send updated traits to the frontend
 
 #### Usage
 
-    WidgetClass$send_state(keys = NULL, drop_defaults = FALSE)
+    Widget$send_state(keys = NULL, drop_defaults = FALSE)
 
 #### Arguments
 
@@ -237,13 +237,13 @@ Send updated traits to the frontend
 
 ------------------------------------------------------------------------
 
-### Method `send()`
+### `Widget$send()`
 
 Send content and binary buffers to the fronend
 
 #### Usage
 
-    WidgetClass$send(content, buffers = NULL)
+    Widget$send(content, buffers = NULL)
 
 #### Arguments
 
@@ -257,23 +257,23 @@ Send content and binary buffers to the fronend
 
 ------------------------------------------------------------------------
 
-### Method [`display_data()`](https://melff.github.io/RKernel/reference/display_data.md)
+### `Widget$display_data()`
 
 Send display-data of the widget to the frontend
 
 #### Usage
 
-    WidgetClass$display_data()
+    Widget$display_data()
 
 ------------------------------------------------------------------------
 
-### Method `handle_comm_opened()`
+### `Widget$handle_comm_opened()`
 
 Handle a 'comm' opened in the frontend
 
 #### Usage
 
-    WidgetClass$handle_comm_opened(comm, data)
+    Widget$handle_comm_opened(comm, data)
 
 #### Arguments
 
@@ -287,13 +287,13 @@ Handle a 'comm' opened in the frontend
 
 ------------------------------------------------------------------------
 
-### Method `handle_comm_msg()`
+### `Widget$handle_comm_msg()`
 
 Handle a message from the frontend
 
 #### Usage
 
-    WidgetClass$handle_comm_msg(comm, msg)
+    Widget$handle_comm_msg(comm, msg)
 
 #### Arguments
 
@@ -307,7 +307,7 @@ Handle a message from the frontend
 
 ------------------------------------------------------------------------
 
-### Method `handle_buffers()`
+### `Widget$handle_buffers()`
 
 Handle buffers in message. This method should be overwritten by
 inherting classes that actually process data in buffer components of
@@ -315,7 +315,7 @@ messages.
 
 #### Usage
 
-    WidgetClass$handle_buffers(msg)
+    Widget$handle_buffers(msg)
 
 #### Arguments
 
@@ -325,13 +325,13 @@ messages.
 
 ------------------------------------------------------------------------
 
-### Method `handle_custom_msg()`
+### `Widget$handle_custom_msg()`
 
 Call the custom message handlers
 
 #### Usage
 
-    WidgetClass$handle_custom_msg(content)
+    Widget$handle_custom_msg(content)
 
 #### Arguments
 
@@ -341,13 +341,13 @@ Call the custom message handlers
 
 ------------------------------------------------------------------------
 
-### Method `on_msg()`
+### `Widget$on_msg()`
 
 Install a handler for messages being received
 
 #### Usage
 
-    WidgetClass$on_msg(handler, remove = FALSE)
+    Widget$on_msg(handler, remove = FALSE)
 
 #### Arguments
 
@@ -361,13 +361,13 @@ Install a handler for messages being received
 
 ------------------------------------------------------------------------
 
-### Method `on_event()`
+### `Widget$on_event()`
 
 Install a handler for events in the frontend
 
 #### Usage
 
-    WidgetClass$on_event(event, handler, remove = FALSE)
+    Widget$on_event(event, handler, remove = FALSE)
 
 #### Arguments
 
@@ -385,13 +385,13 @@ Install a handler for events in the frontend
 
 ------------------------------------------------------------------------
 
-### Method `handle_event()`
+### `Widget$handle_event()`
 
 Call the installed event handlers
 
 #### Usage
 
-    WidgetClass$handle_event(event, args)
+    Widget$handle_event(event, args)
 
 #### Arguments
 
@@ -405,13 +405,13 @@ Call the installed event handlers
 
 ------------------------------------------------------------------------
 
-### Method `on_displayed()`
+### `Widget$on_displayed()`
 
 Install a handler to be called when the widget is displayed
 
 #### Usage
 
-    WidgetClass$on_displayed(handler, remove = FALSE)
+    Widget$on_displayed(handler, remove = FALSE)
 
 #### Arguments
 
@@ -425,23 +425,23 @@ Install a handler to be called when the widget is displayed
 
 ------------------------------------------------------------------------
 
-### Method `handle_displayed()`
+### `Widget$handle_displayed()`
 
 Call the installed display handlers
 
 #### Usage
 
-    WidgetClass$handle_displayed()
+    Widget$handle_displayed()
 
 ------------------------------------------------------------------------
 
-### Method `_send()`
+### `Widget$_send()`
 
 The internal function to send messages to the frontend
 
 #### Usage
 
-    WidgetClass$_send(msg, buffers = NULL)
+    Widget$_send(msg, buffers = NULL)
 
 #### Arguments
 
@@ -455,23 +455,23 @@ The internal function to send messages to the frontend
 
 ------------------------------------------------------------------------
 
-### Method `check_version()`
+### `Widget$check_version()`
 
 Check whether current widget class is supported by ipywidgets
 
 #### Usage
 
-    WidgetClass$check_version()
+    Widget$check_version()
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Widget$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    WidgetClass$clone(deep = FALSE)
+    Widget$clone(deep = FALSE)
 
 #### Arguments
 
