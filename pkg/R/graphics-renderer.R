@@ -217,7 +217,11 @@ new_jupyter_dev <- function(width=getOption("jupyter.plot.width",7),
 }
 
 get_current_renderer <- function() {
-    dev_cur <- as.character(dev.cur())
+    if(length(dev.list())) {
+        dev_cur <- as.character(dev.cur())
+    } else {
+        dev_cur <- as.character(new_jupyter_dev())
+    }
     graphics$device_renderers[[dev_cur]]
 }
 
