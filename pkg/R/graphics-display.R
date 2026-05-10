@@ -64,6 +64,7 @@ GraphicsDisplay <- R6Class("GraphicsDisplay",
          mime_data <- lapply(rendered, "[[","content")
          mime_types <- unlist(lapply(rendered, "[[","type"))
          mime_metadata <- lapply(rendered, self$render1_metadata)
+         self$display_data$data <- list() # Make sure that placeholders are removed
          self$display_data$data[mime_types] <- mime_data
          self$display_data$metadata[mime_types] <- mime_metadata
          if(update) {
