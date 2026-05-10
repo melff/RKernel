@@ -53,11 +53,14 @@ build-and-check: build
 
 install-dir:
 	echo "Installing package ${PACKAGE} version ${VERSION} from ${SRCDIR}"
-	R CMD INSTALL --with-keep.source $(SRCDIR)
+	Rscript -e "install.packages('$(SRCDIR)',repos=NULL,INSTALL_opts='--with-keep.source')"
+# R CMD INSTALL --with-keep.source $(SRCDIR)
+
 
 install-quick:
 	echo "Installing package ${PACKAGE} version ${VERSION} from ${SRCDIR}"
-	R CMD INSTALL --no-byte-compile --with-keep.source --data-compress=none --no-test-load $(SRCDIR)
+	Rscript -e "install.packages('$(SRCDIR)',repos=NULL,INSTALL_opts='--no-byte-compile --with-keep.source --data-compress=none --no-test-load')"
+#R CMD INSTALL --no-byte-compile --with-keep.source --data-compress=none --no-test-load $(SRCDIR)
 
 .PHONY: install-dir-clean
 install-dir-clean:
@@ -83,7 +86,8 @@ roxygenize:
 	Rscript --vanilla -e 'roxygen2::roxygenize(package.dir="${SRCDIR}")'
 
 install-deps:
-	Rscript --vanilla -e 'devtools::install_deps(pkg="${SRCDIR}")'
+	Rscript -e "install.packages(c('pbdZMQ','jsonlite','uuid','digest','R6','svglite','htmltools','htmlwidgets','base64enc','callr','processx','crayon','curl','rappdirs','rsvg'))"
+#	Rscript --vanilla -e 'devtools::install_deps(pkg="${SRCDIR}")'
 
 # install-basic-deps:
 # 	Rscript --vanilla -e 'install.packages(c("devtools","roxygen2"),repos="https://cloud.r-project.org")'
