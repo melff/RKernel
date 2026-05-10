@@ -84,6 +84,7 @@ GraphicsRenderer <- R6Class("GraphicsRenderer",
           replayPlot(plt)
           data <- s()
           dev.off()
+          data <- fix_svglite_bug(data)
           if(format == "pdf") {
               pdf_res <- 72
               data <- charToRaw(data)
@@ -227,4 +228,14 @@ get_current_renderer <- function() {
 
 get_renderer <- function(uuid) {
     graphics$renderers[[uuid]]
+}
+
+
+fix_svglite_bug  <- function(data) {
+    svgstring_needs_fix <- getOption("svgstring_needs_closing_gtag",
+                                     packageVersion("svglite") > '2.1.9')
+    if(svgstring_needs_fix && grepl("<g class='svglite'>",data)) {
+        data <- gsub("</svg>","</g>\n</svg>",data,fixed=TRUE)
+    }
+    data
 }
