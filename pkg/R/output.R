@@ -1,9 +1,10 @@
 RKernel_print <- function(x,...) {
     if(any(class(x) %in% getOption("rkernel_displayed_classes")))
-        display(x)
+        RKernel::display(x)
     else UseMethod("print")
-        #orig_func$print(x,...) # Original 'print' from package "base"
 }
+environment(RKernel_print) <- environment(print)
+
 
 message_stdout <- function (..., domain = NULL, appendLF = TRUE) 
 {
