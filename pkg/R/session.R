@@ -155,6 +155,7 @@ RKernelSession <- R6Class("RKernelSession",
     #' @description Set up the R session, by installing hooks etc.
     setup = function() {
       self$http_port <- random_open_port()
+      self$send_input("library(RKernel)")
       self$send_input(sprintf("RKernel:::setup_session(%d)",self$http_port))
       self$send_input("RKernel:::startup()")
       self$receive_all_output(timeout = 1000)

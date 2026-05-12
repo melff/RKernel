@@ -1,6 +1,6 @@
 RKernel_print <- function(x,...) {
     if(any(class(x) %in% getOption("rkernel_displayed_classes")))
-        RKernel::display(x)
+        display(x)
     else UseMethod("print")
 }
 environment(RKernel_print) <- environment(print)
