@@ -48,6 +48,7 @@ jobs:
             any::jsonlite
             any::uuid
             any::svglite
+            any::processx
             any::htmltools
             any::htmlwidgets
             any::base64enc
