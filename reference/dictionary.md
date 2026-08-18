@@ -46,9 +46,9 @@ print(x, force = FALSE, ...)
 
 ## Methods (by generic)
 
-- `[`: Get an element from a dictionary
+- `dictionary[]`: Get an element from a dictionary
 
-- `` `[`(dictionary) <- value ``: Set an element in a dictionary
+- `dictionary[] <- value`: Set an element in a dictionary
 
 - `print(dictionary)`: Print a dictionary
 

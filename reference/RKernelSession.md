@@ -102,6 +102,7 @@ Inherited methods
 - [`processx::process$write_input()`](http://processx.r-lib.org/reference/process.html#method-write_input)
 - [`callr::r_session$attach()`](https://callr.r-lib.org/reference/r_session.html#method-attach)
 - [`callr::r_session$call()`](https://callr.r-lib.org/reference/r_session.html#method-call)
+- [`callr::r_session$cleanup()`](https://callr.r-lib.org/reference/r_session.html#method-cleanup)
 - [`callr::r_session$close()`](https://callr.r-lib.org/reference/r_session.html#method-close)
 - [`callr::r_session$debug()`](https://callr.r-lib.org/reference/r_session.html#method-debug)
 - [`callr::r_session$finalize()`](https://callr.r-lib.org/reference/r_session.html#method-finalize)
